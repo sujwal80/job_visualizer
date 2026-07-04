@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, make_response, g
+from flask import Flask, jsonify, render_template, request, make_response, g, redirect
 import json
 import os
 import time
@@ -7,12 +7,17 @@ import gzip
 import io
 import re
 from collections import defaultdict
+from functools import wraps
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Import modular utilities and services
 from backend.utils.validators import REQUIRED_FIELDS, _sanitize_string, _safe_float, _check_has_pin, _sanitize_url, _validate_query_params, _strip_redundant
 from backend.utils.rate_limiter import _rate_limits, _check_rate_limit
 from backend.services.startup_service import load_startups, filter_and_sort_startups, format_startup_summary, format_startup_details
+from backend.services.auth_service import (
+    generate_oauth_state, validate_oauth_state, get_google_auth_url,
+    exchange_code_for_user, issue_jwt_token, verify_jwt_token, revoke_jwt_token
+)
 
 app = Flask(
     __name__, 
@@ -20,6 +25,23 @@ app = Flask(
     template_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend', 'templates')
 )
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.cookies.get('session_token') or request.cookies.get('auth_token') or request.cookies.get('jwt_token')
+        if not token and 'Authorization' in request.headers:
+            auth_header = request.headers['Authorization']
+            if auth_header.startswith('Bearer '):
+                token = auth_header.split(' ', 1)[1]
+        if not token:
+            return jsonify({"error": "Unauthenticated. Missing JWT session token."}), 401
+        user = verify_jwt_token(token)
+        if not user:
+            return jsonify({"error": "Unauthenticated. Invalid, expired, or revoked JWT session token."}), 401
+        g.current_user = user
+        return f(*args, **kwargs)
+    return decorated_function
 
 @app.after_request
 def add_security_and_optimization_headers(response):
@@ -42,10 +64,11 @@ def add_security_and_optimization_headers(response):
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     
-    # CORS support
+    # CORS and security headers support
     response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, DELETE, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Accept, Accept-Encoding'
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     
     # Ensure Vary: Accept-Encoding is present outside compression block
     vary = response.headers.get('Vary')
@@ -155,6 +178,142 @@ def get_startup_details(startup_id):
                 resp.headers['Cache-Control'] = 'public, max-age=60'
                 return resp
         return jsonify({"error": "Startup not found"}), 404
+    except Exception as e:
+        return jsonify({"error": "Internal server error"}), 500
+
+@app.route('/api/auth/google', methods=['GET'])
+def auth_google():
+    state = generate_oauth_state()
+    redirect_uri = request.args.get('redirect_uri')
+    auth_url = get_google_auth_url(state, redirect_uri=redirect_uri)
+    
+    if request.args.get('redirect', '').lower() in ('true', '1', 'yes'):
+        resp = make_response('', 302)
+        resp.headers['Location'] = auth_url
+    else:
+        resp = make_response(jsonify({"auth_url": auth_url, "state": state}), 200)
+        resp.headers['Location'] = auth_url
+        
+    resp.set_cookie('oauth_state', state, max_age=600, httponly=True, secure=True, samesite='Strict')
+    return resp
+
+@app.route('/api/auth/callback', methods=['GET', 'POST'])
+@app.route('/api/auth/google/callback', methods=['GET', 'POST'])
+def auth_callback():
+    data = request.args if request.method == 'GET' else (request.get_json(silent=True) or request.form)
+    state = data.get('state')
+    code = data.get('code')
+    
+    valid_in_store = validate_oauth_state(state)
+    cookie_state = request.cookies.get('oauth_state')
+    valid_in_cookie = (state is not None and cookie_state is not None and cookie_state == state)
+    
+    if not (valid_in_store or valid_in_cookie):
+        return jsonify({"error": "CSRF state validation failed. Invalid or expired state parameter."}), 400
+            
+    if not code:
+        return jsonify({"error": "Missing authorization code."}), 400
+        
+    try:
+        user_data = exchange_code_for_user(code)
+        token = issue_jwt_token(user_data)
+        
+        resp = make_response(jsonify({
+            "message": "Authentication successful.",
+            "authenticated": True,
+            "user": {
+                "id": user_data.get("sub") or str(user_data.get("id", "")),
+                "email": user_data.get("email", ""),
+                "name": user_data.get("name", ""),
+                "picture": user_data.get("picture", "")
+            },
+            "token": token
+        }), 200)
+        
+        resp.set_cookie('session_token', token, max_age=3600, httponly=True, secure=True, samesite='Strict')
+        resp.set_cookie('oauth_state', '', expires=0, httponly=True, secure=True, samesite='Strict')
+        return resp
+    except ValueError as ve:
+        return jsonify({"error": str(ve)}), 400
+    except Exception as e:
+        return jsonify({"error": "Authentication exchange failed."}), 500
+
+@app.route('/api/auth/status', methods=['GET'])
+def auth_status():
+    token = request.cookies.get('session_token') or request.cookies.get('auth_token') or request.cookies.get('jwt_token')
+    if not token and 'Authorization' in request.headers:
+        auth_header = request.headers['Authorization']
+        if auth_header.startswith('Bearer '):
+            token = auth_header.split(' ', 1)[1]
+            
+    if not token:
+        return jsonify({"authenticated": False, "user": None, "message": "No session cookie present."}), 200
+        
+    user = verify_jwt_token(token)
+    if not user:
+        return jsonify({"authenticated": False, "user": None, "message": "Invalid, expired, or revoked session cookie."}), 200
+        
+    return jsonify({
+        "authenticated": True,
+        "user": {
+            "id": user.get("sub") or str(user.get("id", "")),
+            "email": user.get("email", ""),
+            "name": user.get("name", ""),
+            "picture": user.get("picture", "")
+        },
+        "expires_at": user.get("exp")
+    }), 200
+
+@app.route('/api/auth/logout', methods=['GET', 'POST'])
+def auth_logout():
+    token = request.cookies.get('session_token') or request.cookies.get('auth_token') or request.cookies.get('jwt_token')
+    if not token and 'Authorization' in request.headers:
+        auth_header = request.headers['Authorization']
+        if auth_header.startswith('Bearer '):
+            token = auth_header.split(' ', 1)[1]
+            
+    if token:
+        revoke_jwt_token(token)
+        
+    resp = make_response(jsonify({"message": "Successfully logged out.", "authenticated": False}), 200)
+    resp.set_cookie('session_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
+    resp.set_cookie('auth_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
+    resp.set_cookie('jwt_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
+    return resp
+
+# Protected API endpoints gated with HTTP 401 unauthenticated
+@app.route('/api/user/profile', methods=['GET'])
+@app.route('/api/protected/profile', methods=['GET'])
+@login_required
+def get_user_profile():
+    return jsonify({
+        "authenticated": True,
+        "user": g.current_user
+    }), 200
+
+@app.route('/api/user/bookmarks', methods=['GET', 'POST', 'DELETE'])
+@app.route('/api/protected/bookmarks', methods=['GET', 'POST', 'DELETE'])
+@login_required
+def manage_user_bookmarks():
+    return jsonify({
+        "authenticated": True,
+        "user_id": g.current_user.get("sub"),
+        "bookmarks": [],
+        "message": "Protected bookmarks endpoint accessed successfully."
+    }), 200
+
+@app.route('/api/startups/export', methods=['GET'])
+@app.route('/api/protected/export', methods=['GET'])
+@login_required
+def export_startups_protected():
+    try:
+        startups = load_startups()
+        light_list = [format_startup_summary(s) for s in startups[:10]]
+        return jsonify({
+            "authenticated": True,
+            "export_count": len(light_list),
+            "data": light_list
+        }), 200
     except Exception as e:
         return jsonify({"error": "Internal server error"}), 500
 

@@ -29,7 +29,9 @@ def main():
         ("2. Data Pipeline Regression Suite", os.path.join(tests_dir, "test_pipeline_regression.py")),
         ("3. Production Scaling & Security E2E", os.path.join(tests_dir, "test_e2e_production.py")),
         ("4. UI Stress Testing & Bug Remediation E2E", os.path.join(tests_dir, "test_e2e_ui_layout.py")),
-        ("5. Exploratory Combinatorial Cross-Feature E2E", os.path.join(tests_dir, "test_e2e_combinatorial.py"))
+        ("5. Exploratory Combinatorial Cross-Feature E2E", os.path.join(tests_dir, "test_e2e_combinatorial.py")),
+        ("6. Production Scalability & Bounded Memory Suite", os.path.join(tests_dir, "test_scalability_bounds.py")),
+        ("7. Google OAuth & Session Security Verification", os.path.join(tests_dir, "test_oauth_security.py"))
     ]
     
     print("\n⚡ WORLDTECH MAP // FULL-STACK MASTER TEST RUNNER ⚡")
@@ -49,7 +51,7 @@ def main():
             
     print(f"\n======================================================================")
     if all_passed:
-        print("🏆 [SUCCESS] All 5 automated verification suites (107+ checks) PASSED 100% CLEANLY!")
+        print("🏆 [SUCCESS] All 7 automated verification suites (126+ checks) PASSED 100% CLEANLY!")
         print("======================================================================\n")
         sys.exit(0)
     else:

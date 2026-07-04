@@ -902,6 +902,64 @@ html {
     }
 }
 
+@media (max-width: 768px) {
+    .top-navbar {
+        padding: 0 14px;
+        gap: 8px;
+    }
+
+    .quick-tabs {
+        display: none;
+    }
+
+    .sidebar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 380px;
+        max-width: 100%;
+        height: 100%;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 45;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .details-drawer {
+        width: 420px;
+        max-width: 100%;
+        right: 0;
+        top: 0;
+        height: 100%;
+        border-radius: 0;
+        z-index: 50;
+    }
+
+    .details-drawer.active {
+        z-index: 55;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .card-title,
+    .job-info h4,
+    .founder-name,
+    .founder-role,
+    .meta-item-val {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+    }
+}
+
 @media (max-width: 600px) {
     .top-navbar {
         padding: 0 12px;
@@ -995,6 +1053,199 @@ html {
     .search-icon {
         margin-right: 4px;
         font-size: 11px;
+    }
+}
+
+@media (max-width: 320px) {
+    .top-navbar {
+        padding: 0 4px;
+        gap: 2px;
+        height: 54px;
+    }
+
+    .navbar-left .brand-logo {
+        gap: 2px;
+    }
+
+    .brand-icon {
+        font-size: 14px;
+    }
+
+    .brand-text h1 {
+        font-size: 10.5px;
+        letter-spacing: -0.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 110px;
+    }
+
+    .search-box {
+        width: 95px;
+        padding: 3px 6px;
+    }
+
+    .search-box input {
+        font-size: 11px;
+    }
+
+    .sidebar {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .directory-list {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .directory-item {
+        padding: 10px;
+        gap: 8px;
+        max-width: 100%;
+    }
+
+    .card-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .card-title {
+        font-size: 13px;
+        max-width: 150px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .details-drawer {
+        width: 100%;
+        max-width: 100%;
+        right: 0;
+        top: 0;
+        height: 100%;
+        padding: 0;
+    }
+
+    .drawer-content {
+        padding: 14px 12px;
+        gap: 14px;
+    }
+
+    .drawer-hero-text h2 {
+        font-size: 17px;
+        word-break: break-word;
+    }
+
+    .meta-box-grid,
+    .founders-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+    }
+
+    .stat-val {
+        font-size: 14px;
+    }
+
+    .stat-lbl {
+        font-size: 9px;
+    }
+
+    .mobile-toggle {
+        padding: 8px 16px;
+        font-size: 12px;
+        bottom: 12px;
+        max-width: 90%;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+@media (min-width: 1920px) {
+    .top-navbar {
+        padding: 0 40px;
+        height: 72px;
+    }
+
+    .brand-icon {
+        font-size: 28px;
+    }
+
+    .brand-text h1 {
+        font-size: 19px;
+    }
+
+    .sidebar {
+        width: 420px;
+        max-width: 25vw;
+    }
+
+    .stats-dashboard {
+        padding: 24px 28px;
+    }
+
+    .stats-grid {
+        gap: 14px;
+    }
+
+    .stat-val {
+        font-size: 22px;
+    }
+
+    .directory-list {
+        padding: 20px 28px;
+        gap: 14px;
+    }
+
+    .directory-item {
+        padding: 18px;
+        gap: 16px;
+    }
+
+    .card-avatar {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+    }
+
+    .card-title {
+        font-size: 16px;
+    }
+
+    .details-drawer {
+        width: 480px;
+        max-width: 30vw;
+        top: 24px;
+        right: 24px;
+        height: calc(100% - 48px);
+        border-radius: 20px;
+    }
+
+    .drawer-content {
+        padding: 32px;
+        gap: 26px;
+    }
+
+    .drawer-hero-text h2 {
+        font-size: 26px;
+    }
+
+    .about-text {
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+    .search-box {
+        width: 340px;
+        padding: 8px 18px;
     }
 }
 

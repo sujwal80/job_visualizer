@@ -73,8 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const el = document.createElement(tag);
         for (const [key, val] of Object.entries(props)) {
             if (key === 'href' || key === 'src') {
-                const lower = String(val).trim().toLowerCase();
-                if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) {
+                const lower = String(val).trim().toLowerCase().replace(/[\x00-\x20\u200b-\u200f\u2028\u2029\ufeff]/g, '');
+                if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:') || lower.startsWith('file:') || lower.startsWith('about:') || lower.startsWith('blob:') || lower.startsWith('view-source:') || lower.startsWith('mhtml:')) {
                     continue;
                 }
             }
@@ -244,6 +244,15 @@ document.addEventListener('DOMContentLoaded', () => {
     map.on('moveend', () => {
         if (viewportDebounceTimer) clearTimeout(viewportDebounceTimer);
         viewportDebounceTimer = setTimeout(() => {
+            try {
+                if (!map || !map.getContainer()) return;
+                const container = map.getContainer();
+                if (container.clientWidth === 0 || container.clientHeight === 0) return;
+                const bounds = map.getBounds();
+                if (!bounds || isNaN(bounds.getSouth()) || isNaN(bounds.getNorth()) || isNaN(bounds.getWest()) || isNaN(bounds.getEast())) return;
+            } catch (err) {
+                return;
+            }
             const bounds = map.getBounds();
             if (!bounds) return;
             if (viewportFetchController) {
@@ -1001,8 +1010,62 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    function checkViewportResilience(width, height) {
+        const result = {
+            viewport: `${width}x${height}`,
+            valid: true,
+            errors: [],
+            elements: {}
+        };
+        try {
+            const isMobile = width <= 900;
+            const isTablet = width > 480 && width <= 900;
+            const isDesktop = width > 900;
+
+            if (sidebar) {
+                const sidebarRect = sidebar.getBoundingClientRect();
+                result.elements.sidebar = { visible: sidebarRect.width > 0, width: sidebarRect.width };
+                if (isDesktop && sidebarRect.width === 0 && sidebar.style.display !== 'none') {
+                    result.valid = false;
+                    result.errors.push('Sidebar unexpectedly hidden on desktop viewport');
+                }
+            }
+            if (detailsDrawer) {
+                const drawerRect = detailsDrawer.getBoundingClientRect();
+                result.elements.detailsDrawer = { active: detailsDrawer.classList.contains('active'), width: drawerRect.width };
+                if (detailsDrawer.classList.contains('active')) {
+                    if (isMobile && drawerRect.width > width + 1) {
+                        result.valid = false;
+                        result.errors.push(`Details drawer width (${drawerRect.width}px) exceeds mobile viewport (${width}px)`);
+                    }
+                }
+            }
+            const nav = document.querySelector('.top-navbar');
+            if (nav) {
+                const navRect = nav.getBoundingClientRect();
+                if (navRect.width > width + 1) {
+                    result.valid = false;
+                    result.errors.push(`Navbar overflow: width (${navRect.width}px) exceeds viewport (${width}px)`);
+                }
+            }
+        } catch (e) {
+            result.valid = false;
+            result.errors.push(`Exception during layout check: ${e.message}`);
+        }
+        return result;
+    }
+
     window.addEventListener('resize', () => {
-        if (map) map.resize();
+        try {
+            if (map && typeof map.resize === 'function') map.resize();
+            const width = window.innerWidth || document.documentElement.clientWidth || (document.body && document.body.clientWidth) || 0;
+            if (width > 900 && sidebar && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                if (mobileToggleBtn) mobileToggleBtn.textContent = 'Show Directory';
+            }
+        } catch (err) {
+            console.warn('Resize adaptation handled safely:', err);
+        }
     });
 
     // Expose core functions to window.WorldTechApp for modular unit & E2E testing
@@ -1023,6 +1086,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderDrawerDetails,
         selectAndOpenStartup,
         _processOpenStartup,
-        handleHashRouting
+        handleHashRouting,
+        checkViewportResilience
     };
 });

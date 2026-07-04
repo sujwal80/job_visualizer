@@ -12,6 +12,7 @@ def _sanitize_string(val):
     if not isinstance(val, str):
         return val
     cleaned = re.sub(r'<[^>]*>', '', val)
+    cleaned = cleaned.replace('<', '').replace('>', '').replace('\x00', '')
     return cleaned.strip()
 
 def _safe_float(val, default=None):
@@ -41,21 +42,34 @@ def _sanitize_url(url):
     if not url or not isinstance(url, str):
         return ""
     url_clean = url.strip()
-    lower = url_clean.lower()
-    if lower.startswith("javascript:") or lower.startswith("data:") or lower.startswith("vbscript:"):
+    lower = re.sub(r'[\x00-\x20\x7f\u200b-\u200f\u2028\u2029\ufeff]', '', url_clean).lower()
+    dangerous_schemes = ("javascript:", "data:", "vbscript:", "file:", "about:", "blob:", "view-source:", "mhtml:")
+    if any(lower.startswith(scheme) for scheme in dangerous_schemes):
+        return ""
+    decoded_lower = lower.replace("&#58;", ":").replace("%3a", ":").replace("&#x3a;", ":").replace("&colon;", ":")
+    if any(decoded_lower.startswith(scheme) for scheme in dangerous_schemes):
         return ""
     return url_clean
 
 def _validate_query_params(args):
     allowed_params = {'min_lat', 'max_lat', 'min_lng', 'max_lng', 'limit', 'city', 'skill', 'industry'}
+    
+    total_params = sum(len(args.getlist(k)) for k in args.keys())
+    if total_params > 20:
+        return False, "Parameter flooding detected: total parameter values exceed maximum limit of 20"
+        
     for key in args.keys():
         if key not in allowed_params:
             return False, f"Unsupported query parameter: '{key}'"
-        for val in args.getlist(key):
-            if len(val) > 100 and key != 'limit':
+        vals = args.getlist(key)
+        if len(vals) > 5:
+            return False, f"Parameter flooding detected: too many duplicate values for parameter '{key}'"
+        for val in vals:
+            if len(val) > 100:
                 return False, f"Parameter '{key}' exceeds maximum length of 100"
             lower = val.lower()
-            if "<script" in lower or "<" in lower or ">" in lower or "' or '" in lower or '" or "' in lower:
+            if any(char in val for char in ["<", ">", "'", '"', ";", "--", "/*", "*/", "\x00"]) or \
+               any(kw in lower for kw in ["javascript:", "data:", "vbscript:", "union select", "drop table", "insert into", "delete from", "update ", "exec(", "execute(", "or 1=1", "or true"]):
                 return False, f"Parameter '{key}' contains invalid characters or injection attempts"
 
     float_bounds = {

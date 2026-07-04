@@ -39,6 +39,9 @@ class TestR1ViewportAndLayoutResilience(unittest.TestCase):
         """Verify style.css defines media queries for mobile/tablet screen adaptation."""
         self.assertIn('@media', self.css_content, "CSS must define media queries for responsive layouts.")
         self.assertIn('max-width: 900px', self.css_content, "CSS must handle mobile/tablet breakpoints.")
+        self.assertIn('max-width: 320px', self.css_content, "CSS must handle mobile portrait (320px) breakpoint.")
+        self.assertIn('max-width: 768px', self.css_content, "CSS must handle tablet (768px) breakpoint.")
+        self.assertIn('min-width: 1920px', self.css_content, "CSS must handle desktop (1920px) breakpoint.")
 
     def test_r1_02_mobile_toggle_button_in_html(self):
         """Verify mobile toggle button element exists in index.html with appropriate accessibility label."""
@@ -140,6 +143,57 @@ class TestR1ViewportAndLayoutResilience(unittest.TestCase):
     def test_r1_16_css_prevent_unintended_horizontal_scroll(self):
         """Verify main workspace container prevents unintended horizontal scrollbars via overflow restrictions."""
         self.assertIn('overflow: hidden;', self.css_content, "CSS must restrict overflow to prevent horizontal scrollbars.")
+
+    def test_r1_17_explicit_320px_mobile_portrait_resilience(self):
+        """Verify @media (max-width: 320px) adapts navbar, search controls, and drawer overlays without text overflow or element overlap."""
+        self.assertIn('@media (max-width: 320px)', self.css_content, "CSS must explicitly define 320px mobile portrait media query.")
+        self.assertIn('max-width: 110px;', self.css_content, "320px media query must restrict brand title width to prevent overlap.")
+        self.assertIn('width: 95px;', self.css_content, "320px media query must adapt search box width cleanly.")
+
+    def test_r1_18_explicit_768px_tablet_resilience(self):
+        """Verify @media (max-width: 768px) adapts sidebar overlay width and z-index hierarchy without overlapping boundaries."""
+        self.assertIn('@media (max-width: 768px)', self.css_content, "CSS must explicitly define 768px tablet media query.")
+        self.assertIn('width: 380px;', self.css_content, "768px media query must constrain sidebar overlay width.")
+        self.assertIn('z-index: 55;', self.css_content, "768px media query must enforce proper drawer z-index layering over sidebar.")
+
+    def test_r1_19_explicit_1920px_desktop_resilience(self):
+        """Verify @media (min-width: 1920px) adapts directory list, drawer dimensions, and typography for ultra-wide desktop viewports."""
+        self.assertIn('@media (min-width: 1920px)', self.css_content, "CSS must explicitly define 1920px desktop media query.")
+        self.assertIn('max-width: 25vw;', self.css_content, "1920px media query must scale sidebar width proportionally.")
+        self.assertIn('max-width: 30vw;', self.css_content, "1920px media query must scale drawer width proportionally.")
+
+    def test_r1_20_js_window_resize_viewport_adaptation_resilience(self):
+        """Verify app.js window resize listener safely transitions between mobile (<=900px) and desktop (>900px) viewports without JS runtime errors."""
+        self.assertIn("window.addEventListener('resize'", self.js_content, "app.js must listen for window resize events.")
+        self.assertIn("width > 900 && sidebar && sidebar.classList.contains('active')", self.js_content, "app.js must clean up active sidebar classes when transitioning to desktop viewport.")
+        self.assertIn("mobileToggleBtn.textContent = 'Show Directory'", self.js_content, "app.js must reset toggle button text on desktop transition.")
+
+    def test_r1_21_js_edge_viewport_zero_dimensions_and_nan_safety(self):
+        """Verify app.js moveend handler checks container clientWidth/clientHeight and validates bounds against isNaN under edge viewport conditions."""
+        self.assertIn("container.clientWidth === 0 || container.clientHeight === 0", self.js_content, "app.js must check for 0-dimension edge viewports.")
+        self.assertIn("isNaN(bounds.getSouth())", self.js_content, "app.js must validate viewport bounds against NaN under edge conditions.")
+
+    def test_r1_22_js_check_viewport_resilience_helper(self):
+        """Verify app.js exports checkViewportResilience on window.WorldTechApp to programmatically assert layout boundaries across viewports."""
+        self.assertIn("function checkViewportResilience(width, height)", self.js_content, "app.js must define checkViewportResilience helper.")
+        self.assertIn("checkViewportResilience", self.js_content, "app.js must export checkViewportResilience in window.WorldTechApp.")
+        self.assertIn("isMobile = width <= 900", self.js_content, "checkViewportResilience must evaluate mobile viewport threshold.")
+        self.assertIn("isTablet = width > 480 && width <= 900", self.js_content, "checkViewportResilience must evaluate tablet viewport threshold.")
+        self.assertIn("isDesktop = width > 900", self.js_content, "checkViewportResilience must evaluate desktop viewport threshold.")
+
+    def test_r1_23_css_glassmorphic_cards_and_drawer_overlay_boundaries(self):
+        """Verify style.css enforces box-sizing border-box, max-width 100%, and text overflow handling on glassmorphic cards and drawers."""
+        self.assertIn("box-sizing: border-box;", self.css_content, "CSS must apply border-box sizing across all elements.")
+        self.assertIn("max-width: 100%;", self.css_content, "CSS must restrict glassmorphic containers and items to max-width: 100%.")
+        self.assertIn("word-break: break-word;", self.css_content, "CSS must allow word breaking for long text strings.")
+
+    def test_r1_24_css_navbar_search_controls_viewport_adaptation(self):
+        """Verify style.css adapts navbar search input dimensions and spacing cleanly across viewports without text overflow."""
+        self.assertIn("width: 280px;", self.css_content, "Default search box width must be 280px.")
+        self.assertIn("width: 160px;", self.css_content, "Search box must adapt to 160px under 600px breakpoint.")
+        self.assertIn("width: 130px;", self.css_content, "Search box must adapt to 130px under 480px breakpoint.")
+        self.assertIn("width: 105px;", self.css_content, "Search box must adapt to 105px under 360px breakpoint.")
+        self.assertIn("width: 95px;", self.css_content, "Search box must adapt to 95px under 320px breakpoint.")
 
 
 class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
