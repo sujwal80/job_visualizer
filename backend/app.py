@@ -1,3 +1,9 @@
+"""
+Startup Visualizer Main Controller Application
+Houses Flask routing endpoints for interactive map queries, individual startup detail lookups,
+Google OAuth 2.0 authentication flows, session management, and HTTP security/caching middleware.
+"""
+
 from flask import Flask, jsonify, render_template, request, make_response, g, redirect
 import json
 import os
@@ -24,9 +30,17 @@ app = Flask(
     static_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend', 'static'),
     template_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend', 'templates')
 )
+# Enable ProxyFix to correctly interpret client IP addresses when deployed behind cloud reverse proxies (e.g. Nginx, WSGI)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 def login_required(f):
+    """
+    Decorator to gate protected API endpoints against unauthenticated access.
+
+    Inspects incoming requests for stateless JWT session tokens in `session_token`,
+    `auth_token`, `jwt_token` cookies, or HTTP Authorization bearer headers.
+    Returns HTTP 401 Unauthorized if missing, expired, or blacklisted.
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.cookies.get('session_token') or request.cookies.get('auth_token') or request.cookies.get('jwt_token')
@@ -39,12 +53,17 @@ def login_required(f):
         user = verify_jwt_token(token)
         if not user:
             return jsonify({"error": "Unauthenticated. Invalid, expired, or revoked JWT session token."}), 401
+        # Store verified user claims on Flask application context global `g`
         g.current_user = user
         return f(*args, **kwargs)
     return decorated_function
 
 @app.after_request
 def add_security_and_optimization_headers(response):
+    """
+    Post-request middleware to attach strict security headers, rate limiting metadata,
+    cache-control directives, and dynamic Gzip payload compression.
+    """
     # Mandatory CSP policy allowing OSM map tiles and CDN resources
     csp = (
         "default-src 'self' https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com; "
@@ -82,11 +101,11 @@ def add_security_and_optimization_headers(response):
         response.headers.setdefault('X-RateLimit-Limit', str(g.rate_limit_limit))
         response.headers.setdefault('X-RateLimit-Remaining', str(g.rate_limit_remaining))
 
-    # Attach Cache-Control: no-store on errors
+    # Attach Cache-Control: no-store on errors to prevent caching proxies from storing transient failure states
     if response.status_code >= 400:
         response.headers['Cache-Control'] = 'no-store'
     
-    # Gzip compression optimization
+    # Dynamic Gzip compression optimization for response payloads >= 500 bytes
     accept_encoding = request.headers.get('Accept-Encoding', '').lower()
     wants_gzip = False
     if 'gzip' in accept_encoding:
@@ -116,10 +135,17 @@ def add_security_and_optimization_headers(response):
 
 @app.route('/')
 def index():
+    """Render the main interactive map application interface."""
     return render_template('index.html')
 
 @app.route('/api/startups', methods=['GET'])
 def get_startups():
+    """
+    Retrieve a filtered, sorted list of startup summary objects within a geographic viewport.
+
+    Enforces token bucket rate limiting and query parameter validation against flooding and SQLi/XSS.
+    Returns lean JSON payloads optimized for client-side map rendering.
+    """
     client_ip = request.remote_addr or "127.0.0.1"
     allowed, retry_after, remaining, limit_val = _check_rate_limit(client_ip)
     g.rate_limit_limit = limit_val
@@ -156,6 +182,11 @@ def get_startups():
 
 @app.route('/api/startups/<int:startup_id>', methods=['GET'])
 def get_startup_details(startup_id):
+    """
+    Retrieve comprehensive details and structured job openings for a specific startup by numeric ID.
+
+    Enforces rate limiting and query validation, returning HTTP 404 if ID is not found.
+    """
     client_ip = request.remote_addr or "127.0.0.1"
     allowed, retry_after, remaining, limit_val = _check_rate_limit(client_ip)
     g.rate_limit_limit = limit_val
@@ -183,6 +214,12 @@ def get_startup_details(startup_id):
 
 @app.route('/api/auth/google', methods=['GET'])
 def auth_google():
+    """
+    Initiate the Google OAuth 2.0 authentication flow.
+
+    Generates a CSRF state token stored in an `HttpOnly, Secure, SameSite=Strict` cookie
+    and redirects or returns the Google consent URL.
+    """
     state = generate_oauth_state()
     redirect_uri = request.args.get('redirect_uri')
     auth_url = get_google_auth_url(state, redirect_uri=redirect_uri)
@@ -200,6 +237,9 @@ def auth_google():
 @app.route('/api/auth/callback', methods=['GET', 'POST'])
 @app.route('/api/auth/google/callback', methods=['GET', 'POST'])
 def auth_callback():
+    """
+    Handle Google OAuth callback redirect, validate CSRF state token, and issue JWT session cookie.
+    """
     data = request.args if request.method == 'GET' else (request.get_json(silent=True) or request.form)
     state = data.get('state')
     code = data.get('code')
@@ -240,6 +280,9 @@ def auth_callback():
 
 @app.route('/api/auth/status', methods=['GET'])
 def auth_status():
+    """
+    Check current authentication status by verifying active JWT session cookies or Authorization headers.
+    """
     token = request.cookies.get('session_token') or request.cookies.get('auth_token') or request.cookies.get('jwt_token')
     if not token and 'Authorization' in request.headers:
         auth_header = request.headers['Authorization']
@@ -266,6 +309,9 @@ def auth_status():
 
 @app.route('/api/auth/logout', methods=['GET', 'POST'])
 def auth_logout():
+    """
+    Revoke current session JWT token and clear all authentication cookies.
+    """
     token = request.cookies.get('session_token') or request.cookies.get('auth_token') or request.cookies.get('jwt_token')
     if not token and 'Authorization' in request.headers:
         auth_header = request.headers['Authorization']
@@ -286,6 +332,7 @@ def auth_logout():
 @app.route('/api/protected/profile', methods=['GET'])
 @login_required
 def get_user_profile():
+    """Protected endpoint returning the currently authenticated user's profile claims."""
     return jsonify({
         "authenticated": True,
         "user": g.current_user
@@ -295,6 +342,7 @@ def get_user_profile():
 @app.route('/api/protected/bookmarks', methods=['GET', 'POST', 'DELETE'])
 @login_required
 def manage_user_bookmarks():
+    """Protected endpoint allowing authenticated users to manage saved startup bookmarks."""
     return jsonify({
         "authenticated": True,
         "user_id": g.current_user.get("sub"),
@@ -306,6 +354,7 @@ def manage_user_bookmarks():
 @app.route('/api/protected/export', methods=['GET'])
 @login_required
 def export_startups_protected():
+    """Protected endpoint allowing authenticated users to export startup summary lists."""
     try:
         startups = load_startups()
         light_list = [format_startup_summary(s) for s in startups[:10]]

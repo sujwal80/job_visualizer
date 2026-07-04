@@ -1,3 +1,10 @@
+"""
+Google OAuth 2.0 & Stateless JWT Authentication Service
+Houses cryptographic helpers for generating and verifying CSRF state tokens,
+constructing OAuth authorization URLs, exchanging authorization codes for Google user profiles,
+and managing stateless JWT session tokens with revocation blacklisting.
+"""
+
 import os
 import time
 import secrets
@@ -36,26 +43,45 @@ MOCK_USERS = {
 }
 
 def reset_auth_stores():
-    """Clear in-memory state and revoked token registries for clean unit testing."""
+    """
+    Clear in-memory CSRF state tokens and revoked JWT token registries.
+    Used during automated unit test teardown and session resetting.
+    """
     _csrf_state_store.clear()
     _revoked_tokens.clear()
 
 def generate_oauth_state(expires_in=600):
-    """Generate a cryptographically secure random CSRF state token and store it with expiration."""
+    """
+    Generate a cryptographically secure random CSRF state token and store it with expiration.
+
+    Args:
+        expires_in (int): Time-to-live in seconds for the generated state token (default 600s).
+
+    Returns:
+        str: A URL-safe 32-byte cryptographic random string token.
+    """
     state = secrets.token_urlsafe(32)
     _csrf_state_store[state] = time.time() + expires_in
-    # Cleanup old expired states
+    # Automated cleanup: sweep expired state records during token generation
     now = time.time()
     expired = [k for k, exp in _csrf_state_store.items() if exp < now]
     for k in expired:
         _csrf_state_store.pop(k, None)
-    # Strictly bound maximum memory capacity
+    # Enforce strict memory bounds on state store (max 10,000 pending logins)
     while len(_csrf_state_store) > 10000:
         _csrf_state_store.pop(next(iter(_csrf_state_store)), None)
     return state
 
 def validate_oauth_state(state):
-    """Validate and consume an OAuth CSRF state token. Returns True if valid and not expired."""
+    """
+    Validate and consume an OAuth CSRF state token.
+
+    Args:
+        state (str): The state token returned by the Google OAuth callback parameter.
+
+    Returns:
+        bool: True if the token exists in the store and has not expired, False otherwise.
+    """
     if not state or not isinstance(state, str):
         return False
     exp = _csrf_state_store.pop(state, None)
@@ -66,7 +92,16 @@ def validate_oauth_state(state):
     return True
 
 def get_google_auth_url(state, redirect_uri=None):
-    """Construct the Google OAuth 2.0 authorization URL."""
+    """
+    Construct the Google OAuth 2.0 authorization URL with requested OpenID Connect scopes.
+
+    Args:
+        state (str): The CSRF protection state token to embed in the request.
+        redirect_uri (str, optional): The callback URI where Google redirects after consent.
+
+    Returns:
+        str: The fully formatted `https://accounts.google.com/o/oauth2/v2/auth` URL.
+    """
     params = {
         "client_id": GOOGLE_CLIENT_ID,
         "redirect_uri": redirect_uri or GOOGLE_REDIRECT_URI,
@@ -79,8 +114,20 @@ def get_google_auth_url(state, redirect_uri=None):
     return "https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(params)
 
 def exchange_code_for_user(code):
-    """Exchange OAuth authorization code for Google user profile data.
-    In offline/test mode, resolves predefined test codes or returns a simulated user profile.
+    """
+    Exchange an OAuth authorization code for a Google user profile dictionary.
+
+    In offline/sandbox test environments, resolves predefined test authorization codes
+    or generates a safe simulated user profile without external network dependencies.
+
+    Args:
+        code (str): The authorization code received from the OAuth callback.
+
+    Returns:
+        dict: User profile data containing 'sub' (ID), 'email', 'name', and 'picture'.
+
+    Raises:
+        ValueError: If the authorization code is missing or malformed.
     """
     if not code or not isinstance(code, str):
         raise ValueError("Invalid authorization code.")
@@ -96,8 +143,8 @@ def exchange_code_for_user(code):
             "picture": "https://lh3.googleusercontent.com/a/default"
         }
     else:
-        # In a real environment with network access, we would do requests.post('https://oauth2.googleapis.com/token'...)
-        # Since we operate in CODE_ONLY sandbox without external network access, return a safe simulated user
+        # In a real environment with network access, we would execute requests.post('https://oauth2.googleapis.com/token'...)
+        # Since we operate in sandbox environments without external network access, return a safe simulated user
         return {
             "sub": f"usr_{secrets.token_hex(6)}",
             "email": "auth_user@worldtech.map",
@@ -106,7 +153,17 @@ def exchange_code_for_user(code):
         }
 
 def issue_jwt_token(user_data, expires_in=3600, custom_secret=None):
-    """Issue a stateless JWT session token for an authenticated user."""
+    """
+    Issue a stateless JSON Web Token (JWT) session token for an authenticated user.
+
+    Args:
+        user_data (dict): The user profile attributes to encode into the token payload.
+        expires_in (int): Token validity duration in seconds (default 3600s / 1 hour).
+        custom_secret (str, optional): Custom HMAC secret key override for encoding.
+
+    Returns:
+        str: The encoded JWT string signed with HS256 algorithm.
+    """
     secret = custom_secret or SECRET_KEY
     now = int(time.time())
     jti = secrets.token_hex(16)
@@ -125,14 +182,23 @@ def issue_jwt_token(user_data, expires_in=3600, custom_secret=None):
     return token
 
 def verify_jwt_token(token, custom_secret=None):
-    """Verify and decode a JWT session token. Returns payload dict if valid, None otherwise."""
+    """
+    Verify and decode a JWT session token against expiration and revocation blacklists.
+
+    Args:
+        token (str): The raw JWT token string to verify.
+        custom_secret (str, optional): Custom HMAC secret key override for verification.
+
+    Returns:
+        dict or None: The decoded token payload dictionary if valid and active, or None if invalid/revoked.
+    """
     if not token or not isinstance(token, str):
         return None
     secret = custom_secret or SECRET_KEY
     try:
         payload = jwt.decode(token, secret, algorithms=["HS256"])
         jti = payload.get("jti")
-        # Check against revoked tokens blacklist
+        # Check if the unique token ID or signature has been revoked in the blacklist
         if jti in _revoked_tokens or token in _revoked_tokens:
             return None
         return payload
@@ -140,12 +206,21 @@ def verify_jwt_token(token, custom_secret=None):
         return None
 
 def revoke_jwt_token(token, custom_secret=None):
-    """Revoke a session JWT token by adding its jti or signature to the revocation blacklist."""
+    """
+    Revoke an active session JWT token by adding its unique `jti` or signature to the blacklist.
+
+    Args:
+        token (str): The JWT session token to revoke during user logout.
+        custom_secret (str, optional): Custom HMAC secret key override for decoding.
+
+    Returns:
+        bool: True if the token was successfully added to the revocation blacklist.
+    """
     if not token or not isinstance(token, str):
         return False
     secret = custom_secret or SECRET_KEY
     try:
-        # Decode without verifying expiration so we can still revoke an expired token if needed
+        # Decode without verifying expiration so we can still revoke an already expired token
         payload = jwt.decode(token, secret, algorithms=["HS256"], options={"verify_exp": False})
         jti = payload.get("jti")
         if jti:
@@ -153,6 +228,6 @@ def revoke_jwt_token(token, custom_secret=None):
         _revoked_tokens.add(token)
         return True
     except Exception:
-        # Even if decode fails completely, add raw token to blacklist
+        # Even if decode fails completely, add raw token string to blacklist
         _revoked_tokens.add(token)
         return True

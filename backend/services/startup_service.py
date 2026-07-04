@@ -1,19 +1,35 @@
+"""
+Startup Domain Business Logic & Data Service
+Houses functions for loading startup records from the filesystem, caching in memory,
+filtering and sorting against viewport queries and metadata criteria, and formatting lean payloads.
+"""
+
 import os
 import json
 from backend.utils.validators import _safe_float, _check_has_pin, _sanitize_string, _sanitize_url, _strip_redundant
 
 DATA_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'startups.json'))
 
-# In-memory database cache
+# In-memory database cache to prevent redundant disk I/O across API requests
 _cache_data = None
 _cache_mtime = 0
 
 def load_startups():
+    """
+    Load startup records from the JSON filesystem database with mtime-based in-memory caching.
+
+    Enforces data sanitization across all startup fields (names, descriptions, websites, founders, and jobs)
+    when data is first loaded into memory from disk.
+
+    Returns:
+        list: A list of sanitized startup dictionary objects.
+    """
     global _cache_data, _cache_mtime
     if not os.path.exists(DATA_FILE):
         return []
     try:
         current_mtime = os.path.getmtime(DATA_FILE)
+        # Return cached dataset if file modification timestamp hasn't changed
         if _cache_data is not None and current_mtime == _cache_mtime:
             return _cache_data
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
@@ -53,11 +69,32 @@ def load_startups():
         return _cache_data or []
 
 def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit, city_query="", skill_query="", industry_query=""):
+    """
+    Filter and sort startup records by geographic viewport bounding boxes and text criteria.
+
+    Remote or unpinned startups (`has_pin=False`) are preserved across geographic queries
+    so remote job opportunities remain discoverable anywhere on the map.
+
+    Args:
+        startups (list): The full list of startup dictionaries to filter.
+        min_lat (float or None): Southern latitude boundary of the viewport.
+        max_lat (float or None): Northern latitude boundary of the viewport.
+        min_lng (float or None): Western longitude boundary of the viewport.
+        max_lng (float or None): Eastern longitude boundary of the viewport.
+        limit (int): Maximum number of startup records to return (slicing limit).
+        city_query (str): Case-insensitive substring filter for city/location.
+        skill_query (str): Case-insensitive substring filter across startup and job skills.
+        industry_query (str): Case-insensitive substring filter for industry classification.
+
+    Returns:
+        list: The filtered, sorted list of startup dictionaries capped at `limit`.
+    """
     filtered = []
     for s in startups:
         lat = _safe_float(s.get("lat"))
         lng = _safe_float(s.get("lng"))
         if min_lat is not None and max_lat is not None and min_lng is not None and max_lng is not None:
+            # Preserve unpinned remote startups regardless of map bounding box
             if s.get("has_pin") is False:
                 pass
             else:
@@ -86,12 +123,24 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
                 continue
         filtered.append(s)
         
+    # Sort startups descending by active job opening count
     filtered.sort(key=lambda x: len(x.get("job_openings") or []), reverse=True)
     if limit >= 0:
         filtered = filtered[:limit]
     return filtered
 
 def format_startup_summary(s):
+    """
+    Format a lightweight summary payload for a startup, pruning heavy raw job arrays.
+
+    Used by `/api/startups` list endpoints to minimize network payload size and improve DOM rendering speed.
+
+    Args:
+        s (dict): The full startup record dictionary.
+
+    Returns:
+        dict: A lightweight summary dictionary optimized for list and map marker rendering.
+    """
     logo_domain = s.get("logo_domain", "")
     logo_url = f"https://www.google.com/s2/favicons?domain={logo_domain}&sz=128" if logo_domain else ""
     website = _sanitize_url(s.get("website", ""))
@@ -140,6 +189,17 @@ def format_startup_summary(s):
     }
 
 def format_startup_details(s):
+    """
+    Format a comprehensive detail payload for a specific startup, including structured job listings.
+
+    Used by `/api/startups/<id>` endpoints to populate details sidebars and modal views.
+
+    Args:
+        s (dict): The full startup record dictionary.
+
+    Returns:
+        dict: A sanitized, detailed dictionary including individual job opening objects.
+    """
     s_copy = dict(s)
     for field in ["name", "city", "description", "industry", "funding_stage", "total_raised", "verified_email"]:
         if field in s_copy:
