@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorldTech Map // Interactive Job Discovery</title>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- MapLibre GL CSS -->
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/css/style.css?v=3.0.8">
+</head>
+
+<body>
+    <div id="app-container">
+        <!-- Floating Glassmorphic Top Navbar -->
+        <header id="top-navbar" class="top-navbar">
+            <div class="navbar-left">
+                <div class="brand-logo">
+                    <span class="brand-icon">⚡</span>
+                    <div class="brand-text">
+                        <h1>WorldTech Map</h1>
+                        <span class="live-badge"><span class="pulse-dot"></span> Worldwide Jobs</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navbar-center">
+                <div id="quick-industry-tabs" class="quick-tabs">
+                    <button class="tab-btn active" data-industry="">All Tech</button>
+                    <button class="tab-btn" data-industry="Artificial Intelligence">AI</button>
+                    <button class="tab-btn" data-industry="Fintech">Fintech</button>
+                    <button class="tab-btn" data-industry="SaaS">SaaS</button>
+                    <button class="tab-btn" data-industry="Biotech">Biotech</button>
+                    <button class="tab-btn" data-industry="CleanTech">CleanTech</button>
+                    <button class="tab-btn" data-industry="E-commerce">E-commerce</button>
+                </div>
+            </div>
+
+            <div class="navbar-right">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="search-input" placeholder="Search companies, founders, tech..."
+                        autocomplete="off">
+                    <kbd class="shortcut-hint">⌘K</kbd>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace (Map + Left Directory Panel + Right Details Drawer) -->
+        <main id="main-content" class="main-content">
+            <!-- Sidebar for directory and secondary filters -->
+            <aside id="sidebar" class="sidebar">
+                <!-- Ecosystem Stats Dashboard -->
+                <div id="stats-dashboard" class="stats-dashboard">
+                    <div class="stats-header">
+                        <span class="stats-title">Ecosystem Overview</span>
+                        <span class="verified-pill">✔ Verified</span>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span id="stat-count" class="stat-val">0</span>
+                            <span class="stat-lbl">Companies</span>
+                        </div>
+                        <div class="stat-card">
+                            <span id="stat-headcount" class="stat-val">0</span>
+                            <span class="stat-lbl">Employees</span>
+                        </div>
+                        <div class="stat-card">
+                            <span id="stat-jobs" class="stat-val">0</span>
+                            <span class="stat-lbl">Open Jobs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Filter Bar -->
+                <div class="secondary-filters">
+                    <select id="dept-filter" class="filter-select" aria-label="Filter by job department">
+                        <option value="">All Job Departments</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="R&D">R&D</option>
+                        <option value="Design">Design</option>
+                        <option value="Sales">Sales</option>
+                        <option value="HR / Operations">HR / Operations</option>
+                        <option value="Finance">Finance</option>
+                    </select>
+                    <select id="exp-filter" class="filter-select" style="margin-top: 8px;"
+                        aria-label="Filter by experience level or job type">
+                        <option value="">All Experience / Job Types</option>
+                        <option value="Internship">Internship</option>
+                        <option value="0-2">0-2 yrs / Fresher</option>
+                        <option value="1-3">1-3 Years</option>
+                        <option value="3-5">3-5 Years</option>
+                        <option value="5+">5+ Years / Senior</option>
+                        <option value="Full-time">Full-time</option>
+                        <option value="Contract">Contract</option>
+                    </select>
+                    <input type="text" id="skill-filter" class="filter-select" style="margin-top: 8px;"
+                        placeholder="Filter by skill (e.g. Python, React)..." aria-label="Filter by tech stack skill"
+                        autocomplete="off">
+                </div>
+
+                <!-- Directory List -->
+                <div id="directory-list" class="directory-list" role="list" aria-label="Companies directory"></div>
+            </aside>
+
+            <!-- Map Container -->
+            <div id="map" class="map-container">
+                <button id="reset-map-btn" class="map-overlay-btn" title="Reset Map View" aria-label="Reset map center">
+                    <span>🏠</span> Reset View
+                </button>
+            </div>
+
+            <!-- Details Drawer (Polished slide-out card) -->
+            <section id="details-drawer" class="details-drawer" aria-hidden="true" aria-label="Company Details">
+                <div class="drawer-header-bar">
+                    <span class="drawer-top-label">Company Profile</span>
+                    <button id="close-drawer-btn" class="close-drawer-btn" title="Close details"
+                        aria-label="Close details">&times;</button>
+                </div>
+                <div id="drawer-content" class="drawer-content"></div>
+            </section>
+        </main>
+
+        <!-- Mobile Toggle Button -->
+        <button id="mobile-toggle-btn" class="mobile-toggle" aria-label="Toggle directory list">Show Directory</button>
+    </div>
+
+    <!-- MapLibre GL JS -->
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <script src="/static/js/app.js?v=3.0.8"></script>
+</body>
+
+</html>
