@@ -136,7 +136,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return await response.json();
         } catch (err) {
-            console.error(`API Fetch Error (${url}):`, err);
+            if (err.name !== 'AbortError') {
+                console.error(`API Fetch Error (${url}):`, err);
+            }
             throw err;
         }
     }
@@ -157,19 +159,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getDomain(startup) {
-        if (startup.name === 'Google') return 'google.com';
-        if (startup.name === 'Microsoft') return 'microsoft.com';
-        if (startup.name === 'Amazon') return 'amazon.com';
-        if (startup.name === 'Flipkart') return 'flipkart.com';
-        if (startup.name === 'Swiggy') return 'swiggy.com';
-        if (startup.name === 'Zomato') return 'zomato.com';
+        if (!startup) return '';
+        const name = startup.name || '';
+        if (name === 'Google') return 'google.com';
+        if (name === 'Microsoft') return 'microsoft.com';
+        if (name === 'Amazon') return 'amazon.com';
+        if (name === 'Flipkart') return 'flipkart.com';
+        if (name === 'Swiggy') return 'swiggy.com';
+        if (name === 'Zomato') return 'zomato.com';
 
-        let domain = startup.logo_domain || '';
+        let domain = typeof startup.logo_domain === 'string' ? startup.logo_domain : '';
         if (domain === 'news.microsoft.com') domain = 'microsoft.com';
         if (domain === 'aboutamazon.com') domain = 'amazon.com';
         if (domain === 'careers.linkedin.com') domain = 'linkedin.com';
 
-        if (!domain && startup.website) {
+        if (!domain && typeof startup.website === 'string') {
             try {
                 const parsed = new URL(startup.website);
                 domain = parsed.hostname.replace(/^www\./, '').toLowerCase();
@@ -188,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = createElement('div', { className: 'logo-marker-container' });
 
         const fallback = createElement('div', { className: 'logo-marker-fallback' }, [
-            (startup.name || 'S').substring(0, 1).toUpperCase()
+            String(startup.name || 'S').substring(0, 1).toUpperCase()
         ]);
         fallback.style.backgroundColor = color;
         fallback.style.border = '2px solid #ffffff';
@@ -198,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const img = createElement('img', {
                 src: logoUrl,
                 className: 'logo-marker-thumbnail',
-                alt: startup.name || 'Startup Logo'
+                alt: String(startup.name || 'Startup Logo')
             });
             img.style.border = `2.5px solid ${color}`;
             img.onerror = () => { img.style.display = 'none'; };
@@ -236,17 +240,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isFetchingViewport = false;
     let viewportDebounceTimer = null;
+    let viewportFetchController = null;
     map.on('moveend', () => {
         if (viewportDebounceTimer) clearTimeout(viewportDebounceTimer);
         viewportDebounceTimer = setTimeout(() => {
-            if (isFetchingViewport) return;
             const bounds = map.getBounds();
             if (!bounds) return;
+            if (viewportFetchController) {
+                viewportFetchController.abort();
+            }
+            viewportFetchController = new AbortController();
+            const signal = viewportFetchController.signal;
             isFetchingViewport = true;
             const url = `/api/startups?min_lat=${bounds.getSouth()}&max_lat=${bounds.getNorth()}&min_lng=${bounds.getWest()}&max_lng=${bounds.getEast()}&limit=500`;
-            safeFetch(url)
+            safeFetch(url, { signal })
                 .then(newStartups => {
                     isFetchingViewport = false;
+                    if (signal.aborted) return;
                     if (Array.isArray(newStartups)) {
                         const existingIds = new Set(startupsData.map(s => s.id));
                         let addedNew = false;
@@ -256,19 +266,94 @@ document.addEventListener('DOMContentLoaded', () => {
                                 addedNew = true;
                             }
                         });
-                        if (addedNew) {
-                            clearAllMarkers();
-                            initializeMarkers(startupsData);
+
+                        const oldLength = startupsData.length;
+                        if (startupsData.length > 1000) {
+                            const minLat = bounds.getSouth();
+                            const maxLat = bounds.getNorth();
+                            const minLng = bounds.getWest();
+                            const maxLng = bounds.getEast();
+                            const newIds = new Set(newStartups.map(s => s.id));
+                            startupsData = startupsData.filter(s => {
+                                if (s.id === currentSelectedId || newIds.has(s.id)) return true;
+                                const lat = s.orig_lat !== undefined ? s.orig_lat : s.lat;
+                                const lng = s.orig_lng !== undefined ? s.orig_lng : s.lng;
+                                if (lat === undefined || lng === undefined) return false;
+                                return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
+                            });
+                            if (startupsData.length > 1000) {
+                                const keep = new Set();
+                                if (currentSelectedId !== null) keep.add(currentSelectedId);
+                                for (let i = startupsData.length - 1; i >= 0 && keep.size < 1000; i--) {
+                                    keep.add(startupsData[i].id);
+                                }
+                                startupsData = startupsData.filter(s => keep.has(s.id));
+                            }
+                        }
+                        const wasPruned = startupsData.length !== oldLength;
+
+                        if (addedNew || wasPruned) {
+                            updateMarkersDiff(startupsData);
                             scheduleFiltering();
                         }
                     }
                 })
                 .catch(err => {
+                    if (err.name === 'AbortError') return;
                     isFetchingViewport = false;
                     console.error('Error fetching viewport startups:', err);
                 });
         }, 300);
     });
+
+    function updateMarkersDiff(startups) {
+        const activeIds = new Set(startups.map(s => String(s.id)));
+
+        for (const id in markersMap) {
+            if (!activeIds.has(String(id))) {
+                markersMap[id].remove();
+                delete markersMap[id];
+            }
+        }
+
+        startups.forEach(startup => {
+            if (startup.has_pin === false) return;
+            if (markersMap[startup.id] || markersMap[String(startup.id)]) return;
+
+            if (startup.orig_lat === undefined) {
+                startup.orig_lat = startup.lat;
+                startup.orig_lng = startup.lng;
+            }
+            let lat = startup.orig_lat;
+            let lng = startup.orig_lng;
+            const coordKey = `${lat.toFixed(5)},${lng.toFixed(5)}`;
+
+            if (coordinatesRegistry[coordKey]) {
+                const count = coordinatesRegistry[coordKey];
+                const angle = count * (2 * Math.PI / 8);
+                const radius = 0.00025 * Math.ceil(count / 8);
+                lat += radius * Math.sin(angle);
+                lng += radius * Math.cos(angle);
+                coordinatesRegistry[coordKey] = count + 1;
+            } else {
+                coordinatesRegistry[coordKey] = 1;
+            }
+
+            startup.lat = lat;
+            startup.lng = lng;
+
+            const markerEl = createLogoContent(startup);
+            const marker = new maplibregl.Marker({
+                element: markerEl,
+                anchor: 'center'
+            })
+                .setLngLat([lng, lat])
+                .addTo(map);
+
+            markerEl.title = String(startup.name || '');
+            markersMap[startup.id] = marker;
+        });
+    }
 
     function clearAllMarkers() {
         if (tempRemoteMarker) {
@@ -315,16 +400,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 .setLngLat([lng, lat])
                 .addTo(map);
 
-            markerEl.title = startup.name;
+            markerEl.title = String(startup.name || '');
             markersMap[startup.id] = marker;
         });
     }
 
     function updateDashboardStats(filteredStartups) {
         statCount.textContent = String(filteredStartups.length);
-        const totalHeadcount = filteredStartups.reduce((sum, s) => sum + (s.head_count || 0), 0);
+        const totalHeadcount = filteredStartups.reduce((sum, s) => sum + Math.max(0, parseInt(s.head_count, 10) || 0), 0);
         statHeadcount.textContent = totalHeadcount.toLocaleString();
-        const totalJobs = filteredStartups.reduce((sum, s) => sum + (s.job_count !== undefined ? s.job_count : (s.job_openings ? s.job_openings.length : 0)), 0);
+        const totalJobs = filteredStartups.reduce((sum, s) => {
+            const jobs = Array.isArray(s.jobs) ? s.jobs : (Array.isArray(s.job_openings) ? s.job_openings : []);
+            const jCnt = s.job_count !== undefined && !isNaN(s.job_count) ? Math.max(0, parseInt(s.job_count, 10)) : jobs.length;
+            return sum + jCnt;
+        }, 0);
         statJobs.textContent = String(totalJobs);
     }
 
@@ -339,16 +428,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         startups.forEach(startup => {
             const isSelected = currentSelectedId === startup.id;
-            const indClass = startup.industry ? startup.industry.toLowerCase().replace(/[^a-z0-9]/g, '') : 'software';
+            const indClass = startup.industry ? String(startup.industry).toLowerCase().replace(/[^a-z0-9]/g, '') : 'software';
             const domain = getDomain(startup);
             const logoUrl = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : '';
-            const jCnt = startup.job_count !== undefined ? startup.job_count : ((startup.jobs || startup.job_openings) ? (startup.jobs || startup.job_openings).length : 0);
+            const jobs = Array.isArray(startup.jobs) ? startup.jobs : (Array.isArray(startup.job_openings) ? startup.job_openings : []);
+            const jCnt = startup.job_count !== undefined && !isNaN(startup.job_count) ? Math.max(0, parseInt(startup.job_count, 10)) : jobs.length;
 
             const avatarChildren = [
-                createElement('span', { textContent: (startup.name || 'S').substring(0, 1).toUpperCase() })
+                createElement('span', { textContent: String(startup.name || 'S').substring(0, 1).toUpperCase() })
             ];
             if (logoUrl) {
-                const img = createElement('img', { src: logoUrl, alt: startup.name });
+                const img = createElement('img', { src: logoUrl, alt: String(startup.name || 'Logo') });
                 img.style.position = 'absolute';
                 img.style.top = '0';
                 img.style.left = '0';
@@ -362,8 +452,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const topTags = [
-                createElement('span', { className: 'card-title', textContent: startup.name }),
-                createElement('span', { className: `pill pill-${indClass}`, textContent: startup.industry })
+                createElement('span', { className: 'card-title', textContent: String(startup.name || 'Unnamed Startup') }),
+                createElement('span', { className: `pill pill-${indClass}`, textContent: startup.industry || 'Tech' })
             ];
             if (startup.has_pin === false) {
                 topTags.push(createElement('span', { className: 'verified-pill', style: 'background: #fef9c3; color: #854d0e; border: 1px solid #fde047; margin-left: 6px;', textContent: '📍 Remote / Hub' }));
@@ -371,10 +461,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (startup.funding_stage && startup.funding_stage !== "N/A") {
                 topTags.push(createElement('span', { className: 'verified-pill', style: 'background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; margin-left: 6px;', textContent: `🌱 ${startup.funding_stage}` }));
             }
-            if (startup.verified_email || (startup.founder_names && startup.founder_names.length > 0)) {
+            if (startup.verified_email || (Array.isArray(startup.founder_names) && startup.founder_names.length > 0)) {
                 topTags.push(createElement('span', { className: 'verified-pill', style: 'background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; margin-left: 6px;', textContent: '✨ Direct Access' }));
             }
 
+            const headCount = Math.max(0, parseInt(startup.head_count, 10) || 0);
             const card = createElement('div', {
                 className: 'directory-item' + (isSelected ? ' active' : ''),
                 id: `directory-item-${startup.id}`
@@ -383,9 +474,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 createElement('div', { className: 'card-body' }, [
                     createElement('div', { className: 'card-top' }, topTags),
                     createElement('div', { className: 'card-meta' }, [
-                        createElement('span', { textContent: `👥 ${startup.head_count || 0}` }),
+                        createElement('span', { textContent: `👥 ${headCount}` }),
                         createElement('span', { textContent: '•' }),
-                        createElement('span', { textContent: `📍 ${startup.city ? startup.city.split(',')[0] : 'Global'}` }),
+                        createElement('span', { textContent: `📍 ${startup.city ? String(startup.city).split(',')[0] : 'Global'}` }),
                         createElement('span', { textContent: '•' }),
                         createElement('span', { textContent: `💼 ${jCnt} jobs` })
                     ])
@@ -411,17 +502,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderDrawerDetails(startup) {
         drawerContent.replaceChildren();
-        const indClass = startup.industry ? startup.industry.toLowerCase().replace(/[^a-z0-9]/g, '') : 'software';
+        const indClass = startup.industry ? String(startup.industry).toLowerCase().replace(/[^a-z0-9]/g, '') : 'software';
         const domain = getDomain(startup);
         const logoUrl = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : '';
-        const jCnt = startup.job_count !== undefined ? startup.job_count : ((startup.jobs || startup.job_openings) ? (startup.jobs || startup.job_openings).length : 0);
+        const jobs = Array.isArray(startup.jobs) ? startup.jobs : (Array.isArray(startup.job_openings) ? startup.job_openings : []);
+        const jCnt = startup.job_count !== undefined && !isNaN(startup.job_count) ? Math.max(0, parseInt(startup.job_count, 10)) : jobs.length;
 
         // Hero Header
         const heroAvatarChildren = [
-            createElement('span', { textContent: (startup.name || 'S').substring(0, 1).toUpperCase() })
+            createElement('span', { textContent: String(startup.name || 'S').substring(0, 1).toUpperCase() })
         ];
         if (logoUrl) {
-            const img = createElement('img', { src: logoUrl, className: 'drawer-logo', alt: startup.name });
+            const img = createElement('img', { src: logoUrl, className: 'drawer-logo', alt: String(startup.name || 'Logo') });
             img.style.position = 'absolute';
             img.style.top = '0';
             img.style.left = '0';
@@ -435,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const heroTagsList = [
-            createElement('span', { className: `pill pill-${indClass}`, textContent: startup.industry }),
+            createElement('span', { className: `pill pill-${indClass}`, textContent: startup.industry || 'Technology' }),
             createElement('span', { className: 'verified-pill', textContent: jCnt > 0 ? `💼 ${jCnt} Active Jobs` : 'Hiring Soon' })
         ];
         if (startup.funding_stage && startup.funding_stage !== "N/A") {
@@ -444,23 +536,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (startup.verified_email) {
             heroTagsList.push(createElement('span', { className: 'verified-pill', style: 'background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;', textContent: `✉️ Verified HR: ${startup.verified_email}` }));
         }
-        if (startup.founders && startup.founders.length > 0) {
-            heroTagsList.push(createElement('span', { className: 'verified-pill', style: 'background: #faf5ff; color: #6b21a8; border: 1px solid #e9d5ff;', textContent: `✨ Direct Founder Access (${startup.founders.length} profiles)` }));
+        const foundersList = Array.isArray(startup.founders) ? startup.founders : [];
+        if (foundersList.length > 0) {
+            heroTagsList.push(createElement('span', { className: 'verified-pill', style: 'background: #faf5ff; color: #6b21a8; border: 1px solid #e9d5ff;', textContent: `✨ Direct Founder Access (${foundersList.length} profiles)` }));
         }
 
         const heroSection = createElement('div', { className: 'drawer-hero' }, [
             createElement('div', { className: 'card-avatar' }, heroAvatarChildren),
             createElement('div', { className: 'drawer-hero-text' }, [
-                createElement('h2', { textContent: startup.name }),
+                createElement('h2', { textContent: String(startup.name || 'Unnamed Startup') }),
                 createElement('div', { className: 'hero-tags' }, heroTagsList)
             ])
         ]);
 
         // Key Metrics Grid
+        const headCount = Math.max(0, parseInt(startup.head_count, 10) || 0);
         const metricsSection = createElement('div', { className: 'meta-box-grid' }, [
             createElement('div', { className: 'meta-item' }, [
                 createElement('span', { className: 'meta-item-lbl', textContent: 'Headcount' }),
-                createElement('span', { className: 'meta-item-val', textContent: `${startup.head_count || 0} Employees` })
+                createElement('span', { className: 'meta-item-val', textContent: `${headCount} Employees` })
             ]),
             createElement('div', { className: 'meta-item' }, [
                 createElement('span', { className: 'meta-item-lbl', textContent: 'City / Hub' }),
@@ -469,9 +563,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ]);
 
         // About & Website
+        const descText = (startup.description && String(startup.description).trim()) ? String(startup.description).trim() : 'No description provided for this company.';
         const aboutSection = createElement('div', {}, [
             createElement('div', { className: 'section-title', textContent: 'About Company' }),
-            createElement('p', { className: 'about-text', textContent: startup.description || 'No description provided.' })
+            createElement('p', { className: 'about-text', textContent: descText })
         ]);
 
         if (startup.website) {
@@ -492,12 +587,12 @@ document.addEventListener('DOMContentLoaded', () => {
         drawerContent.appendChild(aboutSection);
 
         // Founders Section
-        if (startup.founders && startup.founders.length > 0) {
+        if (foundersList.length > 0) {
             const foundersContainer = createElement('div', { className: 'founders-grid' });
-            startup.founders.forEach(f => {
+            foundersList.forEach(f => {
                 const fCardChildren = [
-                    createElement('span', { className: 'founder-name', textContent: f.name || 'Anonymous' }),
-                    createElement('span', { className: 'founder-role', textContent: f.role || 'Founder' })
+                    createElement('span', { className: 'founder-name', textContent: f.name || 'Anonymous Founder' }),
+                    createElement('span', { className: 'founder-role', textContent: f.role || 'Founder / Leadership' })
                 ];
                 if (f.linkedin) {
                     fCardChildren.push(
@@ -526,20 +621,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedExp = expFilter ? expFilter.value.toLowerCase().trim() : '';
         const selectedSkill = skillFilter ? skillFilter.value.toLowerCase().trim() : '';
 
-        const blrJobs = (startup.jobs || startup.job_openings || []).filter(j => {
+        const blrJobs = jobs.filter(j => {
+            if (!j || typeof j !== 'object') return false;
             if (j.location) {
-                const loc = j.location.toLowerCase();
+                const loc = String(j.location).toLowerCase();
                 if (!(loc.includes('bengaluru') || loc.includes('bangalore') || loc.includes('india'))) {
                     return false;
                 }
             }
-            if (selectedDept && !(j.department && j.department.toLowerCase().includes(selectedDept))) {
+            if (selectedDept && !(j.department && String(j.department).toLowerCase().includes(selectedDept))) {
                 return false;
             }
-            if (selectedExp && !((j.experience && j.experience.toLowerCase().includes(selectedExp)) || (j.job_type && j.job_type.toLowerCase().includes(selectedExp)))) {
+            if (selectedExp && !((j.experience && String(j.experience).toLowerCase().includes(selectedExp)) || (j.job_type && String(j.job_type).toLowerCase().includes(selectedExp)))) {
                 return false;
             }
-            if (selectedSkill && !(j.skills && j.skills.some(s => s.toLowerCase().includes(selectedSkill)))) {
+            if (selectedSkill && !(Array.isArray(j.skills) && j.skills.some(s => String(s).toLowerCase().includes(selectedSkill)))) {
                 return false;
             }
             return true;
@@ -548,17 +644,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const jobsContainer = createElement('div', { className: 'jobs-list' });
         if (blrJobs.length > 0) {
             blrJobs.forEach(j => {
+                const deptText = j.department ? String(j.department) : 'General';
+                const sourceText = j.source ? String(j.source) : 'Direct';
+                const jobType = j.job_type ? String(j.job_type) : 'Full-Time';
+                const salaryText = (j.salary && j.salary !== "Not disclosed" && j.salary !== "N/A") ? String(j.salary) : 'Competitive Salary';
+                const expText = (j.experience && j.experience !== "Not specified") ? String(j.experience) : 'Experience Not Specified';
+
                 const tagsChildren = [
-                    createElement('span', { className: 'job-tag badge-attr', textContent: j.department || 'General' }),
-                    createElement('span', { className: 'job-tag badge-attr', textContent: j.source || 'Direct' })
+                    createElement('span', { className: 'job-tag badge-attr', textContent: deptText }),
+                    createElement('span', { className: 'job-tag badge-attr', textContent: sourceText })
                 ];
-                if (j.job_type) {
-                    const jtTag = createElement('span', { className: 'job-tag badge-attr', textContent: `📌 ${j.job_type}` });
+                if (j.job_type || !j.experience) {
+                    const jtTag = createElement('span', { className: 'job-tag badge-attr', textContent: `📌 ${jobType}` });
                     jtTag.addEventListener('click', (e) => {
                         e.stopPropagation();
                         if (expFilter) {
                             for (let opt of expFilter.options) {
-                                if (opt.value && (j.job_type.toLowerCase().includes(opt.value.toLowerCase()) || opt.value.toLowerCase().includes(j.job_type.toLowerCase()))) {
+                                if (opt.value && (jobType.toLowerCase().includes(opt.value.toLowerCase()) || opt.value.toLowerCase().includes(jobType.toLowerCase()))) {
                                     expFilter.value = opt.value;
                                     applyFiltering();
                                     break;
@@ -568,13 +670,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     tagsChildren.push(jtTag);
                 }
-                if (j.experience && j.experience !== "Not specified") {
-                    const expTag = createElement('span', { className: 'job-tag badge-attr', textContent: `⏳ ${j.experience}` });
+                if (j.experience || !j.job_type) {
+                    const expTag = createElement('span', { className: 'job-tag badge-attr', textContent: `⏳ ${expText}` });
                     expTag.addEventListener('click', (e) => {
                         e.stopPropagation();
                         if (expFilter) {
                             for (let opt of expFilter.options) {
-                                if (opt.value && (j.experience.toLowerCase().includes(opt.value.toLowerCase()) || opt.value.toLowerCase().includes(j.experience.toLowerCase()))) {
+                                if (opt.value && (expText.toLowerCase().includes(opt.value.toLowerCase()) || opt.value.toLowerCase().includes(expText.toLowerCase()))) {
                                     expFilter.value = opt.value;
                                     applyFiltering();
                                     break;
@@ -584,10 +686,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     tagsChildren.push(expTag);
                 }
-                if (j.salary && j.salary !== "Not disclosed") {
-                    tagsChildren.push(createElement('span', { className: 'job-tag badge-attr', style: 'background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;', textContent: `💰 ${j.salary}` }));
-                }
-                if (j.skills && Array.isArray(j.skills) && j.skills.length > 0) {
+                tagsChildren.push(createElement('span', { className: 'job-tag badge-attr', style: 'background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;', textContent: `💰 ${salaryText}` }));
+                if (Array.isArray(j.skills) && j.skills.length > 0) {
                     j.skills.forEach(skill => {
                         const skillTag = createElement('span', { className: 'job-tag badge-attr', style: 'background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;', textContent: `🛠 ${skill}` });
                         skillTag.addEventListener('click', (e) => {
@@ -622,7 +722,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 jobsContainer.appendChild(jCard);
             });
         } else {
-            jobsContainer.appendChild(createElement('p', { className: 'about-text', textContent: 'No active job openings.' }));
+            const emptyState = createElement('div', { className: 'about-text', style: 'padding: 16px; text-align: center; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px dashed rgba(255,255,255,0.2);' }, [
+                createElement('p', { style: 'margin: 0 0 4px 0; font-weight: 500;', textContent: 'No active job openings listed.' }),
+                createElement('span', { style: 'font-size: 12px; opacity: 0.7;', textContent: 'Check back later or visit the company website for general career inquiries.' })
+            ]);
+            jobsContainer.appendChild(emptyState);
         }
 
         drawerContent.appendChild(
@@ -648,27 +752,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkStartupMatch(startup, searchText, selectedDept, selectedExp, selectedSkill) {
+        if (!startup || typeof startup !== 'object') return false;
+        const name = (startup.name || '').toString().toLowerCase();
+        const desc = (startup.description || '').toString().toLowerCase();
+        const city = (startup.city || '').toString().toLowerCase();
+        const fNames = Array.isArray(startup.founder_names) ? startup.founder_names : [];
+        const founders = Array.isArray(startup.founders) ? startup.founders : [];
+        const jTitles = Array.isArray(startup.job_titles) ? startup.job_titles : [];
+        const jobs = Array.isArray(startup.jobs) ? startup.jobs : (Array.isArray(startup.job_openings) ? startup.job_openings : []);
+
         const matchesSearch = searchText === '' ||
-            startup.name.toLowerCase().includes(searchText) ||
-            (startup.description && startup.description.toLowerCase().includes(searchText)) ||
-            (startup.city && startup.city.toLowerCase().includes(searchText)) ||
-            (startup.founder_names && startup.founder_names.some(fn => fn.toLowerCase().includes(searchText))) ||
-            (startup.founders && startup.founders.some(f => f.name && f.name.toLowerCase().includes(searchText))) ||
-            (startup.job_titles && startup.job_titles.some(jt => jt.toLowerCase().includes(searchText))) ||
-            ((startup.jobs || startup.job_openings) && (startup.jobs || startup.job_openings).some(j =>
-                (j.title && j.title.toLowerCase().includes(searchText)) ||
-                (j.department && j.department.toLowerCase().includes(searchText)) ||
-                (j.skills && j.skills.some(s => s.toLowerCase().includes(searchText))) ||
-                (j.salary && j.salary.toLowerCase().includes(searchText)) ||
-                (j.experience && j.experience.toLowerCase().includes(searchText))
+            name.includes(searchText) ||
+            desc.includes(searchText) ||
+            city.includes(searchText) ||
+            fNames.some(fn => (fn || '').toString().toLowerCase().includes(searchText)) ||
+            founders.some(f => f && (f.name || '').toString().toLowerCase().includes(searchText)) ||
+            jTitles.some(jt => (jt || '').toString().toLowerCase().includes(searchText)) ||
+            jobs.some(j => j && (
+                ((j.title || '').toString().toLowerCase().includes(searchText)) ||
+                ((j.department || '').toString().toLowerCase().includes(searchText)) ||
+                (Array.isArray(j.skills) && j.skills.some(s => (s || '').toString().toLowerCase().includes(searchText))) ||
+                ((j.salary || '').toString().toLowerCase().includes(searchText)) ||
+                ((j.experience || '').toString().toLowerCase().includes(searchText))
             ));
-        const matchesIndustry = currentSelectedIndustry === '' || startup.industry === currentSelectedIndustry;
-        const matchesDept = selectedDept === '' || ((startup.jobs || startup.job_openings) && (startup.jobs || startup.job_openings).some(j => j.department && j.department.toLowerCase().includes(selectedDept.toLowerCase())));
-        const matchesExp = selectedExp === '' || ((startup.jobs || startup.job_openings) && (startup.jobs || startup.job_openings).some(j =>
-            (j.experience && j.experience.toLowerCase().includes(selectedExp.toLowerCase())) ||
-            (j.job_type && j.job_type.toLowerCase().includes(selectedExp.toLowerCase()))
+        const matchesIndustry = currentSelectedIndustry === '' || (startup.industry || '') === currentSelectedIndustry;
+        const matchesDept = selectedDept === '' || jobs.some(j => j && (j.department || '').toString().toLowerCase().includes(selectedDept.toLowerCase()));
+        const matchesExp = selectedExp === '' || jobs.some(j => j && (
+            ((j.experience || '').toString().toLowerCase().includes(selectedExp.toLowerCase())) ||
+            ((j.job_type || '').toString().toLowerCase().includes(selectedExp.toLowerCase()))
         ));
-        const matchesSkill = selectedSkill === '' || ((startup.jobs || startup.job_openings) && (startup.jobs || startup.job_openings).some(j => j.skills && j.skills.some(s => s.toLowerCase().includes(selectedSkill.toLowerCase()))));
+        const matchesSkill = selectedSkill === '' || jobs.some(j => j && Array.isArray(j.skills) && j.skills.some(s => (s || '').toString().toLowerCase().includes(selectedSkill.toLowerCase())));
         return matchesSearch && matchesIndustry && matchesDept && matchesExp && matchesSkill;
     }
 
@@ -782,6 +895,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function selectAndOpenStartup(id) {
         currentSelectedId = id;
+        for (const [pendingId, controller] of inFlightRequests.entries()) {
+            if (pendingId !== id) {
+                controller.abort();
+                inFlightRequests.delete(pendingId);
+            }
+        }
+
         if (profileCache.has(id)) {
             _processOpenStartup(profileCache.get(id));
             return;
@@ -790,9 +910,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return; // Coalesce redundant concurrent fetch attempts
         }
 
-        const fetchPromise = safeFetch(`/api/startups/${id}`)
+        const controller = new AbortController();
+        inFlightRequests.set(id, controller);
+
+        safeFetch(`/api/startups/${id}`, { signal: controller.signal })
             .then(fullStartup => {
                 inFlightRequests.delete(id);
+                if (controller.signal.aborted) return;
                 if (currentSelectedId === id && fullStartup && !fullStartup.error) {
                     if (profileCache.size >= 50) {
                         const firstKey = profileCache.keys().next().value;
@@ -804,10 +928,9 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(err => {
                 inFlightRequests.delete(id);
+                if (err.name === 'AbortError') return;
                 showToast('Could not load company profile. Please try again.', 'error');
             });
-
-        inFlightRequests.set(id, fetchPromise);
     }
 
     // Hash routing
@@ -877,41 +1000,8 @@ document.addEventListener('DOMContentLoaded', () => {
             mobileToggleBtn.textContent = 'Show Map';
         }
     });
-});
-deptFilter.addEventListener('change', scheduleFiltering);
-if (expFilter) expFilter.addEventListener('change', scheduleFiltering);
-if (skillFilter) {
-    skillFilter.addEventListener('input', handleDebouncedInput);
-    skillFilter.addEventListener('change', scheduleFiltering);
-}
 
-quickTabs.forEach(btn => {
-    btn.addEventListener('click', () => {
-        quickTabs.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentSelectedIndustry = btn.getAttribute('data-industry') || "";
-        applyFiltering();
+    window.addEventListener('resize', () => {
+        if (map) map.resize();
     });
-});
-
-if (resetMapBtn) {
-    resetMapBtn.addEventListener('click', () => {
-        map.setCenter(defaultLocation);
-        map.setZoom(defaultZoom);
-    });
-}
-
-map.on('click', () => { window.location.hash = ''; });
-closeDrawerBtn.addEventListener('click', () => { window.location.hash = ''; });
-
-mobileToggleBtn.addEventListener('click', () => {
-    const isOpen = sidebar.classList.contains('active');
-    if (isOpen) {
-        sidebar.classList.remove('active');
-        mobileToggleBtn.textContent = 'Show Directory';
-    } else {
-        sidebar.classList.add('active');
-        mobileToggleBtn.textContent = 'Show Map';
-    }
-});
 });
