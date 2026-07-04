@@ -1004,4 +1004,25 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => {
         if (map) map.resize();
     });
+
+    // Expose core functions to window.WorldTechApp for modular unit & E2E testing
+    window.WorldTechApp = {
+        createElement,
+        showToast,
+        safeFetch,
+        getDomain,
+        createLogoContent,
+        checkStartupMatch,
+        updateDashboardStats,
+        clearAllMarkers,
+        initializeMarkers,
+        updateMarkersDiff,
+        applyFiltering,
+        scheduleFiltering,
+        renderDirectory,
+        renderDrawerDetails,
+        selectAndOpenStartup,
+        _processOpenStartup,
+        handleHashRouting
+    };
 });
