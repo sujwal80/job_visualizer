@@ -12,7 +12,7 @@
         rel="stylesheet">
     <!-- MapLibre GL CSS -->
     <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
-    <link rel="stylesheet" href="/static/css/style.css?v=3.0.8">
+    <link rel="stylesheet" href="/static/css/style.css?v=9.0.0">
 </head>
 
 <body>
@@ -47,6 +47,15 @@
                     <input type="text" id="search-input" placeholder="Search companies, founders, tech..."
                         autocomplete="off">
                     <kbd class="shortcut-hint">⌘K</kbd>
+                </div>
+                <div id="auth-nav-widget" class="auth-nav-widget" style="display: flex; gap: 6px; align-items: center;">
+                    <a href="/api/auth/demo_login?redirect=true" id="nav-demo-btn" class="nav-signin-btn" style="background: #ecfdf5; color: #047857; border-color: #a7f3d0;">⚡ Demo Login</a>
+                    <a href="/api/auth/google?redirect=true" id="nav-signin-btn" class="nav-signin-btn">🔐 Google OAuth</a>
+                    <div id="nav-user-profile" class="nav-user-profile" style="display: none;">
+                        <img id="nav-user-avatar" src="" alt="Avatar" class="user-avatar-img">
+                        <span id="nav-user-name" class="user-name-text"></span>
+                        <button id="nav-logout-btn" class="nav-logout-btn" title="Sign Out">Logout</button>
+                    </div>
                 </div>
             </div>
         </header>
@@ -132,7 +141,7 @@
 
     <!-- MapLibre GL JS -->
     <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
-    <script src="/static/js/app.js?v=3.0.8"></script>
+    <script src="/static/js/app.js?v=9.0.0"></script>
 </body>
 
 </html>

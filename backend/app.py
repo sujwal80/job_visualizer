@@ -278,6 +278,33 @@ def auth_callback():
     except Exception as e:
         return jsonify({"error": "Authentication exchange failed."}), 500
 
+@app.route('/api/auth/demo_login', methods=['GET', 'POST'])
+def auth_demo_login():
+    """
+    Provide an instant demo/sandbox login for local development and QA testing without requiring real Google Cloud OAuth credentials.
+    """
+    demo_user = {
+        "sub": "usr_google_1001",
+        "email": "ujwal@worldtech.map",
+        "name": "Ujwal Singh",
+        "picture": "https://lh3.googleusercontent.com/a/mockphoto1"
+    }
+    token = issue_jwt_token(demo_user)
+    
+    if request.args.get('redirect', '').lower() in ('true', '1', 'yes') or request.method == 'GET':
+        resp = make_response('', 302)
+        resp.headers['Location'] = '/'
+    else:
+        resp = make_response(jsonify({
+            "message": "Demo sandbox authentication successful.",
+            "authenticated": True,
+            "user": demo_user,
+            "token": token
+        }), 200)
+        
+    resp.set_cookie('session_token', token, max_age=3600, httponly=True, secure=False, samesite='Lax')
+    return resp
+
 @app.route('/api/auth/status', methods=['GET'])
 def auth_status():
     """

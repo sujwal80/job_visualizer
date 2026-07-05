@@ -238,6 +238,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetchAndRender();
 
+    function checkAuthStatus() {
+        const navSigninBtn = document.getElementById('nav-signin-btn');
+        const navDemoBtn = document.getElementById('nav-demo-btn');
+        const navUserProfile = document.getElementById('nav-user-profile');
+        const navUserAvatar = document.getElementById('nav-user-avatar');
+        const navUserName = document.getElementById('nav-user-name');
+        const navLogoutBtn = document.getElementById('nav-logout-btn');
+
+        if (navLogoutBtn) {
+            navLogoutBtn.addEventListener('click', () => {
+                safeFetch('/api/auth/logout', { method: 'POST' })
+                    .then(() => {
+                        window.location.reload();
+                    })
+                    .catch(() => window.location.reload());
+            });
+        }
+
+        safeFetch('/api/auth/status')
+            .then(res => {
+                if (res && res.authenticated === true && res.user) {
+                    if (navSigninBtn) navSigninBtn.style.display = 'none';
+                    if (navDemoBtn) navDemoBtn.style.display = 'none';
+                    if (navUserProfile) {
+                        navUserProfile.style.display = 'flex';
+                        if (navUserAvatar) navUserAvatar.src = res.user.picture || 'https://www.google.com/favicon.ico';
+                        if (navUserName) navUserName.textContent = res.user.name || res.user.email || 'User';
+                    }
+                } else {
+                    if (navSigninBtn) navSigninBtn.style.display = 'inline-block';
+                    if (navDemoBtn) navDemoBtn.style.display = 'inline-block';
+                    if (navUserProfile) navUserProfile.style.display = 'none';
+                }
+            })
+            .catch(() => {});
+    }
+
+    checkAuthStatus();
+
     let isFetchingViewport = false;
     let viewportDebounceTimer = null;
     let viewportFetchController = null;
@@ -460,18 +499,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 avatarChildren.push(img);
             }
 
-            const topTags = [
-                createElement('span', { className: 'card-title', textContent: String(startup.name || 'Unnamed Startup') }),
+            const cardTitle = createElement('div', { className: 'card-title', textContent: String(startup.name || 'Unnamed Startup') });
+            const badgeTags = [
                 createElement('span', { className: `pill pill-${indClass}`, textContent: startup.industry || 'Tech' })
             ];
             if (startup.has_pin === false) {
-                topTags.push(createElement('span', { className: 'verified-pill', style: 'background: #fef9c3; color: #854d0e; border: 1px solid #fde047; margin-left: 6px;', textContent: '📍 Remote / Hub' }));
+                badgeTags.push(createElement('span', { className: 'verified-pill', style: 'background: #fef9c3; color: #854d0e; border: 1px solid #fde047;', textContent: '📍 Remote / Hub' }));
             }
             if (startup.funding_stage && startup.funding_stage !== "N/A") {
-                topTags.push(createElement('span', { className: 'verified-pill', style: 'background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; margin-left: 6px;', textContent: `🌱 ${startup.funding_stage}` }));
+                badgeTags.push(createElement('span', { className: 'verified-pill', style: 'background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;', textContent: `🌱 ${startup.funding_stage}` }));
             }
             if (startup.verified_email || (Array.isArray(startup.founder_names) && startup.founder_names.length > 0)) {
-                topTags.push(createElement('span', { className: 'verified-pill', style: 'background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; margin-left: 6px;', textContent: '✨ Direct Access' }));
+                badgeTags.push(createElement('span', { className: 'verified-pill', style: 'background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;', textContent: '✨ Direct Access' }));
             }
 
             const headCount = Math.max(0, parseInt(startup.head_count, 10) || 0);
@@ -481,7 +520,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }, [
                 createElement('div', { className: 'card-avatar' }, avatarChildren),
                 createElement('div', { className: 'card-body' }, [
-                    createElement('div', { className: 'card-top' }, topTags),
+                    cardTitle,
+                    createElement('div', { className: 'card-tags' }, badgeTags),
                     createElement('div', { className: 'card-meta' }, [
                         createElement('span', { textContent: `👥 ${headCount}` }),
                         createElement('span', { textContent: '•' }),
@@ -1087,6 +1127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         selectAndOpenStartup,
         _processOpenStartup,
         handleHashRouting,
-        checkViewportResilience
+        checkViewportResilience,
+        checkAuthStatus
     };
 });
