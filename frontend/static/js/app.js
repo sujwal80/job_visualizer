@@ -239,12 +239,49 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchAndRender();
 
     function checkAuthStatus() {
+        const searchLanding = document.getElementById('search-first-landing');
+        const landingSearchForm = document.getElementById('landing-search-form');
+        const landingSearchInput = document.getElementById('landing-search-input');
+        const landingSkipBtn = document.getElementById('landing-skip-btn');
+        const landingLaunchBtn = document.getElementById('landing-launch-btn');
+        const landingAuthWelcome = document.getElementById('landing-auth-welcome');
+        const landingAuthButtons = document.querySelector('.landing-auth-buttons');
+        const landingAuthGroup = document.querySelector('.landing-auth-group');
+        const landingDivider = document.querySelector('.landing-divider');
         const navSigninBtn = document.getElementById('nav-signin-btn');
         const navDemoBtn = document.getElementById('nav-demo-btn');
         const navUserProfile = document.getElementById('nav-user-profile');
         const navUserAvatar = document.getElementById('nav-user-avatar');
         const navUserName = document.getElementById('nav-user-name');
         const navLogoutBtn = document.getElementById('nav-logout-btn');
+
+        function dismissLanding() {
+            if (searchLanding) {
+                searchLanding.classList.add('hidden');
+                setTimeout(() => {
+                    searchLanding.style.display = 'none';
+                }, 400);
+            }
+        }
+
+        if (landingSkipBtn) {
+            landingSkipBtn.addEventListener('click', dismissLanding);
+        }
+        if (landingLaunchBtn) {
+            landingLaunchBtn.addEventListener('click', dismissLanding);
+        }
+
+        if (landingSearchForm) {
+            landingSearchForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const query = landingSearchInput ? landingSearchInput.value.trim() : '';
+                dismissLanding();
+                if (query && searchInput) {
+                    searchInput.value = query;
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+            });
+        }
 
         if (navLogoutBtn) {
             navLogoutBtn.addEventListener('click', () => {
@@ -259,6 +296,10 @@ document.addEventListener('DOMContentLoaded', () => {
         safeFetch('/api/auth/status')
             .then(res => {
                 if (res && res.authenticated === true && res.user) {
+                    if (landingAuthButtons) landingAuthButtons.style.display = 'none';
+                    if (landingAuthGroup) landingAuthGroup.style.display = 'none';
+                    if (landingDivider) landingDivider.style.display = 'none';
+                    if (landingAuthWelcome) landingAuthWelcome.style.display = 'block';
                     if (navSigninBtn) navSigninBtn.style.display = 'none';
                     if (navDemoBtn) navDemoBtn.style.display = 'none';
                     if (navUserProfile) {
@@ -267,6 +308,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (navUserName) navUserName.textContent = res.user.name || res.user.email || 'User';
                     }
                 } else {
+                    if (landingAuthButtons) landingAuthButtons.style.display = 'flex';
+                    if (landingAuthGroup) landingAuthGroup.style.display = 'flex';
+                    if (landingDivider) landingDivider.style.display = 'flex';
+                    if (landingAuthWelcome) landingAuthWelcome.style.display = 'none';
                     if (navSigninBtn) navSigninBtn.style.display = 'inline-block';
                     if (navDemoBtn) navDemoBtn.style.display = 'inline-block';
                     if (navUserProfile) navUserProfile.style.display = 'none';
