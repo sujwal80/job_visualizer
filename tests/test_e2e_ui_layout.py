@@ -10,6 +10,26 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from backend.app import app
 
 
+def load_all_js_contents(workspace_root):
+    js_dir = os.path.join(workspace_root, 'frontend', 'static', 'js')
+    contents = []
+    
+    app_js = os.path.join(js_dir, 'app.js')
+    if os.path.exists(app_js):
+        with open(app_js, 'r', encoding='utf-8') as f:
+            contents.append(f.read())
+            
+    modules_dir = os.path.join(js_dir, 'modules')
+    if os.path.exists(modules_dir):
+        for root, dirs, files in os.walk(modules_dir):
+            for file in files:
+                if file.endswith('.js'):
+                    with open(os.path.join(root, file), 'r', encoding='utf-8') as f:
+                        contents.append(f.read())
+                        
+    return "\n\n/* MODULE BOUNDARY */\n\n".join(contents)
+
+
 class TestR1ViewportAndLayoutResilience(unittest.TestCase):
     """
     R1: Viewport & Responsive Layout Stress Testing (>= 15 test cases)
@@ -22,14 +42,12 @@ class TestR1ViewportAndLayoutResilience(unittest.TestCase):
         cls.workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         cls.css_path = os.path.join(cls.workspace_root, 'frontend', 'static', 'css', 'style.css')
         cls.html_path = os.path.join(cls.workspace_root, 'frontend', 'templates', 'index.html')
-        cls.js_path = os.path.join(cls.workspace_root, 'frontend', 'static', 'js', 'app.js')
 
         with open(cls.css_path, 'r', encoding='utf-8') as f:
             cls.css_content = f.read()
         with open(cls.html_path, 'r', encoding='utf-8') as f:
             cls.html_content = f.read()
-        with open(cls.js_path, 'r', encoding='utf-8') as f:
-            cls.js_content = f.read()
+        cls.js_content = load_all_js_contents(cls.workspace_root)
 
     def setUp(self):
         app.testing = True
@@ -207,9 +225,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        cls.js_path = os.path.join(cls.workspace_root, 'frontend', 'static', 'js', 'app.js')
-        with open(cls.js_path, 'r', encoding='utf-8') as f:
-            cls.js_content = f.read()
+        cls.js_content = load_all_js_contents(cls.workspace_root)
 
     def setUp(self):
         app.testing = True
@@ -429,9 +445,7 @@ class TestR3RaceConditionsAndLatencyResilience(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        cls.js_path = os.path.join(cls.workspace_root, 'frontend', 'static', 'js', 'app.js')
-        with open(cls.js_path, 'r', encoding='utf-8') as f:
-            cls.js_content = f.read()
+        cls.js_content = load_all_js_contents(cls.workspace_root)
 
     def setUp(self):
         app.testing = True
@@ -460,8 +474,8 @@ class TestR3RaceConditionsAndLatencyResilience(unittest.TestCase):
 
     def test_r3_05_js_marker_cleanup_on_refetch(self):
         """Verify clearAllMarkers removes maplibregl marker DOM instances and resets registries to prevent DOM node memory leaks."""
-        self.assertIn("markersMap[id].remove()", self.js_content, "clearAllMarkers must call .remove() on existing map markers.")
-        self.assertIn("markersMap = {}", self.js_content, "clearAllMarkers must reset markersMap object.")
+        self.assertTrue("markersMap[id].remove()" in self.js_content or "marker.remove()" in self.js_content, "clearAllMarkers must call .remove() on existing map markers.")
+        self.assertTrue("markersMap = {}" in self.js_content or "markersMap.clear()" in self.js_content, "clearAllMarkers must reset markersMap.")
         self.assertIn("delete coordinatesRegistry[key]", self.js_content, "clearAllMarkers must clean up coordinatesRegistry.")
 
     def test_r3_06_backend_concurrent_request_rate_limiting(self):

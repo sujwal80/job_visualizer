@@ -14905,5 +14905,650 @@
         "skills": []
       }
     ]
+  },
+  {
+    "id": 248,
+    "name": "OpenAI",
+    "lat": 37.7654,
+    "lng": -122.415,
+    "city": "Mission District, San Francisco, CA",
+    "industry": "Artificial Intelligence",
+    "description": "AI research and deployment company dedicated to ensuring artificial general intelligence benefits all of humanity.",
+    "website": "https://openai.com",
+    "logo_domain": "openai.com",
+    "funding_stage": "Series C",
+    "head_count": 1200,
+    "founders": [
+      {
+        "name": "Sam Altman",
+        "role": "CEO",
+        "linkedin": "https://linkedin.com/in/samaltman"
+      },
+      {
+        "name": "Greg Brockman",
+        "role": "President",
+        "linkedin": "https://linkedin.com/in/gregbrockman"
+      }
+    ],
+    "hr_details": {
+      "contact_email": "jobs@openai.com",
+      "benefits": "Competitive salary, equity, comprehensive health benefits, learning stipend"
+    },
+    "job_openings": [
+      {
+        "title": "Research Scientist, ChatGPT",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://openai.com/careers/research-scientist",
+        "experience": "Senior",
+        "salary": "$300k - $500k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "PyTorch"
+        ]
+      },
+      {
+        "title": "Senior Systems Engineer",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://openai.com/careers/senior-systems-engineer",
+        "experience": "Senior",
+        "salary": "$250k - $400k",
+        "job_type": "Full-time",
+        "skills": [
+          "C++",
+          "Distributed Systems"
+        ]
+      },
+      {
+        "title": "AI Safety Engineer",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://openai.com/careers/ai-safety-engineer",
+        "experience": "Mid",
+        "salary": "$200k - $350k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "PyTorch"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 249,
+    "name": "Anthropic",
+    "lat": 37.7785,
+    "lng": -122.4056,
+    "city": "SOMA, San Francisco, CA",
+    "industry": "Artificial Intelligence",
+    "description": "AI safety and research company building reliable, interpretable, and steerable AI systems.",
+    "website": "https://anthropic.com",
+    "logo_domain": "anthropic.com",
+    "funding_stage": "Series C",
+    "head_count": 500,
+    "founders": [
+      {
+        "name": "Dario Amodei",
+        "role": "CEO",
+        "linkedin": ""
+      },
+      {
+        "name": "Daniela Amodei",
+        "role": "President",
+        "linkedin": ""
+      }
+    ],
+    "hr_details": {
+      "contact_email": "careers@anthropic.com",
+      "benefits": "Generous pay, full insurance coverage, modern SF office space"
+    },
+    "job_openings": [
+      {
+        "title": "Member of Technical Staff",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://anthropic.com/careers/mts",
+        "experience": "Senior",
+        "salary": "$280k - $450k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "Rust",
+          "LLMs"
+        ]
+      },
+      {
+        "title": "Security Engineer",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://anthropic.com/careers/security-engineer",
+        "experience": "Mid",
+        "salary": "$190k - $320k",
+        "job_type": "Full-time",
+        "skills": [
+          "Rust",
+          "Kubernetes"
+        ]
+      },
+      {
+        "title": "Product Manager, Claude",
+        "department": "Product",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://anthropic.com/careers/pm-claude",
+        "experience": "Senior",
+        "salary": "$220k - $380k",
+        "job_type": "Full-time",
+        "skills": [
+          "LLMs"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 250,
+    "name": "Stripe",
+    "lat": 37.6688,
+    "lng": -122.392,
+    "city": "South San Francisco, CA",
+    "industry": "Fintech",
+    "description": "Financial infrastructure platform for the internet building economic infrastructure.",
+    "website": "https://stripe.com",
+    "logo_domain": "stripe.com",
+    "funding_stage": "Series I",
+    "head_count": 7000,
+    "founders": [
+      {
+        "name": "Patrick Collison",
+        "role": "CEO",
+        "linkedin": ""
+      },
+      {
+        "name": "John Collison",
+        "role": "President",
+        "linkedin": ""
+      }
+    ],
+    "hr_details": {
+      "contact_email": "recruiting@stripe.com",
+      "benefits": "Wellness allowance, comprehensive medical, retirement match"
+    },
+    "job_openings": [
+      {
+        "title": "Staff Software Engineer, Payments",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://stripe.com/jobs/staff-se-payments",
+        "experience": "Senior",
+        "salary": "$240k - $380k",
+        "job_type": "Full-time",
+        "skills": [
+          "Ruby",
+          "Go",
+          "Distributed Transactions"
+        ]
+      },
+      {
+        "title": "Frontend Engineer, Dashboard",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://stripe.com/jobs/frontend-dashboard",
+        "experience": "Mid",
+        "salary": "$170k - $270k",
+        "job_type": "Full-time",
+        "skills": [
+          "React",
+          "Go",
+          "TypeScript"
+        ]
+      },
+      {
+        "title": "Risk Analyst",
+        "department": "Operations",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://stripe.com/jobs/risk-analyst",
+        "experience": "Junior",
+        "salary": "$110k - $160k",
+        "job_type": "Full-time",
+        "skills": []
+      }
+    ]
+  },
+  {
+    "id": 251,
+    "name": "Scale AI",
+    "lat": 37.7915,
+    "lng": -122.4,
+    "city": "Financial District, San Francisco, CA",
+    "industry": "Artificial Intelligence",
+    "description": "Data platform accelerating AI development for autonomous driving, robotics, and LLMs.",
+    "website": "https://scale.com",
+    "logo_domain": "scale.com",
+    "funding_stage": "Series F",
+    "head_count": 850,
+    "founders": [
+      {
+        "name": "Alexandr Wang",
+        "role": "CEO",
+        "linkedin": ""
+      }
+    ],
+    "hr_details": {
+      "contact_email": "jobs@scale.com",
+      "benefits": "Free catered meals, gym membership, comprehensive health package"
+    },
+    "job_openings": [
+      {
+        "title": "Backend Engineer, Data Engine",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://scale.com/careers/backend-data-engine",
+        "experience": "Mid",
+        "salary": "$180k - $290k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "TypeScript",
+          "AWS"
+        ]
+      },
+      {
+        "title": "Full Stack Engineer",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://scale.com/careers/full-stack-eng",
+        "experience": "Mid",
+        "salary": "$170k - $275k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "TypeScript",
+          "React"
+        ]
+      },
+      {
+        "title": "Applied ML Engineer",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://scale.com/careers/applied-ml-eng",
+        "experience": "Senior",
+        "salary": "$230k - $360k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "ML Infrastructure"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 252,
+    "name": "Vercel",
+    "lat": 37.7706,
+    "lng": -122.3912,
+    "city": "Mission Bay, San Francisco, CA",
+    "industry": "DevOps & Cloud",
+    "description": "Frontend cloud platform for frontend developers, creators of Next.js.",
+    "website": "https://vercel.com",
+    "logo_domain": "vercel.com",
+    "funding_stage": "Series D",
+    "head_count": 450,
+    "founders": [
+      {
+        "name": "Guillermo Rauch",
+        "role": "CEO",
+        "linkedin": ""
+      }
+    ],
+    "hr_details": {
+      "contact_email": "careers@vercel.com",
+      "benefits": "Remote-first culture, home office setup stipend, unlimited PTO"
+    },
+    "job_openings": [
+      {
+        "title": "Senior Frontend Engineer",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://vercel.com/careers/senior-frontend",
+        "experience": "Senior",
+        "salary": "$200k - $300k",
+        "job_type": "Full-time",
+        "skills": [
+          "TypeScript",
+          "Next.js",
+          "React"
+        ]
+      },
+      {
+        "title": "Compiler Engineer, Turborepo",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://vercel.com/careers/compiler-eng",
+        "experience": "Senior",
+        "salary": "$220k - $330k",
+        "job_type": "Full-time",
+        "skills": [
+          "Rust",
+          "TypeScript"
+        ]
+      },
+      {
+        "title": "Cloud Infrastructure Dev",
+        "department": "Engineering",
+        "location": "San Francisco, CA",
+        "source": "Direct",
+        "url": "https://vercel.com/careers/cloud-infra",
+        "experience": "Mid",
+        "salary": "$160k - $250k",
+        "job_type": "Full-time",
+        "skills": [
+          "Rust",
+          "TypeScript"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 253,
+    "name": "Google DeepMind",
+    "lat": 51.5332,
+    "lng": -0.1261,
+    "city": "King's Cross, London, UK",
+    "industry": "Artificial Intelligence",
+    "description": "World-leading artificial intelligence research organization solving intelligence to advance science.",
+    "website": "https://deepmind.com",
+    "logo_domain": "deepmind.com",
+    "funding_stage": "Acquired",
+    "head_count": 1500,
+    "founders": [
+      {
+        "name": "Demis Hassabis",
+        "role": "CEO",
+        "linkedin": ""
+      },
+      {
+        "name": "Shane Legg",
+        "role": "Chief Scientist",
+        "linkedin": ""
+      }
+    ],
+    "hr_details": {
+      "contact_email": "careers@deepmind.com",
+      "benefits": "Google-tier benefits, gym, free gourmet meals, extensive healthcare"
+    },
+    "job_openings": [
+      {
+        "title": "Research Engineer, Gemini",
+        "department": "R&D",
+        "location": "London, UK",
+        "source": "Direct",
+        "url": "https://deepmind.com/careers/re-gemini",
+        "experience": "Senior",
+        "salary": "\u00a3150k - \u00a3250k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "JAX",
+          "C++"
+        ]
+      },
+      {
+        "title": "Research Scientist, AlphaFold",
+        "department": "R&D",
+        "location": "London, UK",
+        "source": "Direct",
+        "url": "https://deepmind.com/careers/rs-alphafold",
+        "experience": "Senior",
+        "salary": "\u00a3180k - \u00a3300k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "JAX",
+          "Reinforcement Learning"
+        ]
+      },
+      {
+        "title": "Infrastructure Engineer",
+        "department": "Engineering",
+        "location": "London, UK",
+        "source": "Direct",
+        "url": "https://deepmind.com/careers/infra-eng",
+        "experience": "Mid",
+        "salary": "\u00a3120k - \u00a3190k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "C++"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 254,
+    "name": "Revolut",
+    "lat": 51.5054,
+    "lng": -0.0235,
+    "city": "Canary Wharf, London, UK",
+    "industry": "Fintech",
+    "description": "Global financial super app offering banking, currency exchange, stock trading, and payments.",
+    "website": "https://revolut.com",
+    "logo_domain": "revolut.com",
+    "funding_stage": "Series E",
+    "head_count": 6000,
+    "founders": [
+      {
+        "name": "Nikolay Storonsky",
+        "role": "CEO",
+        "linkedin": ""
+      },
+      {
+        "name": "Vlad Yatsenko",
+        "role": "CTO",
+        "linkedin": ""
+      }
+    ],
+    "hr_details": {
+      "contact_email": "jobs@revolut.com",
+      "benefits": "Flexible hybrid model, private health cover, employee discounts"
+    },
+    "job_openings": [
+      {
+        "title": "Senior Java Backend Engineer",
+        "department": "Engineering",
+        "location": "London, UK",
+        "source": "Direct",
+        "url": "https://revolut.com/jobs/senior-java",
+        "experience": "Senior",
+        "salary": "\u00a390k - \u00a3150k",
+        "job_type": "Full-time",
+        "skills": [
+          "Java",
+          "Kotlin",
+          "PostgreSQL"
+        ]
+      },
+      {
+        "title": "Lead Android Developer",
+        "department": "Engineering",
+        "location": "London, UK",
+        "source": "Direct",
+        "url": "https://revolut.com/jobs/lead-android",
+        "experience": "Senior",
+        "salary": "\u00a395k - \u00a3160k",
+        "job_type": "Full-time",
+        "skills": [
+          "Kotlin",
+          "React"
+        ]
+      },
+      {
+        "title": "Quantitative Analyst",
+        "department": "Risk & Finance",
+        "location": "London, UK",
+        "source": "Direct",
+        "url": "https://revolut.com/jobs/quant",
+        "experience": "Mid",
+        "salary": "\u00a380k - \u00a3130k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "PostgreSQL"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 255,
+    "name": "Monzo Bank",
+    "lat": 51.5245,
+    "lng": -0.0848,
+    "city": "Shoreditch, London, UK",
+    "industry": "Fintech",
+    "description": "Digital mobile-only challenger bank making money work for everyone.",
+    "website": "https://monzo.com",
+    "logo_domain": "monzo.com",
+    "funding_stage": "Series I",
+    "head_count": 2800,
+    "founders": [
+      {
+        "name": "Tom Blomfield",
+        "role": "Co-founder",
+        "linkedin": ""
+      }
+    ],
+    "hr_details": {
+      "contact_email": "careers@monzo.com",
+      "benefits": "Share option scheme, workspace budget, 30 days annual leave"
+    },
+    "job_openings": [
+      {
+        "title": "Backend Engineer (Go)",
+        "department": "Engineering",
+        "location": "London, UK",
+        "source": "Direct",
+        "url": "https://monzo.com/careers/backend-go",
+        "experience": "Mid",
+        "salary": "\u00a385k - \u00a3140k",
+        "job_type": "Full-time",
+        "skills": [
+          "Go",
+          "Cassandra",
+          "AWS"
+        ]
+      },
+      {
+        "title": "Security Operations Engineer",
+        "department": "Engineering",
+        "location": "London, UK",
+        "source": "Direct",
+        "url": "https://monzo.com/careers/sec-ops",
+        "experience": "Mid",
+        "salary": "\u00a375k - \u00a3120k",
+        "job_type": "Full-time",
+        "skills": [
+          "Go",
+          "AWS"
+        ]
+      },
+      {
+        "title": "Staff Mobile Engineer",
+        "department": "Engineering",
+        "location": "London, UK",
+        "source": "Direct",
+        "url": "https://monzo.com/careers/staff-mobile",
+        "experience": "Senior",
+        "salary": "\u00a3110k - \u00a3180k",
+        "job_type": "Full-time",
+        "skills": [
+          "iOS"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 256,
+    "name": "Wayve",
+    "lat": 51.536,
+    "lng": -0.129,
+    "city": "King's Cross, London, UK",
+    "industry": "Autonomous Vehicles",
+    "description": "Pioneering embodied AI for autonomous driving with end-to-end deep learning.",
+    "website": "https://wayve.ai",
+    "logo_domain": "wayve.ai",
+    "funding_stage": "Series C",
+    "head_count": 320,
+    "founders": [
+      {
+        "name": "Alex Kendall",
+        "role": "CEO",
+        "linkedin": ""
+      }
+    ],
+    "hr_details": {
+      "contact_email": "talent@wayve.ai",
+      "benefits": "State of the art computing resource, hybrid working, share options"
+    },
+    "job_openings": [
+      {
+        "title": "Deep Learning Scientist",
+        "department": "R&D",
+        "location": "London, UK",
+        "source": "Direct",
+        "url": "https://wayve.ai/careers/dl-scientist",
+        "experience": "Senior",
+        "salary": "\u00a3100k - \u00a3170k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "PyTorch",
+          "Computer Vision",
+          "CUDA"
+        ]
+      },
+      {
+        "title": "Autonomous Driving Systems Engineer",
+        "department": "Engineering",
+        "location": "London, UK",
+        "source": "Direct",
+        "url": "https://wayve.ai/careers/ad-systems",
+        "experience": "Senior",
+        "salary": "\u00a395k - \u00a3160k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "Computer Vision"
+        ]
+      },
+      {
+        "title": "Data Infrastructure Lead",
+        "department": "Engineering",
+        "location": "London, UK",
+        "source": "Direct",
+        "url": "https://wayve.ai/careers/data-infra-lead",
+        "experience": "Senior",
+        "salary": "\u00a3110k - \u00a3180k",
+        "job_type": "Full-time",
+        "skills": [
+          "Python",
+          "PyTorch",
+          "Computer Vision"
+        ]
+      }
+    ]
   }
 ]

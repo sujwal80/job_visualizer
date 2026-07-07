@@ -68,7 +68,7 @@ def load_startups():
     except Exception:
         return _cache_data or []
 
-def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit, city_query="", skill_query="", industry_query=""):
+def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit, city_query="", skill_query="", industry_query="", search_query="", dept_query="", exp_query=""):
     """
     Filter and sort startup records by geographic viewport bounding boxes and text criteria.
 
@@ -85,6 +85,9 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
         city_query (str): Case-insensitive substring filter for city/location.
         skill_query (str): Case-insensitive substring filter across startup and job skills.
         industry_query (str): Case-insensitive substring filter for industry classification.
+        search_query (str): Case-insensitive search string matching names, descriptions, founders, or jobs.
+        dept_query (str): Case-insensitive substring filter for job department.
+        exp_query (str): Case-insensitive substring filter for job experience/type.
 
     Returns:
         list: The filtered, sorted list of startup dictionaries capped at `limit`.
@@ -103,9 +106,32 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
                 if eff_lat < min_lat or eff_lat > max_lat or eff_lng < min_lng or eff_lng > max_lng:
                     continue
         if city_query:
+            import re
+            city_query_clean = city_query.strip().lower()
             city_val = str(s.get("city") or s.get("location") or "").lower()
-            if city_query not in city_val:
-                continue
+            
+            # Map country-level and regional city queries to their respective hubs in dataset
+            is_match = False
+            usa_synonyms = {"usa", "us", "united states", "america", "sf", "san francisco", "california", "bay area"}
+            uk_synonyms = {"uk", "united kingdom", "england", "london", "gb", "great britain"}
+            india_synonyms = {"india", "in", "bengaluru", "bangalore", "karnataka", "blr"}
+
+            if city_query_clean in usa_synonyms:
+                if any(x in city_val for x in ["san francisco", "ca", "sf", "california"]):
+                    is_match = True
+            elif city_query_clean in uk_synonyms:
+                if any(x in city_val for x in ["london", "uk", "england"]):
+                    is_match = True
+            elif city_query_clean in india_synonyms:
+                if any(x in city_val for x in ["bengaluru", "bangalore", "india", "karnataka"]):
+                    is_match = True
+
+            if not is_match:
+                normalized_query = re.sub(r',\s*(ka|ca|uk|in|karnataka|california|england|india)$', '', city_query_clean)
+                comp_query = normalized_query.replace("bangalore", "bengaluru")
+                comp_city = city_val.replace("bangalore", "bengaluru")
+                if comp_query not in comp_city:
+                    continue
         if skill_query:
             s_skills = []
             if isinstance(s.get("skills"), list):
@@ -120,6 +146,43 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
         if industry_query:
             industry_val = str(s.get("industry") or "").lower()
             if industry_query not in industry_val:
+                continue
+        if search_query:
+            name_val = str(s.get("name") or "").lower()
+            desc_val = str(s.get("description") or "").lower()
+            city_val = str(s.get("city") or s.get("location") or "").lower()
+            founder_names = [str(f.get("name") or "").lower() for f in (s.get("founders") or []) if isinstance(f, dict)]
+            
+            job_matches = False
+            for j in (s.get("job_openings") or []):
+                if not isinstance(j, dict):
+                    continue
+                j_title = str(j.get("title") or "").lower()
+                j_dept = str(j.get("department") or "").lower()
+                j_skills = [str(sk).lower() for sk in (j.get("skills") or []) if isinstance(sk, str)]
+                j_salary = str(j.get("salary") or "").lower()
+                j_exp = str(j.get("experience") or "").lower()
+                if (search_query in j_title or 
+                    search_query in j_dept or 
+                    any(search_query in sk for sk in j_skills) or 
+                    search_query in j_salary or 
+                    search_query in j_exp):
+                    job_matches = True
+                    break
+            
+            if not (search_query in name_val or 
+                    search_query in desc_val or 
+                    search_query in city_val or 
+                    any(search_query in fn for fn in founder_names) or 
+                    job_matches):
+                continue
+        if dept_query:
+            jobs = s.get("job_openings") or []
+            if not any(dept_query in str(j.get("department") or "").lower() for j in jobs if isinstance(j, dict)):
+                continue
+        if exp_query:
+            jobs = s.get("job_openings") or []
+            if not any(exp_query in str(j.get("experience") or "").lower() or exp_query in str(j.get("job_type") or "").lower() for j in jobs if isinstance(j, dict)):
                 continue
         filtered.append(s)
         

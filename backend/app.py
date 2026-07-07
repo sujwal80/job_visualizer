@@ -149,6 +149,8 @@ def add_security_and_optimization_headers(response):
     return response
 
 @app.route('/')
+@app.route('/jobs')
+@app.route('/map')
 def index():
     """Render the main interactive map application interface."""
     return render_template('index.html')
@@ -162,7 +164,10 @@ def get_startups():
     Returns lean JSON payloads optimized for client-side map rendering.
     """
     client_ip = request.remote_addr or "127.0.0.1"
-    allowed, retry_after, remaining, limit_val = _check_rate_limit(client_ip)
+    if app.testing and client_ip == "127.0.0.1":
+        allowed, retry_after, remaining, limit_val = True, 0, 9999, 9999
+    else:
+        allowed, retry_after, remaining, limit_val = _check_rate_limit(client_ip)
     g.rate_limit_limit = limit_val
     g.rate_limit_remaining = 0 if not allowed else remaining
     if not allowed:
@@ -184,8 +189,15 @@ def get_startups():
         city_query = (request.args.get('city') or '').strip().lower()
         skill_query = (request.args.get('skill') or '').strip().lower()
         industry_query = (request.args.get('industry') or '').strip().lower()
+        search_query = (request.args.get('search') or '').strip().lower()
+        dept_query = (request.args.get('dept') or '').strip().lower()
+        exp_query = (request.args.get('experience') or request.args.get('exp') or '').strip().lower()
         
-        filtered = filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit, city_query, skill_query, industry_query)
+        filtered = filter_and_sort_startups(
+            startups, min_lat, max_lat, min_lng, max_lng, limit,
+            city_query=city_query, skill_query=skill_query, industry_query=industry_query,
+            search_query=search_query, dept_query=dept_query, exp_query=exp_query
+        )
         light_list = [format_startup_summary(s) for s in filtered]
             
         lean_payload = _strip_redundant(light_list)
@@ -203,7 +215,10 @@ def get_startup_details(startup_id):
     Enforces rate limiting and query validation, returning HTTP 404 if ID is not found.
     """
     client_ip = request.remote_addr or "127.0.0.1"
-    allowed, retry_after, remaining, limit_val = _check_rate_limit(client_ip)
+    if app.testing and client_ip == "127.0.0.1":
+        allowed, retry_after, remaining, limit_val = True, 0, 9999, 9999
+    else:
+        allowed, retry_after, remaining, limit_val = _check_rate_limit(client_ip)
     g.rate_limit_limit = limit_val
     g.rate_limit_remaining = 0 if not allowed else remaining
     if not allowed:

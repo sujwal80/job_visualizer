@@ -4,43 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JobMap - Find Local Jobs in Your Neighborhood</title>
+    <script>
+        (function() {
+            const path = window.location.pathname.toLowerCase();
+            if (path === '/jobs' || path === '/map') {
+                document.documentElement.classList.add('page-jobs');
+            } else {
+                document.documentElement.classList.add('page-home');
+            }
+        })();
+    </script>
+    <style>
+        html.page-home #app-container { display: none !important; }
+        html.page-home #landingMain { display: block !important; }
+        html.page-home #landingInterface { display: flex !important; }
+
+        html.page-jobs #app-container { display: flex !important; }
+        html.page-jobs #landingMain { display: none !important; }
+        html.page-jobs #landingInterface { display: none !important; }
+    </style>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Premium Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- MapLibre GL CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <!-- Application CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
     
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f4f3f0;
         }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.12); border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.25); }
 
-        /* Custom scrollbar styling for left panel feed */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(15, 23, 42, 0.12);
-            border-radius: 99px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(15, 23, 42, 0.25);
-        }
-
-        /* Authentic Google Maps Styled SVG Canvas Background Styling */
-        .map-land { fill: #f4f3f0; transition: fill 0.8s ease; } /* Classic warm sand land background */
-        .map-water { fill: #aad3df; transition: d 0.8s ease, fill 0.8s ease; } /* Soothing light water blue */
-        .map-park { fill: #d0edd2; transition: all 0.8s ease; } /* Minty green parklands */
-        .map-highway { stroke: #fcd299; stroke-width: 4px; fill: none; } /* Main highway orange/yellow lines */
-        .map-street { stroke: #ffffff; stroke-width: 2px; fill: none; } /* Local street white lines */
+        .map-land { fill: #f4f3f0; transition: fill 0.8s ease; }
+        .map-water { fill: #aad3df; transition: d 0.8s ease, fill 0.8s ease; }
+        .map-park { fill: #d0edd2; transition: all 0.8s ease; }
+        .map-highway { stroke: #fcd299; stroke-width: 4px; fill: none; }
+        .map-street { stroke: #ffffff; stroke-width: 2px; fill: none; }
         .map-rail { stroke: #cbd5e1; stroke-width: 1.5px; stroke-dasharray: 4,4; fill: none; }
 
-        /* Animation for active pins on selection */
         @keyframes pin-pop {
             0% { transform: scale(0.9) translate(-50%, -50%); }
             100% { transform: scale(1) translate(-50%, -50%); }
@@ -48,45 +59,26 @@
         .animate-pin {
             animation: pin-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
-
-        /* Fluid blurred background states */
-        .blurred-map {
-            filter: blur(20px) scale(1.04);
-            transform-origin: center;
-        }
-        .clear-map {
-            filter: blur(0px) scale(1.0);
-            transform-origin: center;
-        }
+        .blurred-map { filter: blur(20px) scale(1.04); transform-origin: center; }
+        .clear-map { filter: blur(0px) scale(1.0); transform-origin: center; }
     </style>
 </head>
 <body class="h-screen w-screen overflow-hidden flex flex-col select-none relative">
 
-    <!-- FULL SCREEN INTERACTIVE GOOGLE MAP CANVAS -->
-    <main class="absolute inset-0 w-full h-full z-0 bg-[#f4f3f0] overflow-hidden">
-        
-        <!-- High Fidelity SVG Map Backdrop with dynamic blur/unblur states -->
+    <!-- FULL SCREEN INTERACTIVE GOOGLE MAP CANVAS / LANDING BACKDROP -->
+    <main id="landingMain" class="absolute inset-0 w-full h-full z-10 bg-[#f4f3f0] overflow-hidden">
+        <!-- SVG Map Backdrop -->
         <svg id="googleMapsBackdrop" class="absolute inset-0 w-full h-full transition-all duration-1000 ease-out blurred-map" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-            <!-- Base Land background -->
             <rect class="map-land" width="100%" height="100%" />
-
-            <!-- Soft Blue Lake/Waterbody -->
             <path class="map-water" id="mapWater1" d="M100,200 C300,180 400,300 500,250 C600,200 700,350 850,220 C950,150 1200,300 1300,100 L1400,0 L1600,0 L1600,1000 L0,1000 Z" opacity="0.85" />
             <path class="map-water" id="mapWater2" d="M0,0 L300,0 C250,100 150,150 100,250 C80,290 0,320 0,350 Z" opacity="0.6" />
-
-            <!-- Mint Green Parks / Botanical Gardens -->
             <rect class="map-park" id="mapPark1" x="500" y="50" width="320" height="220" rx="30" opacity="0.75" />
             <path class="map-park" id="mapPark2" d="M1000,500 Q1150,450 1250,550 T1400,700 L1500,850 L1200,900 Z" opacity="0.7" />
             <circle class="map-park" id="mapPark3" cx="250" cy="750" r="120" opacity="0.65" />
-
-            <!-- Intersecting High-Quality Street Grids -->
             <g id="mapRoads" class="opacity-80">
-                <!-- Major Highways -->
                 <path class="map-highway" d="M-50,450 L1920,450" />
                 <path class="map-highway" d="M750,-50 L750,1080" />
                 <path class="map-highway" d="M100,100 L1200,900" />
-
-                <!-- Local white residential streets -->
                 <path class="map-street" d="M200,0 L200,1080" />
                 <path class="map-street" d="M450,0 L450,1080" />
                 <path class="map-street" d="M1100,0 L1100,1080" />
@@ -94,45 +86,19 @@
                 <path class="map-street" d="M0,250 L1920,250" />
                 <path class="map-street" d="M0,680 L1920,680" />
                 <path class="map-street" d="M0,850 L1920,850" />
-
-                <!-- Rail tracks -->
                 <path class="map-rail" d="M-20,920 L1940,920" />
             </g>
         </svg>
 
-        <!-- Wage-Tag Pins Layer (Hidden in Landing State, visible in Map State) -->
-        <div id="mapPinsContainer" class="absolute inset-0 pointer-events-none z-10 opacity-0 transition-opacity duration-1000">
-            <!-- Markers are mapped dynamically using absolutely positioned divs -->
-        </div>
-
+        <div id="mapPinsContainer" class="absolute inset-0 pointer-events-none z-10 opacity-0 transition-opacity duration-1000"></div>
     </main>
 
-    <!-- HEADER / NAVIGATION TOP BAR -->
-    <nav class="absolute top-0 inset-x-0 h-16 px-6 z-30 flex items-center justify-between pointer-events-auto">
-        <div class="flex items-center gap-2 cursor-pointer" onclick="resetToLandingState()">
-            <div class="w-9 h-9 rounded-xl bg-[#1a73e8] flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <i class="fa-solid fa-map-location-dot text-white text-sm"></i>
-            </div>
-            <span class="font-extrabold text-lg tracking-tight text-slate-900">Job<span class="text-[#1a73e8]">Map</span></span>
-        </div>
-        <div class="flex items-center gap-4">
-            <span class="text-[11px] bg-slate-900/5 text-slate-700 font-extrabold px-3 py-1 rounded-full border border-slate-950/10 flex items-center gap-1.5 backdrop-blur-md">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                9,482 Local Openings
-            </span>
-        </div>
-    </nav>
-
-    <!-- CONCEPT 1 INITIAL LANDING STATE CONTAINER -->
+    <!-- INITIAL LANDING STATE CONTAINER -->
     <div id="landingInterface" class="absolute inset-0 z-20 flex flex-col items-center justify-center p-4 transition-all duration-700 ease-out">
-        
-        <!-- Center-Focus Onboarding Card -->
         <div class="max-w-xl w-full bg-white/95 backdrop-blur-xl rounded-3xl border border-white/60 shadow-[0_20px_50px_rgba(15,23,42,0.12)] p-8 text-center transition-all duration-500 transform scale-100 opacity-100">
-            
             <div class="w-12 h-12 rounded-2xl bg-[#1a73e8]/10 text-[#1a73e8] flex items-center justify-center mx-auto mb-4 text-xl shadow-inner">
                 <i class="fa-solid fa-magnifying-glass-location"></i>
             </div>
-
             <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
                 Find jobs in your backyard.
             </h1>
@@ -140,7 +106,6 @@
                 Enter your location to reveal immediate roles across all industries plotted right onto your neighborhood map.
             </p>
 
-            <!-- Search Area -->
             <div class="mt-6 flex gap-2 p-1.5 bg-slate-100/80 rounded-2xl border border-slate-200/40">
                 <div class="relative flex-1 flex items-center pl-3">
                     <i class="fa-solid fa-location-dot text-[#ea4335] text-sm mr-2"></i>
@@ -152,7 +117,6 @@
                 </button>
             </div>
 
-            <!-- Pre-defined Cities (Quick Starts) -->
             <div class="mt-4 flex items-center justify-center gap-1.5 text-xs">
                 <span class="text-slate-400 font-bold text-[10px] uppercase tracking-wider mr-1">Popular:</span>
                 <button onclick="handlePresetSearch('bengaluru')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2.5 py-1 rounded-md font-bold transition-all">Bengaluru</button>
@@ -161,567 +125,181 @@
                 <span class="text-slate-300">•</span>
                 <button onclick="handlePresetSearch('london')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2.5 py-1 rounded-md font-bold transition-all">London</button>
             </div>
-
         </div>
     </div>
 
-    <!-- REVEALED JOB EXPLORER PANEL (Transitions in from Left after searching) -->
-    <div id="explorerPanel" class="absolute top-20 left-4 bottom-4 w-[380px] z-20 flex flex-col max-w-[calc(100vw-32px)] transition-all duration-700 transform -translate-x-[420px] opacity-0 pointer-events-none">
-        
-        <div class="bg-white rounded-2xl shadow-[0_12px_40px_rgba(15,23,42,0.1)] flex flex-col h-full border border-slate-200/50 overflow-hidden">
-            
-            <!-- Context Header: Location details with Back to Search button -->
-            <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                <div class="flex items-center gap-2 min-w-0">
-                    <button onclick="resetToLandingState()" class="w-7 h-7 rounded-lg hover:bg-slate-200/80 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all">
-                        <i class="fa-solid fa-arrow-left text-xs"></i>
-                    </button>
-                    <div class="min-w-0">
-                        <span class="block text-[9px] text-slate-400 font-extrabold uppercase tracking-widest leading-none">Map Location</span>
-                        <h2 id="activeMapTitle" class="font-extrabold text-slate-800 text-xs truncate mt-0.5">Bengaluru, KA</h2>
+    <!-- FULL INTERACTIVE APP CONTAINER -->
+    <div id="app-container" class="absolute inset-0 z-30 flex flex-col h-full w-full bg-white">
+        <!-- Top Navbar -->
+        <nav class="top-navbar">
+            <div class="navbar-left">
+                <div class="brand-logo cursor-pointer" onclick="resetToLandingState()">
+                    <div class="w-9 h-9 rounded-xl bg-[#1a73e8] flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <i class="fa-solid fa-map-location-dot text-white text-sm"></i>
+                    </div>
+                    <span class="font-extrabold text-lg tracking-tight text-slate-900">Job<span class="text-[#1a73e8]">Map</span></span>
+                </div>
+                <span class="live-badge">
+                    <span class="pulse-dot"></span>
+                    <span id="activeMapTitle">Bengaluru, KA</span>
+                </span>
+            </div>
+
+            <div class="navbar-center">
+                <div id="quick-industry-tabs" class="quick-tabs">
+                    <button class="tab-btn active" onclick="applyIndustryTab('')">🌐 All Industries</button>
+                    <button class="tab-btn" onclick="applyIndustryTab('sales')">💼 Sales</button>
+                    <button class="tab-btn" onclick="applyIndustryTab('marketing')">📢 Marketing</button>
+                    <button class="tab-btn" onclick="applyIndustryTab('dev')">💻 Tech & Dev</button>
+                    <button class="tab-btn" onclick="applyIndustryTab('healthcare')">🏥 Healthcare</button>
+                </div>
+            </div>
+
+            <div class="navbar-right">
+                <div class="search-box">
+                    <i class="fa-solid fa-location-dot search-icon text-[#ea4335]"></i>
+                    <input id="navbar-city-input" type="text" placeholder="Search city or ZIP..." onkeydown="if(event.key === 'Enter') handleSearchFromNavbar()">
+                </div>
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input id="search-input" type="text" placeholder="Filter jobs by title or company...">
+                </div>
+                <button onclick="resetToLandingState()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs py-2 px-3 rounded-xl transition-all">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Back
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Left Sidebar with Scrollable Job Directory -->
+            <aside id="sidebar" class="sidebar">
+                <div class="stats-dashboard">
+                    <div class="stats-header">
+                        <span class="stats-title">Live Job Directory</span>
+                        <span class="verified-pill">✨ Verified Listings</span>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span id="stat-count" class="stat-val">0</span>
+                            <span class="stat-lbl">Companies</span>
+                        </div>
+                        <div class="stat-card">
+                            <span id="stat-jobs" class="stat-val">0</span>
+                            <span class="stat-lbl">Open Roles</span>
+                        </div>
+                        <div class="stat-card">
+                            <span id="stat-headcount" class="stat-val">0</span>
+                            <span class="stat-lbl">Headcount</span>
+                        </div>
                     </div>
                 </div>
-                <button onclick="resetToLandingState()" class="text-[10px] font-extrabold text-indigo-600 hover:underline">Change</button>
-            </div>
 
-            <!-- Inline Search Console -->
-            <div class="p-4 border-b border-slate-100 space-y-2">
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-                    <input id="liveSearchInput" oninput="handleLiveSearch()" type="text" class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-100/60 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1a73e8] font-semibold text-slate-700" placeholder="Filter jobs by title or company...">
+
+
+                <!-- Scrollable Job Directory List -->
+                <div id="directory-list" class="directory-list">
+                    <div class="p-8 text-center text-slate-400">Loading jobs...</div>
                 </div>
+            </aside>
 
-                <!-- Industry category selection horizontal pills -->
-                <div class="flex gap-1 overflow-x-auto pb-1 text-[9px] whitespace-nowrap">
-                    <button onclick="applyFilter('all')" id="pill-all" class="filter-pill px-2.5 py-1 rounded-md font-bold transition-all bg-[#1a73e8] text-white shadow-sm">
-                        🌐 All Industries
-                    </button>
-                    <button onclick="applyFilter('sales')" id="pill-sales" class="filter-pill px-2.5 py-1 rounded-md font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-                        💼 Sales
-                    </button>
-                    <button onclick="applyFilter('marketing')" id="pill-marketing" class="filter-pill px-2.5 py-1 rounded-md font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-                        📢 Marketing
-                    </button>
-                    <button onclick="applyFilter('dev')" id="pill-dev" class="filter-pill px-2.5 py-1 rounded-md font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-                        💻 Tech & Dev
-                    </button>
-                    <button onclick="applyFilter('healthcare')" id="pill-healthcare" class="filter-pill px-2.5 py-1 rounded-md font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-                        🏥 Healthcare
-                    </button>
+            <!-- Interactive MapLibre Map Container -->
+            <div id="map" class="map-container">
+                <button id="reset-map-btn" class="map-overlay-btn hidden">
+                    <i class="fa-solid fa-compass"></i> Reset View
+                </button>
+            </div>
+
+            <!-- Details Drawer -->
+            <div id="details-drawer" class="details-drawer">
+                <div class="drawer-header-bar">
+                    <span class="drawer-top-label">Role & Company Details</span>
+                    <button id="close-drawer-btn" class="close-drawer-btn">&times;</button>
                 </div>
+                <div id="drawer-content" class="drawer-content"></div>
             </div>
-
-            <!-- Dynamic Job Card Listings Feed -->
-            <div id="jobFeedContainer" class="flex-1 overflow-y-auto p-4 space-y-2.5 bg-slate-50/50">
-                <!-- Mapped via JS -->
-            </div>
-
         </div>
     </div>
 
-    <!-- FLOATING MAP NAVIGATION TOOLS (Google style - visible when map is active) -->
-    <div id="mapControls" class="absolute bottom-6 right-6 flex flex-col gap-2 z-20 opacity-0 pointer-events-none transition-all duration-700 translate-y-4">
-        <button onclick="zoomMap(1.15)" class="w-10 h-10 bg-white hover:bg-slate-50 text-slate-700 font-bold border border-slate-200/80 rounded-xl shadow-lg flex items-center justify-center transition-all transform active:scale-90">
-            <i class="fa-solid fa-plus text-xs"></i>
-        </button>
-        <button onclick="zoomMap(0.85)" class="w-10 h-10 bg-white hover:bg-slate-50 text-slate-700 font-bold border border-slate-200/80 rounded-xl shadow-lg flex items-center justify-center transition-all transform active:scale-90">
-            <i class="fa-solid fa-minus text-xs"></i>
-        </button>
-        <button onclick="resetToLandingState()" class="bg-white hover:bg-slate-50 text-slate-700 font-extrabold text-xs py-2.5 px-3.5 border border-slate-200/80 rounded-xl shadow-lg flex items-center gap-1.5 transition-all transform active:scale-95">
-            <i class="fa-solid fa-arrow-rotate-left text-[#1a73e8]"></i>
-            Back to Search
-        </button>
-    </div>
-
-    <!-- GLASS POP-OVER PREVIEW CARD (Launches when pins are hovered or selected) -->
-    <div id="popupCard" class="hidden absolute bottom-6 left-6 md:left-[412px] right-6 md:right-auto md:w-96 bg-white/95 backdrop-blur-md rounded-2xl border border-white/60 shadow-[0_8px_32px_rgba(15,23,42,0.12)] p-5 z-20 transition-all duration-300 transform translate-y-2">
-        <div class="flex items-start justify-between">
-            <div class="flex gap-3">
-                <div id="popupIconBox" class="w-10 h-10 rounded-xl text-white text-sm flex items-center justify-center shadow-md">
-                    <i id="popupIcon" class="fa-solid fa-briefcase"></i>
-                </div>
-                <div>
-                    <h4 id="popupTitle" class="font-extrabold text-slate-900 text-sm">Role Title</h4>
-                    <span id="popupCategory" class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded mt-1.5 inline-block">Category</span>
-                </div>
-            </div>
-            <button onclick="closePopupCard()" class="text-slate-400 hover:text-slate-600">
-                <i class="fa-solid fa-xmark text-sm"></i>
-            </button>
-        </div>
-
-        <div class="mt-4 grid grid-cols-2 gap-3 text-xs border-y border-slate-100 py-3">
-            <div>
-                <span class="block text-[10px] text-slate-400 uppercase tracking-wide font-semibold">Employer</span>
-                <strong id="popupEmployer" class="text-slate-800 font-bold">Employer Name</strong>
-            </div>
-            <div>
-                <span class="block text-[10px] text-slate-400 uppercase tracking-wide font-semibold">Estimated Pay</span>
-                <strong id="popupSalary" class="text-emerald-600 font-bold">Salary</strong>
-            </div>
-        </div>
-
-        <div class="mt-3.5 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-1 text-slate-400 text-xs min-w-0">
-                <i class="fa-solid fa-location-dot text-rose-500"></i>
-                <span id="popupAddress" class="truncate font-semibold text-[11px]">Address Info</span>
-            </div>
-            <button onclick="showStatusToast('Application submitted! We will contact you soon.')" class="bg-[#1a73e8] hover:bg-blue-700 text-white font-bold text-xs py-2 px-3.5 rounded-xl shadow-md shadow-blue-500/15 transition-all transform active:scale-95 whitespace-nowrap">
-                1-Click Apply →
-            </button>
-        </div>
-    </div>
-
-    <!-- DYNAMIC STATUS TOAST NOTIFIER -->
-    <div id="toastAlert" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900/95 text-white px-4 py-2.5 rounded-xl shadow-xl z-50 text-xs font-semibold tracking-wide flex items-center gap-2 transition-all">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-        <span id="toastText">Setting up grid...</span>
-    </div>
-
-    <!-- Hidden element required for UI E2E test verification suite -->
     <button id="mobile-toggle-btn" class="mobile-toggle" aria-label="Toggle directory list" style="display:none;"></button>
 
+    <!-- Load complete interactive application logic -->
+    <script type="module" src="/static/js/app.js"></script>
     <script>
-        // High fidelity, descriptive industry-agnostic local job market list
-        const initialJobs = [
-            {
-                id: 'job-1',
-                title: 'Junior Landscape Architect',
-                employer: 'Vanam Landscapes',
-                category: 'dev',
-                categoryLabel: 'Design & Architecture',
-                salary: '$₹18\\text{--}24 \\text{ Lpa}$',
-                rawSalary: '₹24 L',
-                address: 'HSR Layout, Bengaluru',
-                lat: 42,
-                lng: 38,
-                distance: '$0.4 \\text{ km}$',
-                icon: 'fa-pencil-ruler',
-                color: 'bg-[#1a73e8]',
-                border: 'border-[#1a73e8]',
-                textCol: 'text-[#1a73e8]'
-            },
-            {
-                id: 'job-2',
-                title: 'Sales Account Manager',
-                employer: 'Flipkart Logistics Hub',
-                category: 'sales',
-                categoryLabel: 'Sales & Client Accounts',
-                salary: '$₹8\\text{--}12 \\text{ Lpa}$',
-                rawSalary: '₹12 L',
-                address: 'Indiranagar, Bengaluru',
-                lat: 62,
-                lng: 55,
-                distance: '$2.1 \\text{ km}$',
-                icon: 'fa-chart-line',
-                color: 'bg-[#34a853]',
-                border: 'border-[#34a853]',
-                textCol: 'text-[#34a853]'
-            },
-            {
-                id: 'job-3',
-                title: 'Local Marketing Coordinator',
-                employer: 'BiteClub Studio',
-                category: 'marketing',
-                categoryLabel: 'Marketing & Ad',
-                salary: '$₹6\\text{--}9 \\text{ Lpa}$',
-                rawSalary: '₹9 L',
-                address: 'Koramangala, Bengaluru',
-                lat: 28,
-                lng: 64,
-                distance: '$1.2 \\text{ km}$',
-                icon: 'fa-bullhorn',
-                color: 'bg-[#f9ab00]',
-                border: 'border-[#f9ab00]',
-                textCol: 'text-[#f9ab00]'
-            },
-            {
-                id: 'job-4',
-                title: 'Emergency Response Nurse',
-                employer: 'Apollo Medical Corp',
-                category: 'healthcare',
-                categoryLabel: 'Healthcare & Nursing',
-                salary: '$₹5\\text{--}7 \\text{ Lpa}$',
-                rawSalary: '₹7 L',
-                address: 'Bellandur, Bengaluru',
-                lat: 50,
-                lng: 22,
-                distance: '$1.8 \\text{ km}$',
-                icon: 'fa-user-doctor',
-                color: 'bg-[#ea4335]',
-                border: 'border-[#ea4335]',
-                textCol: 'text-[#ea4335]'
-            },
-            {
-                id: 'job-5',
-                title: 'Lead Software Engineer',
-                employer: 'Sync Labs Co',
-                category: 'dev',
-                categoryLabel: 'Technology & Eng',
-                salary: '$₹22\\text{--}30 \\text{ Lpa}$',
-                rawSalary: '₹30 L',
-                address: 'Whitefield, Bengaluru',
-                lat: 78,
-                lng: 32,
-                distance: '$4.5 \\text{ km}$',
-                icon: 'fa-code',
-                color: 'bg-[#1a73e8]',
-                border: 'border-[#1a73e8]',
-                textCol: 'text-[#1a73e8]'
-            }
-        ];
-
-        // Specific regional map geometries for seamless transitions
-        const regionalCoordinates = {
-            'bengaluru': {
-                title: 'Bengaluru, KA',
-                waterPath1: 'M100,200 C300,180 400,300 500,250 C600,200 700,350 850,220 C950,150 1200,300 1300,100 L1400,0 L1600,0 L1600,1000 L0,1000 Z',
-                waterPath2: 'M0,0 L300,0 C250,100 150,150 100,250 C80,290 0,320 0,350 Z',
-                park1_x: 500, park1_y: 50,
-                park2_d: 'M1000,500 Q1150,450 1250,550 T1400,700 L1500,850 L1200,900 Z',
-                coords: [
-                    { lat: 42, lng: 38, dist: '$0.4 \\text{ km}$' },
-                    { lat: 62, lng: 55, dist: '$2.1 \\text{ km}$' },
-                    { lat: 28, lng: 64, dist: '$1.2 \\text{ km}$' },
-                    { lat: 50, lng: 22, dist: '$1.8 \\text{ km}$' },
-                    { lat: 78, lng: 32, dist: '$4.5 \\text{ km}$' }
-                ]
-            },
-            'san francisco': {
-                title: 'San Francisco, CA',
-                waterPath1: 'M-50,300 C200,350 400,150 600,200 C800,250 1000,100 1200,150 C1400,200 1500,50 1700,100 L1700,0 L-50,0 Z',
-                waterPath2: 'M0,800 Q300,700 600,850 T1200,800 L1920,950 L1920,1080 L0,1080 Z',
-                park1_x: 200, park1_y: 400,
-                park2_d: 'M800,250 Q900,200 1050,300 T1200,350 L1250,400 L1000,450 Z',
-                coords: [
-                    { lat: 55, lng: 25, dist: '$0.8 \\text{ miles}$' },
-                    { lat: 45, lng: 65, dist: '$1.4 \\text{ miles}$' },
-                    { lat: 70, lng: 45, dist: '$2.5 \\text{ miles}$' },
-                    { lat: 30, lng: 80, dist: '$4.2 \\text{ miles}$' },
-                    { lat: 60, lng: 15, dist: '$0.2 \\text{ miles}$' }
-                ]
-            },
-            'london': {
-                title: 'London, UK',
-                waterPath1: 'M0,500 C400,520 600,300 900,480 C1200,660 1400,450 1920,520 L1920,580 C1400,510 1200,720 900,540 C600,360 400,580 0,560 Z',
-                waterPath2: 'M50,50 Q150,20 250,60 T350,120 L300,180 Z',
-                park1_x: 800, park1_y: 80,
-                park2_d: 'M100,700 Q200,650 350,750 T500,800 L450,900 L200,900 Z',
-                coords: [
-                    { lat: 25, lng: 30, dist: '$0.6 \\text{ miles}$' },
-                    { lat: 38, lng: 72, dist: '$1.9 \\text{ miles}$' },
-                    { lat: 68, lng: 15, dist: '$2.4 \\text{ miles}$' },
-                    { lat: 80, lng: 85, dist: '$4.0 \\text{ miles}$' },
-                    { lat: 15, lng: 60, dist: '$1.1 \\text{ miles}$' }
-                ]
-            }
-        };
-
-        let selectedJobId = null;
-        let activeFilter = 'all';
-        let liveSearchText = '';
-        let currentMapZoom = 1.0;
-        let activeCityKey = 'bengaluru';
-
-        // Perform the Search Action from Landing Page to morph UI
         function handleSearchFromLanding() {
             const rawVal = document.getElementById('landingCityInput').value.trim().toLowerCase();
-            let matchedKey = 'bengaluru';
+            let cityTitle = 'Bengaluru, KA';
+            const usaSynonyms = ["usa", "us", "united states", "america", "sf", "san francisco", "california", "bay area"];
+            const ukSynonyms = ["uk", "united kingdom", "england", "london", "gb", "great britain"];
+            const indiaSynonyms = ["india", "in", "bengaluru", "bangalore", "karnataka", "blr"];
 
-            if (rawVal.includes('san') || rawVal.includes('francisco') || rawVal.includes('sf') || rawVal.includes('bay')) {
-                matchedKey = 'san francisco';
-            } else if (rawVal.includes('london') || rawVal.includes('uk') || rawVal.includes('england')) {
-                matchedKey = 'london';
+            if (usaSynonyms.some(s => rawVal.includes(s)) || rawVal.includes('san') || rawVal.includes('francisco')) {
+                cityTitle = 'San Francisco, CA';
+            } else if (ukSynonyms.some(s => rawVal.includes(s))) {
+                cityTitle = 'London, UK';
+            } else if (indiaSynonyms.some(s => rawVal.includes(s))) {
+                cityTitle = 'Bengaluru, KA';
+            } else if (rawVal) {
+                cityTitle = rawVal.charAt(0).toUpperCase() + rawVal.slice(1);
             }
-
-            transitionToMapState(matchedKey);
+            window.location.href = '/jobs?city=' + encodeURIComponent(cityTitle);
         }
 
         function handlePresetSearch(cityKey) {
-            transitionToMapState(cityKey);
+            let cityTitle = 'Bengaluru, KA';
+            if (cityKey === 'san francisco') cityTitle = 'San Francisco, CA';
+            if (cityKey === 'london') cityTitle = 'London, UK';
+            window.location.href = '/jobs?city=' + encodeURIComponent(cityTitle);
         }
 
-        // Handle the smooth CSS transition and State Changes
-        function transitionToMapState(cityKey) {
-            activeCityKey = cityKey;
-            const config = regionalCoordinates[cityKey];
+        function handleSearchFromNavbar() {
+            const rawVal = document.getElementById('navbar-city-input').value.trim().toLowerCase();
+            let cityTitle = 'Bengaluru, KA';
+            const usaSynonyms = ["usa", "us", "united states", "america", "sf", "san francisco", "california", "bay area"];
+            const ukSynonyms = ["uk", "united kingdom", "england", "london", "gb", "great britain"];
+            const indiaSynonyms = ["india", "in", "bengaluru", "bangalore", "karnataka", "blr"];
 
-            // 1. Shift Map Backdrop SVG configurations
-            document.getElementById('mapWater1').setAttribute('d', config.waterPath1);
-            document.getElementById('mapWater2').setAttribute('d', config.waterPath2);
-            document.getElementById('mapPark1').setAttribute('x', config.park1_x);
-            document.getElementById('mapPark1').setAttribute('y', config.park1_y);
-            document.getElementById('mapPark2').setAttribute('d', config.park2_d);
+            if (usaSynonyms.some(s => rawVal.includes(s)) || rawVal.includes('san') || rawVal.includes('francisco')) {
+                cityTitle = 'San Francisco, CA';
+            } else if (ukSynonyms.some(s => rawVal.includes(s))) {
+                cityTitle = 'London, UK';
+            } else if (indiaSynonyms.some(s => rawVal.includes(s))) {
+                cityTitle = 'Bengaluru, KA';
+            } else if (rawVal) {
+                cityTitle = rawVal.charAt(0).toUpperCase() + rawVal.slice(1);
+            }
 
-            // Re-apply respective coordinates to jobs
-            initialJobs.forEach((job, idx) => {
-                const regionalCoords = config.coords[idx];
-                job.lat = regionalCoords.lat;
-                job.lng = regionalCoords.lng;
-                job.distance = regionalCoords.dist;
-            });
-
-            // Set Title Label
-            document.getElementById('activeMapTitle').innerText = config.title;
-
-            // 2. Trigger Morph Animation
-            const backdrop = document.getElementById('googleMapsBackdrop');
-            backdrop.classList.remove('blurred-map');
-            backdrop.classList.add('clear-map');
-
-            const landing = document.getElementById('landingInterface');
-            landing.classList.add('scale-95', 'opacity-0', 'pointer-events-none');
-
-            // Slide in explorer panel and map tools
-            setTimeout(() => {
-                const explorer = document.getElementById('explorerPanel');
-                explorer.classList.remove('-translate-x-[420px]', 'opacity-0', 'pointer-events-none');
-                explorer.classList.add('translate-x-0', 'opacity-100', 'pointer-events-auto');
-
-                const mapControls = document.getElementById('mapControls');
-                mapControls.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                mapControls.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
-
-                const pins = document.getElementById('mapPinsContainer');
-                pins.classList.remove('opacity-0');
-                pins.classList.add('opacity-100');
-            }, 300);
-
-            // Reset selection and render
-            selectedJobId = null;
-            closePopupCard();
-            renderJobFeed();
-            renderMapPins();
-            showStatusToast(`Exploration map unlocked for ${config.title}`);
+            const path = window.location.pathname.toLowerCase();
+            if ((path === '/jobs' || path === '/map') && typeof window.updateSearchCity === 'function') {
+                window.updateSearchCity(cityTitle);
+            } else {
+                window.location.href = '/jobs?city=' + encodeURIComponent(cityTitle);
+            }
         }
 
-        // Return smoothly to landing layout
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const cityParam = params.get('city');
+            if (cityParam) {
+                const titleEl = document.getElementById('activeMapTitle');
+                if (titleEl) titleEl.textContent = cityParam;
+                const navInput = document.getElementById('navbar-city-input');
+                if (navInput) navInput.value = cityParam;
+            }
+        });
+
         function resetToLandingState() {
-            const backdrop = document.getElementById('googleMapsBackdrop');
-            backdrop.classList.remove('clear-map');
-            backdrop.classList.add('blurred-map');
-
-            const landing = document.getElementById('landingInterface');
-            landing.classList.remove('scale-95', 'opacity-0', 'pointer-events-none');
-
-            const explorer = document.getElementById('explorerPanel');
-            explorer.classList.add('-translate-x-[420px]', 'opacity-0', 'pointer-events-none');
-            explorer.classList.remove('translate-x-0', 'opacity-100', 'pointer-events-auto');
-
-            const mapControls = document.getElementById('mapControls');
-            mapControls.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
-            mapControls.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
-
-            const pins = document.getElementById('mapPinsContainer');
-            pins.classList.add('opacity-0');
-            pins.classList.remove('opacity-100');
-
-            // Clear search values
-            document.getElementById('landingCityInput').value = '';
-            document.getElementById('liveSearchInput').value = '';
-            liveSearchText = '';
-            closePopupCard();
+            window.location.href = '/';
         }
 
-        // Render the job search feed in the left column
-        function renderJobFeed() {
-            const feed = document.getElementById('jobFeedContainer');
-            feed.innerHTML = '';
-
-            let filtered = activeFilter === 'all' 
-                ? initialJobs 
-                : initialJobs.filter(job => job.category === activeFilter);
-
-            if (liveSearchText) {
-                const searchLower = liveSearchText.toLowerCase();
-                filtered = filtered.filter(job => 
-                    job.title.toLowerCase().includes(searchLower) || 
-                    job.employer.toLowerCase().includes(searchLower)
-                );
+        function applyIndustryTab(category) {
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.value = category;
+                searchInput.dispatchEvent(new Event('input'));
             }
-
-            if (filtered.length === 0) {
-                feed.innerHTML = `
-                    <div class="text-center py-12 px-4">
-                        <i class="fa-solid fa-folder-open text-slate-300 text-3xl mb-2"></i>
-                        <p class="text-xs text-slate-500 font-bold">No listed jobs found matching filters.</p>
-                        <button onclick="applyFilter('all'); document.getElementById('liveSearchInput').value=''; liveSearchText='';" class="mt-2 text-[10px] font-extrabold text-[#1a73e8] hover:underline">Reset Search</button>
-                    </div>
-                `;
-                return;
-            }
-
-            filtered.forEach(job => {
-                const isSelected = job.id === selectedJobId;
-                const card = document.createElement('div');
-                
-                card.className = `p-3.5 rounded-xl border transition-all duration-300 cursor-pointer ${
-                    isSelected 
-                        ? 'border-[#1a73e8] bg-blue-50/50 shadow-md ring-1 ring-blue-500/10' 
-                        : 'border-slate-200 bg-white hover:border-slate-300 shadow-sm'
-                }`;
-                card.onclick = () => selectJob(job.id, true);
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-start gap-2">
-                        <div class="flex gap-2 min-w-0">
-                            <div class="w-8 h-8 rounded-lg ${job.color} text-white flex items-center justify-center text-xs shrink-0 shadow-sm">
-                                <i class="fa-solid ${job.icon}"></i>
-                            </div>
-                            <div class="min-w-0">
-                                <h4 class="font-extrabold text-slate-900 text-[11px] tracking-tight truncate leading-tight">${job.title}</h4>
-                                <p class="text-[10px] text-slate-500 font-semibold truncate mt-0.5">${job.employer}</p>
-                            </div>
-                        </div>
-                        <span class="text-[11px] font-extrabold text-slate-900 shrink-0 bg-slate-100 px-2 py-0.5 rounded-md">${job.rawSalary}</span>
-                    </div>
-                    <div class="mt-2.5 flex items-center justify-between text-[9px] text-slate-400 font-bold uppercase tracking-wider">
-                        <span class="flex items-center gap-1">
-                            <i class="fa-solid fa-location-dot ${job.textCol}"></i> ${job.distance}
-                        </span>
-                        <span class="text-[#1a73e8]">Select Pin →</span>
-                    </div>
-                `;
-
-                feed.appendChild(card);
-            });
-        }
-
-        // Plot pins cleanly onto the SVG map container
-        function renderMapPins() {
-            const pins = document.getElementById('mapPinsContainer');
-            pins.innerHTML = '';
-
-            let filtered = activeFilter === 'all' 
-                ? initialJobs 
-                : initialJobs.filter(job => job.category === activeFilter);
-
-            if (liveSearchText) {
-                const searchLower = liveSearchText.toLowerCase();
-                filtered = filtered.filter(job => 
-                    job.title.toLowerCase().includes(searchLower) || 
-                    job.employer.toLowerCase().includes(searchLower)
-                );
-            }
-
-            filtered.forEach(job => {
-                const isSelected = job.id === selectedJobId;
-                const pin = document.createElement('div');
-                
-                pin.className = 'absolute pointer-events-auto cursor-pointer animate-pin';
-                pin.style.top = `${job.lat}%`;
-                pin.style.left = `${job.lng}%`;
-
-                pin.onclick = (e) => {
-                    e.stopPropagation();
-                    selectJob(job.id, false);
-                };
-
-                // Premium map pin with salary representation
-                pin.innerHTML = `
-                    <div class="relative flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-300 ${
-                        isSelected 
-                            ? 'bg-[#1a73e8] text-white shadow-xl scale-110' 
-                            : 'bg-white border border-slate-200 text-slate-800 hover:border-slate-300 shadow-md hover:scale-105'
-                    }">
-                        <div class="w-4 h-4 rounded-full flex items-center justify-center text-[8px] ${
-                            isSelected ? 'bg-white text-[#1a73e8]' : `${job.color} text-white`
-                        }">
-                            <i class="fa-solid ${job.icon}"></i>
-                        </div>
-                        <span class="text-[9px] font-extrabold tracking-tight">${job.rawSalary}</span>
-                    </div>
-                    <!-- Tail aspect -->
-                    <div class="w-2.5 h-2.5 absolute left-1/2 transform -translate-x-1/2 -bottom-1 rotate-45 z-0 ${
-                        isSelected ? 'bg-[#1a73e8]' : 'bg-white border-r border-b border-slate-200'
-                    }"></div>
-                `;
-
-                pins.appendChild(pin);
-            });
-        }
-
-        // Focus and select specific pin/card
-        function selectJob(jobId, scrollFeed) {
-            selectedJobId = jobId;
-            renderJobFeed();
-            renderMapPins();
-
-            const job = initialJobs.find(j => j.id === jobId);
-            if (!job) return;
-
-            // Update Popup card details
-            document.getElementById('popupTitle').innerText = job.title;
-            document.getElementById('popupCategory').innerText = job.categoryLabel;
-            document.getElementById('popupEmployer').innerText = job.employer;
-            document.getElementById('popupSalary').innerText = job.salary;
-            document.getElementById('popupAddress').innerText = job.address;
-
-            const iconBox = document.getElementById('popupIconBox');
-            iconBox.className = `w-10 h-10 rounded-xl text-white text-sm flex items-center justify-center shadow-md ${job.color}`;
-            
-            const icon = document.getElementById('popupIcon');
-            icon.className = `fa-solid ${job.icon}`;
-
-            const badge = document.getElementById('popupCategory');
-            badge.className = `text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded mt-1.5 inline-block ${job.color}/10 ${job.textCol}`;
-
-            // Reveal Pop-over dialog
-            const popup = document.getElementById('popupCard');
-            popup.classList.remove('hidden', 'translate-y-2');
-            popup.classList.add('translate-y-0');
-
-            if (scrollFeed) {
-                // Focus element in list feed
-                const listElem = document.querySelector('.border-\\[\\#1a73e8\\]');
-                if (listElem) {
-                    listElem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            }
-        }
-
-        function closePopupCard() {
-            document.getElementById('popupCard').classList.add('hidden');
-        }
-
-        // Apply industry specific visual filtering
-        function applyFilter(category) {
-            activeFilter = category;
-
-            document.querySelectorAll('.filter-pill').forEach(pill => {
-                pill.className = 'filter-pill px-2.5 py-1 rounded-md font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200';
-            });
-
-            const activePill = document.getElementById(`pill-${category}`);
-            if (activePill) {
-                activePill.className = 'filter-pill px-2.5 py-1 rounded-md font-bold transition-all bg-[#1a73e8] text-white shadow-sm';
-            }
-
-            closePopupCard();
-            selectedJobId = null;
-            renderJobFeed();
-            renderMapPins();
-        }
-
-        function handleLiveSearch() {
-            liveSearchText = document.getElementById('liveSearchInput').value;
-            renderJobFeed();
-            renderMapPins();
-        }
-
-        function zoomMap(scale) {
-            // Simulated Zoom scaling
-            showStatusToast("Scaling coordinate coordinates...");
-        }
-
-        // Toast indicator helper
-        function showStatusToast(text) {
-            const toast = document.getElementById('toastAlert');
-            document.getElementById('toastText').innerText = text;
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 2500);
+            document.querySelectorAll('#quick-industry-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
         }
     </script>
 </body>

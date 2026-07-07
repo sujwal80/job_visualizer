@@ -288,30 +288,7 @@ html {
     margin-top: 2px;
 }
 
-.secondary-filters {
-    padding: 12px 20px;
-    border-bottom: 1px solid #f1f5f9;
-    background: #ffffff;
-}
 
-.filter-select {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #334155;
-    background: #f8fafc;
-    outline: none;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.filter-select:focus {
-    border-color: var(--accent-blue);
-    background: #ffffff;
-}
 
 .directory-list {
     flex: 1;
