@@ -45,6 +45,7 @@ export function updateSearchCity(cityTitle) {
     // Update URL query parameters without reloading
     const newUrl = `${window.location.pathname}?city=${encodeURIComponent(cityTitle)}`;
     window.history.pushState({ path: newUrl }, '', newUrl);
+    state.searchedCity = lowerCity;
 
     // Resolve location coordinates (either hub or geocode)
     let newLocation = [77.5946, 12.9716];

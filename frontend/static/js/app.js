@@ -16,7 +16,8 @@ import {
     renderDirectory,
     renderDrawerDetails,
     selectAndOpenStartup,
-    _processOpenStartup
+    _processOpenStartup,
+    scrollToCard
 } from './modules/ui_manager.js';
 import {
     handleHashRouting,
@@ -39,21 +40,21 @@ let currentSelectedIndustry = "";
 
 // Initialize geocode/hub routing on load
 const urlParams = new URLSearchParams(window.location.search);
-let searchedCity = (urlParams.get('city') || '').toLowerCase();
+state.searchedCity = (urlParams.get('city') || '').toLowerCase();
 
 const usaTerms = ["san", "francisco", "sf", "ca", "usa", "us", "united states", "america", "california"];
 const ukTerms = ["london", "uk", "england", "united kingdom", "gb", "great britain"];
 
 let isHub = false;
-if (usaTerms.some(term => searchedCity.includes(term))) {
+if (usaTerms.some(term => state.searchedCity.includes(term))) {
     state.defaultLocation = [-122.4194, 37.7749];
     state.defaultZoom = 12;
     isHub = true;
-} else if (ukTerms.some(term => searchedCity.includes(term))) {
+} else if (ukTerms.some(term => state.searchedCity.includes(term))) {
     state.defaultLocation = [-0.1276, 51.5072];
     state.defaultZoom = 12;
     isHub = true;
-} else if (searchedCity.includes('bengaluru') || searchedCity.includes('bangalore') || searchedCity.includes('india') || searchedCity === 'in' || searchedCity === 'blr') {
+} else if (state.searchedCity.includes('bengaluru') || state.searchedCity.includes('bangalore') || state.searchedCity.includes('india') || state.searchedCity === 'in' || state.searchedCity === 'blr') {
     state.defaultLocation = [77.5946, 12.9716];
     state.defaultZoom = 11;
     isHub = true;
@@ -61,7 +62,7 @@ if (usaTerms.some(term => searchedCity.includes(term))) {
 
 showDirectoryLoading();
 
-if (isHub || !searchedCity) {
+if (isHub || !state.searchedCity) {
     map.once('load', () => {
         map.flyTo({
             center: state.defaultLocation,
@@ -71,7 +72,7 @@ if (isHub || !searchedCity) {
         });
     });
 } else {
-    const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchedCity)}&format=json&limit=1`;
+    const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(state.searchedCity)}&format=json&limit=1`;
     fetch(geoUrl, {
         headers: {
             'Accept': 'application/json',
@@ -109,7 +110,7 @@ if (isHub || !searchedCity) {
     });
 }
 
-function fetchFilteredStartups() {
+function fetchFilteredStartups(preventScroll = false) {
     if (state.activeFetchController) {
         state.activeFetchController.abort();
     }
@@ -117,8 +118,8 @@ function fetchFilteredStartups() {
     const signal = state.activeFetchController.signal;
 
     const queryParams = new URLSearchParams();
-    if (searchedCity) {
-        queryParams.set('city', searchedCity);
+    if (state.searchedCity) {
+        queryParams.set('city', state.searchedCity);
     }
 
     const searchText = searchInput.value.trim();
@@ -133,7 +134,7 @@ function fetchFilteredStartups() {
     }
 
     try {
-        if (map && map.getContainer() && map.getContainer().clientWidth > 0) {
+        if (!state.searchedCity && map && map.getContainer() && map.getContainer().clientWidth > 0) {
             const bounds = map.getBounds();
             if (bounds && !isNaN(bounds.getSouth()) && !isNaN(bounds.getNorth()) && !isNaN(bounds.getWest()) && !isNaN(bounds.getEast())) {
                 let minLat = Math.max(-90, Math.min(90, bounds.getSouth()));
@@ -174,8 +175,7 @@ function fetchFilteredStartups() {
             renderDirectory(state.startupsData);
             updateDashboardStats(state.startupsData);
             
-            clearAllMarkers();
-            initializeMarkers(state.startupsData);
+            updateMarkersDiff(state.startupsData);
             updateMarkersVisualState();
 
             if (state.currentSelectedId !== null && detailsDrawer.classList.contains('active')) {
@@ -187,6 +187,9 @@ function fetchFilteredStartups() {
                     if (startup) {
                         renderDrawerDetails(startup);
                     }
+                }
+                if (!preventScroll) {
+                    scrollToCard(state.currentSelectedId);
                 }
             }
             handleHashRouting();
@@ -221,7 +224,7 @@ map.on('moveend', () => {
         } catch (err) {
             return;
         }
-        fetchFilteredStartups();
+        fetchFilteredStartups(true);
     }, 300);
 });
 
@@ -473,6 +476,7 @@ window.WorldTechApp = {
     renderDrawerDetails,
     selectAndOpenStartup,
     _processOpenStartup,
+    scrollToCard,
     handleHashRouting,
     checkViewportResilience,
     checkAuthStatus,

@@ -448,8 +448,24 @@ export function _processOpenStartup(fullStartup) {
         
         window.WorldTechApp.applyFiltering();
 
-        const card = document.getElementById(`directory-item-${id}`);
-        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setTimeout(() => {
+            scrollToCard(id);
+        }, 50);
         updateMarkersVisualState();
     }
+}
+
+export function scrollToCard(id) {
+    const container = document.getElementById('directory-list');
+    const card = document.getElementById(`directory-item-${id}`);
+    if (!container || !card) return;
+
+    requestAnimationFrame(() => {
+        const relativeTop = card.offsetTop - container.offsetTop;
+        const targetScrollTop = relativeTop - (container.clientHeight / 2) + (card.clientHeight / 2);
+        container.scrollTo({
+            top: targetScrollTop,
+            behavior: 'auto'
+        });
+    });
 }

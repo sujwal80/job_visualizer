@@ -1,4 +1,5 @@
 export const state = {
+    searchedCity: '',
     startupsData: [],
     currentSelectedId: null,
     defaultLocation: [77.5946, 12.9716],
