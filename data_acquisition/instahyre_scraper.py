@@ -10,9 +10,9 @@ except ImportError:
     from data_acquisition.job_metadata_extractor import extract_job_metadata
 
 try:
-    from geo_config import DEFAULT_TARGET_CITY, match_target_city
+    from geo_config import DEFAULT_TARGET_CITY, match_target_city, get_mock_jobs
 except ImportError:
-    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city, get_mock_jobs
 
 class InstahyreScraper:
     def __init__(self):
@@ -113,6 +113,7 @@ class InstahyreScraper:
                         "headquarters": target_city,
                         "description": desc.strip(),
                         "bangalore_address": target_city,
+                        "office_address": target_city,
                         "logo_domain": ""
                     }
 
@@ -128,10 +129,14 @@ class InstahyreScraper:
                 job_data.update(extract_job_metadata(str(title).strip(), raw_snippet=str(snippet_text), extra_data=obj))
                 jobs.append(job_data)
 
+            if not jobs and os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
+                return get_mock_jobs("Instahyre", keywords, target_city)
             return jobs
 
         except Exception as e:
             print(f"[Instahyre Scraper] Error fetching jobs: {str(e)}")
+            if os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
+                return get_mock_jobs("Instahyre", keywords, target_city)
             return []
 
     def get_company_details(self, company_slug):

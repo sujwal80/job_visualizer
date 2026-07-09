@@ -5,6 +5,7 @@ fallbacks, city synonyms, and domain settings across data acquisition modules.
 """
 
 import os
+import re
 
 # Default Target City
 DEFAULT_TARGET_CITY = os.environ.get("DEFAULT_TARGET_CITY", "Bengaluru")
@@ -58,7 +59,9 @@ if _generic_hubs_env:
 else:
     GENERIC_HUB_LABELS = {
         "bengaluru", "bangalore", "india", "karnataka",
-        "bengaluru, karnataka", "hyderabad", "mumbai", "delhi"
+        "bengaluru, karnataka", "hyderabad", "mumbai", "delhi",
+        "pune", "chennai", "gurugram", "gurgaon", "noida", "new delhi",
+        "in", "ncr"
     }
 
 # City synonyms for matching target cities across scrapers and enrichers
@@ -67,7 +70,14 @@ CITY_SYNONYMS = {
     "bangalore": ["bengaluru", "bangalore"],
     "hyderabad": ["hyderabad"],
     "mumbai": ["mumbai", "bombay"],
-    "delhi": ["delhi", "new delhi"]
+    "delhi": ["delhi", "new delhi", "ncr", "gurugram", "gurgaon", "noida"],
+    "gurugram": ["gurugram", "gurgaon", "delhi", "new delhi", "ncr"],
+    "gurgaon": ["gurugram", "gurgaon", "delhi", "new delhi", "ncr"],
+    "noida": ["noida", "delhi", "new delhi", "ncr"],
+    "pune": ["pune"],
+    "chennai": ["chennai", "madras"],
+    "india": ["india", "in", "bengaluru", "bangalore", "hyderabad", "mumbai", "delhi", "pune", "chennai", "gurugram", "gurgaon", "noida"],
+    "in": ["india", "in", "bengaluru", "bangalore", "hyderabad", "mumbai", "delhi", "pune", "chennai", "gurugram", "gurgaon", "noida"]
 }
 
 # Test fixture whitelisted URLs
@@ -119,9 +129,48 @@ def match_target_city(location, target_city):
     if target_lower in loc_lower:
         return True
 
+    # If target is nationwide India / IN
+    if target_lower in ["india", "in"]:
+        india_keywords = [
+            "india", "in", "bengaluru", "bangalore", "hyderabad", "mumbai",
+            "delhi", "new delhi", "ncr", "gurugram", "gurgaon", "noida",
+            "pune", "chennai", "madras", "karnataka", "maharashtra", "telangana"
+        ]
+        return any(k in loc_lower for k in india_keywords)
+
     # Synonym matching
     synonyms = CITY_SYNONYMS.get(target_lower, [target_lower])
     for syn in synonyms:
         if syn in loc_lower:
             return True
     return False
+
+
+def get_mock_jobs(source="Mock", keywords="Software", target_city=None, company_name=None):
+    """
+    Generate high-quality deterministic mock/fixture job openings matching the target city
+    for testing or fallback when live scrapers are rate-limited or blocked.
+    """
+    if target_city is None:
+        target_city = DEFAULT_TARGET_CITY
+    kw = str(keywords or "Software Engineer").strip()
+    c_name = str(company_name or f"{target_city} Innovation Labs").strip()
+    slug_kw = re.sub(r'[^a-z0-9]+', '-', kw.lower()).strip('-') or "role"
+    slug_comp = re.sub(r'[^a-z0-9]+', '-', c_name.lower()).strip('-') or "comp"
+    source_slug = re.sub(r'[^a-z0-9]+', '-', str(source).lower()).strip('-') or "mock"
+    return [
+        {
+            "title": f"Senior {kw} Specialist",
+            "company_name": c_name,
+            "company_slug": slug_comp,
+            "job_url": f"https://www.google.com/jobs/{source_slug}-{slug_comp}-1",
+            "url": f"https://www.google.com/jobs/{source_slug}-{slug_comp}-1",
+            "location": str(target_city),
+            "source": str(source),
+            "experience": "3-5 years",
+            "salary": "20-30 LPA",
+            "job_type": "Full-time",
+            "skills": ["Python", "Cloud", "Architecture"],
+            "posted_date": "1 day ago"
+        }
+    ]

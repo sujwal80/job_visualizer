@@ -11,11 +11,13 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from db_manager import DBManager
 try:
-    from geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate
+    from geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate, CITY_SYNONYMS
 except ImportError:
-    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate, CITY_SYNONYMS
 
-def clean_snippet_to_address(snippet):
+def clean_snippet_to_address(snippet, target_city=None):
+    if target_city is None:
+        target_city = DEFAULT_TARGET_CITY
     # Strip common prefixes from the start of the snippet
     snippet = re.sub(r'^(get|find|bangalore|bengaluru|office|headquarters|contact|address)?\s*office\s+(address|location|space)?\s*[:\-]?\s*', '', snippet, flags=re.IGNORECASE)
     snippet = re.sub(r'^\b(headquartered in|headquarters at|located in|located at)\b\s*', '', snippet, flags=re.IGNORECASE)
@@ -46,13 +48,19 @@ def clean_snippet_to_address(snippet):
         
     address = ", ".join(clean_parts)
     # Ensure target city is at the end if not present
-    if not any(k in address.lower() for k in ["bengaluru", "bangalore", DEFAULT_TARGET_CITY.lower()]):
-        address += f", {DEFAULT_TARGET_CITY}"
+    target_lower = target_city.lower()
+    synonyms = CITY_SYNONYMS.get(target_lower, [target_lower])
+    if not any(k in address.lower() for k in synonyms + [target_lower]):
+        address += f", {target_city}"
         
     return address
 
-def get_address_from_ddg(company_name):
-    query = f"{company_name} {DEFAULT_TARGET_CITY} office address"
+def get_address_from_ddg(company_name, target_city=None):
+    if target_city is None:
+        target_city = DEFAULT_TARGET_CITY
+    target_lower = target_city.lower()
+    synonyms = CITY_SYNONYMS.get(target_lower, [target_lower])
+    query = f"{company_name} {target_city} office address"
     url = f"https://html.duckduckgo.com/html/?q={urllib.parse.quote(query)}"
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -69,23 +77,31 @@ def get_address_from_ddg(company_name):
                 if snippet_el:
                     snippet = snippet_el.text.strip()
                     snippet_lower = snippet.lower()
-                    has_city = "bangalore" in snippet_lower or "bengaluru" in snippet_lower
-                    has_address_markers = any(m in snippet_lower for m in ["hsr", "koramangala", "indiranagar", "whitefield", "road", "rd", "layout", "sector", "phase", "nagar", "building", "floor", "block", "pincode", "560", "heights", "estates", "tower", "sarakki", "abhaya"])
+                    has_city = any(k in snippet_lower for k in synonyms + [target_lower])
+                    has_address_markers = any(m in snippet_lower for m in [
+                        "hsr", "koramangala", "indiranagar", "whitefield", "road", "rd",
+                        "layout", "sector", "phase", "nagar", "building", "floor", "block",
+                        "pincode", "pin", "560", "400", "110", "500", "411", "600", "201", "122",
+                        "heights", "estates", "tower", "sarakki", "abhaya", "street", "st",
+                        "marg", "vihar", "enclave", "park", "hub"
+                    ])
                     
                     if has_city and has_address_markers:
-                        cleaned = clean_snippet_to_address(snippet)
+                        cleaned = clean_snippet_to_address(snippet, target_city=target_city)
                         if cleaned:
                             return cleaned
     except Exception as e:
         print(f"  [DDG Search] Error searching DDG for '{company_name}': {e}")
     return None
 
-def heal_geocodes():
+def heal_geocodes(target_city=None):
+    if target_city is None:
+        target_city = DEFAULT_TARGET_CITY
     workspace_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     db_path = os.path.join(workspace_root, "backend", "startups.json")
     
     print("=== STARTING OFFLINE GEOLOCATION HEALER WITH DDG FALLBACK ===")
-    print(f"Loading database from: {db_path}")
+    print(f"Loading database from: {db_path} (Target City: {target_city})")
     
     db = DBManager(db_path)
     
@@ -101,7 +117,7 @@ def heal_geocodes():
     
     for idx, s in enumerate(startups_to_heal):
         name = s.get("name")
-        address = s.get("city") or DEFAULT_TARGET_CITY
+        address = s.get("city") or target_city
         
         print(f"\n[Healer {idx+1}/{len(startups_to_heal)}] Attempting to heal '{name}'...")
         print(f"  Current Address/Locality in DB: '{address}'")
@@ -109,15 +125,15 @@ def heal_geocodes():
         heal_count += 1
         
         # Tier 1: Try to geocode using current database address
-        new_lat, new_lng = db.geocode_address(address, name)
+        new_lat, new_lng = db.geocode_address(address, name, target_city=target_city)
         
         # Tier 2: If Tier 1 failed to resolve (still at fallback), scrape DDG snippet
         if is_fallback(new_lat, new_lng):
             print(f"  Tier 1 geocoding failed. Searching DuckDuckGo for office address...")
-            ddg_address = get_address_from_ddg(name)
+            ddg_address = get_address_from_ddg(name, target_city=target_city)
             if ddg_address:
                 print(f"  Extracted DDG Address: '{ddg_address}'")
-                new_lat, new_lng = db.geocode_address(ddg_address, name)
+                new_lat, new_lng = db.geocode_address(ddg_address, name, target_city=target_city)
                 
         # If it resolved successfully to a non-fallback coordinate
         if not is_fallback(new_lat, new_lng):
@@ -129,7 +145,7 @@ def heal_geocodes():
             resolved_addr = ddg_address if 'ddg_address' in locals() and ddg_address else address
             city_label = resolved_addr
             if len(city_label) > 60:
-                city_label = city_label.split(',')[0] + f", {DEFAULT_TARGET_CITY}"
+                city_label = city_label.split(',')[0] + f", {target_city}"
             s["city"] = city_label
             
             success_count += 1

@@ -11,9 +11,9 @@ except ImportError:
     from data_acquisition.job_metadata_extractor import extract_job_metadata
 
 try:
-    from geo_config import DEFAULT_TARGET_CITY, match_target_city
+    from geo_config import DEFAULT_TARGET_CITY, match_target_city, get_mock_jobs
 except ImportError:
-    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city, get_mock_jobs
 
 class LinkedInScraper:
     def __init__(self):
@@ -110,9 +110,13 @@ class LinkedInScraper:
                     job_data.update(extract_job_metadata(title, raw_snippet=snippet_text))
                     jobs.append(job_data)
             
+            if not jobs and os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
+                return get_mock_jobs("LinkedIn", keywords, target_city)
             return jobs
         except Exception as e:
             print(f"[LinkedIn Scraper] Error fetching jobs: {str(e)}")
+            if os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
+                return get_mock_jobs("LinkedIn", keywords, target_city)
             return []
 
     def get_company_details(self, company_slug, target_city=None):
@@ -221,6 +225,7 @@ class LinkedInScraper:
                 "headquarters": headquarters,
                 "description": description,
                 "bangalore_address": bangalore_address,
+                "office_address": bangalore_address,
                 "logo_domain": self._extract_domain(website)
             }
         except Exception as e:

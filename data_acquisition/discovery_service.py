@@ -2,9 +2,9 @@ import os
 import time
 import random
 try:
-    from geo_config import DEFAULT_TARGET_CITY, DEFAULT_DISCOVERY_KEYWORDS
+    from geo_config import DEFAULT_TARGET_CITY, DEFAULT_DISCOVERY_KEYWORDS, get_mock_jobs
 except ImportError:
-    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, DEFAULT_DISCOVERY_KEYWORDS
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, DEFAULT_DISCOVERY_KEYWORDS, get_mock_jobs
 
 class CompanyDiscoveryService:
     """
@@ -36,6 +36,8 @@ class CompanyDiscoveryService:
                 
             print(f"\n[Discovery] Searching LinkedIn for jobs matching: '{kw}' in {target_city}...")
             jobs = self.scraper.get_bangalore_jobs(kw, start=0, target_city=target_city) or []
+            if not jobs and os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
+                jobs = get_mock_jobs("LinkedIn", kw, target_city=target_city)
             print(f"[Discovery] Found {len(jobs)} job listings for keyword '{kw}'.")
 
             for job in jobs:
@@ -57,11 +59,12 @@ class CompanyDiscoveryService:
                 print(f"[Discovery] Discovered NEW company candidate: '{comp_name}' (slug: {comp_slug})")
                 
                 details = None
-                if comp_slug:
+                if comp_slug and hasattr(self.scraper, "get_company_details"):
                     details = self.scraper.get_company_details(comp_slug, target_city=target_city)
                     
                 if not details:
                     job_title = str(job.get('title') or 'Open Roles')
+                    loc_val = str(job.get("location") or target_city)
                     details = {
                         "name": comp_name,
                         "website": "",
@@ -69,9 +72,13 @@ class CompanyDiscoveryService:
                         "head_count": 15,
                         "headquarters": target_city,
                         "description": f"Innovative startup in {target_city} hiring for {job_title}.",
-                        "bangalore_address": str(job.get("location") or target_city),
+                        "bangalore_address": loc_val,
+                        "office_address": loc_val,
                         "logo_domain": ""
                     }
+                else:
+                    if "office_address" not in details:
+                        details["office_address"] = details.get("bangalore_address") or target_city
                     
                 self.db.merge_startup(details, [job], target_city=target_city)
                 self.db.save_db()

@@ -29,7 +29,7 @@ class LocationEnricher:
             return False
             
         comp_name = str(company_record.get("name") or "N/A").strip()
-        address = str(company_record.get("bangalore_address") or company_record.get("city") or target_city or "").strip()
+        address = str(company_record.get("office_address") or company_record.get("bangalore_address") or company_record.get("city") or target_city or "").strip()
         
         print(f"[Location Enricher] Attempting precision geocoding for '{comp_name}' (Address: '{address}', City: '{target_city}')")
         new_lat, new_lng = self.db.geocode_address(address, comp_name, target_city=target_city)

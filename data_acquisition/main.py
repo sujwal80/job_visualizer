@@ -130,6 +130,8 @@ def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_
 if __name__ == "__main__":
     args = sys.argv[1:]
     test_mode = "--test" in args
+    if "--mock" in args:
+        os.environ["MOCK_SCRAPER_FALLBACK"] = "true"
     
     target_city = "Bengaluru"
     if "--city" in args:

@@ -124,7 +124,7 @@ class DBManager:
                 (existing.get("lat") is None or existing.get("lng") is None)
             )
             if is_at_fallback:
-                address = company_details.get("bangalore_address") or target_city
+                address = company_details.get("office_address") or company_details.get("bangalore_address") or target_city
                 new_lat, new_lng = self.geocode_address(address, existing.get("name"), target_city=target_city)
                 if new_lat is not None and new_lng is not None:
                     existing["lat"] = new_lat
@@ -139,7 +139,7 @@ class DBManager:
             new_id = self._generate_new_id()
             print(f"[DB Manager] Registering NEW company: '{name}' (ID: {new_id})")
             
-            address = company_details.get("bangalore_address") or target_city
+            address = company_details.get("office_address") or company_details.get("bangalore_address") or target_city
             lat, lng = self.geocode_address(address, name, target_city=target_city)
             
             city_label = address

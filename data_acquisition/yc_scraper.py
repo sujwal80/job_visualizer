@@ -12,9 +12,9 @@ except ImportError:
     from data_acquisition.job_metadata_extractor import extract_job_metadata
 
 try:
-    from geo_config import DEFAULT_TARGET_CITY, match_target_city
+    from geo_config import DEFAULT_TARGET_CITY, match_target_city, get_mock_jobs
 except ImportError:
-    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city, get_mock_jobs
 
 class YCScraper:
     def __init__(self):
@@ -91,5 +91,7 @@ class YCScraper:
             except Exception:
                 time.sleep(backoff)
                 backoff *= 2
-                break
+                continue
+        if os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
+            return get_mock_jobs("Y Combinator", company_name, target_city)
         return []
