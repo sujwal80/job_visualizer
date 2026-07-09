@@ -5,6 +5,8 @@ from unittest.mock import patch, MagicMock
 # Add data_acquisition and workspace root to sys.path
 workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(workspace_root, "data_acquisition"))
+sys.path.append(os.path.join(workspace_root, "data_acquisition", "job_scrapers"))
+sys.path.append(os.path.join(workspace_root, "data_acquisition", "tagging"))
 sys.path.append(workspace_root)
 
 from logo_enricher import LogoEnricher

@@ -3,25 +3,15 @@ import sys
 import time
 import random
 
-# Add parent directory to path so we can import modules
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+_curr_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(_curr_dir)
+sys.path.append(os.path.join(_curr_dir, "job_scrapers"))
+sys.path.append(os.path.join(_curr_dir, "tagging"))
 
-from linkedin_scraper import LinkedInScraper
-from instahyre_scraper import InstahyreScraper
-from yc_scraper import YCScraper
-from ats_scraper import ATSScraper
-from indeed_scraper import IndeedScraper
-from wellfound_scraper import WellfoundScraper
-from naukri_scraper import NaukriScraper
-from glassdoor_scraper import GlassdoorScraper
-from cutshort_scraper import CutshortScraper
-from hirist_scraper import HiristScraper
+from job_scrapers import LinkedInScraper
 from db_manager import DBManager
-
 from discovery_service import CompanyDiscoveryService
-from logo_enricher import LogoEnricher
-from location_enricher import LocationEnricher
-from job_crawler_service import JobCrawlerService
+from tagging import LogoEnricher, LocationEnricher
 from job_validator import JobValidator
 try:
     from geo_config import DEFAULT_TARGET_CITY
@@ -60,15 +50,6 @@ def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_
     # 0. Initialize components
     db = DBManager(db_path)
     linkedin_scraper = LinkedInScraper()
-    instahyre_scraper = InstahyreScraper()
-    yc_scraper = YCScraper()
-    ats_scraper = ATSScraper()
-    indeed_scraper = IndeedScraper()
-    wellfound_scraper = WellfoundScraper()
-    naukri_scraper = NaukriScraper()
-    glassdoor_scraper = GlassdoorScraper()
-    cutshort_scraper = CutshortScraper()
-    hirist_scraper = HiristScraper()
     
     # 1. Acquisition Phase (Company Discovery)
     if run_discovery:
@@ -80,20 +61,6 @@ def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_
         print("\n=== STARTING DATA TAGGING & ENRICHMENT PHASE ===")
         logo_enricher = LogoEnricher()
         location_enricher = LocationEnricher(db)
-        
-        scrapers_map = {
-            "LinkedIn": linkedin_scraper,
-            "Instahyre": instahyre_scraper,
-            "Y Combinator": yc_scraper,
-            "Direct ATS": ats_scraper,
-            "Indeed": indeed_scraper,
-            "Wellfound": wellfound_scraper,
-            "Naukri": naukri_scraper,
-            "Glassdoor": glassdoor_scraper,
-            "Cutshort": cutshort_scraper,
-            "Hirist": hirist_scraper
-        }
-        job_crawler = JobCrawlerService(db, scrapers_map)
         
         total_startups = len(db.startups)
         print(f"[Tagging Phase] Loaded {total_startups} startups from DB for enrichment.")
@@ -111,12 +78,10 @@ def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_
             if not comp_name or comp_name == "N/A":
                 continue
                 
-            # Run modular enrichers (short-circuiting logic handled inside each enricher)
             logo_changed = logo_enricher.enrich(startup)
             loc_changed = location_enricher.enrich(startup, target_city=target_city)
-            jobs_added = job_crawler.crawl_jobs_for_company(startup, target_city=target_city)
             
-            if logo_changed or loc_changed or jobs_added > 0:
+            if logo_changed or loc_changed:
                 db.save_db()
                 
             time.sleep(random.uniform(1.0, 2.0))

@@ -5,7 +5,7 @@ from data_acquisition.geo_config import (
     match_target_city,
     get_mock_jobs,
 )
-from data_acquisition.heal_geocodes import clean_snippet_to_address
+from data_acquisition.tagging.heal_geocodes import clean_snippet_to_address
 from data_acquisition.job_validator import JobValidator
 
 

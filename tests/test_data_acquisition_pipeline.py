@@ -3,13 +3,14 @@ import sys
 import unittest
 from unittest.mock import patch, MagicMock
 
-# Ensure workspace root and data_acquisition are in sys.path
 workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 data_acq_dir = os.path.join(workspace_root, 'data_acquisition')
-if workspace_root not in sys.path:
-    sys.path.insert(0, workspace_root)
-if data_acq_dir not in sys.path:
-    sys.path.insert(0, data_acq_dir)
+scrapers_dir = os.path.join(data_acq_dir, 'job_scrapers')
+tagging_dir = os.path.join(data_acq_dir, 'tagging')
+
+for _dir in [workspace_root, data_acq_dir, scrapers_dir, tagging_dir]:
+    if _dir not in sys.path:
+        sys.path.insert(0, _dir)
 
 from yc_scraper import YCScraper
 from naukri_scraper import NaukriScraper
