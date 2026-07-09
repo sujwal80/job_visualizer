@@ -219,6 +219,31 @@ class TestR1ViewportAndLayoutResilience(unittest.TestCase):
         self.assertIn("flex-wrap: wrap;", self.css_content, "Badges row must enforce flex-wrap: wrap to prevent horizontal overflow.")
         self.assertIn("drawer-profile-card", self.js_content, "ui_manager.js must render unified .drawer-profile-card at top of company profile.")
 
+    def test_r1_26_css_source_specific_apply_button_classes(self):
+        """Verify style.css defines all 12 source-specific button modifier classes with WCAG white text and inline-flex alignment."""
+        expected_classes = [
+            '.btn-linkedin', '.btn-google', '.btn-instahyre', '.btn-yc',
+            '.btn-ats', '.btn-indeed', '.btn-wellfound', '.btn-naukri',
+            '.btn-glassdoor', '.btn-cutshort', '.btn-hirist', '.btn-direct'
+        ]
+        for cls_name in expected_classes:
+            self.assertIn(cls_name, self.css_content, f"style.css missing modifier class {cls_name}")
+        self.assertIn('display: inline-flex;', self.css_content, "CSS rules must use display: inline-flex for button icon/text alignment.")
+        self.assertIn('align-items: center;', self.css_content, "CSS rules must use align-items: center for button icon/text alignment.")
+
+    def test_r1_27_js_source_specific_apply_button_mapping_and_rendering(self):
+        """Verify ui_manager.js defines getJobSourceButtonStyle and maps the 12 source types with mr-1.5 icon spacing."""
+        self.assertIn('function getJobSourceButtonStyle', self.js_content, "JS missing getJobSourceButtonStyle function definition.")
+        source_classes = [
+            'btn-linkedin', 'btn-google', 'btn-instahyre', 'btn-yc',
+            'btn-ats', 'btn-indeed', 'btn-wellfound', 'btn-naukri',
+            'btn-glassdoor', 'btn-cutshort', 'btn-hirist', 'btn-direct'
+        ]
+        for btn_cls in source_classes:
+            self.assertIn(btn_cls, self.js_content, f"JS missing button class mapping for {btn_cls}")
+        self.assertIn('mr-1.5', self.js_content, "JS must apply mr-1.5 icon spacing in apply button rendering.")
+
+
 
 class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
     """

@@ -17,7 +17,8 @@ import {
     renderDrawerDetails,
     selectAndOpenStartup,
     _processOpenStartup,
-    scrollToCard
+    scrollToCard,
+    getJobSourceButtonStyle
 } from './modules/ui_manager.js';
 import {
     handleHashRouting,
@@ -482,5 +483,6 @@ window.WorldTechApp = {
     checkAuthStatus,
     map,
     fetchFilteredStartups,
+    getJobSourceButtonStyle,
     getTempRemoteMarker: () => state.tempRemoteMarker
 };

@@ -938,12 +938,159 @@ html {
     font-weight: 600;
     padding: 8px 14px;
     border-radius: 8px;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
 }
 
 .job-btn:hover {
     background: var(--accent-blue-hover);
+}
+
+/* Source-specific Apply button modifiers */
+.job-btn.btn-linkedin {
+    background: #0a66c2;
+    border: 1px solid #0a66c2;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+}
+.job-btn.btn-linkedin:hover {
+    background: #084e96;
+    border-color: #084e96;
+}
+
+.job-btn.btn-google {
+    background: #1a73e8;
+    border: 1px solid #1a73e8;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+}
+.job-btn.btn-google:hover {
+    background: #1557b0;
+    border-color: #1557b0;
+}
+
+.job-btn.btn-instahyre {
+    background: #059669;
+    border: 1px solid #059669;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+}
+.job-btn.btn-instahyre:hover {
+    background: #047857;
+    border-color: #047857;
+}
+
+.job-btn.btn-yc {
+    background: #f97316;
+    border: 1px solid #f97316;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+}
+.job-btn.btn-yc:hover {
+    background: #ea580c;
+    border-color: #ea580c;
+}
+
+.job-btn.btn-ats {
+    background: #4f46e5;
+    border: 1px solid #4f46e5;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+}
+.job-btn.btn-ats:hover {
+    background: #4338ca;
+    border-color: #4338ca;
+}
+
+.job-btn.btn-indeed {
+    background: #2563eb;
+    border: 1px solid #2563eb;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+}
+.job-btn.btn-indeed:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.job-btn.btn-wellfound {
+    background: #1e293b;
+    border: 1px solid #1e293b;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+}
+.job-btn.btn-wellfound:hover {
+    background: #0f172a;
+    border-color: #0f172a;
+}
+
+.job-btn.btn-naukri {
+    background: #0284c7;
+    border: 1px solid #0284c7;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+}
+.job-btn.btn-naukri:hover {
+    background: #0369a1;
+    border-color: #0369a1;
+}
+
+.job-btn.btn-glassdoor {
+    background: #0d9488;
+    border: 1px solid #0d9488;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+}
+.job-btn.btn-glassdoor:hover {
+    background: #0f766e;
+    border-color: #0f766e;
+}
+
+.job-btn.btn-cutshort {
+    background: #7c3aed;
+    border: 1px solid #7c3aed;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+}
+.job-btn.btn-cutshort:hover {
+    background: #6d28d9;
+    border-color: #6d28d9;
+}
+
+.job-btn.btn-hirist {
+    background: #ea580c;
+    border: 1px solid #ea580c;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+}
+.job-btn.btn-hirist:hover {
+    background: #c2410c;
+    border-color: #c2410c;
+}
+
+.job-btn.btn-direct {
+    background: #475569;
+    border: 1px solid #475569;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+}
+.job-btn.btn-direct:hover {
+    background: #334155;
+    border-color: #334155;
 }
 
 .other-loc-box {

@@ -126,6 +126,44 @@ export function renderDirectory(startups) {
     }
 }
 
+export function getJobSourceButtonStyle(source) {
+    const s = String(source || '').trim().toLowerCase();
+    if (s.includes('linkedin')) {
+        return { btnClass: 'job-btn btn-linkedin', iconClass: 'fa-brands fa-linkedin', label: 'LinkedIn Apply ↗' };
+    }
+    if (s.includes('google')) {
+        return { btnClass: 'job-btn btn-google', iconClass: 'fa-brands fa-google', label: 'Google Jobs ↗' };
+    }
+    if (s.includes('instahyre')) {
+        return { btnClass: 'job-btn btn-instahyre', iconClass: 'fa-solid fa-bolt', label: 'Instahyre Apply ↗' };
+    }
+    if (s === 'yc' || s.includes('y combinator') || s.includes('ycombinator')) {
+        return { btnClass: 'job-btn btn-yc', iconClass: 'fa-brands fa-y-combinator', label: 'YC Apply ↗' };
+    }
+    if (s.includes('ats') || s.includes('greenhouse') || s.includes('lever')) {
+        return { btnClass: 'job-btn btn-ats', iconClass: 'fa-solid fa-file-lines', label: 'ATS Apply ↗' };
+    }
+    if (s.includes('indeed')) {
+        return { btnClass: 'job-btn btn-indeed', iconClass: 'fa-solid fa-briefcase', label: 'Indeed Apply ↗' };
+    }
+    if (s.includes('wellfound') || s.includes('angellist')) {
+        return { btnClass: 'job-btn btn-wellfound', iconClass: 'fa-brands fa-angellist', label: 'Wellfound Apply ↗' };
+    }
+    if (s.includes('naukri')) {
+        return { btnClass: 'job-btn btn-naukri', iconClass: 'fa-solid fa-user-tie', label: 'Naukri Apply ↗' };
+    }
+    if (s.includes('glassdoor')) {
+        return { btnClass: 'job-btn btn-glassdoor', iconClass: 'fa-solid fa-door-open', label: 'Glassdoor Apply ↗' };
+    }
+    if (s.includes('cutshort')) {
+        return { btnClass: 'job-btn btn-cutshort', iconClass: 'fa-solid fa-scissors', label: 'Cutshort Apply ↗' };
+    }
+    if (s.includes('hirist')) {
+        return { btnClass: 'job-btn btn-hirist', iconClass: 'fa-solid fa-layer-group', label: 'Hirist Apply ↗' };
+    }
+    return { btnClass: 'job-btn btn-direct', iconClass: 'fa-solid fa-up-right-from-square', label: 'Company Site ↗' };
+}
+
 export function renderDrawerDetails(startup) {
     const drawerContent = document.getElementById('drawer-content');
     if (!drawerContent) return;
@@ -304,18 +342,23 @@ export function renderDrawerDetails(startup) {
                 tagsChildren.push(createElement('span', { className: 'job-tag badge-attr', style: 'background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;', textContent: `🔥 Active` }));
             }
 
+            const styleInfo = getJobSourceButtonStyle(j.source);
+            const applyBtn = j.url ? createElement('a', {
+                href: j.url,
+                target: '_blank',
+                rel: 'noopener noreferrer',
+                className: styleInfo.btnClass
+            }, [
+                createElement('i', { className: `${styleInfo.iconClass} mr-1.5` }),
+                styleInfo.label
+            ]) : null;
+
             const jCard = createElement('div', { className: 'job-card' }, [
                 createElement('div', { className: 'job-info' }, [
                     createElement('h4', { textContent: j.title || 'Open Position' }),
                     createElement('div', { className: 'job-tags' }, tagsChildren)
                 ]),
-                j.url ? createElement('a', {
-                    href: j.url,
-                    target: '_blank',
-                    rel: 'noopener noreferrer',
-                    className: 'job-btn',
-                    textContent: 'Apply ↗'
-                }) : null
+                applyBtn
             ]);
             jobsContainer.appendChild(jCard);
         });
