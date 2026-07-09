@@ -14,8 +14,14 @@ try:
 except ImportError:
     from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city, get_mock_jobs
 
-class InstahyreScraper:
-    def __init__(self):
+try:
+    from scraper_base import ScraperBase
+except ImportError:
+    from data_acquisition.job_scrapers.scraper_base import ScraperBase
+
+class InstahyreScraper(ScraperBase):
+    def __init__(self, validator=None):
+        super().__init__(validator=validator)
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             "Accept": "application/json, text/plain, */*",
@@ -130,13 +136,13 @@ class InstahyreScraper:
                 jobs.append(job_data)
 
             if not jobs and os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
-                return get_mock_jobs("Instahyre", keywords, target_city)
-            return jobs
+                return self.validate_and_enrich_jobs(get_mock_jobs("Instahyre", keywords, target_city))
+            return self.validate_and_enrich_jobs(jobs)
 
         except Exception as e:
             print(f"[Instahyre Scraper] Error fetching jobs: {str(e)}")
             if os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
-                return get_mock_jobs("Instahyre", keywords, target_city)
+                return self.validate_and_enrich_jobs(get_mock_jobs("Instahyre", keywords, target_city))
             return []
 
     def get_bangalore_jobs(self, keywords, start=0, target_city=None, **kwargs):

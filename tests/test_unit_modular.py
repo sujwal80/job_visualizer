@@ -136,5 +136,31 @@ class TestFrontendJSModularity(unittest.TestCase):
             self.assertIn(method, content, f"window.WorldTechApp must export {method}.")
 
 
+class TestScraperBaseIntegratedValidation(unittest.TestCase):
+    """Verifies ScraperBase integrates metadata extraction and job validation."""
+
+    def test_validate_and_enrich_jobs_filters_inactive(self):
+        from data_acquisition.job_scrapers.scraper_base import ScraperBase
+        from unittest.mock import MagicMock
+        
+        mock_validator = MagicMock()
+        # First job returns active, second returns inactive
+        mock_validator._check_job_active.side_effect = [
+            (True, "Active"),
+            (False, "Expired role")
+        ]
+        
+        base = ScraperBase(validator=mock_validator)
+        raw_jobs = [
+            {"title": "Senior Python Engineer", "url": "https://example.com/job/1", "description": "Need 4 years experience in Python and AWS."},
+            {"title": "Closed Role", "url": "https://example.com/job/2", "description": "Expired"}
+        ]
+        res = base.validate_and_enrich_jobs(raw_jobs)
+        self.assertEqual(len(res), 1, "Only active jobs should be returned by ScraperBase")
+        self.assertEqual(res[0]["title"], "Senior Python Engineer")
+        self.assertIn("Python", res[0]["skills"])
+        self.assertIn("AWS", res[0]["skills"])
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

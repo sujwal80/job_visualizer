@@ -16,8 +16,14 @@ try:
 except ImportError:
     from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city, get_mock_jobs
 
-class YCScraper:
-    def __init__(self):
+try:
+    from scraper_base import ScraperBase
+except ImportError:
+    from data_acquisition.job_scrapers.scraper_base import ScraperBase
+
+class YCScraper(ScraperBase):
+    def __init__(self, validator=None):
+        super().__init__(validator=validator)
         self.app_id = os.environ.get("YC_ALGOLIA_APP_ID", "45BWZJ1SGC")
         self.api_key = os.environ.get("YC_ALGOLIA_API_KEY", "NzllNTY5MzJiZGM2OTY2ZTQwMDEzOTNhYWZiZGRjODlhYzVkNjBmOGRjNzJiMWM4ZTU0ZDlhYTZjOTJiMjlhMWFuYWx5dGljc1RhZ3M9eWNkYyZyZXN0cmljdEluZGljZXM9WUNDb21wYW55X3Byb2R1Y3Rpb24lMkNZQ0NvbXBhbnlfQnlfTGF1bmNoX0RhdGVfcHJvZHVjdGlvbiZ0YWdGaWx0ZXJzPSU1QiUyMnljZGNfcHVibGljJTIyJTVE")
         user_agent = os.environ.get("YC_USER_AGENT", os.environ.get("SCRAPER_USER_AGENT", 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'))
@@ -80,7 +86,7 @@ class YCScraper:
                             }
                             job_data.update(extract_job_metadata(p.get('title', 'N/A'), raw_snippet=p.get('description', ''), extra_data=p))
                             jobs.append(job_data)
-                        return jobs
+                        return self.validate_and_enrich_jobs(jobs)
                 break
             except urllib.error.HTTPError as e:
                 if e.code == 429 or e.code >= 500:
@@ -93,7 +99,7 @@ class YCScraper:
                 backoff *= 2
                 continue
         if os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
-            return get_mock_jobs("Y Combinator", company_name, target_city)
+            return self.validate_and_enrich_jobs(get_mock_jobs("Y Combinator", company_name, target_city))
         return []
 
     def get_bangalore_jobs(self, company_name, start=0, slug=None, target_city=None, **kwargs):

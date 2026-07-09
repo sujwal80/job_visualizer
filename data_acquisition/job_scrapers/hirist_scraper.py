@@ -15,11 +15,17 @@ try:
 except ImportError:
     from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
 
-class HiristScraper:
+try:
+    from scraper_base import ScraperBase
+except ImportError:
+    from data_acquisition.job_scrapers.scraper_base import ScraperBase
+
+class HiristScraper(ScraperBase):
     """
     Scraper module to find job openings via Hirist.tech.
     """
-    def __init__(self):
+    def __init__(self, validator=None):
+        super().__init__(validator=validator)
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
             "Accept": "application/json, text/html, */*",
@@ -101,10 +107,10 @@ class HiristScraper:
                 job_data.update(extract_job_metadata(str(title).strip(), raw_snippet=str(snippet), extra_data=item))
                 jobs.append(job_data)
 
-            return jobs
+            return self.validate_and_enrich_jobs(jobs)
         except Exception as e:
             print(f"[Hirist Scraper] API error: {str(e)}")
-            return self._fetch_via_html(keywords, target_city)
+            return self.validate_and_enrich_jobs(self._fetch_via_html(keywords, target_city))
 
     def _fetch_via_html(self, keywords, target_city):
         try:

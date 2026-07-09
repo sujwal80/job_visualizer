@@ -19,6 +19,7 @@ from .glassdoor_scraper import GlassdoorScraper
 from .cutshort_scraper import CutshortScraper
 from .hirist_scraper import HiristScraper
 from .job_metadata_extractor import extract_job_metadata
+from .scraper_base import ScraperBase
 
 __all__ = [
     "LinkedInScraper",
@@ -32,4 +33,5 @@ __all__ = [
     "CutshortScraper",
     "HiristScraper",
     "extract_job_metadata",
+    "ScraperBase",
 ]

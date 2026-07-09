@@ -15,11 +15,17 @@ try:
 except ImportError:
     from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
 
-class NaukriScraper:
+try:
+    from scraper_base import ScraperBase
+except ImportError:
+    from data_acquisition.job_scrapers.scraper_base import ScraperBase
+
+class NaukriScraper(ScraperBase):
     """
     Scraper module to find job openings via Naukri.com.
     """
-    def __init__(self):
+    def __init__(self, validator=None):
+        super().__init__(validator=validator)
         user_agent = os.environ.get("NAUKRI_USER_AGENT", os.environ.get("SCRAPER_USER_AGENT", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"))
         self.headers = {
             "User-Agent": user_agent,
@@ -114,10 +120,10 @@ class NaukriScraper:
                 job_data.update(extract_job_metadata(str(title).strip(), raw_snippet=str(item.get("jobDescription") or ""), extra_data=item))
                 jobs.append(job_data)
 
-            return jobs
+            return self.validate_and_enrich_jobs(jobs)
         except Exception as e:
             print(f"[Naukri Scraper] API error: {str(e)}")
-            return self._fetch_via_html(keywords, target_city)
+            return self.validate_and_enrich_jobs(self._fetch_via_html(keywords, target_city))
 
     def get_bangalore_jobs(self, keywords, start=0, target_city=None, **kwargs):
         return self.get_jobs(keywords, start=start, target_city=target_city, **kwargs)

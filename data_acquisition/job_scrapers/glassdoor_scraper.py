@@ -15,11 +15,17 @@ try:
 except ImportError:
     from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
 
-class GlassdoorScraper:
+try:
+    from scraper_base import ScraperBase
+except ImportError:
+    from data_acquisition.job_scrapers.scraper_base import ScraperBase
+
+class GlassdoorScraper(ScraperBase):
     """
     Scraper module to find job openings via Glassdoor.
     """
-    def __init__(self):
+    def __init__(self, validator=None):
+        super().__init__(validator=validator)
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -110,7 +116,7 @@ class GlassdoorScraper:
                 job_data.update(extract_job_metadata(str(raw_title).strip(), raw_snippet=snippet_text))
                 jobs.append(job_data)
 
-            return jobs
+            return self.validate_and_enrich_jobs(jobs)
         except Exception as e:
             print(f"[Glassdoor Scraper] Error fetching jobs: {str(e)}")
             return []

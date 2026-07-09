@@ -13,8 +13,14 @@ try:
 except ImportError:
     from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
 
-class ATSScraper:
-    def __init__(self):
+try:
+    from scraper_base import ScraperBase
+except ImportError:
+    from data_acquisition.job_scrapers.scraper_base import ScraperBase
+
+class ATSScraper(ScraperBase):
+    def __init__(self, validator=None):
+        super().__init__(validator=validator)
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
         }
@@ -46,14 +52,14 @@ class ATSScraper:
         jobs = []
         jobs.extend(self._fetch_lever(company_name, slug, target_city))
         if jobs:
-            return jobs
+            return self.validate_and_enrich_jobs(jobs)
             
         jobs.extend(self._fetch_greenhouse(company_name, slug, target_city))
         if jobs:
-            return jobs
+            return self.validate_and_enrich_jobs(jobs)
             
         jobs.extend(self._fetch_ashby(company_name, slug, target_city))
-        return jobs
+        return self.validate_and_enrich_jobs(jobs)
 
     def get_bangalore_jobs(self, company_name, start=0, target_city=None, **kwargs):
         return self.get_jobs(company_name, start=start, target_city=target_city, **kwargs)
