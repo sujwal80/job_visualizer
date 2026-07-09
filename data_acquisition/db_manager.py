@@ -2,8 +2,15 @@ import json
 import os
 import requests
 import urllib.parse
-import time
 import re
+import time
+import threading
+from contextlib import contextmanager
+try:
+    import fcntl
+    HAS_FCNTL = True
+except ImportError:
+    HAS_FCNTL = False
 
 BLACKLISTED_DOMAINS = {
     "bit.ly", "linktr.ee", "tinyurl.com", "t.co", "buff.ly", "goo.gl", "ow.ly",
@@ -16,6 +23,52 @@ except ImportError:
     from data_acquisition.geo_config import DEFAULT_TARGET_CITY, DEFAULT_GEO_LOCALITIES, GENERIC_HUB_LABELS, is_fallback_coordinate, match_target_city
 
 class DBManager:
+    _lock_state = {}
+    _state_mutex = threading.Lock()
+
+    @classmethod
+    @contextmanager
+    def file_lock(cls, db_path):
+        abs_path = os.path.abspath(db_path)
+        lock_path = abs_path + ".lock"
+        os.makedirs(os.path.dirname(abs_path), exist_ok=True)
+
+        with cls._state_mutex:
+            if abs_path not in cls._lock_state:
+                cls._lock_state[abs_path] = {
+                    'rlock': threading.RLock(),
+                    'count': 0,
+                    'file': None
+                }
+            state = cls._lock_state[abs_path]
+
+        state['rlock'].acquire()
+        try:
+            if state['count'] == 0:
+                state['file'] = open(lock_path, 'a+')
+                if HAS_FCNTL:
+                    try:
+                        fcntl.flock(state['file'], fcntl.LOCK_EX)
+                    except Exception:
+                        pass
+            state['count'] += 1
+            yield
+        finally:
+            state['count'] -= 1
+            if state['count'] == 0:
+                if state['file'] is not None:
+                    if HAS_FCNTL:
+                        try:
+                            fcntl.flock(state['file'], fcntl.LOCK_UN)
+                        except Exception:
+                            pass
+                    try:
+                        state['file'].close()
+                    except Exception:
+                        pass
+                    state['file'] = None
+            state['rlock'].release()
+
     def __init__(self, db_path=None):
         if db_path is None:
             db_path = os.environ.get("STARTUP_DB_PATH", "backend/startups.json")
@@ -24,18 +77,69 @@ class DBManager:
         self.load_db()
         
     def load_db(self):
-        if os.path.exists(self.db_path):
-            with open(self.db_path, 'r') as f:
-                try:
-                    self.startups = json.load(f)
-                except json.JSONDecodeError:
-                    self.startups = []
-        else:
-            self.startups = []
+        with self.file_lock(self.db_path):
+            if os.path.exists(self.db_path):
+                with open(self.db_path, 'r') as f:
+                    try:
+                        self.startups = json.load(f)
+                    except json.JSONDecodeError:
+                        self.startups = []
+            else:
+                self.startups = []
+
+    def get_all_startups(self):
+        return self.startups
             
     def save_db(self):
-        with open(self.db_path, 'w') as f:
-            json.dump(self.startups, f, indent=2)
+        with self.file_lock(self.db_path):
+            os.makedirs(os.path.dirname(os.path.abspath(self.db_path)), exist_ok=True)
+            mode = 'r+' if os.path.exists(self.db_path) else 'w+'
+            with open(self.db_path, mode) as f:
+                if HAS_FCNTL:
+                    try:
+                        fcntl.flock(f, fcntl.LOCK_EX)
+                    except Exception:
+                        pass
+                try:
+                    f.seek(0)
+                    f.truncate(0)
+                    json.dump(self.startups, f, indent=2)
+                    f.flush()
+                    os.fsync(f.fileno())
+                finally:
+                    if HAS_FCNTL:
+                        try:
+                            fcntl.flock(f, fcntl.LOCK_UN)
+                        except Exception:
+                            pass
+
+    def merge_job_openings(self, jobs):
+        if not isinstance(jobs, list) or not jobs:
+            return 0
+        merged_count = 0
+        with self.file_lock(self.db_path):
+            self.load_db()
+            for j in jobs:
+                if not isinstance(j, dict):
+                    continue
+                comp_name = j.get("company_name", "N/A")
+                startup = self.find_startup(comp_name, "")
+                if not startup:
+                    startup = {
+                        "id": len(self.startups) + 1,
+                        "name": comp_name,
+                        "city": j.get("location", DEFAULT_TARGET_CITY),
+                        "job_openings": []
+                    }
+                    self.startups.append(startup)
+                openings = startup.setdefault("job_openings", [])
+                j_url = str(j.get("url") or j.get("job_url") or "").strip()
+                existing_urls = {str(o.get("url") or o.get("job_url") or "").strip() for o in openings}
+                if j_url and j_url not in existing_urls:
+                    openings.append(j)
+                    merged_count += 1
+            self.save_db()
+        return merged_count
             
     def find_startup(self, name, logo_domain, target_city=None):
         """

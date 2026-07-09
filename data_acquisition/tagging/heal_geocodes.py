@@ -6,14 +6,22 @@ from bs4 import BeautifulSoup
 import urllib.parse
 import re
 
-# Add current directory to path
+# Add project root and data_acquisition directory to path
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+DATA_ACQ_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if DATA_ACQ_DIR not in sys.path:
+    sys.path.insert(0, DATA_ACQ_DIR)
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from db_manager import DBManager
 try:
     from geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate, CITY_SYNONYMS
+    from tagging.remote_office_classifier import check_remote_office_status
 except ImportError:
     from data_acquisition.geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate, CITY_SYNONYMS
+    from data_acquisition.tagging.remote_office_classifier import check_remote_office_status
 
 def clean_snippet_to_address(snippet, target_city=None):
     if target_city is None:
@@ -100,8 +108,7 @@ def get_address_from_ddg(company_name, target_city=None):
 def heal_geocodes(target_city=None):
     if target_city is None:
         target_city = DEFAULT_TARGET_CITY
-    workspace_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    db_path = os.path.join(workspace_root, "backend", "startups.json")
+    db_path = os.environ.get("STARTUP_DB_PATH", os.path.join(PROJECT_ROOT, "backend", "startups.json"))
     
     print("=== STARTING OFFLINE GEOLOCATION HEALER WITH DDG FALLBACK ===")
     print(f"Loading database from: {db_path} (Target City: {target_city})")
@@ -150,6 +157,8 @@ def heal_geocodes(target_city=None):
             if len(city_label) > 60:
                 city_label = city_label.split(',')[0] + f", {target_city}"
             s["city"] = city_label
+            check_remote_office_status(s, target_city=target_city)
+            s["location_tagged"] = True
             
             success_count += 1
             db.save_db()

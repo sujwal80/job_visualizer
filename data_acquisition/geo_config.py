@@ -140,6 +140,35 @@ CITY_SYNONYMS = {
     "uk": UK_SYNONYMS,
 }
 
+# Canonical multi-city center coordinates mapping (lat, lng)
+MULTI_CITY_CENTERS = {
+    "bengaluru": (12.9716, 77.5946),
+    "bangalore": (12.9716, 77.5946),
+    "delhi": (28.6139, 77.2090),
+    "new delhi": (28.6139, 77.2090),
+    "ncr": (28.6139, 77.2090),
+    "gurugram": (28.4595, 77.0266),
+    "gurgaon": (28.4595, 77.0266),
+    "noida": (28.5355, 77.3910),
+    "hyderabad": (17.3850, 78.4867),
+    "mumbai": (19.0760, 72.8777),
+    "bombay": (19.0760, 72.8777),
+    "pune": (18.5204, 73.8567),
+    "chennai": (13.0827, 80.2707),
+    "madras": (13.0827, 80.2707),
+    "kolkata": (22.5726, 88.3639),
+    "calcutta": (22.5726, 88.3639),
+    "ahmedabad": (23.0225, 72.5714),
+    "singapore": (1.3521, 103.8198),
+    "california": (37.7749, -122.4194),
+    "san francisco": (37.7749, -122.4194),
+    "sf": (37.7749, -122.4194),
+    "bay area": (37.7749, -122.4194),
+    "london": (51.5074, -0.1278),
+    "new york": (40.7128, -74.0060),
+    "nyc": (40.7128, -74.0060),
+}
+
 # Test fixture whitelisted URLs
 TEST_FIXTURE_WHITELIST_URLS = [
     url.strip() for url in os.environ.get(
@@ -215,6 +244,40 @@ def match_target_city(location, target_city):
         if _keyword_matches(syn, loc_lower):
             return True
     return False
+
+
+def get_city_center_coordinates(target_city):
+    """
+    Get the (lat, lng) city center coordinates for a target city.
+    Returns None if target_city is None, a global/worldwide query, or not found.
+    """
+    if target_city is None:
+        return None
+    t_lower = str(target_city).strip().lower()
+    if not t_lower or t_lower in {
+        "india", "in", "worldwide", "global", "remote", "any", "all", "anywhere",
+        "united states", "usa", "us", "united kingdom", "uk", "europe"
+    }:
+        return None
+
+    if t_lower in MULTI_CITY_CENTERS:
+        return MULTI_CITY_CENTERS[t_lower]
+
+    if t_lower in CITY_SYNONYMS:
+        for syn in CITY_SYNONYMS[t_lower]:
+            syn_lower = syn.strip().lower()
+            if syn_lower in MULTI_CITY_CENTERS:
+                return MULTI_CITY_CENTERS[syn_lower]
+
+    for canonical, syns in CITY_SYNONYMS.items():
+        if t_lower in [s.lower() for s in syns]:
+            if canonical in MULTI_CITY_CENTERS:
+                return MULTI_CITY_CENTERS[canonical]
+            for syn in syns:
+                if syn.lower() in MULTI_CITY_CENTERS:
+                    return MULTI_CITY_CENTERS[syn.lower()]
+
+    return None
 
 
 def get_mock_jobs(source="Mock", keywords="Software", target_city=None, company_name=None):

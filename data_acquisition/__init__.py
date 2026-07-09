@@ -11,6 +11,7 @@ for _d in [_curr_dir, _scrapers_dir, _tagging_dir]:
 
 from .job_scrapers import *
 from .tagging import *
+from .crawl_queue import CrawlQueue
 
 from . import job_scrapers as _js
 from . import tagging as _tg

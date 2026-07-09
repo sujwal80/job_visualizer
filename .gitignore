@@ -79,6 +79,7 @@ Thumbs.db
 *.sqlite3
 *.db
 *.log
+*.lock
 
 # AI Agent / Framework workspace directories
 .agents/

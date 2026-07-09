@@ -34,7 +34,7 @@ class TestIndiaRemediation(unittest.TestCase):
     def test_db_manager_find_startup_india(self):
         """Verify find_startup properly matches existing Indian city startups when target_city='India'."""
         from data_acquisition.db_manager import DBManager
-        db = DBManager(db_path="/nonexistent_test_db.json")
+        db = DBManager(db_path="nonexistent_test_db.json")
         db.startups = [
             {"id": 1, "name": "Pune Tech", "logo_domain": "punetech.com", "city": "Kalyani Nagar, Pune"},
             {"id": 2, "name": "BLR Tech", "logo_domain": "blrtech.com", "city": "Bengaluru, Karnataka"},
