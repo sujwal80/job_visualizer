@@ -16,7 +16,7 @@ class CompanyDiscoveryService:
         self.db = db_manager
         self.scraper = linkedin_scraper
 
-    def discover_new_companies(self, keywords_list=None, max_new_companies=5, target_city=None):
+    def discover_new_companies(self, keywords_list=None, max_new_companies=None, target_city=None):
         if target_city is None:
             target_city = DEFAULT_TARGET_CITY
         if keywords_list is None:
@@ -27,21 +27,24 @@ class CompanyDiscoveryService:
                 keywords_list = DEFAULT_DISCOVERY_KEYWORDS
 
         print("\n=== STARTING COMPANY DISCOVERY PHASE (ACQUISITION) ===")
-        print(f"[Discovery] Target Keywords: {keywords_list}, City: {target_city}")
+        print(f"[Discovery] Target Keywords: {keywords_list}, City: {target_city}, Max New Companies: {'Unlimited' if max_new_companies is None else max_new_companies}")
         
         new_added = 0
         for kw in keywords_list:
-            if new_added >= max_new_companies:
+            if max_new_companies is not None and new_added >= max_new_companies:
                 break
                 
             print(f"\n[Discovery] Searching LinkedIn for jobs matching: '{kw}' in {target_city}...")
-            jobs = self.scraper.get_bangalore_jobs(kw, start=0, target_city=target_city) or []
+            if hasattr(self.scraper, "get_jobs"):
+                jobs = self.scraper.get_jobs(kw, start=0, target_city=target_city) or []
+            else:
+                jobs = self.scraper.get_bangalore_jobs(kw, start=0, target_city=target_city) or []
             if not jobs and os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
                 jobs = get_mock_jobs("LinkedIn", kw, target_city=target_city)
             print(f"[Discovery] Found {len(jobs)} job listings for keyword '{kw}'.")
 
             for job in jobs:
-                if new_added >= max_new_companies:
+                if max_new_companies is not None and new_added >= max_new_companies:
                     break
                 if not isinstance(job, dict):
                     continue

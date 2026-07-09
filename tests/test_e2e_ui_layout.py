@@ -210,8 +210,14 @@ class TestR1ViewportAndLayoutResilience(unittest.TestCase):
         self.assertIn("width: 280px;", self.css_content, "Default search box width must be 280px.")
         self.assertIn("width: 160px;", self.css_content, "Search box must adapt to 160px under 600px breakpoint.")
         self.assertIn("width: 130px;", self.css_content, "Search box must adapt to 130px under 480px breakpoint.")
-        self.assertIn("width: 105px;", self.css_content, "Search box must adapt to 105px under 360px breakpoint.")
         self.assertIn("width: 95px;", self.css_content, "Search box must adapt to 95px under 320px breakpoint.")
+
+    def test_r1_25_css_unified_drawer_profile_card_structure(self):
+        """Verify unified drawer profile card (.drawer-profile-card) and wrapping badge rows prevent multiple stacked divs and badge overflow."""
+        self.assertIn(".drawer-profile-card", self.css_content, "CSS must define .drawer-profile-card container.")
+        self.assertIn(".drawer-badges-row", self.css_content, "CSS must define .drawer-badges-row.")
+        self.assertIn("flex-wrap: wrap;", self.css_content, "Badges row must enforce flex-wrap: wrap to prevent horizontal overflow.")
+        self.assertIn("drawer-profile-card", self.js_content, "ui_manager.js must render unified .drawer-profile-card at top of company profile.")
 
 
 class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):

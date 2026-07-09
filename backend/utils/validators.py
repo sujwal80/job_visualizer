@@ -81,7 +81,7 @@ def _check_has_pin(s):
     for f_lat, f_lng in FALLBACK_COORDINATES:
         if abs(lat - f_lat) < PIN_DELTA_THRESHOLD and abs(lng - f_lng) < PIN_DELTA_THRESHOLD:
             return False
-    addr = str(s.get("bangalore_address") or s.get("address") or s.get("city") or "").strip().lower()
+    addr = str(s.get("address") or s.get("street_address") or s.get("bangalore_address") or s.get("city") or "").strip().lower()
     # Treat general city names without a specific street address as unpinned
     if addr in GENERIC_HUB_LABELS:
         return False

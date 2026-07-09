@@ -32,7 +32,7 @@ class ATSScraper:
             return ""
         return re.sub(r'[^a-z0-9]+', '', str(name).lower())
 
-    def get_bangalore_jobs(self, company_name, start=0, target_city=None, **kwargs):
+    def get_jobs(self, company_name, start=0, target_city=None, **kwargs):
         if target_city is None:
             target_city = DEFAULT_TARGET_CITY
         if not company_name or str(company_name).strip() == "N/A":
@@ -54,6 +54,9 @@ class ATSScraper:
             
         jobs.extend(self._fetch_ashby(company_name, slug, target_city))
         return jobs
+
+    def get_bangalore_jobs(self, company_name, start=0, target_city=None, **kwargs):
+        return self.get_jobs(company_name, start=start, target_city=target_city, **kwargs)
 
     def _match_city(self, loc, target_city):
         return match_target_city(loc, target_city)

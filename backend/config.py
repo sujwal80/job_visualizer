@@ -45,9 +45,23 @@ else:
         "bengaluru, karnataka", "hyderabad", "mumbai", "delhi"
     }
 
+import json
+
 # Regional / Country Synonym Map
-REGION_SYNONYM_MAP = {
-    "usa": {"usa", "us", "united states", "america", "sf", "san francisco", "california", "bay area"},
-    "uk": {"uk", "united kingdom", "england", "london", "gb", "great britain"},
-    "india": {"india", "in", "bengaluru", "bangalore", "karnataka", "blr"}
-}
+_region_synonym_env = os.environ.get("REGION_SYNONYM_MAP")
+if _region_synonym_env:
+    try:
+        _parsed = json.loads(_region_synonym_env)
+        REGION_SYNONYM_MAP = {k.lower(): set(v) for k, v in _parsed.items()}
+    except Exception:
+        REGION_SYNONYM_MAP = {
+            "usa": {"usa", "us", "united states", "america", "sf", "san francisco", "california", "bay area", "ca"},
+            "uk": {"uk", "united kingdom", "england", "london", "gb", "great britain"},
+            "india": {"india", "in", "bengaluru", "bangalore", "karnataka", "blr"}
+        }
+else:
+    REGION_SYNONYM_MAP = {
+        "usa": {"usa", "us", "united states", "america", "sf", "san francisco", "california", "bay area", "ca"},
+        "uk": {"uk", "united kingdom", "england", "london", "gb", "great britain"},
+        "india": {"india", "in", "bengaluru", "bangalore", "karnataka", "blr"}
+    }

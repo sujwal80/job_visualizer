@@ -24,6 +24,10 @@ from logo_enricher import LogoEnricher
 from location_enricher import LocationEnricher
 from job_crawler_service import JobCrawlerService
 from job_validator import JobValidator
+try:
+    from geo_config import DEFAULT_TARGET_CITY
+except ImportError:
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY
 
 def load_env_file():
     workspace_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,7 +41,9 @@ def load_env_file():
                     key, val = line.split('=', 1)
                     os.environ[key.strip()] = val.strip().strip('"').strip("'")
 
-def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=3, max_tagging=None, max_validation=None, target_city="Bengaluru", db_path=None):
+def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=None, max_tagging=None, max_validation=None, target_city=None, db_path=None):
+    if target_city is None:
+        target_city = DEFAULT_TARGET_CITY
     load_env_file()
     workspace_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if db_path is None:
@@ -133,7 +139,7 @@ if __name__ == "__main__":
     if "--mock" in args:
         os.environ["MOCK_SCRAPER_FALLBACK"] = "true"
     
-    target_city = "Bengaluru"
+    target_city = os.environ.get("TARGET_CITY", DEFAULT_TARGET_CITY)
     if "--city" in args:
         idx = args.index("--city")
         if idx + 1 < len(args):
@@ -145,8 +151,19 @@ if __name__ == "__main__":
         if idx + 1 < len(args):
             db_path = args[idx + 1]
 
+    max_discovery_arg = None
+    if "--max-discovery" in args:
+        idx = args.index("--max-discovery")
+        if idx + 1 < len(args):
+            val = args[idx + 1].strip()
+            if val.lower() not in ["none", "all", "unlimited"]:
+                try:
+                    max_discovery_arg = int(val)
+                except ValueError:
+                    max_discovery_arg = None
+
     if test_mode:
         print(f"[CLI] Running in TEST MODE for city '{target_city}' (max 1 discovery, max 2 tagging, max 2 validation)...")
         run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=1, max_tagging=2, max_validation=2, target_city=target_city, db_path=db_path)
     else:
-        run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=3, max_tagging=None, max_validation=None, target_city=target_city, db_path=db_path)
+        run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=max_discovery_arg, max_tagging=None, max_validation=None, target_city=target_city, db_path=db_path)

@@ -608,6 +608,127 @@ html {
     gap: 22px;
 }
 
+/* Unified Top Company Profile Card in Drawer */
+.drawer-profile-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.drawer-header-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.drawer-avatar-box {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--accent-blue);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.drawer-avatar-letter {
+    z-index: 1;
+}
+
+.drawer-avatar-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #ffffff;
+    padding: 6px;
+    z-index: 2;
+}
+
+.drawer-header-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.drawer-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.drawer-company-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.4px;
+    line-height: 1.25;
+    margin: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.drawer-website-btn {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--accent-blue);
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    padding: 3px 10px;
+    border-radius: 99px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.drawer-website-btn:hover {
+    background: #dbeafe;
+}
+
+.drawer-meta-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.drawer-badges-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.drawer-description-box {
+    border-top: 1px solid #f1f5f9;
+    padding-top: 12px;
+}
+
+.drawer-description-box .about-text {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: #334155;
+}
+
 .drawer-hero {
     display: flex;
     align-items: center;
@@ -641,7 +762,8 @@ html {
 
 .hero-tags {
     display: flex;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
     margin-top: 6px;
 }
 

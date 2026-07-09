@@ -58,7 +58,7 @@ class WellfoundScraper:
                 backoff *= 2
         return None
 
-    def get_bangalore_jobs(self, keywords, start=0, target_city=None, **kwargs):
+    def get_jobs(self, keywords, start=0, target_city=None, **kwargs):
         if target_city is None:
             target_city = DEFAULT_TARGET_CITY
         if not keywords or str(keywords).strip() == "N/A":
@@ -116,3 +116,6 @@ class WellfoundScraper:
         except Exception as e:
             print(f"[Wellfound Scraper] Error fetching jobs: {str(e)}")
             return []
+
+    def get_bangalore_jobs(self, keywords, start=0, target_city=None, **kwargs):
+        return self.get_jobs(keywords, start=start, target_city=target_city, **kwargs)

@@ -21,8 +21,28 @@ class TestIndiaRemediation(unittest.TestCase):
         self.assertTrue(match_target_city("HSR Layout, Bengaluru", "Bangalore"))
         self.assertTrue(match_target_city("Kalyani Nagar, Pune, MH", "Pune"))
         self.assertTrue(match_target_city("Cyber City, Gurugram, HR", "Gurgaon"))
+        self.assertTrue(match_target_city("Bengaluru, India", "India"))
+        self.assertTrue(match_target_city("Pune", "India"))
         self.assertTrue(match_target_city("Bengaluru, India", "india"))
         self.assertTrue(match_target_city("Pune, Maharashtra", "in"))
+        # Negative test cases for short substring false positives
+        self.assertFalse(match_target_city("Austin, TX", "India"))
+        self.assertFalse(match_target_city("Berlin, Germany", "India"))
+        self.assertFalse(match_target_city("Austin, TX", "in"))
+        self.assertFalse(match_target_city("Berlin, Germany", "in"))
+
+    def test_db_manager_find_startup_india(self):
+        """Verify find_startup properly matches existing Indian city startups when target_city='India'."""
+        from data_acquisition.db_manager import DBManager
+        db = DBManager(db_path="/nonexistent_test_db.json")
+        db.startups = [
+            {"id": 1, "name": "Pune Tech", "logo_domain": "punetech.com", "city": "Kalyani Nagar, Pune"},
+            {"id": 2, "name": "BLR Tech", "logo_domain": "blrtech.com", "city": "Bengaluru, Karnataka"},
+            {"id": 3, "name": "Austin Tech", "logo_domain": "austintech.com", "city": "Austin, TX"}
+        ]
+        self.assertIsNotNone(db.find_startup("Pune Tech", "punetech.com", target_city="India"))
+        self.assertIsNotNone(db.find_startup("BLR Tech", "blrtech.com", target_city="India"))
+        self.assertIsNone(db.find_startup("Austin Tech", "austintech.com", target_city="India"))
 
     def test_parameterized_snippet_cleaning(self):
         """Verify clean_snippet_to_address uses target_city parameter correctly."""

@@ -137,83 +137,79 @@ export function renderDrawerDetails(startup) {
     const jobs = Array.isArray(startup.jobs) ? startup.jobs : (Array.isArray(startup.job_openings) ? startup.job_openings : []);
     const jCnt = startup.job_count !== undefined && !isNaN(startup.job_count) ? Math.max(0, parseInt(startup.job_count, 10)) : jobs.length;
 
-    // Hero Header
-    const heroAvatarChildren = [
-        createElement('span', { textContent: String(startup.name || 'S').substring(0, 1).toUpperCase() })
+    // Unified Profile Card (Consolidates Hero, Badges, Metrics, and About into one clean card)
+    const headCount = Math.max(0, parseInt(startup.head_count, 10) || 0);
+    const descText = (startup.description && String(startup.description).trim()) ? String(startup.description).trim() : 'No description provided for this company.';
+
+    const avatarChildren = [
+        createElement('span', { className: 'drawer-avatar-letter', textContent: String(startup.name || 'S').substring(0, 1).toUpperCase() })
     ];
     if (logoUrl) {
-        const img = createElement('img', { src: logoUrl, className: 'drawer-logo', alt: String(startup.name || 'Logo') });
-        img.style.position = 'absolute';
-        img.style.top = '0';
-        img.style.left = '0';
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'contain';
-        img.style.backgroundColor = '#ffffff';
-        img.style.padding = '6px';
+        const img = createElement('img', { src: logoUrl, className: 'drawer-avatar-img', alt: String(startup.name || 'Logo') });
         img.onerror = () => { img.style.display = 'none'; };
-        heroAvatarChildren.push(img);
+        avatarChildren.push(img);
     }
+    const avatarBox = createElement('div', { className: 'drawer-avatar-box' }, avatarChildren);
 
-    const heroTagsList = [
-        createElement('span', { className: `pill pill-${indClass}`, textContent: startup.industry || 'Technology' }),
-        createElement('span', { className: 'verified-pill', textContent: jCnt > 0 ? `💼 ${jCnt} Active Jobs` : 'Hiring Soon' })
+    const titleRowChildren = [
+        createElement('h2', { className: 'drawer-company-name', textContent: String(startup.name || 'Unnamed Startup') })
     ];
-    if (startup.funding_stage && startup.funding_stage !== "N/A") {
-        heroTagsList.push(createElement('span', { className: 'verified-pill', style: 'background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;', textContent: `🌱 ${startup.funding_stage} (${startup.total_raised || 'Active'})` }));
-    }
-    if (startup.verified_email) {
-        heroTagsList.push(createElement('span', { className: 'verified-pill', style: 'background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;', textContent: `✉️ Verified HR: ${startup.verified_email}` }));
-    }
-    const foundersList = Array.isArray(startup.founders) ? startup.founders : [];
-    if (foundersList.length > 0) {
-        heroTagsList.push(createElement('span', { className: 'verified-pill', style: 'background: #faf5ff; color: #6b21a8; border: 1px solid #e9d5ff;', textContent: `✨ Direct Founder Access (${foundersList.length} profiles)` }));
-    }
-
-    const heroSection = createElement('div', { className: 'drawer-hero' }, [
-        createElement('div', { className: 'card-avatar' }, heroAvatarChildren),
-        createElement('div', { className: 'drawer-hero-text' }, [
-            createElement('h2', { textContent: String(startup.name || 'Unnamed Startup') }),
-            createElement('div', { className: 'hero-tags' }, heroTagsList)
-        ])
-    ]);
-
-    // Key Metrics Grid
-    const headCount = Math.max(0, parseInt(startup.head_count, 10) || 0);
-    const metricsSection = createElement('div', { className: 'meta-box-grid' }, [
-        createElement('div', { className: 'meta-item' }, [
-            createElement('span', { className: 'meta-item-lbl', textContent: 'Headcount' }),
-            createElement('span', { className: 'meta-item-val', textContent: `${headCount} Employees` })
-        ]),
-        createElement('div', { className: 'meta-item' }, [
-            createElement('span', { className: 'meta-item-lbl', textContent: 'City / Hub' }),
-            createElement('span', { className: 'meta-item-val', textContent: startup.city || 'Bengaluru' })
-        ])
-    ]);
-
-    // About & Website
-    const descText = (startup.description && String(startup.description).trim()) ? String(startup.description).trim() : 'No description provided for this company.';
-    const aboutSection = createElement('div', {}, [
-        createElement('div', { className: 'section-title', textContent: 'About Company' }),
-        createElement('p', { className: 'about-text', textContent: descText })
-    ]);
-
     if (startup.website) {
         const siteLink = createElement('a', {
             href: startup.website,
             target: '_blank',
             rel: 'noopener noreferrer',
-            className: 'founder-link',
-            textContent: `${startup.website} ↗`
+            className: 'drawer-website-btn',
+            textContent: 'Website ↗'
         });
-        siteLink.style.display = 'inline-block';
-        siteLink.style.marginTop = '8px';
-        aboutSection.appendChild(siteLink);
+        titleRowChildren.push(siteLink);
+    }
+    const titleRow = createElement('div', { className: 'drawer-title-row' }, titleRowChildren);
+
+    const metaLine = createElement('div', { className: 'drawer-meta-line' }, [
+        createElement('span', { textContent: `📍 ${startup.city || 'Bengaluru'}` }),
+        createElement('span', { textContent: '•' }),
+        createElement('span', { textContent: `👥 ${headCount > 0 ? headCount.toLocaleString() + ' Employees' : 'Growing Team'}` })
+    ]);
+
+    const headerTextCol = createElement('div', { className: 'drawer-header-text' }, [
+        titleRow,
+        metaLine
+    ]);
+
+    const headerTopRow = createElement('div', { className: 'drawer-header-top' }, [
+        avatarBox,
+        headerTextCol
+    ]);
+
+    const badgesList = [
+        createElement('span', { className: `pill pill-${indClass}`, textContent: startup.industry || 'Technology' }),
+        createElement('span', { className: 'verified-pill', textContent: jCnt > 0 ? `💼 ${jCnt} Active Jobs` : 'Hiring Soon' })
+    ];
+    if (startup.funding_stage && startup.funding_stage !== "N/A") {
+        badgesList.push(createElement('span', { className: 'verified-pill', style: 'background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;', textContent: `🌱 ${startup.funding_stage}` }));
+    }
+    if (startup.verified_email) {
+        badgesList.push(createElement('span', { className: 'verified-pill', style: 'background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;', textContent: `✉️ Verified HR` }));
+    }
+    const foundersList = Array.isArray(startup.founders) ? startup.founders : [];
+    if (foundersList.length > 0) {
+        badgesList.push(createElement('span', { className: 'verified-pill', style: 'background: #faf5ff; color: #6b21a8; border: 1px solid #e9d5ff;', textContent: `✨ Direct Founder Access (${foundersList.length})` }));
     }
 
-    drawerContent.appendChild(heroSection);
-    drawerContent.appendChild(metricsSection);
-    drawerContent.appendChild(aboutSection);
+    const badgesRow = createElement('div', { className: 'drawer-badges-row' }, badgesList);
+
+    const descriptionBox = createElement('div', { className: 'drawer-description-box' }, [
+        createElement('p', { className: 'about-text', textContent: descText })
+    ]);
+
+    const profileCard = createElement('div', { className: 'drawer-profile-card' }, [
+        headerTopRow,
+        badgesRow,
+        descriptionBox
+    ]);
+
+    drawerContent.appendChild(profileCard);
 
     // Founders Section
     if (foundersList.length > 0) {
@@ -406,8 +402,8 @@ export function _processOpenStartup(fullStartup) {
         }
 
         state.currentSelectedId = id;
-        if (window.location.hash !== `#startup=${id}`) {
-            window.location.hash = `startup=${id}`;
+        if (window.location.hash !== `#company_id=${id}`) {
+            window.location.hash = `company_id=${id}`;
         }
 
         let flyCenter = [fullStartup.lng || 77.5946, fullStartup.lat || 12.9716];

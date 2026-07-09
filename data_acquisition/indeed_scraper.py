@@ -53,13 +53,14 @@ class IndeedScraper:
                 backoff *= 2
         return None
 
-    def get_bangalore_jobs(self, keywords, start=0, target_city=None, **kwargs):
+    def get_jobs(self, keywords, start=0, target_city=None, **kwargs):
         if target_city is None:
             target_city = DEFAULT_TARGET_CITY
         if not keywords or keywords == "N/A":
             return []
 
-        url = "https://in.indeed.com/jobs"
+        domain = os.environ.get("INDEED_DOMAIN", "in.indeed.com")
+        url = f"https://{domain}/jobs"
         params = {
             "q": keywords,
             "l": target_city,
@@ -95,11 +96,11 @@ class IndeedScraper:
                 if link_el:
                     href = link_el['href']
                     if href.startswith('/'):
-                        job_url = f"https://in.indeed.com{href}"
+                        job_url = f"https://{domain}{href}"
                     else:
                         job_url = href
                 else:
-                    job_url = f"https://in.indeed.com/jobs?q={urllib.parse.quote(keywords)}"
+                    job_url = f"https://{domain}/jobs?q={urllib.parse.quote(keywords)}"
 
                 job_data = {
                     "title": str(raw_title).strip(),
@@ -116,3 +117,6 @@ class IndeedScraper:
         except Exception as e:
             print(f"[Indeed Scraper] Error fetching jobs: {str(e)}")
             return []
+
+    def get_bangalore_jobs(self, keywords, start=0, target_city=None, **kwargs):
+        return self.get_jobs(keywords, start=start, target_city=target_city, **kwargs)

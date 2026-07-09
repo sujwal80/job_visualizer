@@ -4,13 +4,20 @@ import { selectAndOpenStartup, showDirectoryLoading } from './ui_manager.js';
 
 export function handleHashRouting() {
     const hash = window.location.hash;
-    if (hash.startsWith('#startup=')) {
-        const id = parseInt(hash.split('=')[1], 10);
-        if (!isNaN(id)) {
-            if (state.currentSelectedId === id) return;
-            selectAndOpenStartup(id);
-            return;
-        }
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryCompanyId = urlParams.get('company_id');
+
+    let targetId = null;
+    if (hash.startsWith('#company_id=')) {
+        targetId = parseInt(hash.split('=')[1], 10);
+    } else if (queryCompanyId) {
+        targetId = parseInt(queryCompanyId, 10);
+    }
+
+    if (targetId !== null && !isNaN(targetId)) {
+        if (state.currentSelectedId === targetId) return;
+        selectAndOpenStartup(targetId);
+        return;
     }
 
     if (state.tempRemoteMarker) {

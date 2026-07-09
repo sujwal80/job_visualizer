@@ -114,27 +114,19 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
             city_query_clean = city_query.strip().lower()
             city_val = str(s.get("city") or s.get("location") or "").lower()
             
-            # Map country-level and regional city queries to their respective hubs in dataset
+            # Dynamically match country-level and regional city queries to their respective hubs in dataset
             is_match = False
-            usa_synonyms = REGION_SYNONYM_MAP.get("usa", {"usa", "us", "united states", "america", "sf", "san francisco", "california", "bay area"})
-            uk_synonyms = REGION_SYNONYM_MAP.get("uk", {"uk", "united kingdom", "england", "london", "gb", "great britain"})
-            india_synonyms = REGION_SYNONYM_MAP.get("india", {"india", "in", "bengaluru", "bangalore", "karnataka", "blr"})
-
-            if city_query_clean in usa_synonyms:
-                if any(x in city_val for x in ["san francisco", "ca", "sf", "california"]):
-                    is_match = True
-            elif city_query_clean in uk_synonyms:
-                if any(x in city_val for x in ["london", "uk", "england"]):
-                    is_match = True
-            elif city_query_clean in india_synonyms:
-                if any(x in city_val for x in ["bengaluru", "bangalore", "india", "karnataka"]):
-                    is_match = True
+            for _region_key, _syn_set in REGION_SYNONYM_MAP.items():
+                if city_query_clean in _syn_set:
+                    if any(syn in city_val for syn in _syn_set):
+                        is_match = True
+                        break
 
             if not is_match:
-                normalized_query = re.sub(r',\s*(ka|ca|uk|in|karnataka|california|england|india)$', '', city_query_clean)
+                normalized_query = re.sub(r',\s*[a-z\s]+$', '', city_query_clean).strip()
                 comp_query = normalized_query.replace("bangalore", "bengaluru")
                 comp_city = city_val.replace("bangalore", "bengaluru")
-                if comp_query not in comp_city:
+                if comp_query not in comp_city and city_query_clean not in comp_city:
                     continue
         if skill_query:
             s_skills = []
@@ -290,7 +282,7 @@ def format_startup_details(s):
                 "salary": _sanitize_string(j.get("salary")),
                 "job_type": _sanitize_string(j.get("job_type")),
                 "skills": [_sanitize_string(sk) for sk in (j.get("skills") or []) if isinstance(sk, str)],
-                "location": _sanitize_string(j.get("location", DEFAULT_TARGET_CITY)),
+                "location": _sanitize_string(j.get("location") or s_copy.get("city") or DEFAULT_TARGET_CITY),
                 "posted_date": _sanitize_string(j.get("posted_date", "Active")),
                 "source": _sanitize_string(j.get("source", "Direct"))
             })

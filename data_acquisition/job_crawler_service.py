@@ -34,7 +34,10 @@ class JobCrawlerService:
         
         for source_name, scraper in self.scrapers.items():
             try:
-                jobs = scraper.get_bangalore_jobs(comp_name, start=0, target_city=target_city) or []
+                if hasattr(scraper, "get_jobs"):
+                    jobs = scraper.get_jobs(comp_name, start=0, target_city=target_city) or []
+                else:
+                    jobs = scraper.get_bangalore_jobs(comp_name, start=0, target_city=target_city) or []
                 if not jobs and os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
                     jobs = get_mock_jobs(source_name, keywords=comp_name, target_city=target_city, company_name=comp_name)
                 source_matches = 0

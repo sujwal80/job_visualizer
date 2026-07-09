@@ -135,20 +135,20 @@ def _extract_salary(title: str, snippet: str, extra_data: Dict[str, Any]) -> str
     for text in (title, snippet):
         if not text:
             continue
-        # Pattern 1: Range with currency or LPA/PA/Lakhs/Cr/K
-        pat1 = r'((?:₹|INR|\$|USD|EUR|£)\s*[\d,]+(?:\.\d+)?\s*(?:L|Lakh|Lakhs|LPA|K|k|Cr|cr|m|M)?\s*(?:-|–|—|to)\s*(?:₹|INR|\$|USD|EUR|£)?\s*[\d,]+(?:\.\d+)?\s*(?:L|Lakh|Lakhs|LPA|K|k|Cr|cr|m|M)?\s*(?:LPA|lpa|PA|pa|per\s*annum)?)'
+        # Pattern 1: Range with currency or LPA/PA/Lakhs/Cr/K/year
+        pat1 = r'((?:₹|INR|\$|USD|EUR|£|GBP|AUD|CAD|SGD|AED|JPY|CNY|CHF)\s*[\d,]+(?:\.\d+)?\s*(?:L|Lakh|Lakhs|LPA|K|k|Cr|cr|m|M)?\s*(?:-|–|—|to)\s*(?:₹|INR|\$|USD|EUR|£|GBP|AUD|CAD|SGD|AED|JPY|CNY|CHF)?\s*[\d,]+(?:\.\d+)?\s*(?:L|Lakh|Lakhs|LPA|K|k|Cr|cr|m|M)?\s*(?:LPA|lpa|PA|pa|per\s*annum|/yr|/year)?)'
         match1 = re.search(pat1, text)
         if match1:
             return _clean_text(match1.group(1))
 
         # Pattern 2: Range without leading currency symbol, but ending with LPA/PA/Lakhs
-        pat2 = r'([\d,]+(?:\.\d+)?\s*(?:L|Lakh|Lakhs|K|k|Cr|cr)?\s*(?:-|–|—|to)\s*(?:₹|INR|\$|USD|EUR|£)?\s*[\d,]+(?:\.\d+)?\s*(?:L|Lakh|Lakhs|LPA|K|k|Cr|cr)?\s*(?:LPA|lpa|PA|pa|per\s*annum))'
+        pat2 = r'([\d,]+(?:\.\d+)?\s*(?:L|Lakh|Lakhs|K|k|Cr|cr)?\s*(?:-|–|—|to)\s*(?:₹|INR|\$|USD|EUR|£|GBP|AUD|CAD|SGD|AED|JPY|CNY|CHF)?\s*[\d,]+(?:\.\d+)?\s*(?:L|Lakh|Lakhs|LPA|K|k|Cr|cr)?\s*(?:LPA|lpa|PA|pa|per\s*annum|/yr|/year))'
         match2 = re.search(pat2, text, re.IGNORECASE)
         if match2:
             return _clean_text(match2.group(1))
 
         # Pattern 3: Single salary amount with currency symbol or LPA
-        pat3 = r'((?:₹|INR|\$|USD|EUR|£)\s*[\d,]+(?:\.\d+)?\s*(?:L|Lakh|Lakhs|LPA|K|k|Cr|cr|m|M)\s*(?:LPA|lpa|PA|pa)?)'
+        pat3 = r'((?:₹|INR|\$|USD|EUR|£|GBP|AUD|CAD|SGD|AED|JPY|CNY|CHF)\s*[\d,]+(?:\.\d+)?\s*(?:L|Lakh|Lakhs|LPA|K|k|Cr|cr|m|M)\s*(?:LPA|lpa|PA|pa|/yr|/year)?)'
         match3 = re.search(pat3, text)
         if match3:
             return _clean_text(match3.group(1))

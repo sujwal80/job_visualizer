@@ -11,9 +11,9 @@ BLACKLISTED_DOMAINS = {
 }
 
 try:
-    from geo_config import DEFAULT_TARGET_CITY, DEFAULT_GEO_LOCALITIES, GENERIC_HUB_LABELS, is_fallback_coordinate
+    from geo_config import DEFAULT_TARGET_CITY, DEFAULT_GEO_LOCALITIES, GENERIC_HUB_LABELS, is_fallback_coordinate, match_target_city
 except ImportError:
-    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, DEFAULT_GEO_LOCALITIES, GENERIC_HUB_LABELS, is_fallback_coordinate
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, DEFAULT_GEO_LOCALITIES, GENERIC_HUB_LABELS, is_fallback_coordinate, match_target_city
 
 class DBManager:
     def __init__(self, db_path=None):
@@ -47,8 +47,8 @@ class DBManager:
         if logo_domain and logo_domain not in BLACKLISTED_DOMAINS:
             for s in self.startups:
                 if target_city:
-                    s_city = str(s.get("city") or "").lower()
-                    if s_city and s_city != "n/a" and target_city.lower() not in s_city and s_city not in target_city.lower():
+                    s_city = str(s.get("city") or "")
+                    if s_city and s_city.lower() != "n/a" and not match_target_city(s_city, target_city):
                         continue
                 s_domain = s.get("logo_domain")
                 if s_domain and s_domain == logo_domain and s_domain not in BLACKLISTED_DOMAINS:
@@ -57,8 +57,8 @@ class DBManager:
         # 2. Match by normalized name
         for s in self.startups:
             if target_city:
-                s_city = str(s.get("city") or "").lower()
-                if s_city and s_city != "n/a" and target_city.lower() not in s_city and s_city not in target_city.lower():
+                s_city = str(s.get("city") or "")
+                if s_city and s_city.lower() != "n/a" and not match_target_city(s_city, target_city):
                     continue
             if self._normalize_text(str(s.get("name") or "")) == normalized_name:
                 return s
@@ -189,7 +189,7 @@ class DBManager:
         address = re.sub(r'^\b(primary|headquarters|office|branch|location)\b\s*[:\-]?\s*', '', address, flags=re.IGNORECASE).strip()
             
         # Check if the address is generic (just city name)
-        address_clean = address.lower().strip().replace(" ", "").replace(",karnataka", "").replace(",india", "").replace(",in", "")
+        address_clean = address.lower().strip().replace(" ", "").replace(",karnataka", "").replace(",india", "").replace(",in", "").replace(",usa", "").replace(",us", "").replace(",uk", "")
         is_generic = address_clean in GENERIC_HUB_LABELS
         
         # If the address is generic and we have a company name, try the company name first!
@@ -257,7 +257,7 @@ class DBManager:
                     break
             
             # Strip zipcodes, state, and country from city if present
-            city = re.sub(r'\b(karnataka|maharashtra|telangana|delhi|in|india|\d{6})\b', '', city, flags=re.IGNORECASE)
+            city = re.sub(r'\b(karnataka|maharashtra|telangana|delhi|california|ny|ca|tx|uk|us|usa|in|india|\d{5,6})\b', '', city, flags=re.IGNORECASE)
             city = re.sub(r'\s+', ' ', city).strip()
             
             query2 = f"{first_comp}, {city}"

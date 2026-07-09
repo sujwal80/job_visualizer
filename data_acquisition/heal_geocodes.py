@@ -18,8 +18,9 @@ except ImportError:
 def clean_snippet_to_address(snippet, target_city=None):
     if target_city is None:
         target_city = DEFAULT_TARGET_CITY
+    city_esc = re.escape(str(target_city))
     # Strip common prefixes from the start of the snippet
-    snippet = re.sub(r'^(get|find|bangalore|bengaluru|office|headquarters|contact|address)?\s*office\s+(address|location|space)?\s*[:\-]?\s*', '', snippet, flags=re.IGNORECASE)
+    snippet = re.sub(r'^(get|find|' + city_esc + r'|bangalore|bengaluru|office|headquarters|contact|address)?\s*office\s+(address|location|space)?\s*[:\-]?\s*', '', snippet, flags=re.IGNORECASE)
     snippet = re.sub(r'^\b(headquartered in|headquarters at|located in|located at)\b\s*', '', snippet, flags=re.IGNORECASE)
     
     parts = [p.strip() for p in snippet.split(',')]
@@ -83,7 +84,9 @@ def get_address_from_ddg(company_name, target_city=None):
                         "layout", "sector", "phase", "nagar", "building", "floor", "block",
                         "pincode", "pin", "560", "400", "110", "500", "411", "600", "201", "122",
                         "heights", "estates", "tower", "sarakki", "abhaya", "street", "st",
-                        "marg", "vihar", "enclave", "park", "hub"
+                        "marg", "vihar", "enclave", "park", "hub", "ave", "avenue", "blvd",
+                        "boulevard", "suite", "ste", "drive", "dr", "way", "lane", "ln",
+                        "place", "pl", "square", "sq", "court", "ct", "plaza", "center"
                     ])
                     
                     if has_city and has_address_markers:
@@ -162,4 +165,10 @@ def heal_geocodes(target_city=None):
     print(f"Failed / Left at Center: {heal_count - success_count}")
 
 if __name__ == "__main__":
-    heal_geocodes()
+    args = sys.argv[1:]
+    target_city = DEFAULT_TARGET_CITY
+    if "--city" in args:
+        idx = args.index("--city")
+        if idx + 1 < len(args):
+            target_city = args[idx + 1]
+    heal_geocodes(target_city=target_city)

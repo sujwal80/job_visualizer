@@ -47,7 +47,7 @@ class LinkedInScraper:
                 backoff *= 2
         return None
 
-    def get_bangalore_jobs(self, keywords, start=0, target_city=None, **kwargs):
+    def get_jobs(self, keywords, start=0, target_city=None, **kwargs):
         if target_city is None:
             target_city = DEFAULT_TARGET_CITY
         """
@@ -118,6 +118,9 @@ class LinkedInScraper:
             if os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
                 return get_mock_jobs("LinkedIn", keywords, target_city)
             return []
+
+    def get_bangalore_jobs(self, keywords, start=0, target_city=None, **kwargs):
+        return self.get_jobs(keywords, start=start, target_city=target_city, **kwargs)
 
     def get_company_details(self, company_slug, target_city=None):
         if target_city is None:

@@ -34,7 +34,7 @@ class YCScraper:
             return ""
         return re.sub(r'[^a-z0-9]+', '-', str(name).lower()).strip('-')
 
-    def get_bangalore_jobs(self, company_name, start=0, slug=None, target_city=None, **kwargs):
+    def get_jobs(self, company_name, start=0, slug=None, target_city=None, **kwargs):
         if target_city is None:
             target_city = DEFAULT_TARGET_CITY
         if not company_name or str(company_name).strip() == "N/A":
@@ -95,3 +95,6 @@ class YCScraper:
         if os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
             return get_mock_jobs("Y Combinator", company_name, target_city)
         return []
+
+    def get_bangalore_jobs(self, company_name, start=0, slug=None, target_city=None, **kwargs):
+        return self.get_jobs(company_name, start=start, slug=slug, target_city=target_city, **kwargs)

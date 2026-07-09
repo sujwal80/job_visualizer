@@ -35,7 +35,7 @@ class GoogleJobsScraper:
         mult = float(os.environ.get("DELAY_MULTIPLIER", 1.0))
         time.sleep(random.uniform(min_s, max_s) * mult)
 
-    def get_bangalore_jobs(self, company_name, start=0, target_city=None, **kwargs):
+    def get_jobs(self, company_name, start=0, target_city=None, **kwargs):
         if target_city is None:
             target_city = DEFAULT_TARGET_CITY
         if not company_name or company_name == "N/A":
@@ -48,6 +48,9 @@ class GoogleJobsScraper:
             
         # 2. Fallback to resilient search query parsing
         return self._fetch_via_web_search(company_name, target_city)
+
+    def get_bangalore_jobs(self, company_name, start=0, target_city=None, **kwargs):
+        return self.get_jobs(company_name, start=start, target_city=target_city, **kwargs)
 
     def _request_with_retry(self, method, url, **kwargs):
         backoff = 1.0

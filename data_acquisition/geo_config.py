@@ -61,8 +61,60 @@ else:
         "bengaluru", "bangalore", "india", "karnataka",
         "bengaluru, karnataka", "hyderabad", "mumbai", "delhi",
         "pune", "chennai", "gurugram", "gurgaon", "noida", "new delhi",
-        "in", "ncr"
+        "in", "ncr", "united states", "usa", "us", "united kingdom",
+        "uk", "europe", "remote", "global", "worldwide", "anywhere"
     }
+
+# Nationwide India locations and synonyms
+INDIA_SYNONYMS = [
+    "india", "in",
+    "bengaluru", "bangalore",
+    "hyderabad",
+    "mumbai", "bombay",
+    "delhi", "new delhi", "ncr",
+    "gurugram", "gurgaon",
+    "noida",
+    "pune",
+    "chennai", "madras",
+    "ahmedabad",
+    "kolkata", "calcutta",
+    "jaipur",
+    "kochi", "cochin",
+    "indore",
+    "chandigarh",
+    "coimbatore",
+    "karnataka",
+    "maharashtra",
+    "telangana",
+    "tamil nadu",
+    "kerala",
+    "gujarat",
+    "rajasthan",
+    "west bengal",
+    "punjab",
+    "haryana",
+    "uttar pradesh",
+    "odisha",
+    "bihar",
+    "assam",
+    "surat",
+    "vadodara",
+    "nagpur",
+    "bhopal",
+    "visakhapatnam",
+    "thiruvananthapuram",
+    "mysuru", "mysore",
+    "mangalore"
+]
+
+USA_SYNONYMS = [
+    "united states", "usa", "us", "san francisco", "sf", "bay area", "new york", "nyc",
+    "austin", "seattle", "boston", "los angeles", "la", "chicago"
+]
+
+UK_SYNONYMS = [
+    "united kingdom", "uk", "london", "manchester", "cambridge", "oxford"
+]
 
 # City synonyms for matching target cities across scrapers and enrichers
 CITY_SYNONYMS = {
@@ -76,8 +128,16 @@ CITY_SYNONYMS = {
     "noida": ["noida", "delhi", "new delhi", "ncr"],
     "pune": ["pune"],
     "chennai": ["chennai", "madras"],
-    "india": ["india", "in", "bengaluru", "bangalore", "hyderabad", "mumbai", "delhi", "pune", "chennai", "gurugram", "gurgaon", "noida"],
-    "in": ["india", "in", "bengaluru", "bangalore", "hyderabad", "mumbai", "delhi", "pune", "chennai", "gurugram", "gurgaon", "noida"]
+    "india": INDIA_SYNONYMS,
+    "in": INDIA_SYNONYMS,
+    "san francisco": ["san francisco", "sf", "bay area"],
+    "new york": ["new york", "nyc"],
+    "london": ["london", "uk"],
+    "united states": USA_SYNONYMS,
+    "usa": USA_SYNONYMS,
+    "us": USA_SYNONYMS,
+    "united kingdom": UK_SYNONYMS,
+    "uk": UK_SYNONYMS,
 }
 
 # Test fixture whitelisted URLs
@@ -116,32 +176,43 @@ def is_fallback_coordinate(lat, lng, epsilon=None):
     return False
 
 
+def _keyword_matches(keyword, loc_lower):
+    kw = str(keyword).lower().strip()
+    if not kw:
+        return False
+    if kw == "in":
+        return bool(re.search(r'\bin\b', loc_lower))
+    return kw in loc_lower
+
+
 def match_target_city(location, target_city):
     """
     Match whether a location string corresponds to the target city or any of its synonyms.
+    Supports global/worldwide targets where any location is accepted.
     """
     if not location or not target_city:
         return False
     loc_lower = str(location).lower()
     target_lower = str(target_city).lower().strip()
 
-    # Direct substring match
-    if target_lower in loc_lower:
+    # Global / Worldwide / Remote wildcard target
+    if target_lower in ["global", "worldwide", "any", "all", "remote"]:
         return True
 
     # If target is nationwide India / IN
     if target_lower in ["india", "in"]:
-        india_keywords = [
-            "india", "in", "bengaluru", "bangalore", "hyderabad", "mumbai",
-            "delhi", "new delhi", "ncr", "gurugram", "gurgaon", "noida",
-            "pune", "chennai", "madras", "karnataka", "maharashtra", "telangana"
-        ]
-        return any(k in loc_lower for k in india_keywords)
+        if _keyword_matches("in", loc_lower):
+            return True
+        return any(k in loc_lower for k in INDIA_SYNONYMS if k != "in")
+
+    # Direct keyword match
+    if _keyword_matches(target_lower, loc_lower):
+        return True
 
     # Synonym matching
     synonyms = CITY_SYNONYMS.get(target_lower, [target_lower])
     for syn in synonyms:
-        if syn in loc_lower:
+        if _keyword_matches(syn, loc_lower):
             return True
     return False
 
