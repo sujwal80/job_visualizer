@@ -179,7 +179,9 @@ export function updateMarkersDiff(startups) {
 
 export function updateMarkersVisualState() {
     for (const [id, marker] of state.markersMap.entries()) {
+        if (!marker || typeof marker.getElement !== 'function') continue;
         const el = marker.getElement();
+        if (!el) continue;
         if (state.currentSelectedId === id) {
             el.classList.add('active');
             el.style.zIndex = '1000';
@@ -188,14 +190,16 @@ export function updateMarkersVisualState() {
             el.style.zIndex = '';
         }
     }
-    if (state.tempRemoteMarker) {
+    if (state.tempRemoteMarker && typeof state.tempRemoteMarker.getElement === 'function') {
         const tempEl = state.tempRemoteMarker.getElement();
-        if (state.currentSelectedId) {
-            tempEl.classList.add('active');
-            tempEl.style.zIndex = '10000';
-        } else {
-            tempEl.classList.remove('active');
-            tempEl.style.zIndex = '';
+        if (tempEl) {
+            if (state.currentSelectedId) {
+                tempEl.classList.add('active');
+                tempEl.style.zIndex = '10000';
+            } else {
+                tempEl.classList.remove('active');
+                tempEl.style.zIndex = '';
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-import { state } from './state.js';
+import { state, lockProgrammaticMove } from './state.js';
 import { map, updateMarkersVisualState } from './map_manager.js';
 import { selectAndOpenStartup, showDirectoryLoading } from './ui_manager.js';
 
@@ -29,6 +29,7 @@ export function handleHashRouting() {
     if (detailsDrawer && detailsDrawer.classList.contains('active')) {
         detailsDrawer.classList.remove('active');
         detailsDrawer.setAttribute('aria-hidden', 'true');
+        lockProgrammaticMove(2500);
         map.flyTo({
             center: state.defaultLocation,
             zoom: state.defaultZoom,
@@ -88,6 +89,7 @@ export function updateSearchCity(cityTitle) {
         const zoomDist = Math.abs(currentZoom - zoomVal);
 
         if (dist > 0.005 || zoomDist > 0.5) {
+            lockProgrammaticMove(2500);
             map.flyTo({
                 center: state.defaultLocation,
                 zoom: state.defaultZoom,

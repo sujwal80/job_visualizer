@@ -14,7 +14,19 @@ export const state = {
         industry: 'all',
         query: ''
     },
-    filterDebounceTimer: null,
     filterRafId: null,
-    inputTimeout: null
+    inputTimeout: null,
+    isProgrammaticMove: false,
+    programmaticMoveTimeout: null
 };
+
+export function lockProgrammaticMove(durationMs = 2500) {
+    state.isProgrammaticMove = true;
+    if (state.programmaticMoveTimeout) {
+        clearTimeout(state.programmaticMoveTimeout);
+    }
+    state.programmaticMoveTimeout = setTimeout(() => {
+        state.isProgrammaticMove = false;
+        state.programmaticMoveTimeout = null;
+    }, durationMs);
+}

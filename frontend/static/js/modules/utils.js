@@ -45,7 +45,7 @@ export function showToast(message, type = 'info') {
 }
 
 export function getDomain(startup) {
-    if (!startup || !startup.website) return '';
+    if (!startup || typeof startup.website !== 'string' || !startup.website.trim()) return '';
     try {
         const urlStr = startup.website.trim();
         const url = new URL(urlStr.match(/^https?:\/\//i) ? urlStr : `http://${urlStr}`);

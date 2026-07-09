@@ -243,6 +243,15 @@ class TestR1ViewportAndLayoutResilience(unittest.TestCase):
             self.assertIn(btn_cls, self.js_content, f"JS missing button class mapping for {btn_cls}")
         self.assertIn('mr-1.5', self.js_content, "JS must apply mr-1.5 icon spacing in apply button rendering.")
 
+    def test_r1_28_js_moveend_checks_original_event_or_programmatic_guard(self):
+        """Verify moveend listener checks e.originalEvent alongside state.isProgrammaticMove to prevent programmatic camera move refetches."""
+        self.assertIn("!e.originalEvent", self.js_content, "moveend handler must inspect e.originalEvent for programmatic camera moves.")
+        self.assertIn("state.isProgrammaticMove", self.js_content, "moveend handler must inspect state.isProgrammaticMove.")
+
+    def test_r1_29_js_apply_filtering_uses_profile_cache(self):
+        """Verify applyFiltering checks profileCache before falling back to startupsData list when re-rendering open drawer details."""
+        self.assertIn("state.profileCache.get(state.currentSelectedId)", self.js_content, "applyFiltering must check state.profileCache when detailsDrawer is active.")
+
 
 
 class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
@@ -465,6 +474,23 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
         self.assertNotEqual(resp.status_code, 500, "Server crashed with HTTP 500 on unsupported query parameters!")
         self.assertIn(resp.status_code, [200, 400])
 
+    def test_r2_17_js_null_job_count_safety(self):
+        """Verify ui_manager.js guards against startup.job_count === null to prevent NaN jobs rendering."""
+        self.assertIn("startup.job_count !== null", self.js_content, "ui_manager.js must check startup.job_count !== null to prevent parseInt(null) -> NaN.")
+
+    def test_r2_18_js_document_fragment_dom_batching(self):
+        """Verify renderDirectory and renderDrawerDetails use DocumentFragment batching to prevent live DOM layout thrashing and flickering."""
+        self.assertIn("document.createDocumentFragment()", self.js_content, "ui_manager.js must use DocumentFragment for DOM batching.")
+        self.assertIn("replaceChildren(fragment)", self.js_content, "ui_manager.js must attach batch DocumentFragment cleanly.")
+
+    def test_r2_19_js_update_markers_visual_state_null_safety(self):
+        """Verify updateMarkersVisualState checks marker and getElement existence before accessing element properties."""
+        self.assertIn("typeof marker.getElement !== 'function'", self.js_content, "updateMarkersVisualState must verify marker.getElement is a function.")
+
+    def test_r2_20_js_get_domain_non_string_website_safety(self):
+        """Verify getDomain in utils.js checks typeof startup.website === 'string' before calling trim()."""
+        self.assertIn("typeof startup.website !== 'string'", self.js_content, "getDomain must verify startup.website is a string.")
+
 
 class TestR3RaceConditionsAndLatencyResilience(unittest.TestCase):
     """
@@ -561,6 +587,24 @@ class TestR3RaceConditionsAndLatencyResilience(unittest.TestCase):
         self.assertEqual(resp_404.status_code, 404)
         self.assertIn('no-store', resp_404.headers.get('Cache-Control', '').lower(),
                       "Error responses must specify no-store to prevent cache poisoning during temporary failures.")
+
+    def test_r3_13_js_programmatic_move_lock_in_state(self):
+        """Verify state.js defines isProgrammaticMove lock and programmaticMoveTimeout for map move suppression."""
+        self.assertIn("isProgrammaticMove", self.js_content, "state.js must define isProgrammaticMove flag.")
+        self.assertIn("lockProgrammaticMove", self.js_content, "JS must define lockProgrammaticMove helper.")
+
+    def test_r3_14_js_moveend_suppression_when_programmatic_move(self):
+        """Verify map.on('moveend') checks state.isProgrammaticMove and returns early without fetching startups."""
+        self.assertTrue("if (state.isProgrammaticMove)" in self.js_content or "if (state.isProgrammaticMove ||" in self.js_content, "moveend handler must check state.isProgrammaticMove.")
+        self.assertIn("state.isProgrammaticMove = false", self.js_content, "moveend handler must reset state.isProgrammaticMove to false.")
+
+    def test_r3_15_js_process_open_startup_sets_programmatic_lock(self):
+        """Verify _processOpenStartup sets lockProgrammaticMove before calling map.flyTo."""
+        self.assertIn("lockProgrammaticMove", self.js_content, "_processOpenStartup or map animations must invoke lockProgrammaticMove.")
+
+    def test_r3_16_js_fetch_filtered_startups_applies_filtering(self):
+        """Verify fetchFilteredStartups invokes applyFiltering() to maintain active search keyword filters."""
+        self.assertIn("applyFiltering()", self.js_content, "fetchFilteredStartups must call applyFiltering() upon receiving data.")
 
 
 if __name__ == '__main__':

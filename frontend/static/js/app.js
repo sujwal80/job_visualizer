@@ -1,4 +1,4 @@
-import { state } from './modules/state.js';
+import { state, lockProgrammaticMove } from './modules/state.js';
 import { createElement, showToast, getDomain } from './modules/utils.js';
 import { safeFetch, checkAuthStatus } from './modules/api.js';
 import {
@@ -65,6 +65,7 @@ showDirectoryLoading();
 
 if (isHub || !state.searchedCity) {
     map.once('load', () => {
+        lockProgrammaticMove(2500);
         map.flyTo({
             center: state.defaultLocation,
             zoom: state.defaultZoom,
@@ -91,6 +92,7 @@ if (isHub || !state.searchedCity) {
             if (!isNaN(lat) && !isNaN(lon)) {
                 state.defaultLocation = [lon, lat];
                 state.defaultZoom = 11;
+                lockProgrammaticMove(2500);
                 map.flyTo({
                     center: state.defaultLocation,
                     zoom: state.defaultZoom,
@@ -102,6 +104,7 @@ if (isHub || !state.searchedCity) {
     })
     .catch(err => {
         console.warn('[Geocoder] Failed to geocode custom city query:', err);
+        lockProgrammaticMove(2500);
         map.flyTo({
             center: state.defaultLocation,
             zoom: state.defaultZoom,
@@ -173,8 +176,7 @@ function fetchFilteredStartups(preventScroll = false) {
             if (!Array.isArray(startups)) return;
 
             state.startupsData = startups;
-            renderDirectory(state.startupsData);
-            updateDashboardStats(state.startupsData);
+            applyFiltering();
             
             updateMarkersDiff(state.startupsData);
             updateMarkersVisualState();
@@ -213,7 +215,15 @@ function fetchAndRender() {
 fetchAndRender();
 
 let viewportDebounceTimer = null;
-map.on('moveend', () => {
+map.on('moveend', (e) => {
+    if (state.isProgrammaticMove || (e && !e.originalEvent)) {
+        state.isProgrammaticMove = false;
+        if (state.programmaticMoveTimeout) {
+            clearTimeout(state.programmaticMoveTimeout);
+            state.programmaticMoveTimeout = null;
+        }
+        return;
+    }
     if (viewportDebounceTimer) clearTimeout(viewportDebounceTimer);
     viewportDebounceTimer = setTimeout(() => {
         try {
@@ -263,8 +273,9 @@ function updateLocalMarkersVisualState() {
 
     state.startupsData.forEach(startup => {
         const marker = state.markersMap.get(startup.id) || (state.currentSelectedId === startup.id ? state.tempRemoteMarker : null);
-        if (!marker) return;
+        if (!marker || typeof marker.getElement !== 'function') return;
         const element = marker.getElement();
+        if (!element) return;
         const isSelected = state.currentSelectedId === startup.id;
         const isMatch = checkStartupMatch(startup, searchText);
 
@@ -301,7 +312,7 @@ function applyFiltering() {
     updateDashboardStats(filtered);
     updateLocalMarkersVisualState();
     if (state.currentSelectedId !== null && detailsDrawer.classList.contains('active')) {
-        const startup = state.startupsData.find(s => s.id === state.currentSelectedId);
+        const startup = state.profileCache.get(state.currentSelectedId) || state.startupsData.find(s => s.id === state.currentSelectedId);
         if (startup) {
             renderDrawerDetails(startup);
         }
@@ -350,6 +361,7 @@ if (closeDrawerBtn) {
 
 if (resetMapBtn) {
     resetMapBtn.addEventListener('click', () => {
+        lockProgrammaticMove(2500);
         map.flyTo({
             center: state.defaultLocation,
             zoom: state.defaultZoom,
@@ -484,5 +496,6 @@ window.WorldTechApp = {
     map,
     fetchFilteredStartups,
     getJobSourceButtonStyle,
+    lockProgrammaticMove,
     getTempRemoteMarker: () => state.tempRemoteMarker
 };

@@ -1,4 +1,4 @@
-import { state } from './state.js';
+import { state, lockProgrammaticMove } from './state.js';
 import { createElement, getDomain, showToast } from './utils.js';
 import { safeFetch } from './api.js';
 import { map, updateMarkersVisualState, createLogoContent } from './map_manager.js';
@@ -18,7 +18,7 @@ export function updateDashboardStats(filteredStartups) {
     
     const totalJobs = filteredStartups.reduce((sum, s) => {
         const jobs = Array.isArray(s.jobs) ? s.jobs : (Array.isArray(s.job_openings) ? s.job_openings : []);
-        const jCnt = s.job_count !== undefined && !isNaN(s.job_count) ? Math.max(0, parseInt(s.job_count, 10)) : jobs.length;
+        const jCnt = (s.job_count !== undefined && s.job_count !== null && !isNaN(parseInt(s.job_count, 10))) ? Math.max(0, parseInt(s.job_count, 10)) : jobs.length;
         return sum + jCnt;
     }, 0);
     if (statJobs) statJobs.textContent = String(totalJobs);
@@ -42,11 +42,13 @@ export function renderDirectory(startups) {
     const directoryList = document.getElementById('directory-list');
     if (!directoryList) return;
     
-    directoryList.replaceChildren();
+    const fragment = document.createDocumentFragment();
+
     if (startups.length === 0) {
-        directoryList.appendChild(
+        fragment.appendChild(
             createElement('div', { className: 'about-text', textContent: 'No companies match your criteria.' })
         );
+        directoryList.replaceChildren(fragment);
         return;
     }
 
@@ -56,7 +58,7 @@ export function renderDirectory(startups) {
         const domain = getDomain(startup);
         const logoUrl = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : '';
         const jobs = Array.isArray(startup.jobs) ? startup.jobs : (Array.isArray(startup.job_openings) ? startup.job_openings : []);
-        const jCnt = startup.job_count !== undefined && !isNaN(startup.job_count) ? Math.max(0, parseInt(startup.job_count, 10)) : jobs.length;
+        const jCnt = (startup.job_count !== undefined && startup.job_count !== null && !isNaN(parseInt(startup.job_count, 10))) ? Math.max(0, parseInt(startup.job_count, 10)) : jobs.length;
 
         const avatarChildren = [
             createElement('span', { textContent: String(startup.name || 'S').substring(0, 1).toUpperCase() })
@@ -112,11 +114,11 @@ export function renderDirectory(startups) {
             selectAndOpenStartup(startup.id);
         });
 
-        directoryList.appendChild(card);
+        fragment.appendChild(card);
     });
 
     if (startups.length >= 500) {
-        directoryList.appendChild(
+        fragment.appendChild(
             createElement('div', {
                 className: 'about-text',
                 style: 'text-align: center; padding: 12px; background: #fef3c7; color: #92400e; border-radius: 8px; margin-top: 12px; font-size: 13px;',
@@ -124,6 +126,8 @@ export function renderDirectory(startups) {
             })
         );
     }
+
+    directoryList.replaceChildren(fragment);
 }
 
 export function getJobSourceButtonStyle(source) {
@@ -140,8 +144,8 @@ export function getJobSourceButtonStyle(source) {
     if (s === 'yc' || s.includes('y combinator') || s.includes('ycombinator')) {
         return { btnClass: 'job-btn btn-yc', iconClass: 'fa-brands fa-y-combinator', label: 'YC Apply ↗' };
     }
-    if (s.includes('ats') || s.includes('greenhouse') || s.includes('lever')) {
-        return { btnClass: 'job-btn btn-ats', iconClass: 'fa-solid fa-file-lines', label: 'ATS Apply ↗' };
+    if (s.includes('Green House') || s.includes('greenhouse') || s.includes('lever')) {
+        return { btnClass: 'job-btn btn-ats', iconClass: 'fa-solid fa-file-lines', label: 'Green House ↗' };
     }
     if (s.includes('indeed')) {
         return { btnClass: 'job-btn btn-indeed', iconClass: 'fa-solid fa-briefcase', label: 'Indeed Apply ↗' };
@@ -168,12 +172,12 @@ export function renderDrawerDetails(startup) {
     const drawerContent = document.getElementById('drawer-content');
     if (!drawerContent) return;
     
-    drawerContent.replaceChildren();
+    const fragment = document.createDocumentFragment();
     const indClass = startup.industry ? String(startup.industry).toLowerCase().replace(/[^a-z0-9]/g, '') : 'software';
     const domain = getDomain(startup);
     const logoUrl = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : '';
     const jobs = Array.isArray(startup.jobs) ? startup.jobs : (Array.isArray(startup.job_openings) ? startup.job_openings : []);
-    const jCnt = startup.job_count !== undefined && !isNaN(startup.job_count) ? Math.max(0, parseInt(startup.job_count, 10)) : jobs.length;
+    const jCnt = (startup.job_count !== undefined && startup.job_count !== null && !isNaN(parseInt(startup.job_count, 10))) ? Math.max(0, parseInt(startup.job_count, 10)) : jobs.length;
 
     // Unified Profile Card (Consolidates Hero, Badges, Metrics, and About into one clean card)
     const headCount = Math.max(0, parseInt(startup.head_count, 10) || 0);
@@ -247,7 +251,7 @@ export function renderDrawerDetails(startup) {
         descriptionBox
     ]);
 
-    drawerContent.appendChild(profileCard);
+    fragment.appendChild(profileCard);
 
     // Founders Section
     if (foundersList.length > 0) {
@@ -271,7 +275,7 @@ export function renderDrawerDetails(startup) {
             foundersContainer.appendChild(createElement('div', { className: 'founder-card' }, fCardChildren));
         });
 
-        drawerContent.appendChild(
+        fragment.appendChild(
             createElement('div', {}, [
                 createElement('div', { className: 'section-title', textContent: 'Leadership & Founders' }),
                 foundersContainer
@@ -370,7 +374,7 @@ export function renderDrawerDetails(startup) {
         jobsContainer.appendChild(emptyState);
     }
 
-    drawerContent.appendChild(
+    fragment.appendChild(
         createElement('div', {}, [
             createElement('div', { className: 'section-title', textContent: 'Current Job Openings' }),
             jobsContainer
@@ -386,10 +390,12 @@ export function renderDrawerDetails(startup) {
         if (startup.hr_details.contact_email) {
             hrBoxChildren.push(createElement('p', { className: 'about-text', textContent: `✉ Contact: ${startup.hr_details.contact_email}` }));
         }
-        drawerContent.appendChild(
+        fragment.appendChild(
             createElement('div', { className: 'other-loc-box' }, hrBoxChildren)
         );
     }
+
+    drawerContent.replaceChildren(fragment);
 }
 
 export function selectAndOpenStartup(id) {
@@ -471,6 +477,7 @@ export function _processOpenStartup(fullStartup) {
                 .addTo(map);
         }
 
+        lockProgrammaticMove(2500);
         map.flyTo({
             center: flyCenter,
             zoom: flyZoom,
