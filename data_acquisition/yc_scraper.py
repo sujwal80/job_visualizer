@@ -11,12 +11,18 @@ try:
 except ImportError:
     from data_acquisition.job_metadata_extractor import extract_job_metadata
 
+try:
+    from geo_config import DEFAULT_TARGET_CITY, match_target_city
+except ImportError:
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
+
 class YCScraper:
     def __init__(self):
-        self.app_id = "45BWZJ1SGC"
-        self.api_key = "NzllNTY5MzJiZGM2OTY2ZTQwMDEzOTNhYWZiZGRjODlhYzVkNjBmOGRjNzJiMWM4ZTU0ZDlhYTZjOTJiMjlhMWFuYWx5dGljc1RhZ3M9eWNkYyZyZXN0cmljdEluZGljZXM9WUNDb21wYW55X3Byb2R1Y3Rpb24lMkNZQ0NvbXBhbnlfQnlfTGF1bmNoX0RhdGVfcHJvZHVjdGlvbiZ0YWdGaWx0ZXJzPSU1QiUyMnljZGNfcHVibGljJTIyJTVE"
+        self.app_id = os.environ.get("YC_ALGOLIA_APP_ID", "45BWZJ1SGC")
+        self.api_key = os.environ.get("YC_ALGOLIA_API_KEY", "NzllNTY5MzJiZGM2OTY2ZTQwMDEzOTNhYWZiZGRjODlhYzVkNjBmOGRjNzJiMWM4ZTU0ZDlhYTZjOTJiMjlhMWFuYWx5dGljc1RhZ3M9eWNkYyZyZXN0cmljdEluZGljZXM9WUNDb21wYW55X3Byb2R1Y3Rpb24lMkNZQ0NvbXBhbnlfQnlfTGF1bmNoX0RhdGVfcHJvZHVjdGlvbiZ0YWdGaWx0ZXJzPSU1QiUyMnljZGNfcHVibGljJTIyJTVE")
+        user_agent = os.environ.get("YC_USER_AGENT", os.environ.get("SCRAPER_USER_AGENT", 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'))
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+            'User-Agent': user_agent
         }
 
     def _sleep_throttle(self, min_s=1.0, max_s=2.0):
@@ -28,7 +34,9 @@ class YCScraper:
             return ""
         return re.sub(r'[^a-z0-9]+', '-', str(name).lower()).strip('-')
 
-    def get_bangalore_jobs(self, company_name, start=0, slug=None, target_city="Bengaluru", **kwargs):
+    def get_bangalore_jobs(self, company_name, start=0, slug=None, target_city=None, **kwargs):
+        if target_city is None:
+            target_city = DEFAULT_TARGET_CITY
         if not company_name or str(company_name).strip() == "N/A":
             return []
         company_name = str(company_name).strip()
@@ -43,7 +51,8 @@ class YCScraper:
         for attempt in range(3):
             try:
                 self._sleep_throttle(1.0 if attempt == 0 else backoff, 2.0 if attempt == 0 else backoff+1.0)
-                with urllib.request.urlopen(req, timeout=10) as res:
+                timeout_val = float(os.environ.get("SCRAPER_TIMEOUT", 10))
+                with urllib.request.urlopen(req, timeout=timeout_val) as res:
                     html_content = res.read().decode('utf-8')
                     match = re.search(r'data-page="([^"]+)"', html_content)
                     if match:
@@ -54,15 +63,18 @@ class YCScraper:
                         
                         jobs = []
                         for p in postings:
-                            loc = p.get('location', target_city)
-                            loc_lower = loc.lower()
-                            city_match = target_city.lower() in loc_lower or ("bengaluru" in loc_lower if target_city.lower() == "bangalore" else False) or ("bangalore" in loc_lower if target_city.lower() == "bengaluru" else False)
+                            if not isinstance(p, dict):
+                                continue
+                            loc = p.get('location', target_city) or target_city
+                            city_match = match_target_city(loc, target_city)
                             if not city_match:
                                 continue
+                            job_url_val = p.get('url') or f"{url}/jobs"
                             job_data = {
                                 "title": p.get('title', 'N/A'),
                                 "company_name": company_name,
-                                "job_url": p.get('url') or f"{url}/jobs",
+                                "job_url": job_url_val,
+                                "url": job_url_val,
                                 "location": loc,
                                 "source": "Y Combinator"
                             }

@@ -143,7 +143,7 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         self.assertIsNone(auth_service.verify_jwt_token(expired_token), "verify_jwt_token should return None for expired token!")
         
         # Test against protected API endpoint
-        self.client.set_cookie('session_token', expired_token)
+        self.client.set_cookie('session_token', expired_token, domain='localhost')
         resp = self.client.get('/api/user/profile')
         self.assertEqual(resp.status_code, 401, f"Expected 401 on expired token, got {resp.status_code}")
         data = json.loads(resp.data)
@@ -208,7 +208,7 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         self.client.post('/api/auth/logout')
         
         # Attempt replay attack using old token
-        self.client.set_cookie('session_token', token)
+        self.client.set_cookie('session_token', token, domain='localhost')
         replay_resp = self.client.get('/api/user/profile')
         self.assertEqual(replay_resp.status_code, 401, "Revoked token must be rejected with HTTP 401 on protected endpoints!")
 
@@ -260,7 +260,8 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         
         for name, tok in test_cases:
             with self.subTest(token_type=name):
-                self.client.set_cookie('session_token', tok)
+                self.client.delete_cookie('session_token', domain='localhost')
+                self.client.set_cookie('session_token', tok, domain='localhost')
                 resp = self.client.get('/api/user/profile')
                 self.assertNotEqual(resp.status_code, 500, f"Server crashed with 500 on {name}")
                 self.assertEqual(resp.status_code, 401, f"Expected 401 Unauthenticated on {name}, got {resp.status_code}")

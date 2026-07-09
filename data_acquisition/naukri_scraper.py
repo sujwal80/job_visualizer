@@ -10,17 +10,23 @@ try:
 except ImportError:
     from data_acquisition.job_metadata_extractor import extract_job_metadata
 
+try:
+    from geo_config import DEFAULT_TARGET_CITY, match_target_city
+except ImportError:
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
+
 class NaukriScraper:
     """
     Scraper module to find job openings via Naukri.com.
     """
     def __init__(self):
+        user_agent = os.environ.get("NAUKRI_USER_AGENT", os.environ.get("SCRAPER_USER_AGENT", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"))
         self.headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "User-Agent": user_agent,
             "Accept": "application/json, text/html, */*",
             "Accept-Language": "en-US,en;q=0.5",
-            "appid": "109",
-            "systemid": "109"
+            "appid": os.environ.get("NAUKRI_APP_ID", "109"),
+            "systemid": os.environ.get("NAUKRI_SYSTEM_ID", "109")
         }
 
     def _get_proxies(self):
@@ -32,19 +38,11 @@ class NaukriScraper:
         time.sleep(random.uniform(min_s, max_s) * mult)
 
     def _match_city(self, loc, target_city):
-        if not loc:
-            return False
-        loc_lower = str(loc).lower()
-        target_lower = target_city.lower()
-        if target_lower in loc_lower:
-            return True
-        if target_lower == "bengaluru" and "bangalore" in loc_lower:
-            return True
-        if target_lower == "bangalore" and "bengaluru" in loc_lower:
-            return True
-        return False
+        return match_target_city(loc, target_city)
 
-    def _get_with_retry(self, url, params=None, timeout=10):
+    def _get_with_retry(self, url, params=None, timeout=None):
+        if timeout is None:
+            timeout = float(os.environ.get("SCRAPER_TIMEOUT", 10))
         backoff = 1.0
         for attempt in range(3):
             try:
@@ -60,7 +58,9 @@ class NaukriScraper:
                 backoff *= 2
         return None
 
-    def get_bangalore_jobs(self, keywords, start=0, target_city="Bengaluru", **kwargs):
+    def get_bangalore_jobs(self, keywords, start=0, target_city=None, **kwargs):
+        if target_city is None:
+            target_city = DEFAULT_TARGET_CITY
         if not keywords or str(keywords).strip() == "N/A":
             return []
         keywords = str(keywords).strip()
@@ -107,6 +107,7 @@ class NaukriScraper:
                     "title": str(title).strip(),
                     "company_name": str(comp_name).strip(),
                     "job_url": str(job_url).strip(),
+                    "url": str(job_url).strip(),
                     "location": str(location).strip(),
                     "source": "Naukri"
                 }
@@ -153,6 +154,7 @@ class NaukriScraper:
                     "title": str(title).strip(),
                     "company_name": str(comp_name).strip(),
                     "job_url": str(job_url).strip(),
+                    "url": str(job_url).strip(),
                     "location": str(location).strip(),
                     "source": "Naukri"
                 }

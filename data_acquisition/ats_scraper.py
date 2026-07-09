@@ -8,6 +8,11 @@ try:
 except ImportError:
     from data_acquisition.job_metadata_extractor import extract_job_metadata
 
+try:
+    from geo_config import DEFAULT_TARGET_CITY, match_target_city
+except ImportError:
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
+
 class ATSScraper:
     def __init__(self):
         self.headers = {
@@ -27,7 +32,9 @@ class ATSScraper:
             return ""
         return re.sub(r'[^a-z0-9]+', '', str(name).lower())
 
-    def get_bangalore_jobs(self, company_name, start=0, target_city="Bengaluru", **kwargs):
+    def get_bangalore_jobs(self, company_name, start=0, target_city=None, **kwargs):
+        if target_city is None:
+            target_city = DEFAULT_TARGET_CITY
         if not company_name or str(company_name).strip() == "N/A":
             return []
         company_name = str(company_name).strip()
@@ -49,8 +56,7 @@ class ATSScraper:
         return jobs
 
     def _match_city(self, loc, target_city):
-        loc_lower = str(loc).lower()
-        return target_city.lower() in loc_lower or ("bengaluru" in loc_lower if target_city.lower() == "bangalore" else False) or ("bangalore" in loc_lower if target_city.lower() == "bengaluru" else False)
+        return match_target_city(loc, target_city)
 
     def _get_with_retry(self, url, timeout=6):
         backoff = 1.0

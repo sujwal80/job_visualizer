@@ -10,6 +10,11 @@ try:
 except ImportError:
     from data_acquisition.job_metadata_extractor import extract_job_metadata
 
+try:
+    from geo_config import DEFAULT_TARGET_CITY, match_target_city
+except ImportError:
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
+
 class GoogleJobsScraper:
     """
     Scraper module to find job openings via Google Jobs / Search SERP queries.
@@ -30,7 +35,9 @@ class GoogleJobsScraper:
         mult = float(os.environ.get("DELAY_MULTIPLIER", 1.0))
         time.sleep(random.uniform(min_s, max_s) * mult)
 
-    def get_bangalore_jobs(self, company_name, start=0, target_city="Bengaluru", **kwargs):
+    def get_bangalore_jobs(self, company_name, start=0, target_city=None, **kwargs):
+        if target_city is None:
+            target_city = DEFAULT_TARGET_CITY
         if not company_name or company_name == "N/A":
             return []
             
@@ -72,8 +79,7 @@ class GoogleJobsScraper:
                 jobs = []
                 for j in data.get("jobs_results", []):
                     loc = j.get("location", target_city)
-                    loc_lower = loc.lower()
-                    city_match = target_city.lower() in loc_lower or ("bengaluru" in loc_lower if target_city.lower() == "bangalore" else False) or ("bangalore" in loc_lower if target_city.lower() == "bengaluru" else False)
+                    city_match = match_target_city(loc, target_city)
                     if not city_match:
                         continue
                     job_data = {

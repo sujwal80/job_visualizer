@@ -10,6 +10,11 @@ try:
 except ImportError:
     from data_acquisition.job_metadata_extractor import extract_job_metadata
 
+try:
+    from geo_config import DEFAULT_TARGET_CITY, match_target_city
+except ImportError:
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
+
 class LinkedInScraper:
     def __init__(self):
         self.headers = {
@@ -42,7 +47,9 @@ class LinkedInScraper:
                 backoff *= 2
         return None
 
-    def get_bangalore_jobs(self, keywords, start=0, target_city="Bengaluru", **kwargs):
+    def get_bangalore_jobs(self, keywords, start=0, target_city=None, **kwargs):
+        if target_city is None:
+            target_city = DEFAULT_TARGET_CITY
         """
         Fetch jobs from the public guest jobs API.
         Returns a list of dicts: {title, company_name, company_slug, job_url, location}
@@ -79,7 +86,7 @@ class LinkedInScraper:
                 
                 # Strict city location filtering per grill-me decision
                 loc_lower = location.lower()
-                city_match = target_city.lower() in loc_lower or ("bengaluru" in loc_lower if target_city.lower() == "bangalore" else False) or ("bangalore" in loc_lower if target_city.lower() == "bengaluru" else False)
+                city_match = match_target_city(location, target_city)
                 if not city_match:
                     continue
                 
@@ -108,7 +115,9 @@ class LinkedInScraper:
             print(f"[LinkedIn Scraper] Error fetching jobs: {str(e)}")
             return []
 
-    def get_company_details(self, company_slug, target_city="Bengaluru"):
+    def get_company_details(self, company_slug, target_city=None):
+        if target_city is None:
+            target_city = DEFAULT_TARGET_CITY
         """
         Fetch company metadata from public profile.
         Returns details dict.
@@ -192,13 +201,13 @@ class LinkedInScraper:
                     if heading:
                         addr_text = addr_text.replace(heading, "").strip()
                         
-                    city_match = target_city.lower() in addr_text.lower() or ("bengaluru" in addr_text.lower() if target_city.lower() == "bangalore" else False) or ("bangalore" in addr_text.lower() if target_city.lower() == "bengaluru" else False)
+                    city_match = match_target_city(addr_text, target_city)
                     if city_match:
                         bangalore_address = addr_text
                         break
             
             if not bangalore_address and headquarters:
-                hq_match = target_city.lower() in headquarters.lower() or ("bengaluru" in headquarters.lower() if target_city.lower() == "bangalore" else False) or ("bangalore" in headquarters.lower() if target_city.lower() == "bengaluru" else False)
+                hq_match = match_target_city(headquarters, target_city)
                 if hq_match:
                     bangalore_address = headquarters
                 else:

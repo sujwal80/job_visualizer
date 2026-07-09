@@ -9,6 +9,11 @@ try:
 except ImportError:
     from data_acquisition.job_metadata_extractor import extract_job_metadata
 
+try:
+    from geo_config import DEFAULT_TARGET_CITY, match_target_city
+except ImportError:
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
+
 class InstahyreScraper:
     def __init__(self):
         self.headers = {
@@ -47,7 +52,9 @@ class InstahyreScraper:
                 backoff *= 2
         return None
 
-    def get_bangalore_jobs(self, keywords, start=0, target_city="Bengaluru", **kwargs):
+    def get_bangalore_jobs(self, keywords, start=0, target_city=None, **kwargs):
+        if target_city is None:
+            target_city = DEFAULT_TARGET_CITY
         """
         Fetch jobs from Instahyre's public REST search API.
         Returns a list of dicts: {title, company_name, company_slug, job_url, location, source}
@@ -84,8 +91,7 @@ class InstahyreScraper:
                 location = obj.get("locations") or target_city
 
                 # Strict city location filtering per grill-me decision
-                loc_lower = str(location).lower()
-                city_match = target_city.lower() in loc_lower or ("bengaluru" in loc_lower if target_city.lower() == "bangalore" else False) or ("bangalore" in loc_lower if target_city.lower() == "bengaluru" else False)
+                city_match = match_target_city(location, target_city)
                 if not city_match:
                     continue
 

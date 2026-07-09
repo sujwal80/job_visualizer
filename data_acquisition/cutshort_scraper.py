@@ -10,6 +10,11 @@ try:
 except ImportError:
     from data_acquisition.job_metadata_extractor import extract_job_metadata
 
+try:
+    from geo_config import DEFAULT_TARGET_CITY, match_target_city
+except ImportError:
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
+
 class CutshortScraper:
     """
     Scraper module to find job openings via Cutshort.io.
@@ -30,17 +35,7 @@ class CutshortScraper:
         time.sleep(random.uniform(min_s, max_s) * mult)
 
     def _match_city(self, loc, target_city):
-        if not loc:
-            return False
-        loc_lower = str(loc).lower()
-        target_lower = target_city.lower()
-        if target_lower in loc_lower:
-            return True
-        if target_lower == "bengaluru" and "bangalore" in loc_lower:
-            return True
-        if target_lower == "bangalore" and "bengaluru" in loc_lower:
-            return True
-        return False
+        return match_target_city(loc, target_city)
 
     def _slugify(self, name):
         if not name:
@@ -63,7 +58,9 @@ class CutshortScraper:
                 backoff *= 2
         return None
 
-    def get_bangalore_jobs(self, keywords, start=0, target_city="Bengaluru", **kwargs):
+    def get_bangalore_jobs(self, keywords, start=0, target_city=None, **kwargs):
+        if target_city is None:
+            target_city = DEFAULT_TARGET_CITY
         if not keywords or str(keywords).strip() == "N/A":
             return []
         keywords = str(keywords).strip()

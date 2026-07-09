@@ -248,8 +248,12 @@ def extract_job_metadata(title: str, raw_snippet: str = "", extra_data: Optional
     """
     if title is None:
         title = ""
+    elif not isinstance(title, str):
+        title = str(title)
     if raw_snippet is None:
         raw_snippet = ""
+    elif not isinstance(raw_snippet, str):
+        raw_snippet = str(raw_snippet)
     if extra_data is None or not isinstance(extra_data, dict):
         extra_data = {}
 

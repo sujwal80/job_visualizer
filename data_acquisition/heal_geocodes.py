@@ -10,6 +10,10 @@ import re
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from db_manager import DBManager
+try:
+    from geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate
+except ImportError:
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate
 
 def clean_snippet_to_address(snippet):
     # Strip common prefixes from the start of the snippet
@@ -41,14 +45,14 @@ def clean_snippet_to_address(snippet):
         return None
         
     address = ", ".join(clean_parts)
-    # Ensure Bengaluru is at the end if not present
-    if not any(k in address.lower() for k in ["bengaluru", "bangalore"]):
-        address += ", Bengaluru"
+    # Ensure target city is at the end if not present
+    if not any(k in address.lower() for k in ["bengaluru", "bangalore", DEFAULT_TARGET_CITY.lower()]):
+        address += f", {DEFAULT_TARGET_CITY}"
         
     return address
 
 def get_address_from_ddg(company_name):
-    query = f"{company_name} Bangalore office address"
+    query = f"{company_name} {DEFAULT_TARGET_CITY} office address"
     url = f"https://html.duckduckgo.com/html/?q={urllib.parse.quote(query)}"
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -90,22 +94,14 @@ def heal_geocodes():
     
     # We check for our fallback coordinates
     def is_fallback(lat, lng):
-        if lat is None or lng is None:
-            return True
-        # Check delta for 12.9716, 77.5946 (our center fallback)
-        if abs(lat - 12.9716) < 0.0001 and abs(lng - 77.5946) < 0.0001:
-            return True
-        # Check delta for 12.9767936, 77.590082 (OSM city center geocode)
-        if abs(lat - 12.9767936) < 0.0001 and abs(lng - 77.590082) < 0.0001:
-            return True
-        return False
+        return is_fallback_coordinate(lat, lng)
         
     startups_to_heal = [s for s in db.startups if is_fallback(s.get("lat"), s.get("lng"))]
     print(f"Found {len(startups_to_heal)} startups at fallback coordinates that need healing.")
     
     for idx, s in enumerate(startups_to_heal):
         name = s.get("name")
-        address = s.get("city") or "Bengaluru"
+        address = s.get("city") or DEFAULT_TARGET_CITY
         
         print(f"\n[Healer {idx+1}/{len(startups_to_heal)}] Attempting to heal '{name}'...")
         print(f"  Current Address/Locality in DB: '{address}'")
@@ -133,7 +129,7 @@ def heal_geocodes():
             resolved_addr = ddg_address if 'ddg_address' in locals() and ddg_address else address
             city_label = resolved_addr
             if len(city_label) > 60:
-                city_label = city_label.split(',')[0] + ", Bengaluru"
+                city_label = city_label.split(',')[0] + f", {DEFAULT_TARGET_CITY}"
             s["city"] = city_label
             
             success_count += 1

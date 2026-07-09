@@ -1,3 +1,8 @@
+try:
+    from geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate
+except ImportError:
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate
+
 class LocationEnricher:
     """
     Independent tagging module for resolving company office coordinates.
@@ -7,11 +12,13 @@ class LocationEnricher:
     def __init__(self, db_manager):
         self.db = db_manager
 
-    def enrich(self, company_record, target_city="Bengaluru"):
+    def enrich(self, company_record, target_city=None):
         """
         Enriches company_record in-place.
         Returns True if modified, False if short-circuited or unchanged.
         """
+        if target_city is None:
+            target_city = DEFAULT_TARGET_CITY
         if not isinstance(company_record, dict):
             return False
         lat = company_record.get("lat")
@@ -56,10 +63,6 @@ class LocationEnricher:
         except (ValueError, TypeError):
             return False
             
-        # Check against Fallback Center 1 (MG Road / Bangalore Center)
-        if abs(lat - 12.9716) < 0.0001 and abs(lng - 77.5946) < 0.0001:
-            return False
-        # Check against Fallback Center 2 (OSM Bengaluru City Center)
-        if abs(lat - 12.9767936) < 0.0001 and abs(lng - 77.590082) < 0.0001:
+        if is_fallback_coordinate(lat, lng):
             return False
         return True

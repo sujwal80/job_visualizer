@@ -7,6 +7,10 @@ filtering and sorting against viewport queries and metadata criteria, and format
 import os
 import json
 from backend.utils.validators import _safe_float, _check_has_pin, _sanitize_string, _sanitize_url, _strip_redundant
+try:
+    from backend.config import DEFAULT_MAP_CENTER_LAT, DEFAULT_MAP_CENTER_LNG, DEFAULT_TARGET_CITY, REGION_SYNONYM_MAP
+except ImportError:
+    from config import DEFAULT_MAP_CENTER_LAT, DEFAULT_MAP_CENTER_LNG, DEFAULT_TARGET_CITY, REGION_SYNONYM_MAP
 
 DATA_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'startups.json'))
 
@@ -101,8 +105,8 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
             if s.get("has_pin") is False:
                 pass
             else:
-                eff_lat = lat if lat is not None else 12.9716
-                eff_lng = lng if lng is not None else 77.5946
+                eff_lat = lat if lat is not None else DEFAULT_MAP_CENTER_LAT
+                eff_lng = lng if lng is not None else DEFAULT_MAP_CENTER_LNG
                 if eff_lat < min_lat or eff_lat > max_lat or eff_lng < min_lng or eff_lng > max_lng:
                     continue
         if city_query:
@@ -112,9 +116,9 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
             
             # Map country-level and regional city queries to their respective hubs in dataset
             is_match = False
-            usa_synonyms = {"usa", "us", "united states", "america", "sf", "san francisco", "california", "bay area"}
-            uk_synonyms = {"uk", "united kingdom", "england", "london", "gb", "great britain"}
-            india_synonyms = {"india", "in", "bengaluru", "bangalore", "karnataka", "blr"}
+            usa_synonyms = REGION_SYNONYM_MAP.get("usa", {"usa", "us", "united states", "america", "sf", "san francisco", "california", "bay area"})
+            uk_synonyms = REGION_SYNONYM_MAP.get("uk", {"uk", "united kingdom", "england", "london", "gb", "great britain"})
+            india_synonyms = REGION_SYNONYM_MAP.get("india", {"india", "in", "bengaluru", "bangalore", "karnataka", "blr"})
 
             if city_query_clean in usa_synonyms:
                 if any(x in city_val for x in ["san francisco", "ca", "sf", "california"]):
@@ -227,8 +231,8 @@ def format_startup_summary(s):
     return {
         "id": s.get("id"),
         "name": _sanitize_string(s.get("name")),
-        "lat": lat_val if (has_pin_val and lat_val is not None) else 12.9716,
-        "lng": lng_val if (has_pin_val and lng_val is not None) else 77.5946,
+        "lat": lat_val if (has_pin_val and lat_val is not None) else DEFAULT_MAP_CENTER_LAT,
+        "lng": lng_val if (has_pin_val and lng_val is not None) else DEFAULT_MAP_CENTER_LNG,
         "city": _sanitize_string(s.get("city")),
         "experience": experiences,
         "salary": salaries,
@@ -286,7 +290,7 @@ def format_startup_details(s):
                 "salary": _sanitize_string(j.get("salary")),
                 "job_type": _sanitize_string(j.get("job_type")),
                 "skills": [_sanitize_string(sk) for sk in (j.get("skills") or []) if isinstance(sk, str)],
-                "location": _sanitize_string(j.get("location", "Bengaluru")),
+                "location": _sanitize_string(j.get("location", DEFAULT_TARGET_CITY)),
                 "posted_date": _sanitize_string(j.get("posted_date", "Active")),
                 "source": _sanitize_string(j.get("source", "Direct"))
             })

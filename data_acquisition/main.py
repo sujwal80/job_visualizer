@@ -37,10 +37,15 @@ def load_env_file():
                     key, val = line.split('=', 1)
                     os.environ[key.strip()] = val.strip().strip('"').strip("'")
 
-def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=3, max_tagging=None, max_validation=None, target_city="Bengaluru"):
+def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=3, max_tagging=None, max_validation=None, target_city="Bengaluru", db_path=None):
     load_env_file()
     workspace_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    db_path = os.path.join(workspace_root, "backend", "startups.json")
+    if db_path is None:
+        env_db_path = os.environ.get("STARTUP_DB_PATH", "backend/startups.json")
+        if os.path.isabs(env_db_path):
+            db_path = env_db_path
+        else:
+            db_path = os.path.join(workspace_root, env_db_path)
     
     print("==========================================================")
     print(f"=== {target_city.upper()} STARTUP DATA ACQUISITION & TAGGING PIPELINE ===")
@@ -132,8 +137,14 @@ if __name__ == "__main__":
         if idx + 1 < len(args):
             target_city = args[idx + 1]
             
+    db_path = None
+    if "--db-path" in args:
+        idx = args.index("--db-path")
+        if idx + 1 < len(args):
+            db_path = args[idx + 1]
+
     if test_mode:
         print(f"[CLI] Running in TEST MODE for city '{target_city}' (max 1 discovery, max 2 tagging, max 2 validation)...")
-        run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=1, max_tagging=2, max_validation=2, target_city=target_city)
+        run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=1, max_tagging=2, max_validation=2, target_city=target_city, db_path=db_path)
     else:
-        run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=3, max_tagging=None, max_validation=None, target_city=target_city)
+        run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=3, max_tagging=None, max_validation=None, target_city=target_city, db_path=db_path)

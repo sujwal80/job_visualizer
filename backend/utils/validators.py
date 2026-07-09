@@ -7,6 +7,11 @@ query parameter inspection, floating-point validation, and payload pruning.
 import re
 import math
 
+try:
+    from backend.config import FALLBACK_COORDINATES, PIN_DELTA_THRESHOLD, GENERIC_HUB_LABELS
+except ImportError:
+    from config import FALLBACK_COORDINATES, PIN_DELTA_THRESHOLD, GENERIC_HUB_LABELS
+
 # Essential fields that must never be stripped from startup payload objects during serialization.
 REQUIRED_FIELDS = {
     'id', 'name', 'lat', 'lng', 'city', 'experience', 
@@ -72,12 +77,13 @@ def _check_has_pin(s):
     lng = _safe_float(s.get("lng"))
     if lat is None or lng is None:
         return False
-    # Check if coordinates match default generic Bangalore city centers within a 0.008 degree delta (~1 km)
-    if (abs(lat - 12.9716) < 0.008 and abs(lng - 77.5946) < 0.008) or (abs(lat - 12.9767) < 0.008 and abs(lng - 77.5900) < 0.008):
-        return False
+    # Check if coordinates match default generic city centers within delta threshold
+    for f_lat, f_lng in FALLBACK_COORDINATES:
+        if abs(lat - f_lat) < PIN_DELTA_THRESHOLD and abs(lng - f_lng) < PIN_DELTA_THRESHOLD:
+            return False
     addr = str(s.get("bangalore_address") or s.get("address") or s.get("city") or "").strip().lower()
     # Treat general city names without a specific street address as unpinned
-    if addr in ["bengaluru", "bangalore", "india", "karnataka", "bengaluru, karnataka"]:
+    if addr in GENERIC_HUB_LABELS:
         return False
     return True
 

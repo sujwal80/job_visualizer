@@ -10,8 +10,15 @@ BLACKLISTED_DOMAINS = {
     "forms.gle", "google.com", "docs.google.com", "sheets.google.com", "drive.google.com"
 }
 
+try:
+    from geo_config import DEFAULT_TARGET_CITY, DEFAULT_GEO_LOCALITIES, GENERIC_HUB_LABELS, is_fallback_coordinate
+except ImportError:
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, DEFAULT_GEO_LOCALITIES, GENERIC_HUB_LABELS, is_fallback_coordinate
+
 class DBManager:
-    def __init__(self, db_path):
+    def __init__(self, db_path=None):
+        if db_path is None:
+            db_path = os.environ.get("STARTUP_DB_PATH", "backend/startups.json")
         self.db_path = db_path
         self.startups = []
         self.load_db()
@@ -65,10 +72,16 @@ class DBManager:
         cleaned = re.sub(r'<[^>]*>', '', text)
         return cleaned.strip()
 
-    def merge_startup(self, company_details, jobs, target_city="Bengaluru"):
+    def merge_startup(self, company_details, jobs, target_city=None):
         """
         Add or update a startup and merge job openings.
         """
+        if target_city is None:
+            target_city = DEFAULT_TARGET_CITY
+        if not isinstance(company_details, dict):
+            return
+        if not isinstance(jobs, list):
+            jobs = []
         name = self._sanitize_string(company_details.get("name", "N/A"))
         company_details["name"] = name
         if company_details.get("description"):
@@ -107,8 +120,7 @@ class DBManager:
                 existing["head_count"] = company_details["head_count"]
                 
             is_at_fallback = (
-                (existing.get("lat") == 12.9716 and existing.get("lng") == 77.5946) or
-                (existing.get("lat") == 12.9767936 and existing.get("lng") == 77.590082) or
+                is_fallback_coordinate(existing.get("lat"), existing.get("lng")) or
                 (existing.get("lat") is None or existing.get("lng") is None)
             )
             if is_at_fallback:
@@ -163,11 +175,13 @@ class DBManager:
             self._merge_job_openings(new_startup, jobs)
             self.startups.append(new_startup)
             
-    def geocode_address(self, address, company_name=None, target_city="Bengaluru"):
+    def geocode_address(self, address, company_name=None, target_city=None):
         """
         Geocode address using Google Maps API if API key is present.
         Falls back to Nominatim API with heuristic cleaning. Returns (None, None) if unresolved.
         """
+        if target_city is None:
+            target_city = DEFAULT_TARGET_CITY
         if not address:
             return None, None
             
@@ -176,7 +190,7 @@ class DBManager:
             
         # Check if the address is generic (just city name)
         address_clean = address.lower().strip().replace(" ", "").replace(",karnataka", "").replace(",india", "").replace(",in", "")
-        is_generic = address_clean in [target_city.lower(), "bengaluru", "bangalore", "hyderabad", "mumbai", "delhi"]
+        is_generic = address_clean in GENERIC_HUB_LABELS
         
         # If the address is generic and we have a company name, try the company name first!
         if is_generic and company_name and company_name != "N/A":
@@ -238,7 +252,7 @@ class DBManager:
             first_comp = self._clean_address_component(parts[0])
             city = target_city
             for p in parts:
-                if target_city.lower() in p.lower() or "bangalore" in p.lower() or "bengaluru" in p.lower():
+                if target_city.lower() in p.lower():
                     city = p
                     break
             
@@ -253,13 +267,8 @@ class DBManager:
                 return coords
                 
         # Fallback to Nominatim OSM Geocoding - Attempt 3: Locality matching
-        localities = [
-            "hsr", "koramangala", "indiranagar", "indira nagar", "whitefield", "ejipura", 
-            "nagawara", "nagavara", "kadubeesanahalli", "domlur", "jp nagar", "jayanagar",
-            "manyata", "bagmane", "ecospace", "eco space", "cessna", "bellandur", 
-            "electronics city", "electronic city", "outer ring road", "orr", "hebbal", 
-            "tech park", "it park", "industrial area", "sez", "estate", "bandra", "andheri", "powai", "gachibowli", "hitec city"
-        ]
+        env_locs = os.environ.get("GEO_LOCALITIES")
+        localities = [loc.strip() for loc in env_locs.split(",") if loc.strip()] if env_locs else DEFAULT_GEO_LOCALITIES
         
         for part in parts:
             part_clean = self._clean_address_component(part)
@@ -338,7 +347,14 @@ class DBManager:
         Merge jobs list. Check by normalized job title to avoid duplicates.
         """
         existing_jobs = startup.get("job_openings", [])
+        if not isinstance(existing_jobs, list):
+            existing_jobs = []
         for ej in existing_jobs:
+            if not isinstance(ej, dict):
+                continue
+            normalized_url = ej.get("url") or ej.get("job_url") or ""
+            ej["url"] = normalized_url
+            ej["job_url"] = normalized_url
             if not ej.get("experience") or ej.get("experience") == "Not disclosed":
                 ej["experience"] = "Not specified"
             else:
@@ -390,17 +406,19 @@ class DBManager:
                     found_job["posted_date"] = pdate
             else:
                 clean_title = self._sanitize_string(str(title))
-                clean_loc = self._sanitize_string(str(job.get("location") or "Bengaluru"))
+                clean_loc = self._sanitize_string(str(job.get("location") or DEFAULT_TARGET_CITY))
                 clean_src = self._sanitize_string(str(job.get("source", "LinkedIn")))
                 print(f"  + Adding Job opening: '{clean_title}' ({clean_loc})")
                 # Deduce department from title
                 dept = self._deduce_department(clean_title)
+                job_url_val = job.get("job_url") or job.get("url") or ""
                 existing_jobs.append({
                     "title": clean_title,
                     "department": dept,
                     "location": clean_loc,
                     "source": clean_src,
-                    "url": job.get("job_url") or job.get("url") or "",
+                    "url": job_url_val,
+                    "job_url": job_url_val,
                     "experience": exp,
                     "salary": sal,
                     "job_type": jtype,
@@ -466,10 +484,6 @@ class DBManager:
         if not coords:
             return False
         lat, lng = coords
-        # Reject if close to fallback center 1
-        if abs(lat - 12.9716) < 0.0001 and abs(lng - 77.5946) < 0.0001:
-            return False
-        # Reject if close to fallback center 2 (OSM city center)
-        if abs(lat - 12.9767936) < 0.0001 and abs(lng - 77.590082) < 0.0001:
+        if is_fallback_coordinate(lat, lng):
             return False
         return True

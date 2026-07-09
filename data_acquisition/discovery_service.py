@@ -1,6 +1,10 @@
 import os
 import time
 import random
+try:
+    from geo_config import DEFAULT_TARGET_CITY, DEFAULT_DISCOVERY_KEYWORDS
+except ImportError:
+    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, DEFAULT_DISCOVERY_KEYWORDS
 
 class CompanyDiscoveryService:
     """
@@ -12,13 +16,15 @@ class CompanyDiscoveryService:
         self.db = db_manager
         self.scraper = linkedin_scraper
 
-    def discover_new_companies(self, keywords_list=None, max_new_companies=5, target_city="Bengaluru"):
+    def discover_new_companies(self, keywords_list=None, max_new_companies=5, target_city=None):
+        if target_city is None:
+            target_city = DEFAULT_TARGET_CITY
         if keywords_list is None:
             env_kw = os.environ.get("DISCOVERY_KEYWORDS")
             if env_kw:
                 keywords_list = [k.strip() for k in env_kw.split(",") if k.strip()]
             else:
-                keywords_list = ["Startup", "AI Startup", "SaaS Startup", "Fintech Startup"]
+                keywords_list = DEFAULT_DISCOVERY_KEYWORDS
 
         print("\n=== STARTING COMPANY DISCOVERY PHASE (ACQUISITION) ===")
         print(f"[Discovery] Target Keywords: {keywords_list}, City: {target_city}")

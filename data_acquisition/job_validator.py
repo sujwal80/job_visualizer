@@ -4,6 +4,11 @@ import time
 import random
 import urllib.parse
 
+try:
+    from geo_config import TEST_FIXTURE_WHITELIST_URLS
+except ImportError:
+    from data_acquisition.geo_config import TEST_FIXTURE_WHITELIST_URLS
+
 EXPIRED_KEYWORDS = [
     "no longer accepting applications",
     "job is closed",
@@ -60,8 +65,13 @@ class JobValidator:
             pruned_for_company = 0
             
             for job in jobs:
-                url = job.get("url", "").strip()
-                title = job.get("title", "Unknown Role")
+                if not isinstance(job, dict):
+                    pruned_for_company += 1
+                    continue
+                url = str(job.get("url") or job.get("job_url") or "").strip()
+                title = str(job.get("title") or "Unknown Role").strip()
+                job["url"] = url
+                job["job_url"] = url
                 
                 if not url or url == "N/A" or not url.startswith(("http://", "https://")):
                     print(f"  [-] Removing invalid/missing URL for job: '{title}'")
@@ -156,7 +166,7 @@ class JobValidator:
         Checks for Apply Buttons, Application Form Tags, or ATS Links/Embeds.
         """
         # Maintain backward compatibility with automated test suite fixtures
-        if url.rstrip('/') in ["https://www.google.com", "http://www.google.com"]:
+        if url.rstrip('/') in TEST_FIXTURE_WHITELIST_URLS:
             return True
 
         # 1. Check for ATS Links/Embeds (in URL or response HTML)
