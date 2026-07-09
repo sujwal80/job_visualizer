@@ -10,9 +10,9 @@ sys.path.append(workspace_root)
 from logo_enricher import LogoEnricher
 from location_enricher import LocationEnricher
 from db_manager import DBManager
-from google_jobs_scraper import GoogleJobsScraper
 from yc_scraper import YCScraper
 from ats_scraper import ATSScraper
+from indeed_scraper import IndeedScraper
 from job_validator import JobValidator
 from job_metadata_extractor import extract_job_metadata
 
@@ -72,10 +72,10 @@ def test_job_validator():
 
 def test_scrapers_init():
     print("\n=== TESTING SCRAPERS INITIALIZATION ===")
-    g = GoogleJobsScraper()
     yc = YCScraper()
     ats = ATSScraper()
-    print(" [PASS] All multi-source scrapers (Google Jobs, YC, ATS) initialized cleanly.")
+    indeed = IndeedScraper()
+    print(" [PASS] All multi-source scrapers (YC, ATS, Indeed) initialized cleanly.")
 
 def test_http_429_resilience():
     print("\n=== TESTING HTTP 429 RESILIENCE ===")
@@ -127,10 +127,10 @@ def test_multi_city_deduplication():
 
 def test_scraper_429_backoff_handling():
     print("\n=== TESTING SCRAPER 429 BACKOFF / ERROR HANDLING ===")
-    scraper = GoogleJobsScraper()
+    scraper = IndeedScraper()
     mock_resp = MagicMock()
     mock_resp.status_code = 429
-    with patch("requests.request", return_value=mock_resp), patch("time.sleep"):
+    with patch("requests.get", return_value=mock_resp), patch("time.sleep"):
         jobs = scraper.get_bangalore_jobs("TestCorp")
         assert isinstance(jobs, list), f"Expected list return on 429, got {type(jobs)}"
         assert len(jobs) == 0, f"Expected 0 jobs returned on 429 backoff, got {len(jobs)}"

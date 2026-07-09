@@ -8,7 +8,6 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from linkedin_scraper import LinkedInScraper
 from instahyre_scraper import InstahyreScraper
-from google_jobs_scraper import GoogleJobsScraper
 from yc_scraper import YCScraper
 from ats_scraper import ATSScraper
 from indeed_scraper import IndeedScraper
@@ -62,7 +61,6 @@ def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_
     db = DBManager(db_path)
     linkedin_scraper = LinkedInScraper()
     instahyre_scraper = InstahyreScraper()
-    google_jobs_scraper = GoogleJobsScraper()
     yc_scraper = YCScraper()
     ats_scraper = ATSScraper()
     indeed_scraper = IndeedScraper()
@@ -86,7 +84,6 @@ def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_
         scrapers_map = {
             "LinkedIn": linkedin_scraper,
             "Instahyre": instahyre_scraper,
-            "Google Jobs": google_jobs_scraper,
             "Y Combinator": yc_scraper,
             "Direct ATS": ats_scraper,
             "Indeed": indeed_scraper,

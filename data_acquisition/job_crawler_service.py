@@ -10,7 +10,7 @@ except ImportError:
 class JobCrawlerService:
     """
     Unified job crawling coordinator module.
-    Runs multiple independent job scraper sources (LinkedIn, Instahyre, Google Jobs, YC, ATS)
+    Runs multiple independent job scraper sources (LinkedIn, Instahyre, YC, ATS)
     and merges validated openings into the company record.
     """
     def __init__(self, db_manager, scrapers_dict):
