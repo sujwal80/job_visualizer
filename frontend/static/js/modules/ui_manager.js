@@ -50,15 +50,16 @@ export function showDirectoryLoading() {
     );
 }
 
-export function renderDirectory(startups) {
+export function renderDirectory(startups, customEmptyText = null) {
     const directoryList = document.getElementById('directory-list');
     if (!directoryList) return;
     
     const fragment = document.createDocumentFragment();
 
-    if (startups.length === 0) {
+    if (!Array.isArray(startups) || startups.length === 0) {
+        const emptyText = customEmptyText || 'No companies actively hiring in this location.';
         fragment.appendChild(
-            createElement('div', { className: 'about-text', textContent: 'No companies match your criteria.' })
+            createElement('div', { className: 'about-text', textContent: emptyText })
         );
         directoryList.replaceChildren(fragment);
         return;
@@ -419,35 +420,54 @@ export function renderDrawerDetails(startup) {
 
 export function selectAndOpenStartup(id) {
     state.currentSelectedId = id;
+    const cacheKey = String(id);
+
     for (const [pendingId, controller] of state.inFlightRequests.entries()) {
-        if (pendingId !== id) {
+        if (String(pendingId) !== cacheKey) {
             controller.abort();
             state.inFlightRequests.delete(pendingId);
         }
     }
 
-    if (state.profileCache.has(id)) {
-        _processOpenStartup(state.profileCache.get(id));
-        return;
+    // 1. Check ProfileCache (0 network calls)
+    if (state.profileCache.has(id) || state.profileCache.has(cacheKey)) {
+        const cached = state.profileCache.get(id) || state.profileCache.get(cacheKey);
+        _processOpenStartup(cached);
+        return Promise.resolve(cached);
     }
-    if (state.inFlightRequests.has(id)) {
+
+    // 2. Check Request Coalescing (inFlightPromises / inFlightRequests)
+    if (state.inFlightPromises.has(id) || state.inFlightPromises.has(cacheKey) || state.inFlightRequests.has(id)) {
+        const existingPromise = state.inFlightPromises.get(id) || state.inFlightPromises.get(cacheKey);
+        if (existingPromise) {
+            existingPromise.then(fullStartup => {
+                if (state.currentSelectedId === id) {
+                    _processOpenStartup(fullStartup);
+                }
+            }).catch(() => {});
+            return existingPromise;
+        }
         return;
     }
 
+    // 3. Create fetch promise, store in inFlightPromises, cleanup in .finally()
     const controller = new AbortController();
     state.inFlightRequests.set(id, controller);
+    state.inFlightRequests.set(cacheKey, controller);
 
-    safeFetch(`/api/startups/${id}`, { signal: controller.signal })
+    const promise = safeFetch(`/api/company/${id}`, { signal: controller.signal })
         .then(fullStartup => {
-            state.inFlightRequests.delete(id);
-            if (controller.signal.aborted) return;
-            if (state.currentSelectedId === id && fullStartup && !fullStartup.error) {
+            if (controller.signal.aborted) return fullStartup;
+            if (fullStartup && !fullStartup.error) {
                 if (state.profileCache.size >= 50) {
                     const firstKey = state.profileCache.keys().next().value;
                     state.profileCache.delete(firstKey);
                 }
                 state.profileCache.set(id, fullStartup);
-                _processOpenStartup(fullStartup);
+                state.profileCache.set(cacheKey, fullStartup);
+                if (state.currentSelectedId === id) {
+                    _processOpenStartup(fullStartup);
+                }
             } else {
                 const fallbackStartup = state.startupsData.find(s => String(s.id) === String(id));
                 if (fallbackStartup) {
@@ -456,17 +476,30 @@ export function selectAndOpenStartup(id) {
                     showToast('Could not load company profile. Please try again.', 'error');
                 }
             }
+            return fullStartup;
         })
         .catch(err => {
-            state.inFlightRequests.delete(id);
-            if (err.name === 'AbortError') return;
+            if (err.name === 'AbortError') throw err;
             const fallbackStartup = state.startupsData.find(s => String(s.id) === String(id));
             if (fallbackStartup) {
                 _processOpenStartup(fallbackStartup);
+                return fallbackStartup;
             } else {
                 showToast('Could not load company profile. Please try again.', 'error');
+                throw err;
             }
+        })
+        .finally(() => {
+            state.inFlightRequests.delete(id);
+            state.inFlightRequests.delete(cacheKey);
+            state.inFlightPromises.delete(id);
+            state.inFlightPromises.delete(cacheKey);
         });
+
+    state.inFlightPromises.set(id, promise);
+    state.inFlightPromises.set(cacheKey, promise);
+
+    return promise;
 }
 
 export function _processOpenStartup(fullStartup) {

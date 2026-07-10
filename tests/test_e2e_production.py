@@ -17,7 +17,7 @@ class TestProductionAuditE2E(unittest.TestCase):
 
     def test_01_security_headers(self):
         """Verify presence of strict CSP and X-Content-Type-Options headers."""
-        response = self.client.get('/api/startups')
+        response = self.client.get('/api/companies')
         self.assertIn('Content-Security-Policy', response.headers, "CSP header missing!")
         self.assertEqual(response.headers.get('X-Content-Type-Options'), 'nosniff', "X-Content-Type-Options must be nosniff")
 
@@ -28,7 +28,7 @@ class TestProductionAuditE2E(unittest.TestCase):
         last_response = None
 
         for _ in range(150):
-            last_response = self.client.get('/api/startups', environ_base={'REMOTE_ADDR': test_ip})
+            last_response = self.client.get('/api/companies', environ_base={'REMOTE_ADDR': test_ip})
             if last_response.status_code == 429:
                 rate_limited = True
                 break
@@ -42,11 +42,11 @@ class TestProductionAuditE2E(unittest.TestCase):
     def test_03_query_param_sanitization_400(self):
         """Verify malformed, out-of-bounds, or injection query params return 400 or safe fallback without 500 crash."""
         payloads = [
-            '/api/startups?min_lat=invalid_float&limit=abc',
-            '/api/startups?min_lat=-999&max_lat=999',
-            '/api/startups?city=<script>alert("XSS")</script>',
-            '/api/startups?limit=-50',
-            '/api/startups?city=Bengaluru\' OR \'1\'=\'1'
+            '/api/companies?min_lat=invalid_float&limit=abc',
+            '/api/companies?min_lat=-999&max_lat=999',
+            '/api/companies?city=<script>alert("XSS")</script>',
+            '/api/companies?limit=-50',
+            '/api/companies?city=Bengaluru\' OR \'1\'=\'1'
         ]
         for url in payloads:
             with self.subTest(url=url):
@@ -61,9 +61,9 @@ class TestProductionAuditE2E(unittest.TestCase):
     def test_04_response_optimization_and_caching(self):
         """Verify Gzip compression support, Cache-Control headers, and lean payload structures."""
         # Check caching and lean structure
-        resp = self.client.get('/api/startups')
+        resp = self.client.get('/api/companies')
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('Cache-Control', resp.headers, "Cache-Control header missing on /api/startups")
+        self.assertIn('Cache-Control', resp.headers, "Cache-Control header missing on /api/companies")
         
         data = json.loads(resp.data)
         if len(data) > 0:
@@ -74,7 +74,7 @@ class TestProductionAuditE2E(unittest.TestCase):
             self.assertNotIn('job_openings', item, "Lean payload should not include heavy raw job_openings array")
 
         # Check Gzip compression when requested
-        resp_gzip = self.client.get('/api/startups', headers={'Accept-Encoding': 'gzip'})
+        resp_gzip = self.client.get('/api/companies', headers={'Accept-Encoding': 'gzip'})
         self.assertEqual(resp_gzip.headers.get('Content-Encoding'), 'gzip', "Expected Content-Encoding: gzip when requested")
 
     def test_05_existing_regression_suite(self):
@@ -86,10 +86,10 @@ class TestProductionAuditE2E(unittest.TestCase):
     def test_03b_adversarial_nan_inf_floats(self):
         """Verify NaN and Infinity floating point inputs are strictly rejected with HTTP 400."""
         adversarial_floats = [
-            '/api/startups?min_lat=nan',
-            '/api/startups?max_lat=inf',
-            '/api/startups?min_lng=-inf',
-            '/api/startups?max_lng=1e308'
+            '/api/companies?min_lat=nan',
+            '/api/companies?max_lat=inf',
+            '/api/companies?min_lng=-inf',
+            '/api/companies?max_lng=1e308'
         ]
         for url in adversarial_floats:
             with self.subTest(url=url):
@@ -99,9 +99,9 @@ class TestProductionAuditE2E(unittest.TestCase):
     def test_03c_multidict_duplicate_param_collisions(self):
         """Verify duplicate query parameter collisions do not mask malformed values."""
         duplicate_urls = [
-            '/api/startups?limit=10&limit=abc',
-            '/api/startups?min_lat=12.97&min_lat=invalid',
-            '/api/startups?limit=-10&limit=20'
+            '/api/companies?limit=10&limit=abc',
+            '/api/companies?min_lat=12.97&min_lat=invalid',
+            '/api/companies?limit=-10&limit=20'
         ]
         for url in duplicate_urls:
             with self.subTest(url=url):
@@ -111,9 +111,9 @@ class TestProductionAuditE2E(unittest.TestCase):
     def test_03d_parameter_flooding_and_long_strings(self):
         """Verify long injection payloads and arbitrary parameter flooding are rejected."""
         flooding_urls = [
-            '/api/startups?city=' + ('A' * 101),
-            '/api/startups?unsupported_flooding_param=' + ('B' * 5000),
-            '/api/startups?city=' + '<script>alert("XSS_PAYLOAD_EXCEEDING_ONE_HUNDRED_CHARACTERS_TO_TEST_BOUNDARIES")</script>' * 2
+            '/api/companies?city=' + ('A' * 101),
+            '/api/companies?unsupported_flooding_param=' + ('B' * 5000),
+            '/api/companies?city=' + '<script>alert("XSS_PAYLOAD_EXCEEDING_ONE_HUNDRED_CHARACTERS_TO_TEST_BOUNDARIES")</script>' * 2
         ]
         for url in flooding_urls:
             with self.subTest(url=url):
@@ -129,13 +129,13 @@ class TestProductionAuditE2E(unittest.TestCase):
 
     def test_07_rate_limit_headers_on_400_error(self):
         """Verify X-RateLimit-* headers are attached even when returning 400 Bad Request."""
-        resp = self.client.get('/api/startups?limit=invalid_int', environ_base={'REMOTE_ADDR': '10.0.0.99'})
+        resp = self.client.get('/api/companies?limit=invalid_int', environ_base={'REMOTE_ADDR': '10.0.0.99'})
         self.assertEqual(resp.status_code, 400)
         self.assertIn('X-RateLimit-Remaining', resp.headers, "X-RateLimit-Remaining missing on 400 Bad Request")
 
     def test_08_csp_hardening_directives(self):
         """Verify CSP disallows unsafe-inline and includes object-src and base-uri restrictions."""
-        resp = self.client.get('/api/startups')
+        resp = self.client.get('/api/companies')
         csp = resp.headers.get('Content-Security-Policy', '')
         self.assertNotIn("'unsafe-inline'", csp, "CSP should not permit 'unsafe-inline' in production")
         self.assertIn("object-src 'none'", csp, "CSP must restrict object-src")
@@ -163,7 +163,7 @@ class TestProductionAuditE2E(unittest.TestCase):
                 }],
                 "has_pin": True
             }]
-            resp = self.client.get('/api/startups/8888')
+            resp = self.client.get('/api/companies/8888')
             self.assertEqual(resp.status_code, 200)
             data = json.loads(resp.data)
             
@@ -187,7 +187,7 @@ class TestProductionAuditE2E(unittest.TestCase):
                 "verified_email": "",
                 "has_pin": True
             }]
-            resp = self.client.get('/api/startups')
+            resp = self.client.get('/api/companies')
             self.assertEqual(resp.status_code, 200)
             data = json.loads(resp.data)
             self.assertTrue(len(data) > 0)
@@ -206,7 +206,7 @@ class TestProductionAuditE2E(unittest.TestCase):
                 "city": "San Francisco / Remote",
                 "has_pin": False
             }]
-            resp = self.client.get('/api/startups?min_lat=18.9&max_lat=19.3&min_lng=72.7&max_lng=73.0')
+            resp = self.client.get('/api/companies?min_lat=18.9&max_lat=19.3&min_lng=72.7&max_lng=73.0')
             self.assertEqual(resp.status_code, 200)
             data = json.loads(resp.data)
             ids = [s["id"] for s in data]
@@ -214,10 +214,10 @@ class TestProductionAuditE2E(unittest.TestCase):
 
     def test_12_gzip_quality_and_identity_headers(self):
         """Verify q=0 rejection and presence of Vary header on uncompressed responses."""
-        resp_q0 = self.client.get('/api/startups', headers={'Accept-Encoding': 'gzip;q=0'})
+        resp_q0 = self.client.get('/api/companies', headers={'Accept-Encoding': 'gzip;q=0'})
         self.assertNotEqual(resp_q0.headers.get('Content-Encoding'), 'gzip', "Server must not gzip when q=0 is sent!")
         
-        resp_identity = self.client.get('/api/startups', headers={'Accept-Encoding': 'identity'})
+        resp_identity = self.client.get('/api/companies', headers={'Accept-Encoding': 'identity'})
         self.assertIn('Accept-Encoding', resp_identity.headers.get('Vary', ''), "Vary: Accept-Encoding missing on identity response!")
 
     def test_13_cache_control_on_errors_and_rate_limits(self):
@@ -225,18 +225,18 @@ class TestProductionAuditE2E(unittest.TestCase):
         test_ip = '10.0.0.100'
         last_resp = None
         for _ in range(150):
-            last_resp = self.client.get('/api/startups', environ_base={'REMOTE_ADDR': test_ip})
+            last_resp = self.client.get('/api/companies', environ_base={'REMOTE_ADDR': test_ip})
             if last_resp.status_code == 429:
                 break
         self.assertEqual(last_resp.status_code, 429)
         self.assertIn('no-store', last_resp.headers.get('Cache-Control', '').lower(), "HTTP 429 must include Cache-Control: no-store")
 
-        resp_404 = self.client.get('/api/startups/999999')
+        resp_404 = self.client.get('/api/companies/999999')
         self.assertIn('no-store', resp_404.headers.get('Cache-Control', '').lower(), "HTTP 404 must include Cache-Control: no-store")
 
     def test_14_sensitive_and_redundant_attribute_leakage_in_details(self):
         """Verify details endpoint prunes heavy job_openings array and restricts non-required attributes."""
-        resp = self.client.get('/api/startups/1')
+        resp = self.client.get('/api/companies/1')
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.data)
         self.assertNotIn('job_openings', data, "Details endpoint leaked heavy raw job_openings array!")

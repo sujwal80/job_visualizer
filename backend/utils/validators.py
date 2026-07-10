@@ -124,7 +124,7 @@ def _validate_query_params(args):
     Returns:
         tuple: (bool valid, str error_message). If valid is True, error_message is None.
     """
-    allowed_params = {'min_lat', 'max_lat', 'min_lng', 'max_lng', 'limit', 'city', 'skill', 'industry', 'search', 'dept', 'experience', 'exp'}
+    allowed_params = {'min_lat', 'max_lat', 'min_lng', 'max_lng', 'limit', 'city', 'skill', 'industry', 'search', 'dept', 'experience', 'exp', 'has_jobs'}
     
     # Prevent parameter flooding attacks by capping total parameter values across all keys
     total_params = sum(len(args.getlist(k)) for k in args.keys())

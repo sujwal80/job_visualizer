@@ -19,7 +19,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 # Import modular utilities and services
 from backend.utils.validators import REQUIRED_FIELDS, _sanitize_string, _safe_float, _check_has_pin, _sanitize_url, _validate_query_params, _strip_redundant
 from backend.utils.rate_limiter import _rate_limits, _check_rate_limit
-from backend.services.startup_service import load_startups, filter_and_sort_startups, format_startup_summary, format_startup_details
+from backend.services.startup_service import load_startups, filter_and_sort_startups, format_startup_summary, format_startup_details, format_lightweight_summary, get_data_version
 from backend.services.auth_service import (
     generate_oauth_state, validate_oauth_state, get_google_auth_url,
     exchange_code_for_user, issue_jwt_token, verify_jwt_token, revoke_jwt_token
@@ -116,6 +116,19 @@ def add_security_and_optimization_headers(response):
         response.headers.setdefault('X-RateLimit-Limit', str(g.rate_limit_limit))
         response.headers.setdefault('X-RateLimit-Remaining', str(g.rate_limit_remaining))
 
+    # Attach Dataset Version (X-Data-Version) header for startup endpoints
+    if request.path.startswith('/api/company') or request.path.startswith('/api/companies'):
+        try:
+            response.headers['X-Data-Version'] = get_data_version()
+        except Exception:
+            response.headers['X-Data-Version'] = "0"
+        expose_headers = response.headers.get('Access-Control-Expose-Headers', '')
+        if expose_headers:
+            if 'X-Data-Version' not in expose_headers:
+                response.headers['Access-Control-Expose-Headers'] = f"{expose_headers}, X-Data-Version"
+        else:
+            response.headers['Access-Control-Expose-Headers'] = 'X-Data-Version, X-RateLimit-Limit, X-RateLimit-Remaining, Retry-After'
+
     # Attach Cache-Control: no-store on errors to prevent caching proxies from storing transient failure states
     if response.status_code >= 400:
         response.headers['Cache-Control'] = 'no-store'
@@ -155,7 +168,8 @@ def index():
     """Render the main interactive map application interface."""
     return render_template('index.html')
 
-@app.route('/api/startups', methods=['GET'])
+@app.route('/api/company', methods=['GET'])
+@app.route('/api/companies', methods=['GET'])
 def get_startups():
     """
     Retrieve a filtered, sorted list of startup summary objects within a geographic viewport.
@@ -192,13 +206,18 @@ def get_startups():
         search_query = (request.args.get('search') or '').strip().lower()
         dept_query = (request.args.get('dept') or '').strip().lower()
         exp_query = (request.args.get('experience') or request.args.get('exp') or '').strip().lower()
+        has_jobs = str(request.args.get('has_jobs', 'false')).strip().lower() in ('true', '1', 'yes')
         
         filtered = filter_and_sort_startups(
             startups, min_lat, max_lat, min_lng, max_lng, limit,
             city_query=city_query, skill_query=skill_query, industry_query=industry_query,
-            search_query=search_query, dept_query=dept_query, exp_query=exp_query
+            search_query=search_query, dept_query=dept_query, exp_query=exp_query,
+            has_jobs=has_jobs
         )
-        light_list = [format_startup_summary(s) for s in filtered]
+        if has_jobs:
+            light_list = [format_lightweight_summary(s) for s in filtered]
+        else:
+            light_list = [format_startup_summary(s) for s in filtered]
             
         lean_payload = _strip_redundant(light_list)
         resp = make_response(jsonify(lean_payload))
@@ -216,8 +235,10 @@ def _ids_match(id1, id2):
         return True
     return s1.split('.')[0] == s2.split('.')[0]
 
-@app.route('/api/startups/<startup_id>', methods=['GET'])
-@app.route('/api/startups/<int:startup_id>', methods=['GET'])
+@app.route('/api/company/<startup_id>', methods=['GET'])
+@app.route('/api/company/<int:startup_id>', methods=['GET'])
+@app.route('/api/companies/<startup_id>', methods=['GET'])
+@app.route('/api/companies/<int:startup_id>', methods=['GET'])
 def get_startup_details(startup_id):
     """
     Retrieve comprehensive details and structured job openings for a specific startup by ID (numeric or string).
@@ -417,7 +438,8 @@ def manage_user_bookmarks():
         "message": "Protected bookmarks endpoint accessed successfully."
     }), 200
 
-@app.route('/api/startups/export', methods=['GET'])
+@app.route('/api/company/export', methods=['GET'])
+@app.route('/api/companies/export', methods=['GET'])
 @app.route('/api/protected/export', methods=['GET'])
 @login_required
 def export_startups_protected():

@@ -215,7 +215,7 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
     def test_15_protected_endpoint_gating_unauthenticated(self):
         """Verify protected API endpoints return HTTP 401 Unauthenticated when missing session cookie."""
         self.client.delete_cookie('session_token')
-        protected_endpoints = ['/api/user/profile', '/api/user/bookmarks', '/api/startups/export']
+        protected_endpoints = ['/api/user/profile', '/api/user/bookmarks', '/api/company/export']
         
         for ep in protected_endpoints:
             with self.subTest(endpoint=ep):
@@ -230,7 +230,7 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         state = json.loads(init_resp.data)["state"]
         self.client.get(f'/api/auth/callback?code=mock_code_admin&state={state}')
         
-        protected_endpoints = ['/api/user/profile', '/api/user/bookmarks', '/api/startups/export']
+        protected_endpoints = ['/api/user/profile', '/api/user/bookmarks', '/api/company/export']
         for ep in protected_endpoints:
             with self.subTest(endpoint=ep):
                 resp = self.client.get(ep)
@@ -261,7 +261,7 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         for name, tok in test_cases:
             with self.subTest(token_type=name):
                 self.client = app.test_client()
-                self.client.set_cookie('session_token', tok, domain='localhost')
+                self.client.set_cookie('session_token', tok)
                 resp = self.client.get('/api/user/profile')
                 self.assertNotEqual(resp.status_code, 500, f"Server crashed with 500 on {name}")
                 self.assertEqual(resp.status_code, 401, f"Expected 401 Unauthenticated on {name}, got {resp.status_code}")

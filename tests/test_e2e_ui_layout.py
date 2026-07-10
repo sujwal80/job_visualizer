@@ -128,8 +128,8 @@ class TestR1ViewportAndLayoutResilience(unittest.TestCase):
         self.assertIn("300", self.js_content, "Viewport debounce timeout should be 300ms.")
 
     def test_r1_14_backend_viewport_bounding_box_filtering(self):
-        """Programmatically test /api/startups with viewport bounding coordinates (12.9 to 13.0 Lat, 77.5 to 77.6 Lng)."""
-        resp = self.client.get('/api/startups?min_lat=12.9000&max_lat=13.0000&min_lng=77.5000&max_lng=77.6000')
+        """Programmatically test /api/companies with viewport bounding coordinates (12.9 to 13.0 Lat, 77.5 to 77.6 Lng)."""
+        resp = self.client.get('/api/companies?min_lat=12.9000&max_lat=13.0000&min_lng=77.5000&max_lng=77.6000')
         self.assertEqual(resp.status_code, 200, "Backend must return 200 for valid bounding box queries.")
         data = json.loads(resp.data)
         self.assertIsInstance(data, list, "Response payload must be a JSON array.")
@@ -152,7 +152,7 @@ class TestR1ViewportAndLayoutResilience(unittest.TestCase):
                 "city": "Remote",
                 "has_pin": False
             }]
-            resp = self.client.get('/api/startups?min_lat=40.0&max_lat=41.0&min_lng=-74.0&max_lng=-73.0')
+            resp = self.client.get('/api/companies?min_lat=40.0&max_lat=41.0&min_lng=-74.0&max_lng=-73.0')
             self.assertEqual(resp.status_code, 200)
             data = json.loads(resp.data)
             ids = [s["id"] for s in data]
@@ -282,7 +282,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
                 "city": "Bengaluru",
                 "has_pin": False
             }]
-            resp = self.client.get('/api/startups')
+            resp = self.client.get('/api/companies')
             self.assertNotEqual(resp.status_code, 500, "Server crashed with HTTP 500 on missing coordinates!")
             self.assertEqual(resp.status_code, 200)
             data = json.loads(resp.data)
@@ -301,7 +301,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
                 "description": None,
                 "has_pin": True
             }]
-            resp = self.client.get('/api/startups')
+            resp = self.client.get('/api/companies')
             self.assertNotEqual(resp.status_code, 500, "Server crashed with HTTP 500 on description: None!")
             self.assertEqual(resp.status_code, 200)
             data = json.loads(resp.data)
@@ -320,7 +320,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
                 "description": "Building the future with 🌟 and ⚡!",
                 "has_pin": True
             }]
-            resp = self.client.get('/api/startups')
+            resp = self.client.get('/api/companies')
             self.assertEqual(resp.status_code, 200, "Server must return 200 for unicode emoji payloads.")
             data = json.loads(resp.data.decode('utf-8'))
             self.assertIn("🚀", data[0]["name"])
@@ -333,7 +333,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
                 {"id": 5004, "name": "EmptyJobs Corp", "lat": 12.97, "lng": 77.59, "job_openings": [], "has_pin": True},
                 {"id": 5005, "name": "NullJobs Corp", "lat": 12.98, "lng": 77.60, "job_openings": None, "has_pin": True}
             ]
-            resp = self.client.get('/api/startups')
+            resp = self.client.get('/api/companies')
             self.assertNotEqual(resp.status_code, 500, "Server crashed with HTTP 500 on empty/null job arrays!")
             self.assertEqual(resp.status_code, 200)
             data = json.loads(resp.data)
@@ -354,7 +354,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
                 ],
                 "has_pin": True
             }]
-            resp = self.client.get('/api/startups')
+            resp = self.client.get('/api/companies')
             self.assertEqual(resp.status_code, 200)
             data = json.loads(resp.data)
             self.assertIn("-50 LPA", data[0].get("salary", []))
@@ -362,16 +362,16 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
     def test_r2_06_backend_extreme_string_lengths(self):
         """Send query parameters with extreme string lengths (5000 chars) to verify safe rejection or truncation without 500 error."""
         long_str = "A" * 5000
-        resp = self.client.get(f'/api/startups?city={long_str}')
+        resp = self.client.get(f'/api/companies?city={long_str}')
         self.assertNotEqual(resp.status_code, 500, "Server crashed with HTTP 500 on extreme string length!")
         self.assertIn(resp.status_code, [200, 400], f"Expected 400 Bad Request or 200, got {resp.status_code}")
 
     def test_r2_07_backend_sqli_injection_chars(self):
         """Send SQL injection payloads in query parameters and verify HTTP 400 rejection without unhandled exceptions."""
         sqli_urls = [
-            "/api/startups?city=Bengaluru' OR '1'='1",
-            '/api/startups?city=" OR ""="',
-            "/api/startups?industry=AI'; DROP TABLE startups;--"
+            "/api/companies?city=Bengaluru' OR '1'='1",
+            '/api/companies?city=" OR ""="',
+            "/api/companies?industry=AI'; DROP TABLE startups;--"
         ]
         for url in sqli_urls:
             with self.subTest(url=url):
@@ -382,9 +382,9 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
     def test_r2_08_backend_xss_injection_chars(self):
         """Send XSS script payloads in query parameters and verify HTTP 400 rejection without reflection."""
         xss_urls = [
-            '/api/startups?city=<script>alert("XSS")</script>',
-            '/api/startups?skill=<img src=x onerror=alert(1)>',
-            '/api/startups?industry=<svg/onload=alert(1)>'
+            '/api/companies?city=<script>alert("XSS")</script>',
+            '/api/companies?skill=<img src=x onerror=alert(1)>',
+            '/api/companies?industry=<svg/onload=alert(1)>'
         ]
         for url in xss_urls:
             with self.subTest(url=url):
@@ -411,7 +411,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
                 }],
                 "has_pin": True
             }]
-            resp = self.client.get('/api/startups/5009')
+            resp = self.client.get('/api/companies/5009')
             self.assertEqual(resp.status_code, 200)
             data = json.loads(resp.data)
             self.assertFalse(data.get("url", "").lower().startswith("javascript:"), "javascript: scheme not stripped from website!")
@@ -421,10 +421,10 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
     def test_r2_10_backend_malformed_float_bounds(self):
         """Send malformed float strings (abc, nan, inf, 1e999) to verify HTTP 400 Bad Request without ValueError/OverflowError 500 crash."""
         bad_floats = [
-            '/api/startups?min_lat=invalid_float',
-            '/api/startups?max_lat=nan',
-            '/api/startups?min_lng=-inf',
-            '/api/startups?max_lng=1e999'
+            '/api/companies?min_lat=invalid_float',
+            '/api/companies?max_lat=nan',
+            '/api/companies?min_lng=-inf',
+            '/api/companies?max_lng=1e999'
         ]
         for url in bad_floats:
             with self.subTest(url=url):
@@ -435,9 +435,9 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
     def test_r2_11_backend_invalid_limit_param(self):
         """Send negative, zero, non-integer, and out-of-bounds limit values to verify HTTP 400 rejection or safe capping."""
         bad_limits = [
-            '/api/startups?limit=abc',
-            '/api/startups?limit=-50',
-            '/api/startups?limit=9999999'
+            '/api/companies?limit=abc',
+            '/api/companies?limit=-50',
+            '/api/companies?limit=9999999'
         ]
         for url in bad_limits:
             with self.subTest(url=url):
@@ -446,8 +446,8 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
                 self.assertIn(resp.status_code, [200, 400])
 
     def test_r2_12_backend_nonexistent_startup_id(self):
-        """Query /api/startups/999999999 and verify HTTP 404 Not Found is returned with valid JSON error payload."""
-        resp = self.client.get('/api/startups/999999999')
+        """Query /api/companies/999999999 and verify HTTP 404 Not Found is returned with valid JSON error payload."""
+        resp = self.client.get('/api/companies/999999999')
         self.assertEqual(resp.status_code, 404)
         data = json.loads(resp.data)
         self.assertIn("error", data, "404 response must include JSON error message.")
@@ -470,7 +470,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
 
     def test_r2_16_backend_unsupported_query_params(self):
         """Send arbitrary unexpected query parameters and verify API rejects them with HTTP 400 or ignores them safely."""
-        resp = self.client.get('/api/startups?unsupported_param=hacker&admin=true')
+        resp = self.client.get('/api/companies?unsupported_param=hacker&admin=true')
         self.assertNotEqual(resp.status_code, 500, "Server crashed with HTTP 500 on unsupported query parameters!")
         self.assertIn(resp.status_code, [200, 400])
 
@@ -540,7 +540,7 @@ class TestR3RaceConditionsAndLatencyResilience(unittest.TestCase):
         test_ip = '10.200.0.1'
         rate_limited = False
         for _ in range(150):
-            resp = self.client.get('/api/startups', environ_base={'REMOTE_ADDR': test_ip})
+            resp = self.client.get('/api/companies', environ_base={'REMOTE_ADDR': test_ip})
             if resp.status_code == 429:
                 rate_limited = True
                 break
@@ -551,7 +551,7 @@ class TestR3RaceConditionsAndLatencyResilience(unittest.TestCase):
         test_ip = '10.200.0.2'
         last_resp = None
         for _ in range(150):
-            last_resp = self.client.get('/api/startups', environ_base={'REMOTE_ADDR': test_ip})
+            last_resp = self.client.get('/api/companies', environ_base={'REMOTE_ADDR': test_ip})
             if last_resp.status_code == 429:
                 break
         self.assertEqual(last_resp.status_code, 429)
@@ -575,15 +575,15 @@ class TestR3RaceConditionsAndLatencyResilience(unittest.TestCase):
         self.assertIn("Math.cos(angle)", self.js_content, "JS must offset overlapping coordinates radially.")
 
     def test_r3_11_backend_cache_control_public_max_age(self):
-        """Verify GET /api/startups includes Cache-Control: public, max-age=60 to absorb redundant concurrent client requests."""
-        resp = self.client.get('/api/startups')
+        """Verify GET /api/companies includes Cache-Control: public, max-age=60 to absorb redundant concurrent client requests."""
+        resp = self.client.get('/api/companies')
         self.assertEqual(resp.status_code, 200)
         self.assertIn('public, max-age=60', resp.headers.get('Cache-Control', ''),
                       "Backend must specify public cache control to mitigate repetitive client requests.")
 
     def test_r3_12_backend_no_store_on_error_preventing_cache_poisoning(self):
         """Verify error responses include Cache-Control: no-store to prevent caching proxies from poisoning cache with temporary error states."""
-        resp_404 = self.client.get('/api/startups/88888888')
+        resp_404 = self.client.get('/api/companies/88888888')
         self.assertEqual(resp_404.status_code, 404)
         self.assertIn('no-store', resp_404.headers.get('Cache-Control', '').lower(),
                       "Error responses must specify no-store to prevent cache poisoning during temporary failures.")

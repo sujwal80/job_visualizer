@@ -18,7 +18,7 @@ probing complex interactions across the Startup Visualizer application:
 11. Combined search query filtering with unicode/emojis and Cache-Control headers.
 12. Extreme limits (0 vs 5000) combined with Vary: Accept-Encoding headers.
 13. Memory profile cache LRU consistency under simulated session/token reset.
-14. Rate limit shared quota persistence across multiple endpoints (/api/startups and /api/startups/<id>).
+14. Rate limit shared quota persistence across multiple endpoints (/api/companies and /api/companies/<id>).
 15. CORS and CSP security headers on OPTIONS preflight and GET 400 error responses.
 16. Multi-dict duplicate query parameter flooding combined with viewport bounds and Gzip.
 """
@@ -61,7 +61,7 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
         last_resp = None
 
         for _ in range(130):
-            last_resp = self.client.get('/api/startups?min_lat=invalid_float&limit=-10',
+            last_resp = self.client.get('/api/companies?min_lat=invalid_float&limit=-10',
                                         environ_base={'REMOTE_ADDR': test_ip})
             if last_resp.status_code == 429:
                 rate_limited = True
@@ -85,7 +85,7 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
         test_ip = '10.100.0.2'
         last_resp = None
         for _ in range(130):
-            last_resp = self.client.get('/api/startups',
+            last_resp = self.client.get('/api/companies',
                                         headers={'Accept-Encoding': 'gzip'},
                                         environ_base={'REMOTE_ADDR': test_ip})
             if last_resp.status_code == 429:
@@ -102,11 +102,11 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
     def test_combo_03_viewport_filtering_with_gzip_compression(self):
         """
         Combo 3: Viewport Bounding Box + Gzip Compression + Payload Formatting.
-        Queries /api/startups with viewport bounds (12.9 to 13.0 Lat, 77.5 to 77.6 Lng) and Accept-Encoding: gzip.
+        Queries /api/companies with viewport bounds (12.9 to 13.0 Lat, 77.5 to 77.6 Lng) and Accept-Encoding: gzip.
         Verifies geographic filtering works simultaneously with Gzip compression (Content-Encoding: gzip),
         unpinned (has_pin=False) startups are retained, and heavy raw job_openings are stripped from payload.
         """
-        resp = self.client.get('/api/startups?min_lat=12.9000&max_lat=13.0000&min_lng=77.5000&max_lng=77.6000',
+        resp = self.client.get('/api/companies?min_lat=12.9000&max_lat=13.0000&min_lng=77.5000&max_lng=77.6000',
                                headers={'Accept-Encoding': 'gzip'})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.headers.get('Content-Encoding'), 'gzip', "Expected Content-Encoding: gzip on large bounded payload.")
@@ -126,11 +126,11 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
     def test_combo_04_viewport_boundary_coordinates_with_limit_slicing(self):
         """
         Combo 4: Viewport Bounding Box at world extremes + Limit validation & slicing.
-        Queries /api/startups?min_lat=-90.0&max_lat=90.0&min_lng=-180.0&max_lng=180.0&limit=5.
+        Queries /api/companies?min_lat=-90.0&max_lat=90.0&min_lng=-180.0&max_lng=180.0&limit=5.
         Verifies that extreme valid boundary coordinates combine cleanly with limit slicing,
         returning at most 5 startups sorted by job count descending without numeric overflow.
         """
-        resp = self.client.get('/api/startups?min_lat=-90.0&max_lat=90.0&min_lng=-180.0&max_lng=180.0&limit=5')
+        resp = self.client.get('/api/companies?min_lat=-90.0&max_lat=90.0&min_lng=-180.0&max_lng=180.0&limit=5')
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.data)
         self.assertIsInstance(data, list)
@@ -143,12 +143,12 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
     def test_combo_05_metadata_filters_with_viewport_bounds_bug_probe(self):
         """
         Combo 5: Viewport Bounding Box + Query Parameter Validation (city, skill, industry) - BUG PROBE.
-        Queries /api/startups?min_lat=12.0&max_lat=14.0&min_lng=77.0&max_lng=78.0&city=Hyderabad&skill=Python.
+        Queries /api/companies?min_lat=12.0&max_lat=14.0&min_lng=77.0&max_lng=78.0&city=Hyderabad&skill=Python.
         Notice: _validate_query_params explicitly permits 'city', 'skill', and 'industry'.
         We assert that all returned startups in this query actually match the requested city ('Hyderabad').
         If the backend ignores 'city' during filtering in get_startups(), this test will expose the regression/bug!
         """
-        resp = self.client.get('/api/startups?min_lat=10.0&max_lat=20.0&min_lng=70.0&max_lng=80.0&city=Hyderabad')
+        resp = self.client.get('/api/companies?min_lat=10.0&max_lat=20.0&min_lng=70.0&max_lng=80.0&city=Hyderabad')
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.data)
         self.assertIsInstance(data, list)
@@ -162,34 +162,34 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
 
     def test_combo_06_rate_limiting_protects_details_404(self):
         """
-        Combo 6: Rate Limiter + Details Endpoint (/api/startups/<id>) 404 handling.
-        Simulates burst requests against /api/startups/99999999 (non-existent startup ID) from an isolated IP.
+        Combo 6: Rate Limiter + Details Endpoint (/api/companies/<id>) 404 handling.
+        Simulates burst requests against /api/companies/99999999 (non-existent startup ID) from an isolated IP.
         Verifies that after 120 requests, the status transitions from 404 Not Found (with Cache-Control: no-store)
         to 429 Too Many Requests, confirming rate limiting protects details endpoints from automated enumeration.
         """
         test_ip = '10.100.0.3'
-        first_resp = self.client.get('/api/startups/99999999', environ_base={'REMOTE_ADDR': test_ip})
+        first_resp = self.client.get('/api/companies/99999999', environ_base={'REMOTE_ADDR': test_ip})
         self.assertEqual(first_resp.status_code, 404)
         self.assertIn('no-store', first_resp.headers.get('Cache-Control', '').lower(), "404 must include Cache-Control: no-store.")
 
         rate_limited = False
         for _ in range(130):
-            resp = self.client.get('/api/startups/99999999', environ_base={'REMOTE_ADDR': test_ip})
+            resp = self.client.get('/api/companies/99999999', environ_base={'REMOTE_ADDR': test_ip})
             if resp.status_code == 429:
                 rate_limited = True
                 break
 
         self.assertTrue(rate_limited, "Expected HTTP 429 when enumerating non-existent startup IDs rapidly.")
-        print(" [PASS] Combo 06: Rate limiter protects /api/startups/<id> 404 responses from automated scanning.")
+        print(" [PASS] Combo 06: Rate limiter protects /api/companies/<id> 404 responses from automated scanning.")
 
     def test_combo_07_security_headers_on_xss_param_injection(self):
         """
         Combo 7: Security Headers (CSP, nosniff) + Query Parameter Validation (XSS detection) + Gzip.
-        Sends XSS injection payload in query param (/api/startups?city=<script>alert("XSS")</script>) with Accept-Encoding: gzip.
+        Sends XSS injection payload in query param (/api/companies?city=<script>alert("XSS")</script>) with Accept-Encoding: gzip.
         Verifies request is rejected with HTTP 400 Bad Request, Content-Security-Policy and nosniff headers
         are present on the 400 response, and no 500 server crash or script execution occurs.
         """
-        resp = self.client.get('/api/startups?city=<script>alert("XSS")</script>', headers={'Accept-Encoding': 'gzip'})
+        resp = self.client.get('/api/companies?city=<script>alert("XSS")</script>', headers={'Accept-Encoding': 'gzip'})
         self.assertEqual(resp.status_code, 400, f"Expected 400 Bad Request on XSS injection attempt, got {resp.status_code}")
         self.assertIn('Content-Security-Policy', resp.headers, "CSP header missing on HTTP 400 XSS rejection response.")
         self.assertEqual(resp.headers.get('X-Content-Type-Options'), 'nosniff', "nosniff header missing on HTTP 400.")
@@ -199,11 +199,11 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
     def test_combo_08_inverted_viewport_bounding_box(self):
         """
         Combo 8: Viewport Bounding Box logic + Numeric Float validation.
-        Queries /api/startups?min_lat=13.0&max_lat=12.0&min_lng=78.0&max_lng=77.0 where min > max.
+        Queries /api/companies?min_lat=13.0&max_lat=12.0&min_lng=78.0&max_lng=77.0 where min > max.
         Verifies inverted bounding box passes basic float validation in _validate_query_params,
         and in get_startups() filters out all pinned startups without throwing 500 ValueError/IndexError.
         """
-        resp = self.client.get('/api/startups?min_lat=13.0000&max_lat=12.0000&min_lng=78.0000&max_lng=77.0000')
+        resp = self.client.get('/api/companies?min_lat=13.0000&max_lat=12.0000&min_lng=78.0000&max_lng=77.0000')
         self.assertEqual(resp.status_code, 200, "Server must return 200 OK without crashing on inverted bounding coordinates.")
         data = json.loads(resp.data)
         self.assertIsInstance(data, list)
@@ -214,7 +214,7 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
 
     def test_combo_09_details_endpoint_xss_uri_sanitization_with_gzip(self):
         """
-        Combo 9: Details Endpoint (/api/startups/<id>) + URI Sanitization (_sanitize_url) + Gzip Compression.
+        Combo 9: Details Endpoint (/api/companies/<id>) + URI Sanitization (_sanitize_url) + Gzip Compression.
         Mocks a startup record with javascript:alert(1) in website, data:text/html in founder LinkedIn,
         and vbscript: in job URLs, requested with Accept-Encoding: gzip.
         Verifies backend strips all malicious URI schemes to empty string "", prunes job_openings, and Gzips cleanly.
@@ -238,7 +238,7 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
                 }],
                 "has_pin": True
             }]
-            resp = self.client.get('/api/startups/8801', headers={'Accept-Encoding': 'gzip'})
+            resp = self.client.get('/api/companies/8801', headers={'Accept-Encoding': 'gzip'})
             self.assertEqual(resp.status_code, 200)
             
             # Decompress or read data
@@ -278,7 +278,7 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
                 "founders": None,
                 "has_pin": True
             }]
-            resp = self.client.get('/api/startups/8802', environ_base={'REMOTE_ADDR': '10.100.0.4'})
+            resp = self.client.get('/api/companies/8802', environ_base={'REMOTE_ADDR': '10.100.0.4'})
             self.assertEqual(resp.status_code, 200, "Server must return 200 OK without crashing on all-Null attributes.")
             data = json.loads(resp.data)
             self.assertEqual(data.get("name", ""), "", "Null name should be sanitized to empty string.")
@@ -289,11 +289,11 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
     def test_combo_11_search_query_unicode_emojis_with_caching_headers(self):
         """
         Combo 11: Query Parameter Validation + Unicode/Emoji string handling + Cache-Control.
-        Queries /api/startups?city=Bengaluru 🚀&skill=Artificial Intelligence 🤖 with Accept-Encoding: gzip.
+        Queries /api/companies?city=Bengaluru 🚀&skill=Artificial Intelligence 🤖 with Accept-Encoding: gzip.
         Verifies unicode emojis pass query parameter length and character checks without triggering SQLi/XSS false positives,
         returning 200 OK with Cache-Control: public, max-age=60.
         """
-        resp = self.client.get('/api/startups?city=Bengaluru 🚀&skill=Artificial Intelligence 🤖',
+        resp = self.client.get('/api/companies?city=Bengaluru 🚀&skill=Artificial Intelligence 🤖',
                                headers={'Accept-Encoding': 'gzip'})
         self.assertEqual(resp.status_code, 200, "Server must return 200 OK for unicode emoji query params without false positive rejection.")
         self.assertIn('public, max-age=60', resp.headers.get('Cache-Control', ''), "Cache-Control header missing or incorrect.")
@@ -302,16 +302,16 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
     def test_combo_12_extreme_limits_with_vary_encoding(self):
         """
         Combo 12: Query Parameter Validation (limit=0 and limit=5000) + Vary Header + Gzip logic.
-        Queries /api/startups?limit=0 and /api/startups?limit=5000 with Accept-Encoding: identity.
+        Queries /api/companies?limit=0 and /api/companies?limit=5000 with Accept-Encoding: identity.
         Verifies limit=0 returns empty JSON list [] without division-by-zero or indexing errors;
         limit=5000 returns up to 5000 records. Both include Vary: Accept-Encoding.
         """
-        resp_0 = self.client.get('/api/startups?limit=0', headers={'Accept-Encoding': 'identity'})
+        resp_0 = self.client.get('/api/companies?limit=0', headers={'Accept-Encoding': 'identity'})
         self.assertEqual(resp_0.status_code, 200)
         self.assertEqual(json.loads(resp_0.data), [], "limit=0 must return empty JSON array [].")
         self.assertIn('Accept-Encoding', resp_0.headers.get('Vary', ''), "Vary: Accept-Encoding missing on limit=0 response.")
 
-        resp_5000 = self.client.get('/api/startups?limit=5000', headers={'Accept-Encoding': 'identity'})
+        resp_5000 = self.client.get('/api/companies?limit=5000', headers={'Accept-Encoding': 'identity'})
         self.assertEqual(resp_5000.status_code, 200)
         data_5000 = json.loads(resp_5000.data)
         self.assertIsInstance(data_5000, list)
@@ -347,38 +347,38 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
 
     def test_combo_14_rate_limit_shared_quota_across_endpoints(self):
         """
-        Combo 14: Token Bucket Rate Limiter (_rate_limits) + Cross-endpoint routing (/api/startups and /api/startups/<id>).
-        From an isolated client IP (10.150.0.1), makes 60 GET requests to /api/startups followed immediately by
-        60 GET requests to /api/startups/1. Verifies the token bucket rate limiter shares quota by client IP
+        Combo 14: Token Bucket Rate Limiter (_rate_limits) + Cross-endpoint routing (/api/companies and /api/companies/<id>).
+        From an isolated client IP (10.150.0.1), makes 60 GET requests to /api/companies followed immediately by
+        60 GET requests to /api/companies/1. Verifies the token bucket rate limiter shares quota by client IP
         across endpoints, so the 121st request from that IP to either endpoint returns HTTP 429 Too Many Requests.
         """
         test_ip = '10.150.0.1'
         for _ in range(60):
-            resp = self.client.get('/api/startups', environ_base={'REMOTE_ADDR': test_ip})
+            resp = self.client.get('/api/companies', environ_base={'REMOTE_ADDR': test_ip})
             self.assertEqual(resp.status_code, 200)
 
         for _ in range(60):
-            resp = self.client.get('/api/startups/1', environ_base={'REMOTE_ADDR': test_ip})
+            resp = self.client.get('/api/companies/1', environ_base={'REMOTE_ADDR': test_ip})
             # May be 200 or 404, but should not be 429 yet
             self.assertNotEqual(resp.status_code, 429)
 
         # The 121st request across combined endpoints must trigger 429
-        resp_121 = self.client.get('/api/startups', environ_base={'REMOTE_ADDR': test_ip})
+        resp_121 = self.client.get('/api/companies', environ_base={'REMOTE_ADDR': test_ip})
         self.assertEqual(resp_121.status_code, 429, "Expected HTTP 429 on 121st combined request across endpoints.")
         print(" [PASS] Combo 14: Rate limiter enforces shared 120 req/min quota per client IP across multiple endpoints.")
 
     def test_combo_15_cors_and_csp_headers_on_options_and_400_errors(self):
         """
         Combo 15: CORS (Access-Control-Allow-*) + Security Headers (CSP) + HTTP Methods (OPTIONS, GET with malformed params).
-        Sends an HTTP OPTIONS /api/startups preflight request, and an HTTP GET /api/startups?limit=invalid request.
+        Sends an HTTP OPTIONS /api/companies preflight request, and an HTTP GET /api/companies?limit=invalid request.
         Verifies CORS headers (Access-Control-Allow-Origin: *) and strict Content-Security-Policy are present
         on both the OPTIONS preflight response and the 400 Bad Request error response.
         """
-        resp_options = self.client.options('/api/startups')
+        resp_options = self.client.options('/api/companies')
         self.assertIn('Access-Control-Allow-Origin', resp_options.headers, "CORS origin header missing on OPTIONS preflight.")
         self.assertIn('Content-Security-Policy', resp_options.headers, "CSP header missing on OPTIONS preflight.")
 
-        resp_400 = self.client.get('/api/startups?limit=invalid_integer')
+        resp_400 = self.client.get('/api/companies?limit=invalid_integer')
         self.assertEqual(resp_400.status_code, 400)
         self.assertIn('Access-Control-Allow-Origin', resp_400.headers, "CORS origin header missing on HTTP 400 error response.")
         self.assertIn('Content-Security-Policy', resp_400.headers, "CSP header missing on HTTP 400 error response.")
@@ -387,11 +387,11 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
     def test_combo_16_duplicate_param_flooding_with_viewport_bounds(self):
         """
         Combo 16: Multi-dict Duplicate Parameter handling + Viewport Bounding Box + Gzip.
-        Sends duplicate bounding and limit parameters: /api/startups?min_lat=12.9&min_lat=invalid&max_lat=13.0&limit=10&limit=abc
+        Sends duplicate bounding and limit parameters: /api/companies?min_lat=12.9&min_lat=invalid&max_lat=13.0&limit=10&limit=abc
         with Accept-Encoding: gzip. Verifies _validate_query_params checks all items in args.getlist() and cleanly
         rejects the request with HTTP 400 Bad Request when encountering 'invalid' or 'abc' among duplicates without 500 crash.
         """
-        resp = self.client.get('/api/startups?min_lat=12.9000&min_lat=invalid_float&max_lat=13.0000&limit=10&limit=abc',
+        resp = self.client.get('/api/companies?min_lat=12.9000&min_lat=invalid_float&max_lat=13.0000&limit=10&limit=abc',
                                headers={'Accept-Encoding': 'gzip'})
         self.assertEqual(resp.status_code, 400, f"Expected 400 Bad Request on duplicate malformed params, got {resp.status_code}")
         self.assertNotEqual(resp.status_code, 500, "Server crashed with HTTP 500 on duplicate parameter collision!")
@@ -401,12 +401,12 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
     def test_combo_17_viewport_bounds_with_unsupported_metadata_filters(self):
         """
         Combo 17: Viewport Bounding Box + Unsupported Metadata Filters (experience, salary, job_type).
-        Queries /api/startups?min_lat=12.9&max_lat=13.0&experience=3-5 yrs&salary=20 LPA.
+        Queries /api/companies?min_lat=12.9&max_lat=13.0&experience=3-5 yrs&salary=20 LPA.
         Verifies that passing boundary/unsupported metadata filters alongside viewport coordinates
         is cleanly rejected by _validate_query_params with HTTP 400 Bad Request without server error (HTTP 500),
         while attaching rate limit and security headers.
         """
-        resp = self.client.get('/api/startups?min_lat=12.9000&max_lat=13.0000&experience=3-5 yrs&salary=20 LPA',
+        resp = self.client.get('/api/companies?min_lat=12.9000&max_lat=13.0000&experience=3-5 yrs&salary=20 LPA',
                                environ_base={'REMOTE_ADDR': '10.100.0.5'})
         self.assertEqual(resp.status_code, 400, f"Expected 400 Bad Request on unsupported filter params, got {resp.status_code}")
         self.assertNotEqual(resp.status_code, 500, "Server crashed with HTTP 500 on unsupported metadata filters!")

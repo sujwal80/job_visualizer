@@ -169,13 +169,13 @@ class TestFlexibleStartupIDLookupAndFallback(unittest.TestCase):
         from backend.app import app
         client = app.test_client()
         # Test with numeric string and int
-        res_int = client.get("/api/startups/1")
+        res_int = client.get("/api/company/1")
         self.assertEqual(res_int.status_code, 200, "Should resolve numeric ID 1")
         data_int = res_int.get_json()
         self.assertIsNotNone(data_int)
         self.assertNotIn("error", data_int)
 
-        res_str = client.get(f"/api/startups/{data_int['id']}")
+        res_str = client.get(f"/api/company/{data_int['id']}")
         self.assertEqual(res_str.status_code, 200, "Should resolve string/int ID flexibly")
 
     def test_frontend_select_and_open_startup_fallback(self):

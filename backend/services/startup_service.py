@@ -72,7 +72,7 @@ def load_startups():
     except Exception:
         return _cache_data or []
 
-def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit, city_query="", skill_query="", industry_query="", search_query="", dept_query="", exp_query=""):
+def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit, city_query="", skill_query="", industry_query="", search_query="", dept_query="", exp_query="", has_jobs=False):
     """
     Filter and sort startup records by geographic viewport bounding boxes and text criteria.
 
@@ -180,11 +180,16 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
             jobs = s.get("job_openings") or []
             if not any(exp_query in str(j.get("experience") or "").lower() or exp_query in str(j.get("job_type") or "").lower() for j in jobs if isinstance(j, dict)):
                 continue
+        if has_jobs:
+            jobs = s.get("job_openings") or s.get("jobs") or []
+            job_cnt = len(jobs) if len(jobs) > 0 else (s.get("job_count") or 0)
+            if job_cnt == 0:
+                continue
         filtered.append(s)
         
     # Sort startups descending by active job opening count
-    filtered.sort(key=lambda x: len(x.get("job_openings") or []), reverse=True)
-    if limit >= 0:
+    filtered.sort(key=lambda x: len(x.get("job_openings") or x.get("jobs") or []), reverse=True)
+    if not has_jobs and limit >= 0:
         filtered = filtered[:limit]
     return filtered
 
@@ -192,7 +197,7 @@ def format_startup_summary(s):
     """
     Format a lightweight summary payload for a startup, pruning heavy raw job arrays.
 
-    Used by `/api/startups` list endpoints to minimize network payload size and improve DOM rendering speed.
+    Used by `/api/companies` list endpoints to minimize network payload size and improve DOM rendering speed.
 
     Args:
         s (dict): The full startup record dictionary.
@@ -251,7 +256,7 @@ def format_startup_details(s):
     """
     Format a comprehensive detail payload for a specific startup, including structured job listings.
 
-    Used by `/api/startups/<id>` endpoints to populate details sidebars and modal views.
+    Used by `/api/companies/<id>` endpoints to populate details sidebars and modal views.
 
     Args:
         s (dict): The full startup record dictionary.
@@ -315,3 +320,50 @@ def format_startup_details(s):
         s_copy["founders"] = clean_founders
 
     return _strip_redundant(s_copy)
+
+def format_lightweight_summary(s):
+    """
+    Format a lightweight summary payload (9 fields) for a startup when has_jobs=true.
+
+    Used by `/api/companies?has_jobs=true` to minimize network payload size and improve map plotting speed.
+
+    Args:
+        s (dict): The startup record dictionary.
+
+    Returns:
+        dict: A lightweight summary dictionary containing 9 fields:
+              id, name, lat, lng, city, logo_url, industry, job_count, has_pin.
+    """
+    logo_domain = s.get("logo_domain", "")
+    logo_url = f"https://www.google.com/s2/favicons?domain={logo_domain}&sz=128" if logo_domain else ""
+    has_pin_val = s.get("has_pin", True)
+    lat_val = _safe_float(s.get("lat"))
+    lng_val = _safe_float(s.get("lng"))
+    jobs = s.get("job_openings") or s.get("jobs") or []
+    job_count = len(jobs) if len(jobs) > 0 else (s.get("job_count") or 0)
+    return {
+        "id": s.get("id"),
+        "name": _sanitize_string(s.get("name")),
+        "lat": lat_val if (has_pin_val and lat_val is not None) else DEFAULT_MAP_CENTER_LAT,
+        "lng": lng_val if (has_pin_val and lng_val is not None) else DEFAULT_MAP_CENTER_LNG,
+        "city": _sanitize_string(s.get("city")),
+        "logo_url": logo_url,
+        "industry": _sanitize_string(s.get("industry")),
+        "job_count": job_count,
+        "has_pin": has_pin_val
+    }
+
+def get_data_version():
+    """
+    Retrieve the dataset version derived from the disk file modification timestamp of startups.json.
+
+    Returns:
+        str: String representation of int(mtime) of DATA_FILE, or "0" if file missing or error occurs.
+    """
+    try:
+        if os.path.exists(DATA_FILE):
+            return str(int(os.path.getmtime(DATA_FILE)))
+    except Exception:
+        pass
+    return "0"
+

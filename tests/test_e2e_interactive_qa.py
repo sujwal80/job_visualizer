@@ -47,7 +47,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
 
         # First check if a backend server instance is already running on 5001
         try:
-            with urllib.request.urlopen(f"{cls.BASE_URL}/api/startups?limit=1", timeout=1) as response:
+            with urllib.request.urlopen(f"{cls.BASE_URL}/api/companies?limit=1", timeout=1) as response:
                 if response.status == 200:
                     cls.server_ready = True
         except Exception:
@@ -65,7 +65,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
             # Wait for server to become ready
             for _ in range(30):
                 try:
-                    with urllib.request.urlopen(f"{cls.BASE_URL}/api/startups?limit=1", timeout=1) as response:
+                    with urllib.request.urlopen(f"{cls.BASE_URL}/api/companies?limit=1", timeout=1) as response:
                         if response.status == 200:
                             cls.server_ready = True
                             break

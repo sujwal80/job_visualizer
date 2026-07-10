@@ -22,6 +22,20 @@ export async function safeFetch(url, options = {}) {
             showToast('Server error encountered. Retaining existing map data.', 'error');
             throw new Error(`HTTP ${response.status} Server Error`);
         }
+        if (typeof url === 'string' && (url.includes('/api/company') || url.includes('/api/companies'))) {
+            const dataVersion = response.headers && typeof response.headers.get === 'function' ? response.headers.get('X-Data-Version') : null;
+            if (dataVersion !== null && dataVersion !== undefined && dataVersion !== '') {
+                if (state.currentDataVersion !== null && state.currentDataVersion !== undefined && state.currentDataVersion !== dataVersion) {
+                    if (state.queryCache && typeof state.queryCache.clear === 'function') {
+                        state.queryCache.clear();
+                    }
+                    if (state.profileCache && typeof state.profileCache.clear === 'function') {
+                        state.profileCache.clear();
+                    }
+                }
+                state.currentDataVersion = dataVersion;
+            }
+        }
         return response.json();
     } catch (err) {
         if (err.name === 'AbortError') throw err;

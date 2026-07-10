@@ -33,7 +33,10 @@ def main():
         ("6. Production Scalability & Bounded Memory Suite", os.path.join(tests_dir, "test_scalability_bounds.py")),
         ("7. Google OAuth & Session Security Verification", os.path.join(tests_dir, "test_oauth_security.py")),
         ("8. E2E Interactive QA (Playwright Chromium)", os.path.join(tests_dir, "test_e2e_interactive_qa.py")),
-        ("9. Asynchronous Crawler Queue & Atomic Locking Verification", os.path.join(tests_dir, "test_async_crawler_queue.py"))
+        ("9. Asynchronous Crawler Queue & Atomic Locking Verification", os.path.join(tests_dir, "test_async_crawler_queue.py")),
+        ("10. Client-Side Caching Milestone 2 Backend Verification", os.path.join(tests_dir, "test_backend_m2.py")),
+        ("11. Client-Side Caching Milestone 3 Frontend Verification", os.path.join(tests_dir, "test_frontend_m3_caching.py")),
+        ("12. Client-Side Caching Milestone 4 Master Verification Suite", os.path.join(tests_dir, "test_client_side_api_caching.py"))
     ]
     
     print("\n⚡ WORLDTECH MAP // FULL-STACK MASTER TEST RUNNER ⚡")
@@ -53,7 +56,7 @@ def main():
             
     print(f"\n======================================================================")
     if all_passed:
-        print("🏆 [SUCCESS] All 9 automated verification suites (145+ checks) PASSED 100% CLEANLY!")
+        print(f"🏆 [SUCCESS] All {len(suites)} automated verification suites PASSED 100% CLEANLY!")
         print("======================================================================\n")
         sys.exit(0)
     else:

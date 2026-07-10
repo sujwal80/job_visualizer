@@ -73,36 +73,10 @@ if (isHub || !state.searchedCity) {
         });
     });
 } else {
-    const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(state.searchedCity)}&format=json&limit=1`;
-    fetch(geoUrl, {
-        headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'WorldTechMap-JobVisualizer/1.0 (sujwal80@gmail.com)'
-        }
-    })
-    .then(res => {
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-        return res.json();
-    })
-    .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-            const lat = parseFloat(data[0].lat);
-            const lon = parseFloat(data[0].lon);
-            if (!isNaN(lat) && !isNaN(lon)) {
-                state.defaultLocation = [lon, lat];
-                state.defaultZoom = 11;
-                lockProgrammaticMove(2500);
-                map.flyTo({
-                    center: state.defaultLocation,
-                    zoom: state.defaultZoom,
-                    speed: 3.0,
-                    essential: true
-                });
-            }
-        }
-    })
-    .catch(err => {
-        console.warn('[Geocoder] Failed to geocode custom city query:', err);
+    const cachedCoords = state.geocodeCache.get(state.searchedCity);
+    if (cachedCoords && Array.isArray(cachedCoords) && cachedCoords.length === 2) {
+        state.defaultLocation = cachedCoords;
+        state.defaultZoom = 11;
         lockProgrammaticMove(2500);
         map.flyTo({
             center: state.defaultLocation,
@@ -110,16 +84,74 @@ if (isHub || !state.searchedCity) {
             speed: 3.0,
             essential: true
         });
-    });
+    } else {
+        const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(state.searchedCity)}&format=json&limit=1`;
+        fetch(geoUrl, {
+            headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'WorldTechMap-JobVisualizer/1.0 (sujwal80@gmail.com)'
+            }
+        })
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+            return res.json();
+        })
+        .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                if (!isNaN(lat) && !isNaN(lon)) {
+                    state.defaultLocation = [lon, lat];
+                    state.defaultZoom = 11;
+                    state.geocodeCache.set(state.searchedCity, [lon, lat]);
+                    lockProgrammaticMove(2500);
+                    map.flyTo({
+                        center: state.defaultLocation,
+                        zoom: state.defaultZoom,
+                        speed: 3.0,
+                        essential: true
+                    });
+                }
+            }
+        })
+        .catch(err => {
+            console.warn('[Geocoder] Failed to geocode custom city query:', err);
+            lockProgrammaticMove(2500);
+            map.flyTo({
+                center: state.defaultLocation,
+                zoom: state.defaultZoom,
+                speed: 3.0,
+                essential: true
+            });
+        });
+    }
+}
+
+function _processFilteredStartupsResult(startups, preventScroll = false) {
+    if (!Array.isArray(startups)) return;
+    state.startupsData = startups;
+    applyFiltering();
+    updateMarkersDiff(state.startupsData);
+    updateMarkersVisualState();
+
+    if (state.currentSelectedId !== null && detailsDrawer.classList.contains('active')) {
+        const cached = state.profileCache.get(state.currentSelectedId);
+        if (cached) {
+            renderDrawerDetails(cached);
+        } else {
+            const startup = state.startupsData.find(s => s.id === state.currentSelectedId);
+            if (startup) {
+                renderDrawerDetails(startup);
+            }
+        }
+        if (!preventScroll) {
+            scrollToCard(state.currentSelectedId);
+        }
+    }
+    handleHashRouting();
 }
 
 function fetchFilteredStartups(preventScroll = false) {
-    if (state.activeFetchController) {
-        state.activeFetchController.abort();
-    }
-    state.activeFetchController = new AbortController();
-    const signal = state.activeFetchController.signal;
-
     const queryParams = new URLSearchParams();
     if (state.searchedCity) {
         queryParams.set('city', state.searchedCity);
@@ -130,10 +162,13 @@ function fetchFilteredStartups(preventScroll = false) {
         queryParams.set('search', searchText);
     }
 
-
-
     if (currentSelectedIndustry) {
         queryParams.set('industry', currentSelectedIndustry);
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('has_jobs') === 'true' || urlParams.get('has_jobs') === '1') {
+        queryParams.set('has_jobs', 'true');
     }
 
     try {
@@ -166,35 +201,43 @@ function fetchFilteredStartups(preventScroll = false) {
         }
     } catch (e) {}
 
-    queryParams.set('limit', '500');
+    queryParams.set('has_jobs', 'true');
 
-    const url = `/api/startups?${queryParams.toString()}`;
-    return safeFetch(url, { signal })
+    const url = `/api/companies?${queryParams.toString()}`;
+
+    // 1. Check QueryCache (0 network calls)
+    if (state.queryCache.has(url)) {
+        const cachedStartups = state.queryCache.get(url);
+        _processFilteredStartupsResult(cachedStartups, preventScroll);
+        return Promise.resolve(cachedStartups);
+    }
+
+    // 2. Check Request Coalescing (inFlightPromises)
+    if (state.inFlightPromises.has(url)) {
+        const existingPromise = state.inFlightPromises.get(url);
+        existingPromise.then(startups => {
+            _processFilteredStartupsResult(startups, preventScroll);
+        }).catch(() => {});
+        return existingPromise;
+    }
+
+    if (state.activeFetchController) {
+        state.activeFetchController.abort();
+    }
+    state.activeFetchController = new AbortController();
+    const signal = state.activeFetchController.signal;
+
+    // 3. Dispatch fetch, store in inFlightPromises, populate cache
+    const promise = safeFetch(url, { signal })
         .then(startups => {
-            if (signal.aborted) return;
-            if (!Array.isArray(startups)) return;
+            if (signal.aborted) return startups;
+            if (!Array.isArray(startups)) return startups;
 
-            state.startupsData = startups;
-            applyFiltering();
-            
-            updateMarkersDiff(state.startupsData);
-            updateMarkersVisualState();
+            const ttl = startups.length === 0 ? 60000 : 120000;
+            state.queryCache.set(url, startups, ttl);
 
-            if (state.currentSelectedId !== null && detailsDrawer.classList.contains('active')) {
-                const cached = state.profileCache.get(state.currentSelectedId);
-                if (cached) {
-                    renderDrawerDetails(cached);
-                } else {
-                    const startup = state.startupsData.find(s => s.id === state.currentSelectedId);
-                    if (startup) {
-                        renderDrawerDetails(startup);
-                    }
-                }
-                if (!preventScroll) {
-                    scrollToCard(state.currentSelectedId);
-                }
-            }
-            handleHashRouting();
+            _processFilteredStartupsResult(startups, preventScroll);
+            return startups;
         })
         .catch(err => {
             if (err.name !== 'AbortError') {
@@ -204,7 +247,14 @@ function fetchFilteredStartups(preventScroll = false) {
                     );
                 }
             }
+            throw err;
+        })
+        .finally(() => {
+            state.inFlightPromises.delete(url);
         });
+
+    state.inFlightPromises.set(url, promise);
+    return promise;
 }
 
 function fetchAndRender() {
@@ -500,5 +550,6 @@ window.WorldTechApp = {
     getJobSourceButtonStyle,
     lockProgrammaticMove,
     getTempRemoteMarker: () => state.tempRemoteMarker,
-    resetMapView
+    resetMapView,
+    state
 };
