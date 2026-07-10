@@ -3,6 +3,18 @@ import { createElement, getDomain, showToast } from './utils.js';
 import { safeFetch } from './api.js';
 import { map, updateMarkersVisualState, createLogoContent } from './map_manager.js';
 
+export function getSafeUrl(url) {
+    if (!url || typeof url !== 'string') return null;
+    const trimmed = url.trim();
+    if (/^https?:\/\//i.test(trimmed)) {
+        return trimmed;
+    }
+    if (/^[a-z0-9.+-]+:/i.test(trimmed)) {
+        return null;
+    }
+    return 'https://' + trimmed;
+}
+
 // Global filters reference (resolved lazily)
 
 
@@ -197,14 +209,17 @@ export function renderDrawerDetails(startup) {
         createElement('h2', { className: 'drawer-company-name', textContent: String(startup.name || 'Unnamed Startup') })
     ];
     if (startup.website) {
-        const siteLink = createElement('a', {
-            href: startup.website,
-            target: '_blank',
-            rel: 'noopener noreferrer',
-            className: 'drawer-website-btn',
-            textContent: 'Website ↗'
-        });
-        titleRowChildren.push(siteLink);
+        const safeWebsite = getSafeUrl(startup.website);
+        if (safeWebsite) {
+            const siteLink = createElement('a', {
+                href: safeWebsite,
+                target: '_blank',
+                rel: 'noopener noreferrer',
+                className: 'drawer-website-btn',
+                textContent: 'Website ↗'
+            });
+            titleRowChildren.push(siteLink);
+        }
     }
     const titleRow = createElement('div', { className: 'drawer-title-row' }, titleRowChildren);
 
@@ -262,15 +277,18 @@ export function renderDrawerDetails(startup) {
                 createElement('span', { className: 'founder-role', textContent: f.role || 'Founder / Leadership' })
             ];
             if (f.linkedin) {
-                fCardChildren.push(
-                    createElement('a', {
-                        href: f.linkedin,
-                        target: '_blank',
-                        rel: 'noopener noreferrer',
-                        className: 'founder-link',
-                        textContent: 'LinkedIn Profile &rarr;'
-                    })
-                );
+                const safeLinkedin = getSafeUrl(f.linkedin);
+                if (safeLinkedin) {
+                    fCardChildren.push(
+                        createElement('a', {
+                            href: safeLinkedin,
+                            target: '_blank',
+                            rel: 'noopener noreferrer',
+                            className: 'founder-link',
+                            textContent: 'LinkedIn Profile &rarr;'
+                        })
+                    );
+                }
             }
             foundersContainer.appendChild(createElement('div', { className: 'founder-card' }, fCardChildren));
         });
@@ -347,8 +365,9 @@ export function renderDrawerDetails(startup) {
             }
 
             const styleInfo = getJobSourceButtonStyle(j.source);
-            const applyBtn = j.url ? createElement('a', {
-                href: j.url,
+            const safeJobUrl = getSafeUrl(j.url);
+            const applyBtn = safeJobUrl ? createElement('a', {
+                href: safeJobUrl,
                 target: '_blank',
                 rel: 'noopener noreferrer',
                 className: styleInfo.btnClass
@@ -429,12 +448,24 @@ export function selectAndOpenStartup(id) {
                 }
                 state.profileCache.set(id, fullStartup);
                 _processOpenStartup(fullStartup);
+            } else {
+                const fallbackStartup = state.startupsData.find(s => String(s.id) === String(id));
+                if (fallbackStartup) {
+                    _processOpenStartup(fallbackStartup);
+                } else {
+                    showToast('Could not load company profile. Please try again.', 'error');
+                }
             }
         })
         .catch(err => {
             state.inFlightRequests.delete(id);
             if (err.name === 'AbortError') return;
-            showToast('Could not load company profile. Please try again.', 'error');
+            const fallbackStartup = state.startupsData.find(s => String(s.id) === String(id));
+            if (fallbackStartup) {
+                _processOpenStartup(fallbackStartup);
+            } else {
+                showToast('Could not load company profile. Please try again.', 'error');
+            }
         });
 }
 

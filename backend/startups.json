@@ -4512,9 +4512,9 @@
   {
     "id": 25,
     "name": "PwC Acceleration Center India",
-    "lat": 33.2627128,
-    "lng": -7.9639028,
-    "city": "Primary Level - 6, Bengaluru (Remote Office)",
+    "lat": 12.9497,
+    "lng": 77.6406,
+    "city": "Level 6, Embassy Golf-Links Business Park, Domlur, Bengaluru",
     "industry": "Artificial Intelligence",
     "description": "PwC Acceleration Center India | 574,455 followers on LinkedIn. PricewaterhouseCoopers Service Delivery Center, Kolkata (PwC SDC, Kolkata) and PricewaterhouseCoopers Service Delivery Center, Bangalore (PwC SDC, Bangalore) are now PwC Acceleration Centers in India.\n\nThe Acceleration Centers in India enable PwC territories across the world in growth and operational excellence by providing high quality services. We currently have offices in Kolkata, Hyderabad, Mumbai and Bangalore.",
     "website": "https://jobs-ta.pwc.com/global/en/ACs-in-India-Career-Site",
@@ -4775,8 +4775,8 @@
         "url": "https://in.linkedin.com/jobs/view/workday-payroll-consultant-at-pwc-acceleration-center-india-4417898221?position=10&pageNum=0&refId=HhNgztDINQJwDLDOTIuxhA%3D%3D&trackingId=%2Fovm0GwLI5HQb3oIsYVNjA%3D%3D"
       }
     ],
-    "is_remote_office": true,
-    "remote_office_distance_km": 8814.19,
+    "is_remote_office": false,
+    "remote_office_distance_km": 5.5,
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true
@@ -17231,9 +17231,9 @@
   {
     "id": 88,
     "name": "Wisemonk",
-    "lat": 45.0857249,
-    "lng": 3.8338261,
-    "city": "Primary 43, Bengaluru (Remote Office)",
+    "lat": 12.9116,
+    "lng": 77.6413,
+    "city": "43, HSR Layout Sector 2, Bengaluru",
     "industry": "Fintech",
     "description": "Wisemonk | 294,723 followers on LinkedIn. Simplifying global companies&#39; talent operations in India by offering payments, compliance &amp; device procurement solutions | Wisemonk is the partner global companies trust to hire, pay, and manage talent in India. Our mission is to make India the easiest country in the world to build a team in, by combining one platform for EOR, Contractor of Record, payroll, freelancer payments, talent acquisition, and GCC setup with a Bengaluru-based team that owns compliance end to end and absorbs the regulatory risk our customers would otherwise carry.\n\nSo far, Wisemonk has served 300+ companies across the US, UK, Europe, and Australia, and employed over 2,000 people across India.",
     "website": "https://www.wisemonk.io",
@@ -17403,8 +17403,8 @@
         "posted_date": "3 days ago"
       }
     ],
-    "is_remote_office": true,
-    "remote_office_distance_km": 7720.16,
+    "is_remote_office": false,
+    "remote_office_distance_km": 8.2,
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true
@@ -18666,9 +18666,9 @@
   {
     "id": 96,
     "name": "Sprinto",
-    "lat": 29.1243403,
-    "lng": 118.4057259,
-    "city": "175 & 176, 4th Floor, 91 Springboard Bengaluru, IN (Remote Office)",
+    "lat": 12.8953,
+    "lng": 77.598,
+    "city": "175 & 176, 4th Floor, 91springboard, Dollars Colony, JP Nagar 4th Phase, Bannerghatta Road, Bengaluru",
     "industry": "Artificial Intelligence",
     "description": "Sprinto | 407,698 followers on LinkedIn. Making trust accessible, frictionless and fast for every business \ud83d\ude80\n\nRated 4.8 \ud83c\udf1f on G2 | Sprinto is world&#39;s first Autonomous Trust Platform, detecting change across your posture, determining what&#39;s at risk, and acting across compliance, vendor risk, AI governance, and more, so your organization stays trustworthy without the operational chaos.\n\nWe are trusted by 3,000+ companies across 75 countries, including Emergent, CodeRabbit, Anaconda, and Whatfix. The platform supports 200+ global standards, including SOC 2, ISO 27001, GDPR, HIPAA, PCI-DSS, and ISO 42001, for AI governance across 300+ integrations.",
     "website": "https://www.sprinto.com",
@@ -18825,8 +18825,8 @@
         "posted_date": "3 weeks ago"
       }
     ],
-    "is_remote_office": true,
-    "remote_office_distance_km": 4570.22,
+    "is_remote_office": false,
+    "remote_office_distance_km": 8.8,
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true
@@ -29849,9 +29849,9 @@
   {
     "id": 171,
     "name": "Jubilant Biosys Limited",
-    "lat": 46.441568,
-    "lng": 15.8861078,
-    "city": "96, Bengaluru (Remote Office)",
+    "lat": 13.0232,
+    "lng": 77.5528,
+    "city": "96, Industrial Suburb, 2nd Stage, Yeshwanthpur, Bengaluru",
     "industry": "HealthTech",
     "description": "Jubilant Biosys Limited | 223,114 followers on LinkedIn. Your CRDMO partner in science | Jubilant Biosys is an integrated Contract Research, Development and Manufacturing Organization (CRDMO) providing drug discovery, development, and GMP manufacturing services to global pharmaceutical and biotech companies. \n\nBacked by 20+ years of experience, 1,200+ scientists, and operations across India and Europe, we support small molecule programs from discovery through commercial manufacturing, alongside discovery services for large molecules.\n\nCombining deep scientific expertise, advanced technologies, and a strong commitment to quality and sustainability, we help advance complex and time-sensitive programs with speed, precision, and reliability.",
     "website": "http://www.jubilantbiosys.com",
@@ -30047,8 +30047,8 @@
         "posted_date": "Just now"
       }
     ],
-    "is_remote_office": true,
-    "remote_office_distance_km": 6811.1,
+    "is_remote_office": false,
+    "remote_office_distance_km": 7.3,
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true

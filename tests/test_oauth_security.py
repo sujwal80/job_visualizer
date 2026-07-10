@@ -260,8 +260,8 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         
         for name, tok in test_cases:
             with self.subTest(token_type=name):
-                self.client.delete_cookie('session_token')
-                self.client.set_cookie('session_token', tok)
+                self.client = app.test_client()
+                self.client.set_cookie('session_token', tok, domain='localhost')
                 resp = self.client.get('/api/user/profile')
                 self.assertNotEqual(resp.status_code, 500, f"Server crashed with 500 on {name}")
                 self.assertEqual(resp.status_code, 401, f"Expected 401 Unauthenticated on {name}, got {resp.status_code}")

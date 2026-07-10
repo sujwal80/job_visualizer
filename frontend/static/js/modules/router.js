@@ -1,5 +1,8 @@
 import { state, lockProgrammaticMove } from './state.js';
-import { map, updateMarkersVisualState } from './map_manager.js';
+import {
+    map,
+    updateMarkersVisualState
+} from './map_manager.js';
 import { selectAndOpenStartup, showDirectoryLoading } from './ui_manager.js';
 
 export function handleHashRouting() {
@@ -42,7 +45,7 @@ export function handleHashRouting() {
 }
 
 export function updateSearchCity(cityTitle) {
-    const lowerCity = cityTitle.toLowerCase();
+    const lowerCity = (cityTitle || '').trim().toLowerCase();
 
     // Update active title and navbar input value
     const titleEl = document.getElementById('activeMapTitle');
@@ -96,7 +99,8 @@ export function updateSearchCity(cityTitle) {
                 speed: 3.0,
                 essential: true
             });
-        } else {
+        }
+        if (window.WorldTechApp && typeof window.WorldTechApp.fetchFilteredStartups === 'function') {
             window.WorldTechApp.fetchFilteredStartups();
         }
     };
@@ -121,8 +125,10 @@ export function updateSearchCity(cityTitle) {
                 const lon = parseFloat(data[0].lon);
                 if (!isNaN(lat) && !isNaN(lon)) {
                     handleFlyTo([lon, lat], 11);
+                    return;
                 }
             }
+            handleFlyTo(newLocation, newZoom);
         })
         .catch(err => {
             console.warn('[Geocoder] Failed to geocode custom city query:', err);
@@ -130,3 +136,4 @@ export function updateSearchCity(cityTitle) {
         });
     }
 }
+

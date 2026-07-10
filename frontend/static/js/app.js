@@ -7,8 +7,7 @@ import {
     initializeMarkers,
     updateMarkersDiff,
     updateMarkersVisualState,
-    industryColors,
-    defaultColor
+    industryColors
 } from './modules/map_manager.js';
 import {
     updateDashboardStats,
@@ -359,16 +358,18 @@ if (closeDrawerBtn) {
     });
 }
 
-if (resetMapBtn) {
-    resetMapBtn.addEventListener('click', () => {
-        lockProgrammaticMove(2500);
-        map.flyTo({
-            center: state.defaultLocation,
-            zoom: state.defaultZoom,
-            speed: 3.0,
-            essential: true
-        });
+function resetMapView() {
+    lockProgrammaticMove(2500);
+    map.flyTo({
+        center: state.defaultLocation,
+        zoom: state.defaultZoom,
+        speed: 3.0,
+        essential: true
     });
+}
+
+if (resetMapBtn) {
+    resetMapBtn.addEventListener('click', resetMapView);
 }
 
 if (mobileToggleBtn) {
@@ -460,6 +461,7 @@ handleHashRouting();
 
 // Expose interface to window for E2E tests and index.html compatibility
 window.updateSearchCity = updateSearchCity;
+window.resetMapView = resetMapView;
 
 window.WorldTechApp = {
     createElement,
@@ -497,5 +499,6 @@ window.WorldTechApp = {
     fetchFilteredStartups,
     getJobSourceButtonStyle,
     lockProgrammaticMove,
-    getTempRemoteMarker: () => state.tempRemoteMarker
+    getTempRemoteMarker: () => state.tempRemoteMarker,
+    resetMapView
 };

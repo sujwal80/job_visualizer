@@ -607,6 +607,63 @@ class TestR3RaceConditionsAndLatencyResilience(unittest.TestCase):
         self.assertIn("applyFiltering()", self.js_content, "fetchFilteredStartups must call applyFiltering() upon receiving data.")
 
 
+
+
+class TestM1UIUXModernizationAndSecurityResilience(unittest.TestCase):
+    """
+    Milestone 1: UI/UX Modernization & Frontend Security Hardening Verification (R1-R4)
+    Verifies OKLCH color tokens, WCAG 2.2 AA contrast, focus-visible rings,
+    tactile active press states, line-height/padding descender safety,
+    prefers-reduced-motion overrides, and getSafeUrl HTTP/HTTPS scheme validation.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        cls.css_path = os.path.join(cls.workspace_root, 'frontend', 'static', 'css', 'style.css')
+        cls.js_path = os.path.join(cls.workspace_root, 'frontend', 'static', 'js', 'modules', 'ui_manager.js')
+
+        with open(cls.css_path, 'r', encoding='utf-8') as f:
+            cls.css_content = f.read()
+        with open(cls.js_path, 'r', encoding='utf-8') as f:
+            cls.js_content = f.read()
+
+    def test_m1_r1_oklch_root_tokens_and_wcag_contrast(self):
+        """Verify :root defines OKLCH tokens and --text-muted uses high-contrast lightness ensuring >= 4.5:1 against white."""
+        self.assertIn('oklch(', self.css_content, "style.css must use oklch() color definitions.")
+        self.assertIn('--surface-main:', self.css_content, "CSS :root missing --surface-main token.")
+        self.assertIn('--text-primary:', self.css_content, "CSS :root missing --text-primary token.")
+        self.assertIn('--text-muted:', self.css_content, "CSS :root missing --text-muted token.")
+        # Ensure --text-muted lightness is <= 0.55 for WCAG AA compliance
+        self.assertIn('oklch(0.52 0.03 256)', self.css_content, "--text-muted must use oklch(0.52 0.03 256) for >= 4.5:1 contrast.")
+
+    def test_m1_r2_interactive_focus_visible_and_active_press(self):
+        """Verify .tab-btn, .directory-item, and .map-overlay-btn define :focus-visible outline rings and :active press scaling."""
+        components = ['.tab-btn', '.directory-item', '.map-overlay-btn']
+        for comp in components:
+            self.assertIn(f"{comp}:focus-visible", self.css_content, f"Missing :focus-visible outline for {comp}")
+            self.assertIn(f"{comp}:active", self.css_content, f"Missing :active press transform for {comp}")
+        self.assertIn('outline: 2px solid', self.css_content, "Must specify 2px solid outline ring for focus-visible.")
+        self.assertIn('outline-offset: 2px', self.css_content, "Must specify 2px outline-offset.")
+        self.assertIn('transform: scale(0.95)', self.css_content, "Small interactive buttons must scale to 0.95 on press.")
+        self.assertIn('transform: scale(0.985)', self.css_content, "Card items must scale to 0.985 on press.")
+
+    def test_m1_r3_timing_line_height_and_reduced_motion(self):
+        """Verify 150ms/90ms standardized transitions, 1.5 line-height on pills/badges, and prefers-reduced-motion media query."""
+        self.assertIn('line-height: 1.5;', self.css_content, "Pills and badges must specify line-height: 1.5 to prevent descender clipping.")
+        self.assertIn('padding: 4px 8px;', self.css_content, "Pills and badges must use >= 4px vertical padding.")
+        self.assertIn('@media (prefers-reduced-motion: reduce)', self.css_content, "CSS must define prefers-reduced-motion media query.")
+        self.assertIn('animation-duration: 0.01ms !important;', self.css_content, "Reduced motion must override animation duration.")
+
+    def test_m1_r4_js_get_safe_url_scheme_validation(self):
+        """Verify ui_manager.js defines getSafeUrl helper and applies it to startup.website, founder links, and job URLs."""
+        self.assertIn('function getSafeUrl', self.js_content, "ui_manager.js must define getSafeUrl helper.")
+        self.assertIn('/^https?:\\/\\//i.test', self.js_content, "getSafeUrl must validate http/https schemes.")
+        self.assertIn('getSafeUrl(startup.website)', self.js_content, "Must sanitize startup.website with getSafeUrl.")
+        self.assertIn('getSafeUrl(f.linkedin)', self.js_content, "Must sanitize founder linkedin URL with getSafeUrl.")
+        self.assertIn('getSafeUrl(j.url)', self.js_content, "Must sanitize job opening URL with getSafeUrl.")
+
+
 if __name__ == '__main__':
     # Run test suite with verbose output
     unittest.main(verbosity=2)

@@ -162,5 +162,29 @@ class TestScraperBaseIntegratedValidation(unittest.TestCase):
         self.assertIn("AWS", res[0]["skills"])
 
 
+class TestFlexibleStartupIDLookupAndFallback(unittest.TestCase):
+    """Verifies flexible ID endpoint resolution (int/str) and frontend profile fallback."""
+
+    def test_backend_startup_details_flexible_id(self):
+        from backend.app import app
+        client = app.test_client()
+        # Test with numeric string and int
+        res_int = client.get("/api/startups/1")
+        self.assertEqual(res_int.status_code, 200, "Should resolve numeric ID 1")
+        data_int = res_int.get_json()
+        self.assertIsNotNone(data_int)
+        self.assertNotIn("error", data_int)
+
+        res_str = client.get(f"/api/startups/{data_int['id']}")
+        self.assertEqual(res_str.status_code, 200, "Should resolve string/int ID flexibly")
+
+    def test_frontend_select_and_open_startup_fallback(self):
+        js_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "static", "js", "modules", "ui_manager.js"))
+        with open(js_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        self.assertIn("const fallbackStartup = state.startupsData.find(s => String(s.id) === String(id));", content)
+        self.assertIn("_processOpenStartup(fallbackStartup);", content)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

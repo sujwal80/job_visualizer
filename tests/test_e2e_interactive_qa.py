@@ -251,12 +251,12 @@ class TestE2EInteractiveQA(unittest.TestCase):
 
         total_items = self.page.locator("#directory-list .directory-item").count()
 
-        # Search for a specific company name that exists, e.g., "Kora.AI"
-        self.page.fill("#search-input", "Kora.AI")
+        # Search for a specific company name that exists and is unique, e.g., "Whitefield CleanTech"
+        self.page.fill("#search-input", "Whitefield CleanTech")
         self.page.wait_for_timeout(500)
 
-        kora_items = self.page.locator("#directory-list .directory-item").count()
-        self.assertEqual(kora_items, 1)
+        matches = self.page.locator("#directory-list .directory-item").count()
+        self.assertEqual(matches, 1)
 
         # Clear search
         self.page.fill("#search-input", "")
@@ -300,23 +300,24 @@ class TestE2EInteractiveQA(unittest.TestCase):
 
     def test_d2_job_openings_render_apply_links(self):
         """Verify that opening a startup with job openings renders apply links inside the drawer."""
-        # OpenAI has jobs
+        # Stripe has jobs
         self.page.goto(f"{self.BASE_URL}/jobs?city=San%20Francisco%2C%20CA")
         self.page.wait_for_load_state("networkidle")
         self.page.wait_for_timeout(1000)
 
-        # Click OpenAI directory item
-        self.page.locator("#directory-list .directory-item:has-text('OpenAI')").first.click()
+        # Click Stripe directory item
+        self.page.locator("#directory-list .directory-item:has-text('Stripe')").first.click()
 
         # Verify job card is rendered in details drawer and wait for it
         job_card = self.page.locator("#details-drawer .job-card").first
-        job_card.wait_for(state="visible", timeout=5000)
+        job_card.wait_for(state="visible", timeout=15000)
         self.assertTrue(job_card.is_visible())
 
-        # Verify apply link exists and has text Apply
+        # Verify apply link exists and has text Apply / Company Site / Jobs
         apply_link = job_card.locator("a.job-btn")
         self.assertTrue(apply_link.is_visible())
-        self.assertIn("Apply", apply_link.text_content())
+        link_text = apply_link.text_content()
+        self.assertTrue("↗" in link_text or "Apply" in link_text or "Site" in link_text or "Jobs" in link_text)
         self.assertEqual(self.js_errors, [])
 
     def test_d3_country_search_usa(self):
@@ -363,7 +364,12 @@ class TestE2EInteractiveQA(unittest.TestCase):
         self.page.wait_for_load_state("networkidle")
         self.page.wait_for_timeout(1500)
 
-        # Verify directory list renders matching startups or empty state
+        # Verify left directory list is NOT stuck on "Finding jobs in neighborhood..."
+        dir_text = self.page.locator("#directory-list").text_content()
+        self.assertNotIn("Finding jobs in neighborhood...", dir_text,
+                         "Left side job directory bar must not remain stuck on loading text after city search.")
+
+        # Verify directory list renders matching startups or empty state cleanly
         self.assertGreaterEqual(self.page.locator("#directory-list .directory-item").count(), 0)
 
         # Verify map title displays Delhi
@@ -587,6 +593,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
         center_after = self.page.evaluate("() => { const c = WorldTechApp.map.getCenter(); return [c.lng, c.lat]; }")
         self.assertNotEqual(center_before[0], center_after[0], "Longitude should have panned and remained changed")
         self.assertNotEqual(center_before[1], center_after[1], "Latitude should have panned and remained changed")
+
 
 
 

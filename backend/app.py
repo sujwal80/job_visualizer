@@ -207,10 +207,20 @@ def get_startups():
     except Exception as e:
         return jsonify({"error": "Internal server error"}), 500
 
+def _ids_match(id1, id2):
+    if id1 is None or id2 is None:
+        return False
+    s1 = str(id1).strip()
+    s2 = str(id2).strip()
+    if s1 == s2:
+        return True
+    return s1.split('.')[0] == s2.split('.')[0]
+
+@app.route('/api/startups/<startup_id>', methods=['GET'])
 @app.route('/api/startups/<int:startup_id>', methods=['GET'])
 def get_startup_details(startup_id):
     """
-    Retrieve comprehensive details and structured job openings for a specific startup by numeric ID.
+    Retrieve comprehensive details and structured job openings for a specific startup by ID (numeric or string).
 
     Enforces rate limiting and query validation, returning HTTP 404 if ID is not found.
     """
@@ -233,7 +243,7 @@ def get_startup_details(startup_id):
     try:
         startups = load_startups()
         for s in startups:
-            if s.get("id") == startup_id:
+            if _ids_match(s.get("id"), startup_id):
                 lean_payload = format_startup_details(s)
                 resp = make_response(jsonify(lean_payload))
                 resp.headers['Cache-Control'] = 'public, max-age=60'
