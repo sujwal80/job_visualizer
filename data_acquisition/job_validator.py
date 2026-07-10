@@ -4,6 +4,7 @@ import re
 import time
 import random
 import urllib.parse
+import concurrent.futures
 
 try:
     from geo_config import TEST_FIXTURE_WHITELIST_URLS
@@ -40,9 +41,26 @@ class JobValidator:
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
         }
 
+    def _validate_job_worker(self, job):
+        if not isinstance(job, dict):
+            return None, "Invalid job record", "Unknown Role"
+        url = str(job.get("url") or job.get("job_url") or "").strip()
+        title = str(job.get("title") or "Unknown Role").strip()
+        job["url"] = url
+        job["job_url"] = url
+
+        if not url or url == "N/A" or not url.startswith(("http://", "https://")):
+            return None, "Invalid/missing URL", title
+
+        is_active, reason = self._check_job_active(url)
+        if is_active:
+            return job, "Active", title
+        else:
+            return None, reason, title
+
     def validate_and_prune(self, max_startups=None):
         print("\n==========================================================")
-        print("=== STARTING DATA VALIDATION & EXPIRED JOB REMOVAL ===")
+        print("=== STARTING LIVE PROD VALIDATION & EXPIRED JOB REMOVAL ===")
         print("==========================================================")
         
         total_startups = len(self.db.startups)
@@ -60,41 +78,27 @@ class JobValidator:
             if not jobs:
                 continue
                 
-            print(f"\n[Validating {processed}/{total_startups}] Company: '{comp_name}' ({len(jobs)} jobs)")
-            
             valid_jobs = []
             pruned_for_company = 0
             
-            for job in jobs:
-                if not isinstance(job, dict):
-                    pruned_for_company += 1
-                    continue
-                url = str(job.get("url") or job.get("job_url") or "").strip()
-                title = str(job.get("title") or "Unknown Role").strip()
-                job["url"] = url
-                job["job_url"] = url
+            with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
+                results = list(executor.map(self._validate_job_worker, jobs))
                 
-                if not url or url == "N/A" or not url.startswith(("http://", "https://")):
-                    print(f"  [-] Removing invalid/missing URL for job: '{title}'")
-                    pruned_for_company += 1
-                    continue
-                    
-                is_active, reason = self._check_job_active(url)
-                if is_active:
-                    valid_jobs.append(job)
+            for res_job, reason, title in results:
+                if res_job is not None:
+                    valid_jobs.append(res_job)
                 else:
-                    print(f"  [-] Pruning expired job '{title}' -> {reason}")
                     pruned_for_company += 1
                     
-                time.sleep(random.uniform(0.8, 1.5))
-                
-            self.validate_company_status(startup)
             if pruned_for_company > 0:
+                print(f"  [~] Company '{comp_name}': Pruned {pruned_for_company} non-valid/expired jobs (Remaining active: {len(valid_jobs)})")
                 startup["job_openings"] = valid_jobs
                 total_pruned += pruned_for_company
+                
+            self.validate_company_status(startup)
             self.db.save_db()
                 
-        print("\n=== DATA VALIDATION FINISHED ===")
+        print("\n=== LIVE PROD DATA VALIDATION FINISHED ===")
         print(f"Total expired/invalid jobs pruned from database: {total_pruned}")
         return total_pruned
 
