@@ -23,14 +23,22 @@ def test_short_circuiting():
     logo_enricher = LogoEnricher()
     
     # 1. Test Logo Short-Circuit
-    startup_with_logo = {"name": "TestCorp", "logo_domain": "testcorp.com", "website": "https://testcorp.com"}
+    startup_with_logo = {
+        "name": "TestCorp",
+        "logo_domain": "testcorp.com",
+        "logo_svg_url": "https://testcorp.com/logo.svg",
+        "website": "https://testcorp.com"
+    }
     res = logo_enricher.enrich(startup_with_logo)
-    assert res is False, "Expected LogoEnricher to short-circuit when logo_domain exists!"
+    assert res is False, "Expected LogoEnricher to short-circuit when logo_domain and logo_svg_url exist!"
     print(" [PASS] LogoEnricher short-circuits correctly when logo_domain exists.")
     
     startup_no_logo = {"name": "NewCorp", "logo_domain": "", "website": "https://newcorp.io"}
-    res = logo_enricher.enrich(startup_no_logo)
+    mock_resp = MagicMock(status_code=404)
+    with patch("requests.get", return_value=mock_resp):
+        res = logo_enricher.enrich(startup_no_logo)
     assert res is True and startup_no_logo["logo_domain"] == "newcorp.io", "Expected LogoEnricher to extract domain from website!"
+    assert startup_no_logo["logo_svg_url"] == "", "Expected logo_svg_url to be empty when scraping fails"
     print(" [PASS] LogoEnricher tags logo_domain from website when missing.")
 
     # 2. Test Location Short-Circuit

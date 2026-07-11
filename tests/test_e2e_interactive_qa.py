@@ -251,8 +251,8 @@ class TestE2EInteractiveQA(unittest.TestCase):
 
         total_items = self.page.locator("#directory-list .directory-item").count()
 
-        # Search for a specific company name that exists and is unique, e.g., "Whitefield CleanTech"
-        self.page.fill("#search-input", "Whitefield CleanTech")
+        # Search for a specific company name that exists, has job openings and is unique, e.g., "Indira Pay"
+        self.page.fill("#search-input", "Indira Pay")
         self.page.wait_for_timeout(500)
 
         matches = self.page.locator("#directory-list .directory-item").count()

@@ -206,7 +206,8 @@ def format_startup_summary(s):
         dict: A lightweight summary dictionary optimized for list and map marker rendering.
     """
     logo_domain = s.get("logo_domain", "")
-    logo_url = f"https://www.google.com/s2/favicons?domain={logo_domain}&sz=128" if logo_domain else ""
+    logo_svg_url = s.get("logo_svg_url", "")
+    logo_url = logo_svg_url if logo_svg_url else (f"https://www.google.com/s2/favicons?domain={logo_domain}&sz=128" if logo_domain else "")
     website = _sanitize_url(s.get("website", ""))
     
     job_openings = s.get("job_openings") or []
@@ -270,7 +271,8 @@ def format_startup_details(s):
             s_copy[field] = _sanitize_string(s_copy[field])
 
     logo_domain = s_copy.get("logo_domain", "")
-    s_copy["logo_url"] = f"https://www.google.com/s2/favicons?domain={logo_domain}&sz=128" if logo_domain else ""
+    logo_svg_url = s_copy.get("logo_svg_url", "")
+    s_copy["logo_url"] = logo_svg_url if logo_svg_url else (f"https://www.google.com/s2/favicons?domain={logo_domain}&sz=128" if logo_domain else "")
     s_copy["url"] = _sanitize_url(s_copy.get("website", ""))
     if "website" in s_copy:
         s_copy["website"] = _sanitize_url(s_copy.get("website", ""))
@@ -335,7 +337,8 @@ def format_lightweight_summary(s):
               id, name, lat, lng, city, logo_url, industry, job_count, has_pin.
     """
     logo_domain = s.get("logo_domain", "")
-    logo_url = f"https://www.google.com/s2/favicons?domain={logo_domain}&sz=128" if logo_domain else ""
+    logo_svg_url = s.get("logo_svg_url", "")
+    logo_url = logo_svg_url if logo_svg_url else (f"https://www.google.com/s2/favicons?domain={logo_domain}&sz=128" if logo_domain else "")
     has_pin_val = s.get("has_pin", True)
     lat_val = _safe_float(s.get("lat"))
     lng_val = _safe_float(s.get("lng"))

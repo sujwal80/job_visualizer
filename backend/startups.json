@@ -50,7 +50,8 @@
     "is_active_website": true,
     "is_remote_office": false,
     "remote_office_distance_km": 5.11,
-    "location_tagged": true
+    "location_tagged": true,
+    "logo_svg_url": ""
   },
   {
     "id": 2,
@@ -103,7 +104,8 @@
     "is_active_website": true,
     "is_remote_office": false,
     "remote_office_distance_km": 4.97,
-    "location_tagged": true
+    "location_tagged": true,
+    "logo_svg_url": ""
   },
   {
     "id": 3,
@@ -175,7 +177,8 @@
     "remote_office_distance_km": 8.22,
     "location_tagged": true,
     "verified_email": "join@hsrsaas.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 4,
@@ -203,7 +206,8 @@
     "job_openings": [],
     "is_remote_office": false,
     "remote_office_distance_km": 17.9,
-    "location_tagged": true
+    "location_tagged": true,
+    "logo_svg_url": ""
   },
   {
     "id": 5,
@@ -279,7 +283,8 @@
     "remote_office_distance_km": 5.11,
     "location_tagged": true,
     "verified_email": "work@nammacart.co.in",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 6,
@@ -318,7 +323,8 @@
     "remote_office_distance_km": 4.35,
     "location_tagged": true,
     "verified_email": "careers@bengalurubiosystems.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 7,
@@ -357,7 +363,8 @@
     "remote_office_distance_km": 5.11,
     "location_tagged": true,
     "verified_email": "hr@quickpulse.health",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 8,
@@ -409,7 +416,8 @@
     "remote_office_distance_km": 1.39,
     "location_tagged": true,
     "verified_email": "talent@rupeeflow.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 9,
@@ -437,7 +445,8 @@
     "job_openings": [],
     "is_remote_office": false,
     "remote_office_distance_km": 8.22,
-    "location_tagged": true
+    "location_tagged": true,
+    "logo_svg_url": ""
   },
   {
     "id": 10,
@@ -484,7 +493,8 @@
     "remote_office_distance_km": 4.97,
     "location_tagged": true,
     "verified_email": "careers@zenithsaas.io",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 11,
@@ -574,7 +584,8 @@
     "remote_office_distance_km": 5.66,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 12,
@@ -924,7 +935,8 @@
     "remote_office_distance_km": 7.55,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 13,
@@ -1313,7 +1325,8 @@
     "remote_office_distance_km": 16.1,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 14,
@@ -1407,7 +1420,8 @@
     "remote_office_distance_km": 5.11,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 15,
@@ -1824,7 +1838,8 @@
     "remote_office_distance_km": 11.3,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 16,
@@ -2282,7 +2297,8 @@
     "remote_office_distance_km": 15.59,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 17,
@@ -2671,7 +2687,8 @@
     "remote_office_distance_km": 11.26,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://assets.aboutamazon.com/85/0b/a54bd5854c1b99512aa65180a2f0/result-2.svg"
   },
   {
     "id": 18,
@@ -2953,7 +2970,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 19,
@@ -3290,7 +3308,8 @@
     "remote_office_distance_km": 1.2,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 20,
@@ -3523,7 +3542,8 @@
     "remote_office_distance_km": 10.76,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 21,
@@ -3714,7 +3734,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 22,
@@ -3973,7 +3994,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.epiroc.com/etc.clientlibs/settings/wcm/designs/business/clientlib-preloaded/resources/favicon.svg"
   },
   {
     "id": 23,
@@ -4287,7 +4309,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.digicert.com/icon.svg"
   },
   {
     "id": 24,
@@ -4507,7 +4530,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "http://www.millerknoll.com/favicon/favicon.svg"
   },
   {
     "id": 25,
@@ -4779,7 +4803,8 @@
     "remote_office_distance_km": 5.5,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 26,
@@ -4832,7 +4857,8 @@
     "remote_office_distance_km": 4.99,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 27,
@@ -4865,7 +4891,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 28,
@@ -5345,7 +5372,8 @@
     "remote_office_distance_km": 11.7,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 29,
@@ -5721,7 +5749,8 @@
     "remote_office_distance_km": 16.96,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 30,
@@ -5785,7 +5814,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 31,
@@ -6122,7 +6152,8 @@
     "remote_office_distance_km": 11.02,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 32,
@@ -6357,7 +6388,8 @@
     "remote_office_distance_km": 14.14,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 33,
@@ -6603,7 +6635,8 @@
     "remote_office_distance_km": 8.07,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "http://www.honeywell.com/content/dam/honcorp/us-en/common-assets/logos/hon-honeywell-technologies-logo-mini.svg"
   },
   {
     "id": 34,
@@ -6953,7 +6986,8 @@
     "remote_office_distance_km": 16.1,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 35,
@@ -7017,7 +7051,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://accuristech.com/nitropack_static/bHdjIkhZtcHmsYKHlTSenzWyuqhznzWH/assets/images/optimized/rev-9e43878/accuristech.com/wp-content/themes/accuristech-wp/favicons/favicon.svg"
   },
   {
     "id": 36,
@@ -7050,7 +7085,8 @@
     "remote_office_distance_km": 744.97,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 37,
@@ -7231,7 +7267,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 38,
@@ -7334,7 +7371,8 @@
     "remote_office_distance_km": 4.99,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 39,
@@ -7367,7 +7405,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 40,
@@ -7548,7 +7587,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 41,
@@ -7599,7 +7639,8 @@
     "remote_office_distance_km": 8.28,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://kb-serve-img.gumlet.io/krazybee/kreditbee_in/logo_horizontal_BNqOuZWg_.svg"
   },
   {
     "id": 42,
@@ -7763,7 +7804,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 43,
@@ -7827,7 +7869,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 44,
@@ -8034,7 +8077,8 @@
     "remote_office_distance_km": 9.21,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://navi.com/static/media/naviLogo.c2380d7b.svg"
   },
   {
     "id": 45,
@@ -8371,7 +8415,8 @@
     "remote_office_distance_km": 10.14,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 46,
@@ -8487,7 +8532,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 47,
@@ -8655,7 +8701,8 @@
     "remote_office_distance_km": 12.65,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 48,
@@ -8760,7 +8807,8 @@
     "remote_office_distance_km": 6.27,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 49,
@@ -9442,7 +9490,8 @@
     "remote_office_distance_km": 8.35,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 50,
@@ -9636,7 +9685,8 @@
     "remote_office_distance_km": 1.14,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 51,
@@ -10434,7 +10484,8 @@
     "remote_office_distance_km": 11.02,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 52,
@@ -10499,7 +10550,8 @@
     "remote_office_distance_km": 11.79,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 53,
@@ -10697,7 +10749,8 @@
     "remote_office_distance_km": 514.98,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 54,
@@ -10856,7 +10909,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 55,
@@ -10920,7 +10974,8 @@
     "remote_office_distance_km": 11.33,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 56,
@@ -11088,7 +11143,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://goodscore.app/assets/good-coin.svg"
   },
   {
     "id": 57,
@@ -11217,7 +11273,8 @@
     "remote_office_distance_km": 1900.47,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 58,
@@ -11450,7 +11507,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 59,
@@ -11657,7 +11715,8 @@
     "remote_office_distance_km": 3.83,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.ujjivansfb.bank.in/assets/svgviewer_output_6bc1ef1266.svg"
   },
   {
     "id": 60,
@@ -11838,7 +11897,8 @@
     "remote_office_distance_km": 7.41,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.signzy.com/_next/static/media/Logo.0740c233.svg"
   },
   {
     "id": 61,
@@ -12058,7 +12118,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 62,
@@ -12200,7 +12261,8 @@
     "remote_office_distance_km": 31.81,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 63,
@@ -12446,7 +12508,8 @@
     "remote_office_distance_km": 5.64,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 64,
@@ -12679,7 +12742,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 65,
@@ -12873,7 +12937,8 @@
     "remote_office_distance_km": 18.06,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 66,
@@ -13160,7 +13225,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 67,
@@ -13354,7 +13420,8 @@
     "remote_office_distance_km": 19.81,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 68,
@@ -13522,7 +13589,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 69,
@@ -13768,7 +13836,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 70,
@@ -13949,7 +14018,8 @@
     "remote_office_distance_km": 1953.23,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 71,
@@ -14065,7 +14135,8 @@
     "remote_office_distance_km": 5.01,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 72,
@@ -14098,7 +14169,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 73,
@@ -14131,7 +14203,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 74,
@@ -14338,7 +14411,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.eclinicalsol.com/wp-content/themes/eclinical-solutions/assets/build/images/pwa/icon.svg"
   },
   {
     "id": 75,
@@ -14371,7 +14445,8 @@
     "remote_office_distance_km": 16.74,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "http://www.fico.com/assets/favicons/favicon.svg"
   },
   {
     "id": 76,
@@ -14528,7 +14603,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 77,
@@ -14709,7 +14785,8 @@
     "remote_office_distance_km": 3.51,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 78,
@@ -14812,7 +14889,8 @@
     "remote_office_distance_km": 4.86,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 79,
@@ -15097,7 +15175,8 @@
     "remote_office_distance_km": 13.94,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://2025prodstorageaccount-eqdyc8g8hpccdfez.a02.azurefd.net/ltprod/media/d44ph50r/lt.svg"
   },
   {
     "id": 80,
@@ -15330,7 +15409,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 81,
@@ -15472,7 +15552,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 82,
@@ -15579,7 +15660,8 @@
     "remote_office_distance_km": 8.72,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 83,
@@ -15620,7 +15702,8 @@
     "remote_office_distance_km": 5.65,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.littlebigconnection.com/_next/static/media/five-stars.3c70fc87.svg"
   },
   {
     "id": 84,
@@ -15801,7 +15884,8 @@
     "remote_office_distance_km": 6.4,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 85,
@@ -15850,7 +15934,8 @@
     "remote_office_distance_km": 9.16,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "http://www.sugarfit.com/favicon.svg"
   },
   {
     "id": 86,
@@ -16005,7 +16090,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 87,
@@ -17226,7 +17312,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 88,
@@ -17407,7 +17494,8 @@
     "remote_office_distance_km": 8.2,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.wisemonk.io/favicon.svg"
   },
   {
     "id": 89,
@@ -17707,7 +17795,8 @@
     "remote_office_distance_km": 2.23,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 90,
@@ -17812,7 +17901,8 @@
     "remote_office_distance_km": 1386.22,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://link.wati.io/wp-content/uploads/2023/03/wati-icon.svg"
   },
   {
     "id": 91,
@@ -17863,7 +17953,8 @@
     "remote_office_distance_km": 4.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 92,
@@ -18018,7 +18109,8 @@
     "remote_office_distance_km": 0.86,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 93,
@@ -18390,7 +18482,8 @@
     "remote_office_distance_km": 5.16,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 94,
@@ -18571,7 +18664,8 @@
     "remote_office_distance_km": 8.41,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 95,
@@ -18661,7 +18755,8 @@
     "remote_office_distance_km": 2.49,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 96,
@@ -18829,7 +18924,8 @@
     "remote_office_distance_km": 8.8,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 97,
@@ -19010,7 +19106,8 @@
     "remote_office_distance_km": 11.2,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 98,
@@ -19061,7 +19158,8 @@
     "remote_office_distance_km": 356.37,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 99,
@@ -19094,7 +19192,8 @@
     "remote_office_distance_km": 1.74,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 100,
@@ -19158,7 +19257,8 @@
     "remote_office_distance_km": 226.23,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 101,
@@ -19339,7 +19439,8 @@
     "remote_office_distance_km": 6.31,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false
+    "is_active_website": false,
+    "logo_svg_url": ""
   },
   {
     "id": 102,
@@ -19663,7 +19764,8 @@
     "remote_office_distance_km": 4.36,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 103,
@@ -19857,7 +19959,8 @@
     "remote_office_distance_km": 11.5,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 104,
@@ -20155,7 +20258,8 @@
     "remote_office_distance_km": 3.31,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 105,
@@ -20193,7 +20297,8 @@
     "remote_office_distance_km": 7.91,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.zibtek.com/assets/images/homepage/Spotlight-1.svg"
   },
   {
     "id": 106,
@@ -20298,7 +20403,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.sourcingxpress.com/sxp-logo-1.svg"
   },
   {
     "id": 107,
@@ -20427,7 +20533,8 @@
     "remote_office_distance_km": 12.22,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 108,
@@ -20460,7 +20567,8 @@
     "remote_office_distance_km": 6.37,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 109,
@@ -20498,7 +20606,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 110,
@@ -20681,7 +20790,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 111,
@@ -20966,7 +21076,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://social.kpmg/etc.clientlibs/kpmg/clientlibs/clientlib-site/resources/images/favicons/favicon-96x96.svg"
   },
   {
     "id": 112,
@@ -21199,7 +21310,8 @@
     "remote_office_distance_km": 11.81,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://global.rakuten.com/corp/assets/img/site-icons/rakuten-black.svg"
   },
   {
     "id": 113,
@@ -21250,7 +21362,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 114,
@@ -21522,7 +21635,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 115,
@@ -21742,7 +21856,8 @@
     "remote_office_distance_km": 14.75,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 116,
@@ -21791,7 +21906,8 @@
     "remote_office_distance_km": 9.79,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 117,
@@ -21829,7 +21945,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 118,
@@ -21919,7 +22036,8 @@
     "remote_office_distance_km": 1725.3,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 119,
@@ -21952,7 +22070,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 120,
@@ -21985,7 +22104,8 @@
     "remote_office_distance_km": 5.93,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://op.tech/wp-content/themes/op/resources/images/favicon/favicon.svg"
   },
   {
     "id": 121,
@@ -22309,7 +22429,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 122,
@@ -22516,7 +22637,8 @@
     "remote_office_distance_km": 8.01,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 123,
@@ -22557,7 +22679,8 @@
     "remote_office_distance_km": 1.15,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 124,
@@ -22751,7 +22874,8 @@
     "remote_office_distance_km": 8.26,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 125,
@@ -22997,7 +23121,8 @@
     "remote_office_distance_km": 4.43,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 126,
@@ -23048,7 +23173,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 127,
@@ -23242,7 +23368,8 @@
     "remote_office_distance_km": 4.55,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 128,
@@ -23384,7 +23511,8 @@
     "remote_office_distance_km": 14.02,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 129,
@@ -23539,7 +23667,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false
+    "is_active_website": false,
+    "logo_svg_url": ""
   },
   {
     "id": 130,
@@ -23629,7 +23758,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "http://www.everkindconsumer.com/favicon.svg"
   },
   {
     "id": 131,
@@ -23708,7 +23838,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 132,
@@ -23741,7 +23872,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 133,
@@ -23909,7 +24041,8 @@
     "remote_office_distance_km": 9.0,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 134,
@@ -24194,7 +24327,8 @@
     "remote_office_distance_km": 7.45,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "http://www.techmahindra.com/themes/custom/techm/favicon/favicon.svg"
   },
   {
     "id": 135,
@@ -24414,7 +24548,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 136,
@@ -24608,7 +24743,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 137,
@@ -24724,7 +24860,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 138,
@@ -24918,7 +25055,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 139,
@@ -25128,7 +25266,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 140,
@@ -25166,7 +25305,8 @@
     "remote_office_distance_km": 2057.83,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://soar.inc/favicons/icon.svg"
   },
   {
     "id": 141,
@@ -25360,7 +25500,8 @@
     "remote_office_distance_km": 852.36,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 142,
@@ -25528,7 +25669,8 @@
     "remote_office_distance_km": 11.56,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 143,
@@ -25735,7 +25877,8 @@
     "remote_office_distance_km": 7.94,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 144,
@@ -25786,7 +25929,8 @@
     "remote_office_distance_km": 11.21,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 145,
@@ -26032,7 +26176,8 @@
     "remote_office_distance_km": 8.33,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 146,
@@ -26081,7 +26226,8 @@
     "remote_office_distance_km": 24.86,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 147,
@@ -26249,7 +26395,8 @@
     "remote_office_distance_km": 5.37,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false
+    "is_active_website": false,
+    "logo_svg_url": ""
   },
   {
     "id": 148,
@@ -26300,7 +26447,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.hackajob.com/favicons/production/favicon.svg"
   },
   {
     "id": 149,
@@ -26357,7 +26505,8 @@
     "remote_office_distance_km": 0.89,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 150,
@@ -26525,7 +26674,8 @@
     "remote_office_distance_km": 7.61,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 151,
@@ -26890,7 +27040,8 @@
     "remote_office_distance_km": 5.63,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 152,
@@ -27123,7 +27274,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 153,
@@ -27377,7 +27529,8 @@
     "remote_office_distance_km": 11.37,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 154,
@@ -27642,7 +27795,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 155,
@@ -27823,7 +27977,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 156,
@@ -28040,7 +28195,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 157,
@@ -28169,7 +28325,8 @@
     "remote_office_distance_km": 6.32,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.slicebank.com/favicon.svg"
   },
   {
     "id": 158,
@@ -28246,7 +28403,8 @@
     "remote_office_distance_km": 4.66,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://juspay.io/favicon.png"
   },
   {
     "id": 159,
@@ -28388,7 +28546,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 160,
@@ -28439,7 +28598,8 @@
     "remote_office_distance_km": 17.1,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 161,
@@ -28480,7 +28640,8 @@
     "remote_office_distance_km": 15.23,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.roma.global/images/roma-favicon.svg"
   },
   {
     "id": 162,
@@ -28513,7 +28674,8 @@
     "remote_office_distance_km": 13.1,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 163,
@@ -28642,7 +28804,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 164,
@@ -28793,7 +28956,8 @@
     "remote_office_distance_km": 5.56,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 165,
@@ -28883,7 +29047,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 166,
@@ -29207,7 +29372,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 167,
@@ -29362,7 +29528,8 @@
     "remote_office_distance_km": 1.34,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 168,
@@ -29608,7 +29775,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 169,
@@ -29689,7 +29857,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 170,
@@ -29844,7 +30013,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 171,
@@ -30051,7 +30221,8 @@
     "remote_office_distance_km": 7.3,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 172,
@@ -30271,7 +30442,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 173,
@@ -30478,7 +30650,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 174,
@@ -30672,7 +30845,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 175,
@@ -30944,7 +31118,8 @@
     "remote_office_distance_km": 532.39,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 176,
@@ -31203,7 +31378,8 @@
     "remote_office_distance_km": 532.96,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 177,
@@ -31462,7 +31638,8 @@
     "remote_office_distance_km": 14.27,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false
+    "is_active_website": false,
+    "logo_svg_url": ""
   },
   {
     "id": 178,
@@ -31513,7 +31690,8 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 179,
@@ -31546,7 +31724,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 180,
@@ -31651,7 +31830,8 @@
     "remote_office_distance_km": 5.94,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 181,
@@ -31716,7 +31896,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 182,
@@ -31805,7 +31986,8 @@
     "remote_office_distance_km": 4.99,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 183,
@@ -31862,7 +32044,8 @@
     "remote_office_distance_km": 4.99,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://saviynt.com/hubfs/favicon.svg"
   },
   {
     "id": 184,
@@ -31895,7 +32078,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 185,
@@ -31992,7 +32176,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 186,
@@ -32033,7 +32218,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 187,
@@ -32074,7 +32260,8 @@
     "remote_office_distance_km": 2.19,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 188,
@@ -32187,7 +32374,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "http://about.puma.com/themes/custom/dreist/build/assets/images/favicon/safari-pinned-tab.svg"
   },
   {
     "id": 189,
@@ -32292,7 +32480,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 190,
@@ -32341,7 +32530,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 191,
@@ -32398,7 +32588,8 @@
     "remote_office_distance_km": 7.41,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 192,
@@ -32471,7 +32662,8 @@
     "remote_office_distance_km": 14.6,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 193,
@@ -32504,7 +32696,8 @@
     "remote_office_distance_km": 4.99,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 194,
@@ -32617,7 +32810,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://lowes.co.in/wp-content/themes/lowesite/assets/img/favicon/favicon.svg"
   },
   {
     "id": 195,
@@ -32714,7 +32908,8 @@
     "remote_office_distance_km": 1.93,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 196,
@@ -32755,7 +32950,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 197,
@@ -32852,7 +33048,8 @@
     "remote_office_distance_km": 2.56,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 198,
@@ -32885,7 +33082,8 @@
     "remote_office_distance_km": 8.18,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 199,
@@ -32926,7 +33124,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 200,
@@ -32967,7 +33166,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false
+    "is_active_website": false,
+    "logo_svg_url": ""
   },
   {
     "id": 201,
@@ -33056,7 +33256,8 @@
     "remote_office_distance_km": 11.64,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 202,
@@ -33161,7 +33362,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 203,
@@ -33194,7 +33396,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 204,
@@ -33243,7 +33446,8 @@
     "remote_office_distance_km": 11.58,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.rippling.com/favicons/favicon.svg"
   },
   {
     "id": 205,
@@ -33276,7 +33480,8 @@
     "remote_office_distance_km": 8.94,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.side.inc/favicon-svg-512.svg"
   },
   {
     "id": 206,
@@ -33287,7 +33492,7 @@
     "industry": "Fintech",
     "description": "Prime Video &amp; Amazon MGM Studios | 584,284 followers on LinkedIn. Come build the future of entertainment with us | Prime Video delivers an entertainment destination unlike any other\u2014fast, reliable, personal, effortless, and delightful. The Prime Video team comprises individuals who are all obsessively focused on one mission: to give consumers the world\u2019s best-in-class digital video customer experience.\n\nAmazon Studios is the home for talent, creating and producing original films and television series for a global audience.",
     "website": "",
-    "logo_domain": "",
+    "logo_domain": "primevideoamazonmgmstudios.com",
     "funding_stage": "N/A",
     "head_count": 10001,
     "founders": [],
@@ -33381,7 +33586,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 207,
@@ -33414,7 +33620,8 @@
     "remote_office_distance_km": 5.4,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 208,
@@ -33511,7 +33718,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 209,
@@ -33560,7 +33768,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 210,
@@ -33625,7 +33834,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 211,
@@ -33722,7 +33932,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://res.cloudinary.com/hevo/image/upload/v1763716896/website-rewamp/favicon/SVG/light_sq6q2p.svg"
   },
   {
     "id": 212,
@@ -33787,7 +33998,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 213,
@@ -33892,7 +34104,8 @@
     "remote_office_distance_km": 6.18,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://links.sarvam.io/favicon.svg"
   },
   {
     "id": 214,
@@ -33965,7 +34178,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://www.clickhouse.com/icon0.svg?icon0.0b55wpn19lxsq.svg"
   },
   {
     "id": 215,
@@ -33998,7 +34212,8 @@
     "remote_office_distance_km": 4.56,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 216,
@@ -34079,7 +34294,8 @@
     "remote_office_distance_km": 12.7,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 217,
@@ -34168,7 +34384,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 218,
@@ -34257,7 +34474,8 @@
     "remote_office_distance_km": 12.25,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false
+    "is_active_website": false,
+    "logo_svg_url": ""
   },
   {
     "id": 219,
@@ -34290,7 +34508,8 @@
     "remote_office_distance_km": 3.46,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 220,
@@ -34395,7 +34614,8 @@
     "remote_office_distance_km": 1.72,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 221,
@@ -34484,7 +34704,8 @@
     "remote_office_distance_km": 10.58,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 222,
@@ -34573,7 +34794,8 @@
     "remote_office_distance_km": 11.17,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 223,
@@ -34638,7 +34860,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false
+    "is_active_website": false,
+    "logo_svg_url": ""
   },
   {
     "id": 224,
@@ -34711,7 +34934,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 225,
@@ -34760,7 +34984,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 226,
@@ -34793,7 +35018,8 @@
     "remote_office_distance_km": 12.48,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 227,
@@ -34826,7 +35052,8 @@
     "remote_office_distance_km": 13.31,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 228,
@@ -34859,7 +35086,8 @@
     "remote_office_distance_km": 15.73,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 229,
@@ -34948,7 +35176,8 @@
     "remote_office_distance_km": 11.39,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 230,
@@ -34989,7 +35218,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 231,
@@ -35022,7 +35252,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 232,
@@ -35111,7 +35342,8 @@
     "remote_office_distance_km": 8.15,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 233,
@@ -35168,7 +35400,8 @@
     "remote_office_distance_km": 8.46,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 234,
@@ -35201,7 +35434,8 @@
     "remote_office_distance_km": 6.28,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 235,
@@ -35234,7 +35468,8 @@
     "remote_office_distance_km": 6.24,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 236,
@@ -35267,7 +35502,8 @@
     "remote_office_distance_km": 504.23,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 237,
@@ -35291,7 +35527,8 @@
     "remote_office_distance_km": 497.07,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 238,
@@ -35324,7 +35561,8 @@
     "remote_office_distance_km": 497.07,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 239,
@@ -35357,7 +35595,8 @@
     "remote_office_distance_km": 497.07,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 240,
@@ -35390,7 +35629,8 @@
     "remote_office_distance_km": 504.05,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 241,
@@ -35423,7 +35663,8 @@
     "remote_office_distance_km": 503.5,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 242,
@@ -35456,7 +35697,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false
+    "is_active_website": false,
+    "logo_svg_url": ""
   },
   {
     "id": 243,
@@ -35489,7 +35731,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://cdn.prod.website-files.com/65c292289fb0ea1ff3a84bd3/6807f0d918342111b78873bd_gushwork-fav-con-32X32px.svg"
   },
   {
     "id": 244,
@@ -35522,7 +35765,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false
+    "is_active_website": false,
+    "logo_svg_url": ""
   },
   {
     "id": 245,
@@ -35555,7 +35799,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false
+    "is_active_website": false,
+    "logo_svg_url": ""
   },
   {
     "id": 246,
@@ -35592,7 +35837,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false
+    "is_active_website": false,
+    "logo_svg_url": ""
   },
   {
     "id": 247,
@@ -35629,7 +35875,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false
+    "is_active_website": false,
+    "logo_svg_url": ""
   },
   {
     "id": 248,
@@ -35664,7 +35911,8 @@
     "remote_office_distance_km": 13999.49,
     "location_tagged": true,
     "verified_email": "jobs@openai.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 249,
@@ -35699,7 +35947,8 @@
     "remote_office_distance_km": 13998.51,
     "location_tagged": true,
     "verified_email": "careers@anthropic.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 250,
@@ -35748,7 +35997,8 @@
     "remote_office_distance_km": 14010.12,
     "location_tagged": true,
     "verified_email": "recruiting@stripe.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://images.stripeassets.com/fzn2n1nzq965/1hgcBNd12BfT9VLgbId7By/01d91920114b124fb4cf6d448f9f06eb/favicon.svg"
   },
   {
     "id": 251,
@@ -35778,7 +36028,8 @@
     "remote_office_distance_km": 13997.39,
     "location_tagged": true,
     "verified_email": "jobs@scale.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://scale.com/favicon.svg"
   },
   {
     "id": 252,
@@ -35808,7 +36059,8 @@
     "remote_office_distance_km": 13999.83,
     "location_tagged": true,
     "verified_email": "careers@vercel.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://vercel.com/vc-ap-vercel-marketing/_next/static/immutable/media/vercel-light.3_gxxexgi1nmy.svg"
   },
   {
     "id": 253,
@@ -35857,7 +36109,8 @@
     "remote_office_distance_km": 8035.11,
     "location_tagged": true,
     "verified_email": "careers@deepmind.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://storage.googleapis.com/gdm-deepmind-com-prod-public/icons/google_deepmind_48dp.svg"
   },
   {
     "id": 254,
@@ -35892,7 +36145,8 @@
     "remote_office_distance_km": 8027.94,
     "location_tagged": true,
     "verified_email": "jobs@revolut.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 255,
@@ -35922,7 +36176,8 @@
     "remote_office_distance_km": 8032.23,
     "location_tagged": true,
     "verified_email": "careers@monzo.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": "https://static-assets.monzo.com/monzo-com/6842b3188b2cc0064b8bceeaf52ff7960fed011e/_next/static/media/favicon.4c6ebc6f.svg"
   },
   {
     "id": 256,
@@ -35952,7 +36207,8 @@
     "remote_office_distance_km": 8035.32,
     "location_tagged": true,
     "verified_email": "talent@wayve.ai",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_svg_url": ""
   },
   {
     "id": 257,
@@ -35991,7 +36247,8 @@
     ],
     "is_remote_office": false,
     "remote_office_distance_km": null,
-    "location_tagged": true
+    "location_tagged": true,
+    "logo_svg_url": ""
   },
   {
     "id": 258,
@@ -36030,7 +36287,8 @@
     ],
     "is_remote_office": true,
     "remote_office_distance_km": 1739.8,
-    "location_tagged": true
+    "location_tagged": true,
+    "logo_svg_url": ""
   },
   {
     "id": 259,
@@ -36069,7 +36327,8 @@
     ],
     "is_remote_office": true,
     "remote_office_distance_km": 735.44,
-    "location_tagged": true
+    "location_tagged": true,
+    "logo_svg_url": ""
   },
   {
     "id": 260,
@@ -36108,7 +36367,8 @@
     ],
     "is_remote_office": false,
     "remote_office_distance_km": 15.59,
-    "location_tagged": true
+    "location_tagged": true,
+    "logo_svg_url": ""
   },
   {
     "id": 261,
@@ -36147,7 +36407,8 @@
     ],
     "is_remote_office": false,
     "remote_office_distance_km": null,
-    "location_tagged": true
+    "location_tagged": true,
+    "logo_svg_url": "http://www.echovane.com/favicon.svg"
   },
   {
     "id": 262,
@@ -36186,7 +36447,8 @@
     ],
     "is_remote_office": false,
     "remote_office_distance_km": 5.11,
-    "location_tagged": true
+    "location_tagged": true,
+    "logo_svg_url": ""
   },
   {
     "id": 263,
@@ -36225,7 +36487,8 @@
     ],
     "is_remote_office": false,
     "remote_office_distance_km": 21.2,
-    "location_tagged": true
+    "location_tagged": true,
+    "logo_svg_url": ""
   },
   {
     "id": 264,
@@ -36264,7 +36527,8 @@
     ],
     "is_remote_office": true,
     "remote_office_distance_km": 1049.12,
-    "location_tagged": true
+    "location_tagged": true,
+    "logo_svg_url": "https://www.credhive.in/logo.svg"
   },
   {
     "id": 265,
@@ -36289,7 +36553,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "ken42.com",
+    "logo_svg_url": ""
   },
   {
     "id": 266,
@@ -36314,7 +36580,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "skitai.com",
+    "logo_svg_url": ""
   },
   {
     "id": 267,
@@ -36339,7 +36607,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "synthycs21.com",
+    "logo_svg_url": ""
   },
   {
     "id": 268,
@@ -36364,7 +36634,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "pypeai.com",
+    "logo_svg_url": ""
   },
   {
     "id": 269,
@@ -36389,7 +36661,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "samoraaiycw26.com",
+    "logo_svg_url": ""
   },
   {
     "id": 270,
@@ -36414,7 +36688,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "2careai.com",
+    "logo_svg_url": ""
   },
   {
     "id": 271,
@@ -36439,7 +36715,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "eloelo.com",
+    "logo_svg_url": ""
   },
   {
     "id": 272,
@@ -36464,7 +36742,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "healthasyst.com",
+    "logo_svg_url": ""
   },
   {
     "id": 273,
@@ -36512,7 +36792,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "bengaluruinnovationlabs.com",
+    "logo_svg_url": ""
   },
   {
     "id": 274,
@@ -36523,7 +36805,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "wissentechnology.com",
+    "logo_svg_url": ""
   },
   {
     "id": 275,
@@ -36534,7 +36818,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "echos.com",
+    "logo_svg_url": ""
   },
   {
     "id": 276,
@@ -36545,7 +36831,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "appviewx.com",
+    "logo_svg_url": ""
   },
   {
     "id": 277,
@@ -36556,7 +36844,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "kickdrum.com",
+    "logo_svg_url": ""
   },
   {
     "id": 278,
@@ -36567,7 +36857,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "epsilon.com",
+    "logo_svg_url": ""
   },
   {
     "id": 279,
@@ -36578,7 +36870,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "equitigroup.com",
+    "logo_svg_url": ""
   },
   {
     "id": 280,
@@ -36589,7 +36883,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "wizzme.com",
+    "logo_svg_url": ""
   },
   {
     "id": 281,
@@ -36600,7 +36896,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "myhq.com",
+    "logo_svg_url": ""
   },
   {
     "id": 282,
@@ -36611,7 +36909,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "nielsen.com",
+    "logo_svg_url": ""
   },
   {
     "id": 283,
@@ -36622,7 +36922,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "mihup.com",
+    "logo_svg_url": ""
   },
   {
     "id": 284,
@@ -36725,7 +37027,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "zenplusfleet.com",
+    "logo_svg_url": ""
   },
   {
     "id": 285,
@@ -36750,7 +37054,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "rapido.com",
+    "logo_svg_url": ""
   },
   {
     "id": 286,
@@ -36775,7 +37081,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "yulu.com",
+    "logo_svg_url": ""
   },
   {
     "id": 287,
@@ -36800,7 +37108,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "scano.com",
+    "logo_svg_url": ""
   },
   {
     "id": 288,
@@ -36838,7 +37148,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "healthify.com",
+    "logo_svg_url": ""
   },
   {
     "id": 289,
@@ -36863,7 +37175,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "noorahealth.com",
+    "logo_svg_url": ""
   },
   {
     "id": 290,
@@ -36901,7 +37215,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "visithealth.com",
+    "logo_svg_url": ""
   },
   {
     "id": 291,
@@ -36926,7 +37242,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "resoluteai.com",
+    "logo_svg_url": ""
   },
   {
     "id": 292,
@@ -36951,7 +37269,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "egovfoundation.com",
+    "logo_svg_url": ""
   },
   {
     "id": 293,
@@ -36976,7 +37296,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "healthedge.com",
+    "logo_svg_url": ""
   },
   {
     "id": 294,
@@ -37001,7 +37323,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "even.com",
+    "logo_svg_url": ""
   },
   {
     "id": 295,
@@ -37026,7 +37350,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "plum.com",
+    "logo_svg_url": ""
   },
   {
     "id": 296,
@@ -37051,7 +37377,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "decathlon.com",
+    "logo_svg_url": ""
   },
   {
     "id": 297,
@@ -37076,7 +37404,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "payoneer.com",
+    "logo_svg_url": ""
   },
   {
     "id": 298,
@@ -37114,7 +37444,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "ibm.com",
+    "logo_svg_url": ""
   },
   {
     "id": 299,
@@ -37165,7 +37497,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "questglobal.com",
+    "logo_svg_url": ""
   },
   {
     "id": 300,
@@ -37190,7 +37524,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "intel.com",
+    "logo_svg_url": ""
   },
   {
     "id": 301,
@@ -37215,7 +37551,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "goldmansachs.com",
+    "logo_svg_url": ""
   },
   {
     "id": 302,
@@ -37240,7 +37578,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "idfcfirstbank.com",
+    "logo_svg_url": ""
   },
   {
     "id": 303,
@@ -37265,7 +37605,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "univers.com",
+    "logo_svg_url": ""
   },
   {
     "id": 304,
@@ -37290,7 +37632,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "cgi.com",
+    "logo_svg_url": ""
   },
   {
     "id": 305,
@@ -37315,7 +37659,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "jacobs.com",
+    "logo_svg_url": ""
   },
   {
     "id": 306,
@@ -37340,7 +37686,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "siemensgamesa.com",
+    "logo_svg_url": ""
   },
   {
     "id": 307,
@@ -37365,7 +37713,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "capgeminiengineering.com",
+    "logo_svg_url": ""
   },
   {
     "id": 308,
@@ -37390,7 +37740,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "tatahousingdevelopmentcompanylimited.com",
+    "logo_svg_url": ""
   },
   {
     "id": 309,
@@ -37415,7 +37767,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "hindustancocacolabeverages.com",
+    "logo_svg_url": ""
   },
   {
     "id": 310,
@@ -37426,7 +37780,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "wayfair.com",
+    "logo_svg_url": ""
   },
   {
     "id": 311,
@@ -37464,7 +37820,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "marriottinternational.com",
+    "logo_svg_url": ""
   },
   {
     "id": 312,
@@ -37489,7 +37847,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "hilton.com",
+    "logo_svg_url": ""
   },
   {
     "id": 313,
@@ -37514,7 +37874,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "jwmarriott.com",
+    "logo_svg_url": ""
   },
   {
     "id": 314,
@@ -37565,7 +37927,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "accor.com",
+    "logo_svg_url": ""
   },
   {
     "id": 315,
@@ -37590,7 +37954,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "innovititechnologies.com",
+    "logo_svg_url": ""
   },
   {
     "id": 316,
@@ -37615,7 +37981,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "skillz.com",
+    "logo_svg_url": ""
   },
   {
     "id": 317,
@@ -37640,7 +38008,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "prodigal.com",
+    "logo_svg_url": ""
   },
   {
     "id": 318,
@@ -37651,7 +38021,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "scispace.com",
+    "logo_svg_url": ""
   },
   {
     "id": 319,
@@ -37741,7 +38113,9 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "infiniteconvergencesolutions.com",
+    "logo_svg_url": ""
   },
   {
     "id": 320,
@@ -37857,6 +38231,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true
+    "is_active_website": true,
+    "logo_domain": "honeywelltechnologies.com",
+    "logo_svg_url": ""
   }
 ]

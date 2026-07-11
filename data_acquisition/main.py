@@ -84,7 +84,8 @@ def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_
             if logo_changed or loc_changed:
                 db.save_db()
                 
-            time.sleep(random.uniform(1.0, 2.0))
+            if not os.environ.get("NO_RATE_LIMIT"):
+                time.sleep(random.uniform(1.0, 2.0))
             
         print("\n=== TAGGING & ENRICHMENT PHASE COMPLETED ===")
         

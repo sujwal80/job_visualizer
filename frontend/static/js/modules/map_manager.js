@@ -74,8 +74,7 @@ export function createLogoContent(startup) {
 }
 
 function logoUrlForStartup(startup) {
-    const domain = getDomain(startup);
-    return domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : '';
+    return startup.logo_url || '';
 }
 
 export function clearAllMarkers() {

@@ -81,7 +81,7 @@ class TestMilestone3FrontendCachingAndCoalescing(unittest.TestCase):
         """Verify local filtering and search input execute purely in-memory on state.startupsData."""
         self.assertIn("state.startupsData.filter(startup => checkStartupMatch(startup, searchText))", self.app_js,
                       "applyFiltering() must run purely in-memory on state.startupsData.")
-        self.assertIn("renderDirectory(filtered)", self.app_js,
+        self.assertIn("renderDirectory(filtered", self.app_js,
                       "applyFiltering() must directly render local filtered results without API calls.")
 
     def test_06_clean_empty_state_and_short_ttl(self):

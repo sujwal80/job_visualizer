@@ -7,7 +7,8 @@ import {
     initializeMarkers,
     updateMarkersDiff,
     updateMarkersVisualState,
-    industryColors
+    industryColors,
+    defaultColor
 } from './modules/map_manager.js';
 import {
     updateDashboardStats,
@@ -357,7 +358,7 @@ function applyFiltering() {
 
     const filtered = state.startupsData.filter(startup => checkStartupMatch(startup, searchText));
 
-    renderDirectory(filtered);
+    renderDirectory(filtered, (searchText || currentSelectedIndustry) ? 'No companies match your criteria' : null);
     updateDashboardStats(filtered);
     updateLocalMarkersVisualState();
     if (state.currentSelectedId !== null && detailsDrawer.classList.contains('active')) {

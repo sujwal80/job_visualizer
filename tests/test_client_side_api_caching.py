@@ -357,7 +357,7 @@ class TestClientSideApiCachingMasterSuite(unittest.TestCase):
         """
         # 1. Frontend JS static verification
         self.assertIn("state.startupsData.filter(startup => checkStartupMatch(startup, searchText))", self.app_js)
-        self.assertIn("renderDirectory(filtered)", self.app_js)
+        self.assertIn("renderDirectory(filtered", self.app_js)
 
         # 2. Programmatic simulation of purely in-memory filtering with 0 API calls
         in_memory_startups = [

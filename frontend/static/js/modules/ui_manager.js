@@ -69,7 +69,7 @@ export function renderDirectory(startups, customEmptyText = null) {
         const isSelected = state.currentSelectedId === startup.id;
         const indClass = startup.industry ? String(startup.industry).toLowerCase().replace(/[^a-z0-9]/g, '') : 'software';
         const domain = getDomain(startup);
-        const logoUrl = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : '';
+        const logoUrl = startup.logo_url || '';
         const jobs = Array.isArray(startup.jobs) ? startup.jobs : (Array.isArray(startup.job_openings) ? startup.job_openings : []);
         const jCnt = (startup.job_count !== undefined && startup.job_count !== null && !isNaN(parseInt(startup.job_count, 10))) ? Math.max(0, parseInt(startup.job_count, 10)) : jobs.length;
 
@@ -188,7 +188,7 @@ export function renderDrawerDetails(startup) {
     const fragment = document.createDocumentFragment();
     const indClass = startup.industry ? String(startup.industry).toLowerCase().replace(/[^a-z0-9]/g, '') : 'software';
     const domain = getDomain(startup);
-    const logoUrl = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : '';
+    const logoUrl = startup.logo_url || '';
     const jobs = Array.isArray(startup.jobs) ? startup.jobs : (Array.isArray(startup.job_openings) ? startup.job_openings : []);
     const jCnt = (startup.job_count !== undefined && startup.job_count !== null && !isNaN(parseInt(startup.job_count, 10))) ? Math.max(0, parseInt(startup.job_count, 10)) : jobs.length;
 
