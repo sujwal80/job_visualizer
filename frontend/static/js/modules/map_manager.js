@@ -58,7 +58,8 @@ export function createLogoContent(startup) {
         const img = createElement('img', {
             src: logoUrl,
             className: 'logo-marker-thumbnail',
-            alt: String(startup.name || 'Startup Logo')
+            alt: String(startup.name || 'Startup Logo'),
+            loading: 'lazy'
         });
         img.style.border = `2.5px solid ${color}`;
         img.onerror = () => { img.style.display = 'none'; };

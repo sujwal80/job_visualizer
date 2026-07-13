@@ -71,7 +71,7 @@ def add_security_and_optimization_headers(response):
             "script-src 'self' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.tailwindcss.com; "
             "style-src 'self' https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; "
             "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com https://unpkg.com https://*.cartocdn.com; "
-            "img-src 'self' data: blob: https://*.google.com https://*.gstatic.com https://*.duckduckgo.com https://*.clearbit.com https://*.cartocdn.com https://*.basemaps.cartocdn.com https://basemaps.cartocdn.com https://*.maplibre.org https://*.arcgisonline.com https://*.openstreetmap.org https://*.tile.openstreetmap.org; "
+            "img-src 'self' data: blob: https: http:; "
             "connect-src 'self' https://*.cartocdn.com https://*.basemaps.cartocdn.com https://basemaps.cartocdn.com https://*.maplibre.org https://*.arcgisonline.com https://*.openstreetmap.org https://*.tile.openstreetmap.org blob: data:; "
             "worker-src 'self' blob:; "
             "child-src 'self' blob:; "
@@ -85,7 +85,7 @@ def add_security_and_optimization_headers(response):
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.tailwindcss.com; "
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; "
             "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com https://unpkg.com https://*.cartocdn.com; "
-            "img-src 'self' data: blob: https://*.google.com https://*.gstatic.com https://*.duckduckgo.com https://*.clearbit.com https://*.cartocdn.com https://*.basemaps.cartocdn.com https://basemaps.cartocdn.com https://*.maplibre.org https://*.arcgisonline.com https://*.openstreetmap.org https://*.tile.openstreetmap.org; "
+            "img-src 'self' data: blob: https: http:; "
             "connect-src 'self' https://*.cartocdn.com https://*.basemaps.cartocdn.com https://basemaps.cartocdn.com https://*.maplibre.org https://*.arcgisonline.com https://*.openstreetmap.org https://*.tile.openstreetmap.org blob: data:; "
             "worker-src 'self' blob:; "
             "child-src 'self' blob:; "
@@ -182,6 +182,8 @@ def get_startups():
         allowed, retry_after, remaining, limit_val = True, 0, 9999, 9999
     else:
         allowed, retry_after, remaining, limit_val = _check_rate_limit(client_ip)
+    if client_ip in ('10.0.0.88', '10.0.0.100', '10.100.0.2', '10.100.0.1'):
+        print(f"[DEBUG] client_ip={client_ip}, allowed={allowed}, remaining={remaining}, path={request.path}")
     g.rate_limit_limit = limit_val
     g.rate_limit_remaining = 0 if not allowed else remaining
     if not allowed:

@@ -56,9 +56,16 @@ class TestAsyncCrawlerQueue(unittest.TestCase):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.db_path = os.path.join(self.temp_dir.name, "test_crawl_queue.db")
         self.json_path = os.path.join(self.temp_dir.name, "test_startups.json")
+        self._old_mock_env = os.environ.get("MOCK_SCRAPER_FALLBACK")
+        os.environ["MOCK_SCRAPER_FALLBACK"] = "true"
 
     def tearDown(self):
         self.temp_dir.cleanup()
+        if self._old_mock_env is not None:
+            os.environ["MOCK_SCRAPER_FALLBACK"] = self._old_mock_env
+        else:
+            os.environ.pop("MOCK_SCRAPER_FALLBACK", None)
+
 
     def test_01_fifo_and_source_isolation(self):
         """Verify tasks are popped in strict FIFO order and isolated by source_name."""

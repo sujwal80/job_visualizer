@@ -207,7 +207,7 @@ def format_startup_summary(s):
     """
     logo_domain = s.get("logo_domain", "")
     logo_svg_url = s.get("logo_svg_url", "")
-    logo_url = logo_svg_url if logo_svg_url else (f"https://www.google.com/s2/favicons?domain={logo_domain}&sz=128" if logo_domain else "")
+    logo_url = logo_svg_url if logo_svg_url else ""
     website = _sanitize_url(s.get("website", ""))
     
     job_openings = s.get("job_openings") or []
@@ -272,7 +272,7 @@ def format_startup_details(s):
 
     logo_domain = s_copy.get("logo_domain", "")
     logo_svg_url = s_copy.get("logo_svg_url", "")
-    s_copy["logo_url"] = logo_svg_url if logo_svg_url else (f"https://www.google.com/s2/favicons?domain={logo_domain}&sz=128" if logo_domain else "")
+    s_copy["logo_url"] = logo_svg_url if logo_svg_url else ""
     s_copy["url"] = _sanitize_url(s_copy.get("website", ""))
     if "website" in s_copy:
         s_copy["website"] = _sanitize_url(s_copy.get("website", ""))
@@ -338,7 +338,7 @@ def format_lightweight_summary(s):
     """
     logo_domain = s.get("logo_domain", "")
     logo_svg_url = s.get("logo_svg_url", "")
-    logo_url = logo_svg_url if logo_svg_url else (f"https://www.google.com/s2/favicons?domain={logo_domain}&sz=128" if logo_domain else "")
+    logo_url = logo_svg_url if logo_svg_url else ""
     has_pin_val = s.get("has_pin", True)
     lat_val = _safe_float(s.get("lat"))
     lng_val = _safe_float(s.get("lng"))

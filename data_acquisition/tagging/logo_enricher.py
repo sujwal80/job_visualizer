@@ -43,6 +43,7 @@ class LogoEnricher:
                     company_record["logo_domain"] = extracted
                     modified = True
                     has_valid_domain = True
+                    current_domain = extracted
                     
             if not has_valid_domain:
                 # Fallback: Deduce candidate domain from company name
@@ -54,21 +55,67 @@ class LogoEnricher:
                         print(f"[Logo Enricher] Tagged fallback logo domain '{candidate}' for '{name}'")
                         company_record["logo_domain"] = candidate
                         modified = True
+                        has_valid_domain = True
+                        current_domain = candidate
                         
-        # 2. Check and enrich logo_svg_url if missing (not present in keys)
-        if "logo_svg_url" not in company_record:
+        # 2. Check and enrich logo_svg_url if missing, empty, or invalid (does not start with http)
+        current_svg = str(company_record.get("logo_svg_url") or "").strip()
+        is_valid_svg = current_svg.startswith("http")
+        
+        if not is_valid_svg:
+            logo_url = ""
+            
+            # Priority A: SVG Scraping
             if website:
                 svg_url = self._scrape_svg_logo(website)
                 if svg_url:
-                    print(f"[Logo Enricher] Resolved SVG logo URL '{svg_url}' for '{company_record.get('name')}'")
-                    company_record["logo_svg_url"] = svg_url
-                else:
-                    company_record["logo_svg_url"] = ""
-            else:
-                company_record["logo_svg_url"] = ""
+                    logo_url = svg_url
+            
+            # Priority B: Unavatar API check (200 status code)
+            if not logo_url and current_domain:
+                unavatar_url = self._check_unavatar(current_domain)
+                if unavatar_url:
+                    logo_url = unavatar_url
+            
+            # Priority C: Google Favicon API check (200 status code)
+            if not logo_url and current_domain:
+                google_url = self._check_google_favicon(current_domain)
+                if google_url:
+                    logo_url = google_url
+            
+            company_record["logo_svg_url"] = logo_url
+            print(f"[Logo Enricher] Resolved logo URL '{logo_url}' for '{company_record.get('name')}'")
             modified = True
             
         return modified
+
+    def _check_unavatar(self, domain):
+        try:
+            url = f"https://unavatar.io/{domain}?fallback=false"
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+            resp = requests.get(url, timeout=5, headers=headers, allow_redirects=True)
+            if resp.status_code == 200:
+                return f"https://unavatar.io/{domain}"
+            elif resp.status_code == 429:
+                print(f"[Logo Enricher] Unavatar rate limit (429) for '{domain}' - falling back immediately")
+        except Exception as e:
+            print(f"[Logo Enricher] Error checking Unavatar for '{domain}': {e}")
+        return None
+
+    def _check_google_favicon(self, domain):
+        try:
+            url = f"https://www.google.com/s2/favicons?domain={domain}&sz=128"
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+            resp = requests.get(url, timeout=5, headers=headers, allow_redirects=True)
+            if resp.status_code == 200:
+                return url
+        except Exception as e:
+            print(f"[Logo Enricher] Error checking Google Favicon for '{domain}': {e}")
+        return None
 
     def _scrape_svg_logo(self, website_url):
         website_url = str(website_url or "").strip()
@@ -82,14 +129,12 @@ class LogoEnricher:
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             }
-            # Request the homepage with a 5-second timeout
             response = requests.get(website_url, timeout=5, headers=headers, allow_redirects=True)
             if response.status_code != 200:
                 return self._check_fallback_svg(website_url)
                 
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            # Look for link tags matching icon types or containing .svg href
             svg_href = None
             for link in soup.find_all('link'):
                 rel = [r.lower() for r in (link.get('rel') or [])]
@@ -103,12 +148,10 @@ class LogoEnricher:
                                href.lower().split('#')[0].endswith('.svg'))
                 
                 if is_svg_link:
-                    # Prefer standard icons
                     if any(r in rel for r in ['icon', 'shortcut icon', 'apple-touch-icon', 'apple-touch-icon-precomposed', 'mask-icon']):
                         svg_href = href
                         break
             
-            # Fallback within soup: look for ANY link element ending in .svg
             if not svg_href:
                 for link in soup.find_all('link'):
                     href = link.get('href')
@@ -155,6 +198,6 @@ class LogoEnricher:
             domain = parsed.netloc.lower()
             if domain.startswith('www.'):
                 domain = domain[4:]
-            return domain.split(':')[0] # strip port if any
+            return domain.split(':')[0]
         except Exception:
             return ""

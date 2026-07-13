@@ -12,6 +12,7 @@ sys.path.append(workspace_root)
 from logo_enricher import LogoEnricher
 from location_enricher import LocationEnricher
 from db_manager import DBManager
+
 from yc_scraper import YCScraper
 from ats_scraper import ATSScraper
 from indeed_scraper import IndeedScraper
@@ -169,7 +170,9 @@ def test_multi_city_merge_isolation():
             "job_openings": []
         }
     ]
-    with patch.object(db, "geocode_address", return_value=(12.9716, 77.5946)):
+    mock_response = MagicMock(status_code=200, url="http://apex.ai/job", text="<html><body><button>Apply Now</button></body></html>")
+    with patch.object(db, "geocode_address", return_value=(12.9716, 77.5946)), \
+         patch("requests.get", return_value=mock_response):
         db.merge_startup({"name": "Apex AI", "logo_domain": "apex.ai"}, [{"title": "Eng", "url": "http://apex.ai/job"}], target_city="Bengaluru")
     
     assert len(db.startups) == 2, f"Expected 2 separate startup records for different cities, got {len(db.startups)}"
@@ -205,24 +208,26 @@ def test_universal_scrapers_init():
 
 def test_deep_html_apply_inspection():
     print("\n=== TESTING DEEP HTML APPLY-ABILITY INSPECTION ===")
-    db = DBManager("/tmp/test_deep_apply.json")
-    validator = JobValidator(db)
+    try:
+        from utils.validation import inspect_html_content
+    except ImportError:
+        from data_acquisition.utils.validation import inspect_html_content
     
     # Positive case 1: Apply button text
     html_apply_btn = '<html><body><div class="job-header"><h1>Software Engineer</h1><a href="/apply/123" class="btn">Apply Now</a></div></body></html>'
-    assert validator._inspect_html_content(html_apply_btn, "https://example.com/job/123") is True, "Expected Apply Now button text to pass deep inspection"
+    assert inspect_html_content(html_apply_btn, "https://example.com/job/123") is True, "Expected Apply Now button text to pass deep inspection"
     
     # Positive case 2: Application form endpoint
     html_form = '<html><body><form action="https://example.com/submit-application" method="POST"><input type="text" name="resume"/></form></body></html>'
-    assert validator._inspect_html_content(html_form, "https://example.com/job/form") is True, "Expected form submit-application endpoint to pass deep inspection"
+    assert inspect_html_content(html_form, "https://example.com/job/form") is True, "Expected form submit-application endpoint to pass deep inspection"
     
     # Positive case 3: ATS embed URL
     html_ats = '<html><body><iframe src="https://boards.greenhouse.io/embed/job_app"></iframe></body></html>'
-    assert validator._inspect_html_content(html_ats, "https://example.com/careers/role") is True, "Expected Greenhouse ATS embed to pass deep inspection"
+    assert inspect_html_content(html_ats, "https://example.com/careers/role") is True, "Expected Greenhouse ATS embed to pass deep inspection"
     
     # Negative case: Generic homepage landing trap
     html_trap = '<html><head><title>Welcome to Corp</title></head><body><h1>About Us</h1><p>We are a leading software solutions provider.</p></body></html>'
-    assert validator._inspect_html_content(html_trap, "https://example.com/careers") is False, "Expected generic homepage landing trap to fail deep inspection"
+    assert inspect_html_content(html_trap, "https://example.com/careers") is False, "Expected generic homepage landing trap to fail deep inspection"
     print(" [PASS] Deep HTML apply-ability inspection correctly distinguished true apply pages from generic homepage traps.")
 
 def test_universal_scrapers():

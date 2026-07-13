@@ -11,9 +11,9 @@ from unittest.mock import patch, MagicMock
 
 # Add project root to path
 workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(workspace_root)
-sys.path.append(os.path.join(workspace_root, "data_acquisition"))
-sys.path.append(os.path.join(workspace_root, "data_acquisition", "tagging"))
+sys.path.insert(0, workspace_root)
+sys.path.insert(0, os.path.join(workspace_root, "data_acquisition"))
+sys.path.insert(0, os.path.join(workspace_root, "data_acquisition", "tagging"))
 
 from logo_enricher import LogoEnricher
 from backend.services.startup_service import format_startup_summary, format_startup_details, format_lightweight_summary
@@ -94,7 +94,7 @@ class TestLogoEnricher(unittest.TestCase):
             text="<svg xmlns='http://www.w3.org/2000/svg'></svg>"
         )
         
-        # requests.get will be called twice: first for homepage, second for /favicon.svg fallback
+        # requests.get will be called twice for SVG scraping
         mock_get.side_effect = [mock_home, mock_favicon]
 
         company = {"name": "TestCorp", "website": "https://testcorp.com"}
@@ -105,34 +105,36 @@ class TestLogoEnricher(unittest.TestCase):
 
     @patch("requests.get")
     def test_enrich_handling_non_svg_response_for_fallback(self, mock_get):
-        # 5. Homepage has no SVG. /favicon.svg returns a 200 HTML page (trap)
+        # 5. Homepage has no SVG. /favicon.svg returns 200 html.
+        # Then Unavatar returns 404, Google Favicon returns 404.
         html_homepage = "<html></html>"
-        
         mock_home = MagicMock(status_code=200, text=html_homepage)
         mock_favicon = MagicMock(
             status_code=200, 
             headers={"content-type": "text/html"}, 
             text="<html>404 Not Found but 200 OK</html>"
         )
+        mock_unavatar = MagicMock(status_code=404)
+        mock_google = MagicMock(status_code=404)
         
-        mock_get.side_effect = [mock_home, mock_favicon]
+        mock_get.side_effect = [mock_home, mock_favicon, mock_unavatar, mock_google]
 
         company = {"name": "TestCorp", "website": "https://testcorp.com"}
         res = self.logo_enricher.enrich(company)
 
         self.assertTrue(res)
-        self.assertEqual(company["logo_svg_url"], "") # Empty string: scraping attempted and failed
+        self.assertEqual(company["logo_svg_url"], "")
 
     @patch("requests.get")
     def test_enrich_handling_timeout_gracefully(self, mock_get):
-        # 6. Request to homepage times out
+        # Request to website times out, and following check APIs also fail/timeout
         mock_get.side_effect = Exception("Connection timed out")
 
         company = {"name": "TestCorp", "website": "https://testcorp.com"}
         res = self.logo_enricher.enrich(company)
 
         self.assertTrue(res)
-        self.assertEqual(company["logo_svg_url"], "") # Sets empty string gracefully on error
+        self.assertEqual(company["logo_svg_url"], "")
 
     def test_enrich_short_circuits_fully_enriched(self):
         # 7. Already fully enriched startup
@@ -145,10 +147,89 @@ class TestLogoEnricher(unittest.TestCase):
         res = self.logo_enricher.enrich(company)
         self.assertFalse(res)
 
+    @patch("requests.get")
+    def test_enrich_does_not_short_circuit_if_empty(self, mock_get):
+        # Already has empty logo_svg_url, but we should attempt resolution
+        company = {
+            "name": "TestCorp",
+            "logo_domain": "testcorp.com",
+            "logo_svg_url": "",
+            "website": "https://testcorp.com"
+        }
+        # SVG fails, Unavatar succeeds
+        html_homepage = "<html></html>"
+        mock_home = MagicMock(status_code=200, text=html_homepage)
+        mock_favicon = MagicMock(status_code=404)
+        mock_unavatar = MagicMock(status_code=200)
+        
+        mock_get.side_effect = [mock_home, mock_favicon, mock_unavatar]
+        
+        res = self.logo_enricher.enrich(company)
+        self.assertTrue(res)
+        self.assertEqual(company["logo_svg_url"], "https://unavatar.io/testcorp.com")
+
+    @patch("requests.get")
+    def test_enrich_unavatar_fallback_success(self, mock_get):
+        # SVG scraping fails (returns HTML without link, and /favicon.svg returns 404)
+        # Unavatar API check returns 200
+        html_homepage = "<html></html>"
+        mock_home = MagicMock(status_code=200, text=html_homepage)
+        mock_favicon = MagicMock(status_code=404)
+        mock_unavatar = MagicMock(status_code=200)
+
+        mock_get.side_effect = [mock_home, mock_favicon, mock_unavatar]
+
+        company = {"name": "TestCorp", "website": "https://testcorp.com"}
+        res = self.logo_enricher.enrich(company)
+
+        self.assertTrue(res)
+        self.assertEqual(company["logo_svg_url"], "https://unavatar.io/testcorp.com")
+        # Check that we did not call Google Favicon (mock_get called exactly 3 times)
+        self.assertEqual(mock_get.call_count, 3)
+
+    @patch("requests.get")
+    def test_enrich_google_favicon_fallback_success(self, mock_get):
+        # SVG scraping fails
+        # Unavatar returns 404
+        # Google Favicon returns 200
+        html_homepage = "<html></html>"
+        mock_home = MagicMock(status_code=200, text=html_homepage)
+        mock_favicon = MagicMock(status_code=404)
+        mock_unavatar = MagicMock(status_code=404)
+        mock_google = MagicMock(status_code=200)
+
+        mock_get.side_effect = [mock_home, mock_favicon, mock_unavatar, mock_google]
+
+        company = {"name": "TestCorp", "website": "https://testcorp.com"}
+        res = self.logo_enricher.enrich(company)
+
+        self.assertTrue(res)
+        self.assertEqual(company["logo_svg_url"], "https://www.google.com/s2/favicons?domain=testcorp.com&sz=128")
+        self.assertEqual(mock_get.call_count, 4)
+
+    @patch("requests.get")
+    def test_enrich_unavatar_rate_limit_fallback_to_google(self, mock_get):
+        # SVG scraping fails
+        # Unavatar returns 429 (Rate Limit)
+        # Google Favicon returns 200
+        html_homepage = "<html></html>"
+        mock_home = MagicMock(status_code=200, text=html_homepage)
+        mock_favicon = MagicMock(status_code=404)
+        mock_unavatar = MagicMock(status_code=429)
+        mock_google = MagicMock(status_code=200)
+
+        mock_get.side_effect = [mock_home, mock_favicon, mock_unavatar, mock_google]
+
+        company = {"name": "TestCorp", "website": "https://testcorp.com"}
+        res = self.logo_enricher.enrich(company)
+
+        self.assertTrue(res)
+        self.assertEqual(company["logo_svg_url"], "https://www.google.com/s2/favicons?domain=testcorp.com&sz=128")
+        self.assertEqual(mock_get.call_count, 4)
+
 
 class TestBackendStartupLogoUrl(unittest.TestCase):
     def test_format_startup_summary_uses_svg(self):
-        # Startup service using logo_svg_url
         startup = {
             "id": 1,
             "name": "TestCorp",
@@ -160,18 +241,18 @@ class TestBackendStartupLogoUrl(unittest.TestCase):
         summary = format_startup_summary(startup)
         self.assertEqual(summary["logo_url"], "https://testcorp.com/logo.svg")
 
-    def test_format_startup_summary_fallback_to_google_favicon(self):
-        # Startup service falling back to Google Favicon API
+    def test_format_startup_summary_empty_logo(self):
+        # Formatters serve logo_svg_url directly (which is empty string)
         startup = {
             "id": 2,
             "name": "TestCorp",
             "logo_domain": "testcorp.com",
-            "logo_svg_url": "", # Empty SVG resolved
+            "logo_svg_url": "",
             "website": "https://testcorp.com",
             "job_openings": []
         }
         summary = format_startup_summary(startup)
-        self.assertEqual(summary["logo_url"], "https://www.google.com/s2/favicons?domain=testcorp.com&sz=128")
+        self.assertEqual(summary["logo_url"], "")
 
     def test_format_startup_details_uses_svg(self):
         startup = {

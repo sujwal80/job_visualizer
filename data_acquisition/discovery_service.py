@@ -12,9 +12,10 @@ class CompanyDiscoveryService:
     Discovers new companies using LinkedIn search keywords in Bangalore
     and adds shell records to the database if they don't already exist.
     """
-    def __init__(self, db_manager, linkedin_scraper):
+    def __init__(self, db_manager, linkedin_scraper, validator=None):
         self.db = db_manager
         self.scraper = linkedin_scraper
+        self.validator = validator
 
     def discover_new_companies(self, keywords_list=None, max_new_companies=None, target_city=None):
         if target_city is None:
@@ -83,6 +84,8 @@ class CompanyDiscoveryService:
                     if "office_address" not in details:
                         details["office_address"] = details.get("bangalore_address") or target_city
                     
+                if self.validator is not None:
+                    self.validator.validate_company_status(details)
                 self.db.merge_startup(details, [job], target_city=target_city)
                 self.db.save_db()
                 new_added += 1

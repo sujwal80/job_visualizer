@@ -5,12 +5,21 @@ import urllib.parse
 import re
 import time
 import threading
+import concurrent.futures
 from contextlib import contextmanager
 try:
     import fcntl
     HAS_FCNTL = True
 except ImportError:
     HAS_FCNTL = False
+
+try:
+    from utils.validation import validate_website_domain, check_job_active
+except ImportError:
+    try:
+        from data_acquisition.utils.validation import validate_website_domain, check_job_active
+    except ImportError:
+        pass
 
 BLACKLISTED_DOMAINS = {
     "bit.ly", "linktr.ee", "tinyurl.com", "t.co", "buff.ly", "goo.gl", "ow.ly",
@@ -116,12 +125,27 @@ class DBManager:
     def merge_job_openings(self, jobs):
         if not isinstance(jobs, list) or not jobs:
             return 0
+            
+        # Parallel validate job URLs
+        valid_jobs = []
+        if jobs:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=min(15, len(jobs))) as executor:
+                def check_job(job):
+                    if not isinstance(job, dict):
+                        return None
+                    url = str(job.get("url") or job.get("job_url") or "").strip()
+                    if not url or url == "N/A" or not url.startswith(("http://", "https://")):
+                        return None
+                    active, _ = check_job_active(url)
+                    return job if active else None
+                
+                results = list(executor.map(check_job, jobs))
+                valid_jobs = [r for r in results if r is not None]
+                
         merged_count = 0
         with self.file_lock(self.db_path):
             self.load_db()
-            for j in jobs:
-                if not isinstance(j, dict):
-                    continue
+            for j in valid_jobs:
                 comp_name = j.get("company_name", "N/A")
                 startup = self.find_startup(comp_name, "")
                 if not startup:
@@ -192,7 +216,17 @@ class DBManager:
             company_details["description"] = self._sanitize_string(company_details["description"])
             
         raw_web = company_details.get("website") or ""
-        clean_web, clean_dom = self._clean_url_and_domain(raw_web)
+        if raw_web and raw_web != "N/A":
+            is_active, healed_url, reason = validate_website_domain(raw_web)
+            company_details["is_active_website"] = is_active
+            if is_active and healed_url:
+                company_details["website"] = healed_url
+                _, clean_dom = self._clean_url_and_domain(healed_url)
+                company_details["logo_domain"] = clean_dom
+        else:
+            company_details["is_active_website"] = True
+
+        clean_web, clean_dom = self._clean_url_and_domain(company_details.get("website") or "")
         logo_domain = company_details.get("logo_domain") or clean_dom
         if not logo_domain and clean_dom:
             logo_domain = clean_dom
@@ -450,6 +484,21 @@ class DBManager:
         """
         Merge jobs list. Check by normalized job title to avoid duplicates.
         """
+        valid_crawled_jobs = []
+        if crawled_jobs:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=min(15, len(crawled_jobs))) as executor:
+                def check_job(job):
+                    if not isinstance(job, dict):
+                        return None
+                    url = str(job.get("url") or job.get("job_url") or "").strip()
+                    if not url or url == "N/A" or not url.startswith(("http://", "https://")):
+                        return None
+                    active, _ = check_job_active(url)
+                    return job if active else None
+                
+                results = list(executor.map(check_job, crawled_jobs))
+                valid_crawled_jobs = [r for r in results if r is not None]
+
         existing_jobs = startup.get("job_openings", [])
         if not isinstance(existing_jobs, list):
             existing_jobs = []
@@ -478,7 +527,7 @@ class DBManager:
             else:
                 ej["posted_date"] = self._sanitize_string(str(ej["posted_date"]))
         
-        for job in crawled_jobs:
+        for job in valid_crawled_jobs:
             if not isinstance(job, dict) or not job.get("title"):
                 continue
             title = job.get("title")

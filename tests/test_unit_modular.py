@@ -10,6 +10,9 @@ import sys
 import os
 import math
 import time
+import socket
+import requests
+from unittest.mock import patch, MagicMock
 
 # Add project root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -184,6 +187,85 @@ class TestFlexibleStartupIDLookupAndFallback(unittest.TestCase):
             content = f.read()
         self.assertIn("const fallbackStartup = state.startupsData.find(s => String(s.id) === String(id));", content)
         self.assertIn("_processOpenStartup(fallbackStartup);", content)
+
+
+class TestValidationUtils(unittest.TestCase):
+    """Unit tests for check_dns and validate_website_domain with mock patches."""
+
+    @patch('socket.gethostbyname')
+    def test_check_dns_success(self, mock_gethostbyname):
+        mock_gethostbyname.return_value = '1.2.3.4'
+        from data_acquisition.utils.validation import check_dns
+        self.assertTrue(check_dns('example.com'))
+        mock_gethostbyname.assert_called_once_with('example.com')
+
+    @patch('socket.gethostbyname')
+    def test_check_dns_failure(self, mock_gethostbyname):
+        mock_gethostbyname.side_effect = socket.gaierror('mock gaierror')
+        from data_acquisition.utils.validation import check_dns
+        self.assertFalse(check_dns('invalid-domain.com'))
+        mock_gethostbyname.assert_called_once_with('invalid-domain.com')
+
+    @patch('socket.gethostbyname')
+    @patch('requests.get')
+    @patch('requests.head')
+    def test_validate_website_domain_success(self, mock_head, mock_get, mock_gethostbyname):
+        mock_gethostbyname.return_value = '1.2.3.4'
+        
+        # Mock requests.head success
+        mock_res = MagicMock()
+        mock_res.status_code = 200
+        mock_res.url = 'https://rupeek.com'
+        mock_head.return_value = mock_res
+
+        from data_acquisition.utils.validation import validate_website_domain
+        is_active, healed_url, reason = validate_website_domain('https://rupeek.com')
+        self.assertTrue(is_active)
+        self.assertEqual(healed_url, 'https://rupeek.com')
+        self.assertIsNone(reason)
+        mock_head.assert_called_once()
+        mock_get.assert_not_called()
+
+    @patch('socket.gethostbyname')
+    @patch('requests.get')
+    @patch('requests.head')
+    def test_validate_website_domain_self_healing(self, mock_head, mock_get, mock_gethostbyname):
+        # We start with https://www.rupeek.com
+        # Primary domain is www.rupeek.com, alt_domain is rupeek.com
+        # Mock DNS: www.rupeek.com fails, rupeek.com succeeds
+        def dns_side_effect(domain):
+            if domain == 'www.rupeek.com':
+                raise socket.gaierror('Mock DNS fail')
+            return '1.2.3.4'
+        mock_gethostbyname.side_effect = dns_side_effect
+
+        # Mock requests for rupeek.com to succeed
+        mock_res = MagicMock()
+        mock_res.status_code = 200
+        mock_res.url = 'https://rupeek.com'
+        mock_head.return_value = mock_res
+
+        from data_acquisition.utils.validation import validate_website_domain
+        is_active, healed_url, reason = validate_website_domain('https://www.rupeek.com')
+        self.assertTrue(is_active)
+        self.assertEqual(healed_url, 'https://rupeek.com')
+        self.assertIsNone(reason)
+
+    @patch('socket.gethostbyname')
+    @patch('requests.get')
+    @patch('requests.head')
+    def test_validate_website_domain_failure(self, mock_head, mock_get, mock_gethostbyname):
+        # kora.ai DNS fails, www.kora.ai DNS fails, and fallback direct request fails
+        mock_gethostbyname.side_effect = socket.gaierror('Mock DNS fail')
+        
+        mock_head.side_effect = requests.exceptions.ConnectionError('Mock connection fail')
+        mock_get.side_effect = requests.exceptions.ConnectionError('Mock connection fail')
+
+        from data_acquisition.utils.validation import validate_website_domain
+        is_active, healed_url, reason = validate_website_domain('https://kora.ai')
+        self.assertFalse(is_active)
+        self.assertEqual(healed_url, 'https://kora.ai')
+        self.assertIn('Mock connection fail', reason)
 
 
 if __name__ == '__main__':

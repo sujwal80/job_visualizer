@@ -11,6 +11,11 @@ try:
 except ImportError:
     from data_acquisition.geo_config import TEST_FIXTURE_WHITELIST_URLS
 
+try:
+    from utils.validation import validate_website_domain, check_job_active
+except ImportError:
+    from data_acquisition.utils.validation import validate_website_domain, check_job_active
+
 EXPIRED_KEYWORDS = [
     "no longer accepting applications",
     "job is closed",
@@ -52,51 +57,66 @@ class JobValidator:
         if not url or url == "N/A" or not url.startswith(("http://", "https://")):
             return None, "Invalid/missing URL", title
 
-        is_active, reason = self._check_job_active(url)
+        is_active, reason = check_job_active(url)
         if is_active:
             return job, "Active", title
         else:
             return None, reason, title
+
+    def _validate_flat_job_worker(self, task):
+        startup, job = task
+        res_job, reason, title = self._validate_job_worker(job)
+        return startup, res_job, reason, title
 
     def validate_and_prune(self, max_startups=None):
         print("\n==========================================================")
         print("=== STARTING LIVE PROD VALIDATION & EXPIRED JOB REMOVAL ===")
         print("==========================================================")
         
-        total_startups = len(self.db.startups)
-        total_pruned = 0
+        processed_startups = []
         processed = 0
-        
         for startup in self.db.startups:
             processed += 1
             if max_startups and processed > max_startups:
-                print(f"[Job Validator] Reached max_startups limit ({max_startups}). Stopping validation.")
+                print(f"[Job Validator] Reached max_startups limit ({max_startups}). Stopping collection.")
                 break
-                
-            comp_name = startup.get("name", "N/A")
-            jobs = startup.get("job_openings", [])
-            if not jobs:
-                continue
-                
-            valid_jobs = []
-            pruned_for_company = 0
+            processed_startups.append(startup)
             
+        job_tasks = []
+        startups_to_validate_website = []
+        for startup in processed_startups:
+            startups_to_validate_website.append(startup)
+            jobs = startup.get("job_openings", [])
+            for job in jobs:
+                job_tasks.append((startup, job))
+
+
+        total_pruned = 0
+        if job_tasks:
             with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
-                results = list(executor.map(self._validate_job_worker, jobs))
+                results = list(executor.map(self._validate_flat_job_worker, job_tasks))
                 
-            for res_job, reason, title in results:
+            valid_jobs_map = {id(startup): [] for startup in startups_to_validate_website}
+            for startup, res_job, reason, title in results:
                 if res_job is not None:
-                    valid_jobs.append(res_job)
+                    valid_jobs_map[id(startup)].append(res_job)
                 else:
-                    pruned_for_company += 1
-                    
-            if pruned_for_company > 0:
-                print(f"  [~] Company '{comp_name}': Pruned {pruned_for_company} non-valid/expired jobs (Remaining active: {len(valid_jobs)})")
-                startup["job_openings"] = valid_jobs
-                total_pruned += pruned_for_company
-                
-            self.validate_company_status(startup)
-            self.db.save_db()
+                    total_pruned += 1
+
+            for startup in startups_to_validate_website:
+                old_count = len(startup.get("job_openings", []))
+                valid_jobs = valid_jobs_map[id(startup)]
+                pruned_for_company = old_count - len(valid_jobs)
+                if pruned_for_company > 0:
+                    comp_name = startup.get("name", "N/A")
+                    print(f"  [~] Company '{comp_name}': Pruned {pruned_for_company} non-valid/expired jobs (Remaining active: {len(valid_jobs)})")
+                    startup["job_openings"] = valid_jobs
+
+        if startups_to_validate_website:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
+                list(executor.map(self.validate_company_status, startups_to_validate_website))
+
+        self.db.save_db()
                 
         print("\n=== LIVE PROD DATA VALIDATION FINISHED ===")
         print(f"Total expired/invalid jobs pruned from database: {total_pruned}")
@@ -112,84 +132,13 @@ class JobValidator:
 
         web = startup.get("website", "")
         if web and web != "N/A" and web.startswith(("http://", "https://")):
-            try:
-                res = requests.head(web, headers=self.headers, timeout=5, allow_redirects=True)
-                if res.status_code < 400 or res.status_code in [403, 405, 429, 503]:
-                    startup["is_active_website"] = True
-                else:
-                    startup["is_active_website"] = False
-            except Exception:
-                startup["is_active_website"] = True
+            is_active, healed_url, reason = validate_website_domain(web, headers=self.headers)
+            startup["is_active_website"] = is_active
+            startup["website"] = healed_url
         else:
             startup["is_active_website"] = True
 
     def _check_job_active(self, url):
-        if url.rstrip('/') in TEST_FIXTURE_WHITELIST_URLS or url.startswith("https://www.google.com") or os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
-            return True, "Active (Whitelisted/Mock)"
-        try:
-            res = requests.get(url, headers=self.headers, allow_redirects=True, timeout=8)
-            
-            # 1. Check status code
-            if res.status_code in [404, 410]:
-                return False, f"HTTP {res.status_code} Not Found/Gone"
-            if res.status_code in [429, 500, 502, 503, 504]:
-                return True, f"HTTP {res.status_code} Temporarily Unavailable (Assumed Active)"
-                
-            # 2. Check for redirect to generic login or main careers page
-            final_url = res.url.lower()
-            if "login" in final_url or "signup" in final_url or "session_redirect" in final_url:
-                return False, "Redirected to auth/login page"
-                
-            parsed_orig = urllib.parse.urlparse(url)
-            parsed_final = urllib.parse.urlparse(res.url)
-            
-            orig_path = parsed_orig.path.rstrip('/')
-            final_path = parsed_final.path.rstrip('/')
-            
-            # If redirected away from a specific job path to root domain or main careers search
-            if orig_path != final_path and len(orig_path) > 1:
-                if final_path in ["", "/jobs", "/careers", "/search", "/jobs/search", "/openings"]:
-                    return False, f"Redirected to generic page ({final_path or '/'})"
-                    
-            # 3. Check page text content for expiration keywords
-            text_lower = res.text.lower()
-            for kw in EXPIRED_KEYWORDS:
-                if kw in text_lower:
-                    return False, f"Matched expiration phrase: '{kw}'"
-                    
-            # 4. Perform deep content inspection on response HTML
-            if not self._inspect_html_content(res.text, url):
-                return False, "No Apply Mechanism/ATS Found"
-                
-            return True, "Active"
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.RequestException) as e:
-            return True, f"Network issue ({type(e).__name__}) (Assumed Active)"
-        except Exception as e:
-            return False, f"Request error: {str(e)[:40]}"
+        is_active, reason = check_job_active(url)
+        return is_active, reason
 
-    def _inspect_html_content(self, html, url):
-        """
-        Deep HTML content inspection verifying direct job application capability.
-        Checks for Apply Buttons, Application Form Tags, or ATS Links/Embeds.
-        """
-        # Maintain backward compatibility with automated test suite fixtures
-        if url.rstrip('/') in TEST_FIXTURE_WHITELIST_URLS:
-            return True
-
-        # 1. Check for ATS Links/Embeds (in URL or response HTML)
-        ats_pattern = r'(boards\.greenhouse\.io|jobs\.lever\.co|api\.ashbyhq\.com|workable\.com|bamboohr\.com|smartrecruiters\.com)'
-        if re.search(ats_pattern, url, re.IGNORECASE) or re.search(ats_pattern, html, re.IGNORECASE):
-            return True
-
-        # 2. Check for Apply Buttons (tags with id/class/value/title/aria-label containing apply/submit/application or visible text)
-        button_tag_pattern = r'<(button|a|input)[^>]*\b(id|class|value|title|aria-label)=["\']?[^"\'>]*(apply|submit|application)[^"\'>]*["\']?'
-        button_text_pattern = r'>[^<]*(Apply Now|Apply for this job|Submit Application|Apply Online|Apply Here)[^<]*<'
-        if re.search(button_tag_pattern, html, re.IGNORECASE) or re.search(button_text_pattern, html, re.IGNORECASE):
-            return True
-
-        # 3. Check for Application Form Tags (<form> pointing to apply/submit endpoints or enctype="multipart/form-data")
-        form_pattern = r'<form[^>]*\b(action=["\']?[^"\'>]*(apply|job|career|submit|application)[^"\'>]*["\']?|enctype=["\']?multipart/form-data["\']?)'
-        if re.search(form_pattern, html, re.IGNORECASE):
-            return True
-
-        return False

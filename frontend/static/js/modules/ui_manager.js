@@ -77,7 +77,11 @@ export function renderDirectory(startups, customEmptyText = null) {
             createElement('span', { textContent: String(startup.name || 'S').substring(0, 1).toUpperCase() })
         ];
         if (logoUrl) {
-            const img = createElement('img', { src: logoUrl, alt: String(startup.name || 'Logo') });
+            const img = createElement('img', { 
+                src: logoUrl, 
+                alt: String(startup.name || 'Logo'),
+                loading: 'lazy'
+            });
             img.style.position = 'absolute';
             img.style.top = '0';
             img.style.left = '0';
@@ -209,7 +213,7 @@ export function renderDrawerDetails(startup) {
     const titleRowChildren = [
         createElement('h2', { className: 'drawer-company-name', textContent: String(startup.name || 'Unnamed Startup') })
     ];
-    if (startup.website) {
+    if (startup.website && startup.is_active_website !== false) {
         const safeWebsite = getSafeUrl(startup.website);
         if (safeWebsite) {
             const siteLink = createElement('a', {

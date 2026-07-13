@@ -116,7 +116,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
         response = self.page.goto(f"{self.BASE_URL}/")
         self.assertIsNotNone(response, "Page response should not be None")
         self.assertEqual(response.status, 200, "Homepage should return HTTP 200")
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
 
         title = self.page.title()
         self.assertIn("JobMap", title, "Page title should contain JobMap")
@@ -146,7 +146,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
                 page.on("pageerror", lambda err: errors.append(str(err)))
                 response = page.goto(f"{self.BASE_URL}/")
                 self.assertEqual(response.status, 200)
-                page.wait_for_load_state("networkidle")
+                page.wait_for_load_state("domcontentloaded")
 
                 input_box = page.locator("#landingCityInput")
                 self.assertTrue(input_box.is_visible(), f"#landingCityInput should be visible on {name}")
@@ -164,7 +164,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
     def test_b1_interactive_map_rendering_and_preset_navigation(self):
         """Verify preset city navigation redirects and loads startup marker pins & directory items."""
         self.page.goto(f"{self.BASE_URL}/")
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
 
         # Click preset city Bengaluru
         self.page.click("button[onclick=\"handlePresetSearch('bengaluru')\"]")
@@ -224,7 +224,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
     def test_c2_industry_filter_pills(self):
         """Verify clicking industry filter tabs updates job directory and marker pins."""
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
         self.page.wait_for_timeout(1000)
 
         # Total items initially
@@ -246,7 +246,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
     def test_c3_live_search_filtering(self):
         """Verify typing into live search input dynamically filters directory."""
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
         self.page.wait_for_timeout(1000)
 
         total_items = self.page.locator("#directory-list .directory-item").count()
@@ -273,7 +273,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
     def test_d1_directory_item_click_opens_details_drawer(self):
         """Verify clicking a directory item opens the details drawer populated with company info."""
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
         self.page.wait_for_timeout(1000)
 
         # Click first directory item
@@ -302,7 +302,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
         """Verify that opening a startup with job openings renders apply links inside the drawer."""
         # Stripe has jobs
         self.page.goto(f"{self.BASE_URL}/jobs?city=San%20Francisco%2C%20CA")
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
         self.page.wait_for_timeout(1000)
 
         # Click Stripe directory item
@@ -323,7 +323,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
     def test_d3_country_search_usa(self):
         """Verify that searching for 'USA' in the landing search redirects and centers on San Francisco with jobs."""
         self.page.goto(self.BASE_URL)
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
 
         # Fill USA in landing search input and press enter
         self.page.fill("#landingCityInput", "USA")
@@ -331,7 +331,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
 
         # Wait for redirect
         self.page.wait_for_url(f"**/jobs?city=San%20Francisco%2C%20CA")
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
         self.page.wait_for_timeout(1000)
 
         # Verify directory items exist
@@ -353,7 +353,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
         )
 
         self.page.goto(self.BASE_URL)
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
 
         # Fill Delhi in landing search and press enter
         self.page.fill("#landingCityInput", "Delhi")
@@ -361,7 +361,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
 
         # Wait for redirect
         self.page.wait_for_url(f"**/jobs?city=Delhi")
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
         self.page.wait_for_timeout(1500)
 
         # Verify left directory list is NOT stuck on "Finding jobs in neighborhood..."
@@ -383,7 +383,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
     def test_e1_demo_login_cookie_issuance_and_status(self):
         """Verify demo login endpoint sets session_token cookie and status API returns authenticated profile."""
         self.page.goto(f"{self.BASE_URL}/api/auth/demo_login?redirect=true")
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
 
         # Check browser landed on root /
         parsed_path = urllib.parse.urlparse(self.page.url).path
@@ -409,7 +409,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
     def test_e2_logout_flow_and_session_revocation(self):
         """Verify logout endpoint revokes active session and clears authentication status."""
         self.page.goto(f"{self.BASE_URL}/api/auth/demo_login?redirect=true")
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
 
         # Call logout API
         logout_data = self.page.evaluate("() => fetch('/api/auth/logout', {method: 'POST'}).then(r => r.json())")
@@ -427,7 +427,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
     def test_f1_rapid_filter_toggles_resilience(self):
         """Verify rapid successive industry filter toggling causes zero JS runtime errors or crashes."""
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
         self.page.wait_for_timeout(1000)
 
         # Rapidly click filters
@@ -441,7 +441,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
     def test_f2_empty_search_results_and_recovery(self):
         """Verify graceful UI rendering on zero search matches and recovery by clearing search."""
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
-        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_load_state("domcontentloaded")
         self.page.wait_for_timeout(1000)
 
         self.page.fill("#search-input", "NONEXISTENT_XYZ_99999")

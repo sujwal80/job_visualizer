@@ -49,11 +49,12 @@ def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_
     
     # 0. Initialize components
     db = DBManager(db_path)
-    linkedin_scraper = LinkedInScraper()
+    validator = JobValidator(db)
+    linkedin_scraper = LinkedInScraper(validator=validator)
     
     # 1. Acquisition Phase (Company Discovery)
     if run_discovery:
-        discovery = CompanyDiscoveryService(db, linkedin_scraper)
+        discovery = CompanyDiscoveryService(db, linkedin_scraper, validator=validator)
         discovery.discover_new_companies(max_new_companies=max_discovery, target_city=target_city)
         
     # 2. Tagging & Enrichment Phase
@@ -91,7 +92,6 @@ def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_
         
     # 3. Validation & Pruning Phase
     if run_validation:
-        validator = JobValidator(db)
         validator.validate_and_prune(max_startups=max_validation)
         
     print(f"\nPipeline execution finished successfully. Total startups in DB: {len(db.startups)}")

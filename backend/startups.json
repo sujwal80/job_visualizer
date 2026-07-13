@@ -47,7 +47,7 @@
       }
     ],
     "verified_email": "careers@kora.ai",
-    "is_active_website": true,
+    "is_active_website": false,
     "is_remote_office": false,
     "remote_office_distance_km": 5.11,
     "location_tagged": true,
@@ -101,7 +101,7 @@
       }
     ],
     "verified_email": "jobs@indirapay.in",
-    "is_active_website": true,
+    "is_active_website": false,
     "is_remote_office": false,
     "remote_office_distance_km": 4.97,
     "location_tagged": true,
@@ -207,7 +207,9 @@
     "is_remote_office": false,
     "remote_office_distance_km": 17.9,
     "location_tagged": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "verified_email": "info@whitefieldcleantech.com",
+    "is_active_website": true
   },
   {
     "id": 5,
@@ -239,22 +241,6 @@
     },
     "job_openings": [
       {
-        "title": "Operations Manager",
-        "department": "Operations",
-        "location": "Bengaluru",
-        "source": "LinkedIn",
-        "url": "https://nammacart.co.in/careers",
-        "job_url": "https://nammacart.co.in/careers"
-      },
-      {
-        "title": "Backend Dev (Node.js)",
-        "department": "Engineering",
-        "location": "Bengaluru",
-        "source": "Company Site",
-        "url": "https://nammacart.co.in/careers",
-        "job_url": "https://nammacart.co.in/careers"
-      },
-      {
         "title": "Human Resources Business Manager",
         "department": "Engineering",
         "location": "Bengaluru, Karnataka, India",
@@ -283,7 +269,7 @@
     "remote_office_distance_km": 5.11,
     "location_tagged": true,
     "verified_email": "work@nammacart.co.in",
-    "is_active_website": true,
+    "is_active_website": false,
     "logo_svg_url": ""
   },
   {
@@ -417,7 +403,7 @@
     "location_tagged": true,
     "verified_email": "talent@rupeeflow.com",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/rupeeflow.com"
   },
   {
     "id": 9,
@@ -446,7 +432,9 @@
     "is_remote_office": false,
     "remote_office_distance_km": 8.22,
     "location_tagged": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "verified_email": "join@solargridindia.com",
+    "is_active_website": true
   },
   {
     "id": 10,
@@ -585,7 +573,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/news.microsoft.com"
   },
   {
     "id": 12,
@@ -936,7 +924,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/goo.gle"
   },
   {
     "id": 13,
@@ -1326,7 +1314,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/lenovo.com"
   },
   {
     "id": 14,
@@ -1421,7 +1409,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/porter.in"
   },
   {
     "id": 15,
@@ -1839,7 +1827,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/deloitte.com"
   },
   {
     "id": 16,
@@ -2298,7 +2286,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/infosys.com"
   },
   {
     "id": 17,
@@ -2971,7 +2959,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/bairesdev.com"
   },
   {
     "id": 19,
@@ -3309,7 +3297,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/apple.com"
   },
   {
     "id": 20,
@@ -3543,7 +3531,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/careers.linkedin.com"
   },
   {
     "id": 21,
@@ -4804,7 +4792,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/jobs-ta.pwc.com"
   },
   {
     "id": 26,
@@ -4858,7 +4846,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=wolkensoftware.com&sz=128"
   },
   {
     "id": 27,
@@ -4892,7 +4880,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=yardstick.live&sz=128"
   },
   {
     "id": 28,
@@ -5373,7 +5361,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=life.myntra.com&sz=128"
   },
   {
     "id": 29,
@@ -5750,7 +5738,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=capgemini.com&sz=128"
   },
   {
     "id": 30,
@@ -5815,7 +5803,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=openleaf.tech&sz=128"
   },
   {
     "id": 31,
@@ -6153,7 +6141,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ebayinc.com&sz=128"
   },
   {
     "id": 32,
@@ -6987,7 +6975,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=tataelectronics.com&sz=128"
   },
   {
     "id": 35,
@@ -7086,7 +7074,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=merge.money&sz=128"
   },
   {
     "id": 37,
@@ -7268,7 +7256,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=gosats.io&sz=128"
   },
   {
     "id": 38,
@@ -7372,7 +7360,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=razorpay.com&sz=128"
   },
   {
     "id": 39,
@@ -7406,7 +7394,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=axi.com&sz=128"
   },
   {
     "id": 40,
@@ -7588,7 +7576,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=snapmintbusiness.com&sz=128"
   },
   {
     "id": 41,
@@ -7805,7 +7793,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=glomopay.com&sz=128"
   },
   {
     "id": 43,
@@ -8416,7 +8404,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=groww.in&sz=128"
   },
   {
     "id": 46,
@@ -8702,7 +8690,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=wns.com&sz=128"
   },
   {
     "id": 48,
@@ -8808,7 +8796,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=mcafee.com&sz=128"
   },
   {
     "id": 49,
@@ -9491,7 +9479,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=meesho.io&sz=128"
   },
   {
     "id": 50,
@@ -9686,7 +9674,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=smallcase.com&sz=128"
   },
   {
     "id": 51,
@@ -10485,7 +10473,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=phonepe.com&sz=128"
   },
   {
     "id": 52,
@@ -10495,7 +10483,7 @@
     "city": "Corporate Office 45/B, Bengaluru",
     "industry": "Fintech",
     "description": "Rupeek | 225,903 followers on LinkedIn. India&#39;s fastest growing fintech company. | Rupeek is India\u2019s leading asset-backed, digital lending fintech platform. Driven by the mission to make credit accessible to Indians in a fair and convenient way, Rupeek is pioneering innovative financial products to help monetize India\u2019s $2 trillion gold. Powered by state-of-the-art technology and an automated asset-light supply chain, Rupeek is transforming the way gold loans are disbursed in India.",
-    "website": "https://www.rupeek.com",
+    "website": "https://rupeek.com",
     "logo_domain": "rupeek.com",
     "funding_stage": "N/A",
     "head_count": 3000,
@@ -10551,7 +10539,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=rupeek.com&sz=128"
   },
   {
     "id": 53,
@@ -10750,7 +10738,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=endava.com&sz=128"
   },
   {
     "id": 54,
@@ -10910,7 +10898,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=cgvakindia.com&sz=128"
   },
   {
     "id": 55,
@@ -10975,7 +10963,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=jupiter.money&sz=128"
   },
   {
     "id": 56,
@@ -11274,7 +11262,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=piceapp.com&sz=128"
   },
   {
     "id": 58,
@@ -11508,7 +11496,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=pinelabs.com&sz=128"
   },
   {
     "id": 59,
@@ -12119,7 +12107,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=straive.com&sz=128"
   },
   {
     "id": 62,
@@ -12262,7 +12250,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/sunpharma.com"
   },
   {
     "id": 63,
@@ -12743,7 +12731,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/iqvia.com"
   },
   {
     "id": 65,
@@ -13226,7 +13214,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=eversana.com&sz=128"
   },
   {
     "id": 67,
@@ -13421,7 +13409,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=himalayawellness.in&sz=128"
   },
   {
     "id": 68,
@@ -13590,7 +13578,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=thermofisher.com&sz=128"
   },
   {
     "id": 69,
@@ -13837,7 +13825,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/itcportal.com"
   },
   {
     "id": 70,
@@ -14019,7 +14007,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=turing.com&sz=128"
   },
   {
     "id": 71,
@@ -14136,7 +14124,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=leucine.io&sz=128"
   },
   {
     "id": 72,
@@ -14170,7 +14158,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=esslsecurity.com&sz=128"
   },
   {
     "id": 73,
@@ -14204,7 +14192,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=biotechhealthcare.com&sz=128"
   },
   {
     "id": 74,
@@ -14604,7 +14592,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=haystackanalytics.in&sz=128"
   },
   {
     "id": 77,
@@ -14786,7 +14774,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=nykaa.com&sz=128"
   },
   {
     "id": 78,
@@ -14890,7 +14878,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=oracle.com&sz=128"
   },
   {
     "id": 79,
@@ -15410,7 +15398,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=renesas.com&sz=128"
   },
   {
     "id": 81,
@@ -15553,7 +15541,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sumologic.com&sz=128"
   },
   {
     "id": 82,
@@ -15661,7 +15649,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=fortanix.com&sz=128"
   },
   {
     "id": 83,
@@ -15885,7 +15873,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=excelr.com&sz=128"
   },
   {
     "id": 85,
@@ -16091,7 +16079,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/teradata.com"
   },
   {
     "id": 87,
@@ -17313,7 +17301,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=okta.com&sz=128"
   },
   {
     "id": 88,
@@ -17796,7 +17784,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/tcs.com"
   },
   {
     "id": 90,
@@ -17902,7 +17890,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://link.wati.io/wp-content/uploads/2023/03/wati-icon.svg"
+    "logo_svg_url": "https://unavatar.io/wati.io"
   },
   {
     "id": 91,
@@ -17954,7 +17942,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=konghq.com&sz=128"
   },
   {
     "id": 92,
@@ -18110,7 +18098,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=delhivery.com&sz=128"
   },
   {
     "id": 93,
@@ -18483,7 +18471,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=acceldata.io&sz=128"
   },
   {
     "id": 94,
@@ -18665,7 +18653,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=shorturl.at&sz=128"
   },
   {
     "id": 95,
@@ -18756,7 +18744,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=cisco.com&sz=128"
   },
   {
     "id": 96,
@@ -18925,7 +18913,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/sprinto.com"
   },
   {
     "id": 97,
@@ -19107,7 +19095,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=freshworks.com&sz=128"
   },
   {
     "id": 98,
@@ -19159,7 +19147,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=quickheal.com&sz=128"
   },
   {
     "id": 99,
@@ -19193,7 +19181,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/clari.com"
   },
   {
     "id": 100,
@@ -19258,7 +19246,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=zoca.com&sz=128"
   },
   {
     "id": 101,
@@ -19439,8 +19427,8 @@
     "remote_office_distance_km": 6.31,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false,
-    "logo_svg_url": ""
+    "is_active_website": true,
+    "logo_svg_url": "https://unavatar.io/intuit.com"
   },
   {
     "id": 102,
@@ -19765,7 +19753,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=accenture.com&sz=128"
   },
   {
     "id": 103,
@@ -19960,7 +19948,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/adobe.com"
   },
   {
     "id": 104,
@@ -20259,7 +20247,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/hcltech.com"
   },
   {
     "id": 105,
@@ -20534,7 +20522,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/wipro.com"
   },
   {
     "id": 108,
@@ -20568,7 +20556,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=origin.tech&sz=128"
   },
   {
     "id": 109,
@@ -20607,7 +20595,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=inceptlabs.ai&sz=128"
   },
   {
     "id": 110,
@@ -20791,7 +20779,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=nightfall.ai&sz=128"
   },
   {
     "id": 111,
@@ -21363,7 +21351,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=r3consultant.com&sz=128"
   },
   {
     "id": 114,
@@ -21636,7 +21624,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=hitachids.com&sz=128"
   },
   {
     "id": 115,
@@ -21857,7 +21845,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ust.com&sz=128"
   },
   {
     "id": 116,
@@ -21907,7 +21895,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sap.com&sz=128"
   },
   {
     "id": 117,
@@ -21946,7 +21934,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=fanplayiot.com&sz=128"
   },
   {
     "id": 118,
@@ -22037,7 +22025,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=st.com&sz=128"
   },
   {
     "id": 119,
@@ -22071,7 +22059,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=mindflix.ai&sz=128"
   },
   {
     "id": 120,
@@ -22430,7 +22418,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=cult.fit&sz=128"
   },
   {
     "id": 122,
@@ -22638,7 +22626,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=licious.in&sz=128"
   },
   {
     "id": 123,
@@ -22680,7 +22668,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ninjacart.com&sz=128"
   },
   {
     "id": 124,
@@ -22875,7 +22863,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/zeptonow.com"
   },
   {
     "id": 125,
@@ -23122,7 +23110,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=atherenergy.com&sz=128"
   },
   {
     "id": 126,
@@ -23174,7 +23162,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ecofira.com&sz=128"
   },
   {
     "id": 127,
@@ -23369,7 +23357,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=giva.co&sz=128"
   },
   {
     "id": 128,
@@ -23512,7 +23500,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=3m.com&sz=128"
   },
   {
     "id": 129,
@@ -23667,7 +23655,7 @@
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false,
+    "is_active_website": true,
     "logo_svg_url": ""
   },
   {
@@ -23839,7 +23827,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=skillyt.com&sz=128"
   },
   {
     "id": 132,
@@ -23873,7 +23861,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=mcfadyen.com&sz=128"
   },
   {
     "id": 133,
@@ -24042,7 +24030,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=kyndryl.com&sz=128"
   },
   {
     "id": 134,
@@ -24744,7 +24732,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=testsigma.com&sz=128"
   },
   {
     "id": 137,
@@ -24861,7 +24849,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=bayrocklabs.com&sz=128"
   },
   {
     "id": 138,
@@ -25056,7 +25044,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ltm.com&sz=128"
   },
   {
     "id": 139,
@@ -25267,7 +25255,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=cyble.com&sz=128"
   },
   {
     "id": 140,
@@ -25501,7 +25489,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/bayer.com"
   },
   {
     "id": 142,
@@ -25670,7 +25658,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=exlservice.com&sz=128"
   },
   {
     "id": 143,
@@ -25930,7 +25918,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sequoia.com&sz=128"
   },
   {
     "id": 145,
@@ -26177,7 +26165,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=commbank.com.au&sz=128"
   },
   {
     "id": 146,
@@ -26227,7 +26215,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ikigailabs.io&sz=128"
   },
   {
     "id": 147,
@@ -26395,8 +26383,8 @@
     "remote_office_distance_km": 5.37,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false,
-    "logo_svg_url": ""
+    "is_active_website": true,
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=hdfcsec.com&sz=128"
   },
   {
     "id": 148,
@@ -26506,7 +26494,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=impactanalytics.ai&sz=128"
   },
   {
     "id": 150,
@@ -26675,7 +26663,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=dovercorporation.com&sz=128"
   },
   {
     "id": 151,
@@ -27041,7 +27029,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=weareroku.com&sz=128"
   },
   {
     "id": 152,
@@ -27275,7 +27263,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=tredence.com&sz=128"
   },
   {
     "id": 153,
@@ -27530,7 +27518,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/harman.com"
   },
   {
     "id": 154,
@@ -27796,7 +27784,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=about.gitlab.com&sz=128"
   },
   {
     "id": 155,
@@ -27978,7 +27966,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://clarivate.com/wp-content/themes/clarivate/src/favicon/safari-pinned-tab.svg"
   },
   {
     "id": 156,
@@ -28196,7 +28184,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/aws.amazon.com"
   },
   {
     "id": 157,
@@ -28547,7 +28535,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=join.brightmoney.co&sz=128"
   },
   {
     "id": 160,
@@ -28675,7 +28663,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=peakxv.com&sz=128"
   },
   {
     "id": 163,
@@ -28805,7 +28793,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=harmonic.ai&sz=128"
   },
   {
     "id": 164,
@@ -28957,7 +28945,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=aspora.com&sz=128"
   },
   {
     "id": 165,
@@ -29048,7 +29036,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=xpaycheckout.com&sz=128"
   },
   {
     "id": 166,
@@ -29373,7 +29361,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/openfx.com"
   },
   {
     "id": 167,
@@ -29776,7 +29764,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=vantive.com&sz=128"
   },
   {
     "id": 169,
@@ -29858,7 +29846,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=pandorum.com&sz=128"
   },
   {
     "id": 170,
@@ -30014,7 +30002,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sartorius.com&sz=128"
   },
   {
     "id": 171,
@@ -30443,7 +30431,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sigmaaldrich.com&sz=128"
   },
   {
     "id": 173,
@@ -30651,7 +30639,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=apotex.com&sz=128"
   },
   {
     "id": 174,
@@ -30846,7 +30834,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ltts.com&sz=128"
   },
   {
     "id": 175,
@@ -31119,7 +31107,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=eurofins.com&sz=128"
   },
   {
     "id": 176,
@@ -31379,7 +31367,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/syngeneintl.com"
   },
   {
     "id": 177,
@@ -31638,8 +31626,8 @@
     "remote_office_distance_km": 14.27,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false,
-    "logo_svg_url": ""
+    "is_active_website": true,
+    "logo_svg_url": "https://unavatar.io/tataelxsi.com"
   },
   {
     "id": 178,
@@ -31691,7 +31679,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/guardanthealth.com"
   },
   {
     "id": 179,
@@ -31725,7 +31713,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/uravulabs.com"
   },
   {
     "id": 180,
@@ -31831,7 +31819,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/citigroup.com"
   },
   {
     "id": 181,
@@ -31897,7 +31885,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/pwc.in"
   },
   {
     "id": 182,
@@ -31987,7 +31975,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/hgs.com"
   },
   {
     "id": 183,
@@ -32079,7 +32067,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/smytten.com"
   },
   {
     "id": 185,
@@ -32177,7 +32165,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/thoucentric.com"
   },
   {
     "id": 186,
@@ -32219,7 +32207,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/servify.com"
   },
   {
     "id": 187,
@@ -32261,7 +32249,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/prestigeconstructions.com"
   },
   {
     "id": 188,
@@ -32481,7 +32469,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/tmrw.in"
   },
   {
     "id": 190,
@@ -32531,7 +32519,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/kirana.club"
   },
   {
     "id": 191,
@@ -32589,7 +32577,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/pratilipi.com"
   },
   {
     "id": 192,
@@ -32663,7 +32651,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/career.hm.com"
   },
   {
     "id": 193,
@@ -32697,7 +32685,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/sprig.store"
   },
   {
     "id": 194,
@@ -32909,7 +32897,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/relianceretail.com"
   },
   {
     "id": 196,
@@ -32951,7 +32939,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/mmoser.com"
   },
   {
     "id": 197,
@@ -33049,7 +33037,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=bnpp.lk&sz=128"
   },
   {
     "id": 198,
@@ -33083,7 +33071,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=archvi.com&sz=128"
   },
   {
     "id": 199,
@@ -33125,7 +33113,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=letitbexai.com&sz=128"
   },
   {
     "id": 200,
@@ -33166,7 +33154,7 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false,
+    "is_active_website": true,
     "logo_svg_url": ""
   },
   {
@@ -33257,7 +33245,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=careers.walmart.com&sz=128"
   },
   {
     "id": 202,
@@ -33363,7 +33351,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=kredivocorp.com&sz=128"
   },
   {
     "id": 203,
@@ -33397,7 +33385,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ewar.in&sz=128"
   },
   {
     "id": 204,
@@ -33719,7 +33707,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=playsimple.in&sz=128"
   },
   {
     "id": 209,
@@ -33769,7 +33757,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=weekday.works&sz=128"
   },
   {
     "id": 210,
@@ -33835,7 +33823,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=jitterbit.com&sz=128"
   },
   {
     "id": 211,
@@ -33999,7 +33987,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=niveussolutions.com&sz=128"
   },
   {
     "id": 213,
@@ -34213,7 +34201,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sheshi.ai&sz=128"
   },
   {
     "id": 216,
@@ -34295,7 +34283,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/netskope.com"
   },
   {
     "id": 217,
@@ -34385,7 +34373,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=skyworksinc.com&sz=128"
   },
   {
     "id": 218,
@@ -34474,8 +34462,8 @@
     "remote_office_distance_km": 12.25,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false,
-    "logo_svg_url": ""
+    "is_active_website": true,
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=hackerrank.com&sz=128"
   },
   {
     "id": 219,
@@ -34509,7 +34497,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ascendion.com&sz=128"
   },
   {
     "id": 220,
@@ -34615,7 +34603,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=spacematrix.com&sz=128"
   },
   {
     "id": 221,
@@ -34705,7 +34693,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/hpe.com"
   },
   {
     "id": 222,
@@ -34795,7 +34783,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/teampumpkin.com"
   },
   {
     "id": 223,
@@ -34860,8 +34848,8 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false,
-    "logo_svg_url": ""
+    "is_active_website": true,
+    "logo_svg_url": "https://unavatar.io/stylishop.com"
   },
   {
     "id": 224,
@@ -34985,7 +34973,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/oneretailgroup.com"
   },
   {
     "id": 226,
@@ -35019,7 +35007,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/scottinternational.com"
   },
   {
     "id": 227,
@@ -35053,7 +35041,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/dalvkot.com"
   },
   {
     "id": 228,
@@ -35087,7 +35075,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/varma.capital"
   },
   {
     "id": 229,
@@ -35177,7 +35165,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/commerceiq.ai"
   },
   {
     "id": 230,
@@ -35219,7 +35207,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/himatsingka.com"
   },
   {
     "id": 231,
@@ -35253,7 +35241,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/mellowdesigns.co"
   },
   {
     "id": 232,
@@ -35343,7 +35331,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/vedantu.com"
   },
   {
     "id": 233,
@@ -35401,7 +35389,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=furlenco.com&sz=128"
   },
   {
     "id": 234,
@@ -35435,7 +35423,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/tech.walmart.com"
   },
   {
     "id": 235,
@@ -35469,7 +35457,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/algonox.com"
   },
   {
     "id": 236,
@@ -35503,7 +35491,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/deccan.ai"
   },
   {
     "id": 237,
@@ -35528,7 +35516,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/zamp.ai"
   },
   {
     "id": 238,
@@ -35562,7 +35550,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/landeed.com"
   },
   {
     "id": 239,
@@ -35596,7 +35584,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/weekday.works"
   },
   {
     "id": 240,
@@ -35630,7 +35618,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/algonox.com"
   },
   {
     "id": 241,
@@ -35664,7 +35652,7 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/goo.gle"
   },
   {
     "id": 242,
@@ -35697,7 +35685,7 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false,
+    "is_active_website": true,
     "logo_svg_url": ""
   },
   {
@@ -35765,7 +35753,7 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false,
+    "is_active_website": true,
     "logo_svg_url": ""
   },
   {
@@ -35799,7 +35787,7 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false,
+    "is_active_website": true,
     "logo_svg_url": ""
   },
   {
@@ -35837,7 +35825,7 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false,
+    "is_active_website": true,
     "logo_svg_url": ""
   },
   {
@@ -35875,7 +35863,7 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": false,
+    "is_active_website": true,
     "logo_svg_url": ""
   },
   {
@@ -35912,7 +35900,7 @@
     "location_tagged": true,
     "verified_email": "jobs@openai.com",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/openai.com"
   },
   {
     "id": 249,
@@ -35948,7 +35936,7 @@
     "location_tagged": true,
     "verified_email": "careers@anthropic.com",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/anthropic.com"
   },
   {
     "id": 250,
@@ -36146,7 +36134,7 @@
     "location_tagged": true,
     "verified_email": "jobs@revolut.com",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/revolut.com"
   },
   {
     "id": 255,
@@ -36208,7 +36196,7 @@
     "location_tagged": true,
     "verified_email": "talent@wayve.ai",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/wayve.ai"
   },
   {
     "id": 257,
@@ -36248,7 +36236,7 @@
     "is_remote_office": false,
     "remote_office_distance_km": null,
     "location_tagged": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/lyzr.ai"
   },
   {
     "id": 258,
@@ -36288,7 +36276,7 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1739.8,
     "location_tagged": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/mivoya.in"
   },
   {
     "id": 259,
@@ -36328,7 +36316,7 @@
     "is_remote_office": true,
     "remote_office_distance_km": 735.44,
     "location_tagged": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/hello.pricelabs.co"
   },
   {
     "id": 260,
@@ -36368,7 +36356,7 @@
     "is_remote_office": false,
     "remote_office_distance_km": 15.59,
     "location_tagged": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/infosys.com"
   },
   {
     "id": 261,
@@ -36448,7 +36436,7 @@
     "is_remote_office": false,
     "remote_office_distance_km": 5.11,
     "location_tagged": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/signeasy.com"
   },
   {
     "id": 263,
@@ -36488,7 +36476,7 @@
     "is_remote_office": false,
     "remote_office_distance_km": 21.2,
     "location_tagged": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/binary.so"
   },
   {
     "id": 264,
@@ -36555,7 +36543,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "ken42.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/ken42.com"
   },
   {
     "id": 266,
@@ -36636,7 +36624,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "pypeai.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=pypeai.com&sz=128"
   },
   {
     "id": 269,
@@ -36717,7 +36705,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "eloelo.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/eloelo.com"
   },
   {
     "id": 272,
@@ -36744,7 +36732,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "healthasyst.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=healthasyst.com&sz=128"
   },
   {
     "id": 273,
@@ -36846,7 +36834,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "kickdrum.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/kickdrum.com"
   },
   {
     "id": 278,
@@ -36859,7 +36847,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "epsilon.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/epsilon.com"
   },
   {
     "id": 279,
@@ -36872,7 +36860,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "equitigroup.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/equitigroup.com"
   },
   {
     "id": 280,
@@ -36911,7 +36899,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "nielsen.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/nielsen.com"
   },
   {
     "id": 283,
@@ -36924,7 +36912,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "mihup.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/mihup.com"
   },
   {
     "id": 284,
@@ -37056,7 +37044,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "rapido.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/rapido.com"
   },
   {
     "id": 286,
@@ -37150,7 +37138,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "healthify.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/healthify.com"
   },
   {
     "id": 289,
@@ -37177,7 +37165,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "noorahealth.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/noorahealth.com"
   },
   {
     "id": 290,
@@ -37217,7 +37205,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "visithealth.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/visithealth.com"
   },
   {
     "id": 291,
@@ -37244,7 +37232,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "resoluteai.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/resoluteai.com"
   },
   {
     "id": 292,
@@ -37271,7 +37259,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "egovfoundation.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/egovfoundation.com"
   },
   {
     "id": 293,
@@ -37298,7 +37286,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "healthedge.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/healthedge.com"
   },
   {
     "id": 294,
@@ -37325,7 +37313,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "even.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/even.com"
   },
   {
     "id": 295,
@@ -37352,7 +37340,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "plum.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/plum.com"
   },
   {
     "id": 296,
@@ -37379,7 +37367,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "decathlon.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/decathlon.com"
   },
   {
     "id": 297,
@@ -37406,7 +37394,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "payoneer.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/payoneer.com"
   },
   {
     "id": 298,
@@ -37446,7 +37434,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "ibm.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/ibm.com"
   },
   {
     "id": 299,
@@ -37499,7 +37487,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "questglobal.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/questglobal.com"
   },
   {
     "id": 300,
@@ -37526,7 +37514,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "intel.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/intel.com"
   },
   {
     "id": 301,
@@ -37553,7 +37541,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "goldmansachs.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/goldmansachs.com"
   },
   {
     "id": 302,
@@ -37580,7 +37568,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "idfcfirstbank.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/idfcfirstbank.com"
   },
   {
     "id": 303,
@@ -37607,7 +37595,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "univers.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/univers.com"
   },
   {
     "id": 304,
@@ -37634,7 +37622,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "cgi.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/cgi.com"
   },
   {
     "id": 305,
@@ -37661,7 +37649,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "jacobs.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/jacobs.com"
   },
   {
     "id": 306,
@@ -37688,7 +37676,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "siemensgamesa.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/siemensgamesa.com"
   },
   {
     "id": 307,
@@ -37782,7 +37770,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "wayfair.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/wayfair.com"
   },
   {
     "id": 311,
@@ -37822,7 +37810,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "marriottinternational.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/marriottinternational.com"
   },
   {
     "id": 312,
@@ -37849,7 +37837,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "hilton.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/hilton.com"
   },
   {
     "id": 313,
@@ -37876,7 +37864,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "jwmarriott.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/jwmarriott.com"
   },
   {
     "id": 314,
@@ -37929,7 +37917,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "accor.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=accor.com&sz=128"
   },
   {
     "id": 315,
@@ -37983,7 +37971,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "skillz.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/skillz.com"
   },
   {
     "id": 317,
@@ -38010,7 +37998,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "prodigal.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/prodigal.com"
   },
   {
     "id": 318,
@@ -38023,7 +38011,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "scispace.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/scispace.com"
   },
   {
     "id": 319,
@@ -38115,7 +38103,7 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "infiniteconvergencesolutions.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/infiniteconvergencesolutions.com"
   },
   {
     "id": 320,
@@ -38233,6 +38221,6 @@
     "verified_email": "",
     "is_active_website": true,
     "logo_domain": "honeywelltechnologies.com",
-    "logo_svg_url": ""
+    "logo_svg_url": "https://unavatar.io/honeywelltechnologies.com"
   }
 ]
