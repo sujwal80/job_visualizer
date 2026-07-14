@@ -19,7 +19,7 @@ import requests
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from data_acquisition.tagging.classify_industries import (
+from data_acquisition.pipelines.tagging.classify_industries import (
     classify_startup,
     run_classification,
     LINKEDIN_MAPPING,
@@ -432,7 +432,7 @@ class TestIndustryClassification(unittest.TestCase):
                 json.dump(test_data, f, indent=2)
 
             script_path = os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "..", "data_acquisition", "tagging", "classify_industries.py")
+                os.path.join(os.path.dirname(__file__), "..", "data_acquisition", "pipelines", "tagging", "classify_industries.py")
             )
 
             # Run classify_industries.py as a subprocess on the temp db

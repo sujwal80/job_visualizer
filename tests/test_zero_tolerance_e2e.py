@@ -16,8 +16,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # Import modules to be tested
 import data_acquisition.utils.validation
 import data_acquisition.db_manager
-import data_acquisition.job_validator
-import data_acquisition.tagging.logo_enricher
+import data_acquisition.pipelines.validation.job_validator as job_validator
+import data_acquisition.pipelines.tagging.logo_enricher as logo_enricher
 import backend.app
 
 from unittest.mock import patch, MagicMock
@@ -95,7 +95,7 @@ class TestZeroToleranceE2E(unittest.TestCase):
     def test_auto_cleaning_triggered_on_dead_site(self):
         """Test auto-cleaning triggered on dead site."""
         try:
-            from data_acquisition.job_validator import JobValidator
+            from data_acquisition.pipelines.validation.job_validator import JobValidator
             from data_acquisition.db_manager import DBManager
         except ImportError:
             self.skipTest("JobValidator or DBManager not found")
@@ -119,7 +119,7 @@ class TestZeroToleranceE2E(unittest.TestCase):
         validator = JobValidator(db)
         
         # Mock validate_website_domain to return False (site is dead)
-        with patch('data_acquisition.job_validator.validate_website_domain', return_value=(False, "https://dead-site.com", "DNS failed")):
+        with patch('data_acquisition.pipelines.validation.job_validator.validate_website_domain', return_value=(False, "https://dead-site.com", "DNS failed")):
             validator.validate_company_status(company)
             
         # Check if logo_svg_url is cleared to "" and verified_email is cleared to ""
@@ -356,7 +356,7 @@ class TestZeroToleranceE2E(unittest.TestCase):
     @patch('requests.get')
     def test_cloudflare_and_expiration_keywords(self, mock_get, mock_dns):
         """Test check_job_active preserves Cloudflare pages even if they contain text matching expiration keywords."""
-        from data_acquisition.job_validator import check_job_active
+        from data_acquisition.utils.validation import check_job_active
 
         mock_res = MagicMock()
         mock_res.status_code = 200
@@ -398,7 +398,7 @@ class TestZeroToleranceE2E(unittest.TestCase):
             
         try:
             python_exec = "/Users/singhujwal/starup_visualizer/venv/bin/python3"
-            script_path = os.path.join(os.path.dirname(__file__), "..", "data_acquisition", "run_validator.py")
+            script_path = os.path.join(os.path.dirname(__file__), "..", "data_acquisition", "pipelines", "validation", "run_validation.py")
             script_path = os.path.abspath(script_path)
             
             cmd = [python_exec, script_path, "--db-path", db_filename, "--mock"]
@@ -423,7 +423,7 @@ class TestZeroToleranceE2E(unittest.TestCase):
                 os.remove(lock_path)
 
     def test_cli_pipeline_execution(self):
-        """Test that the main pipeline runs successfully in test mode."""
+        """Test that the four pipeline runner scripts execute successfully in sequence."""
         db_filename = "test_startups_pipeline.json"
         db_path = os.path.join(os.path.dirname(__file__), "..", db_filename)
         db_path = os.path.abspath(db_path)
@@ -451,24 +451,30 @@ class TestZeroToleranceE2E(unittest.TestCase):
             
         try:
             python_exec = "/Users/singhujwal/starup_visualizer/venv/bin/python3"
-            script_path = os.path.join(os.path.dirname(__file__), "..", "data_acquisition", "main.py")
-            script_path = os.path.abspath(script_path)
+            cwd_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
             
-            cmd = [python_exec, script_path, "--test", "--mock", "--db-path", db_filename]
-            
-            # Execute the pipeline tool in a subprocess
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-            )
-            
-            # Verify exit code
-            self.assertEqual(result.returncode, 0, f"Pipeline failed with exit code {result.returncode}. Stderr: {result.stderr}")
+            # 1. Run Discovery
+            disc_path = os.path.join(cwd_path, "data_acquisition", "pipelines", "discovery", "run_discovery.py")
+            res_disc = subprocess.run([python_exec, disc_path, "--db-path", db_filename, "--mock", "--max-discovery", "1"], capture_output=True, text=True, cwd=cwd_path)
+            self.assertEqual(res_disc.returncode, 0, f"Discovery runner failed. Stderr: {res_disc.stderr}")
+
+            # 2. Run Tagging
+            tag_path = os.path.join(cwd_path, "data_acquisition", "pipelines", "tagging", "run_tagging.py")
+            res_tag = subprocess.run([python_exec, tag_path, "--db-path", db_filename, "--max-tagging", "2"], capture_output=True, text=True, cwd=cwd_path)
+            self.assertEqual(res_tag.returncode, 0, f"Tagging runner failed. Stderr: {res_tag.stderr}")
+
+            # 3. Run Crawling
+            crawl_path = os.path.join(cwd_path, "data_acquisition", "pipelines", "crawling", "run_crawling.py")
+            res_crawl = subprocess.run([python_exec, crawl_path, "--db-path", db_filename, "--limit", "2"], capture_output=True, text=True, cwd=cwd_path)
+            self.assertEqual(res_crawl.returncode, 0, f"Crawling runner failed. Stderr: {res_crawl.stderr}")
+
+            # 4. Run Validation
+            val_path = os.path.join(cwd_path, "data_acquisition", "pipelines", "validation", "run_validation.py")
+            res_val = subprocess.run([python_exec, val_path, "--db-path", db_filename, "--mock", "--max-startups", "2"], capture_output=True, text=True, cwd=cwd_path)
+            self.assertEqual(res_val.returncode, 0, f"Validation runner failed. Stderr: {res_val.stderr}")
             
         finally:
-            # Clean up files (both database and any lock file)
+            # Clean up files
             if os.path.exists(db_path):
                 os.remove(db_path)
             lock_path = db_path + ".lock"
@@ -477,7 +483,7 @@ class TestZeroToleranceE2E(unittest.TestCase):
 
     def test_job_validator_concurrency_config(self):
         """Verify JobValidator parameterization and sequential vs parallel execution branching."""
-        from data_acquisition.job_validator import JobValidator
+        from data_acquisition.pipelines.validation.job_validator import JobValidator
         from data_acquisition.db_manager import DBManager
 
         db = DBManager(db_path="test_startups_dummy.json")
@@ -564,7 +570,7 @@ class TestZeroToleranceE2E(unittest.TestCase):
             
         try:
             python_exec = "/Users/singhujwal/starup_visualizer/venv/bin/python3"
-            script_path = os.path.join(os.path.dirname(__file__), "..", "data_acquisition", "run_validator.py")
+            script_path = os.path.join(os.path.dirname(__file__), "..", "data_acquisition", "pipelines", "validation", "run_validation.py")
             script_path = os.path.abspath(script_path)
             
             # Helper function to run script and get stdout
@@ -617,84 +623,53 @@ class TestZeroToleranceE2E(unittest.TestCase):
             if os.path.exists(lock_path):
                 os.remove(lock_path)
 
-    def test_job_validator_concurrency_config(self):
-        """Verify JobValidator parameterization and sequential vs parallel execution branching."""
-        from data_acquisition.job_validator import JobValidator
+    def test_startup_insertion_pending_status(self):
+        """Verify startup insertion defaults tagging_status and classification_status to pending, and last_crawled to None."""
         from data_acquisition.db_manager import DBManager
-
+        
         db = DBManager(db_path="test_startups_dummy.json")
         db.save_db = MagicMock()
-        db.load_db = MagicMock()
+        db.geocode_address = MagicMock(return_value=(12.9716, 77.5946))
+        db.startups = []
         
-        # Test default/custom initialization
-        validator_default = JobValidator(db)
-        self.assertEqual(validator_default.concurrency, 1)
-
-        validator_custom = JobValidator(db, concurrency=5)
-        self.assertEqual(validator_custom.concurrency, 5)
-
-        # Setup mock startups/jobs to validate
         company = {
-            "id": 1,
-            "name": "Test Corp",
-            "website": "https://example.com",
-            "job_openings": [
-                {"title": "Job 1", "url": "https://example.com/job1"}
-            ]
+            "name": "New Pending Corp",
+            "website": "https://newpending.com"
         }
-        db.startups = [company]
-        company_expected = dict(company)
-
-        # Case 1: Sequential Execution (concurrency=1)
-        validator_seq = JobValidator(db, concurrency=1)
-        with patch('concurrent.futures.ThreadPoolExecutor') as mock_executor:
-            with patch.object(validator_seq, '_validate_job_worker', return_value=(True, 'Active', 'Job 1')) as mock_val_job, \
-                 patch.object(validator_seq, 'validate_company_status') as mock_val_company:
-                 
-                 validator_seq.validate_and_prune()
-                 mock_executor.assert_not_called()
-                 mock_val_job.assert_called_once()
-                 mock_val_company.assert_called_once_with(company_expected)
-
-        # Case 2: Parallel Execution (concurrency > 1)
-        company = {
-            "id": 1,
-            "name": "Test Corp",
-            "website": "https://example.com",
-            "job_openings": [
-                {"title": "Job 1", "url": "https://example.com/job1"}
-            ]
-        }
-        db.startups = [company]
-        validator_par = JobValidator(db, concurrency=3)
-        with patch('concurrent.futures.ThreadPoolExecutor') as mock_executor:
-            mock_executor.return_value.__enter__.return_value.map.return_value = []
+        
+        with patch('data_acquisition.db_manager.validate_website_domain', return_value=(True, 'https://newpending.com', None)):
+            res = db.merge_startup(company, [])
             
-            validator_par.validate_and_prune()
-            mock_executor.assert_any_call(max_workers=3)
-            self.assertEqual(mock_executor.call_count, 1)
+        self.assertIsNotNone(res)
+        self.assertEqual(res.get("tagging_status"), "pending")
+        self.assertEqual(res.get("classification_status"), "pending")
+        self.assertIsNone(res.get("last_crawled"))
 
-    def test_cli_live_sweep_options(self):
-        """Execute the CLI validator run_validator.py under various flag combinations and verify configuration."""
-        db_filename = "test_startups_cli_sweep.json"
+    def test_tagging_runner_state_changes(self):
+        """Verify tagging runner skips completed startups and processes pending startups, updating their status."""
+        from data_acquisition.db_manager import DBManager
+        
+        db_filename = "test_startups_tagging.json"
         db_path = os.path.join(os.path.dirname(__file__), "..", db_filename)
         db_path = os.path.abspath(db_path)
         
-        # Create mock database JSON file
         mock_data = [
             {
                 "id": 1,
-                "name": "Active Corp",
-                "website": "https://active-site.com",
-                "logo_domain": "active-site.com",
-                "is_active_website": True,
-                "job_openings": [
-                    {
-                        "title": "Software Engineer",
-                        "url": "https://active-site.com/jobs/1",
-                        "location": "Bengaluru"
-                    }
-                ]
+                "name": "Completed Corp",
+                "tagging_status": "completed",
+                "classification_status": "completed",
+                "industry": "SaaS"
+            },
+            {
+                "id": 2,
+                "name": "Pending Corp",
+                "tagging_status": "pending",
+                "classification_status": "pending",
+                "industry": "IT Services and IT Consulting",
+                "is_active_website": False,
+                "logo_svg_url": "",
+                "location_tagged": True
             }
         ]
         
@@ -703,48 +678,34 @@ class TestZeroToleranceE2E(unittest.TestCase):
             
         try:
             python_exec = "/Users/singhujwal/starup_visualizer/venv/bin/python3"
-            script_path = os.path.join(os.path.dirname(__file__), "..", "data_acquisition", "run_validator.py")
+            script_path = os.path.join(os.path.dirname(__file__), "..", "data_acquisition", "pipelines", "tagging", "run_tagging.py")
             script_path = os.path.abspath(script_path)
             
-            # Case 1: Run with no args (should default to mock, concurrency 1)
-            cmd1 = [python_exec, script_path, "--db-path", db_filename]
-            res1 = subprocess.run(cmd1, capture_output=True, text=True, cwd=os.path.dirname(script_path))
-            self.assertEqual(res1.returncode, 0, f"Failed with: {res1.stderr}")
-            self.assertIn("Concurrency: 1", res1.stdout)
-            self.assertIn("Live Sweep: False", res1.stdout)
-            self.assertIn("Mock Scraper Fallback: true", res1.stdout)
-
-            # Case 2: Run with --live-sweep (should run live, concurrency 15)
-            cmd2 = [python_exec, script_path, "--db-path", db_filename, "--live-sweep"]
-            res2 = subprocess.run(cmd2, capture_output=True, text=True, cwd=os.path.dirname(script_path))
-            self.assertEqual(res2.returncode, 0, f"Failed with: {res2.stderr}")
-            self.assertIn("Concurrency: 15", res2.stdout)
-            self.assertIn("Live Sweep: True", res2.stdout)
-            self.assertIn("Mock Scraper Fallback: false", res2.stdout)
-
-            # Case 3: Run with --concurrency 3 (should run mock, concurrency 3)
-            cmd3 = [python_exec, script_path, "--db-path", db_filename, "--concurrency", "3"]
-            res3 = subprocess.run(cmd3, capture_output=True, text=True, cwd=os.path.dirname(script_path))
-            self.assertEqual(res3.returncode, 0, f"Failed with: {res3.stderr}")
-            self.assertIn("Concurrency: 3", res3.stdout)
-            self.assertIn("Live Sweep: False", res3.stdout)
-            self.assertIn("Mock Scraper Fallback: true", res3.stdout)
-
-            # Case 4: Run with --live-sweep --concurrency 5 (should run live, concurrency 5)
-            cmd4 = [python_exec, script_path, "--db-path", db_filename, "--live-sweep", "--concurrency", "5"]
-            res4 = subprocess.run(cmd4, capture_output=True, text=True, cwd=os.path.dirname(script_path))
-            self.assertEqual(res4.returncode, 0, f"Failed with: {res4.stderr}")
-            self.assertIn("Concurrency: 5", res4.stdout)
-            self.assertIn("Live Sweep: True", res4.stdout)
-            self.assertIn("Mock Scraper Fallback: false", res4.stdout)
-
-            # Case 5: Run with --live-sweep --mock (should run mock, concurrency 15)
-            cmd5 = [python_exec, script_path, "--db-path", db_filename, "--live-sweep", "--mock"]
-            res5 = subprocess.run(cmd5, capture_output=True, text=True, cwd=os.path.dirname(script_path))
-            self.assertEqual(res5.returncode, 0, f"Failed with: {res5.stderr}")
-            self.assertIn("Concurrency: 15", res5.stdout)
-            self.assertIn("Live Sweep: True", res5.stdout)
-            self.assertIn("Mock Scraper Fallback: true", res5.stdout)
+            cmd = [python_exec, script_path, "--db-path", db_filename]
+            
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            )
+            
+            self.assertEqual(result.returncode, 0, f"Tagging runner failed: {result.stderr}")
+            
+            # Read DB and verify status updates
+            db = DBManager(db_path=db_path)
+            db.load_db()
+            
+            s1 = next(x for x in db.startups if x["id"] == 1)
+            s2 = next(x for x in db.startups if x["id"] == 2)
+            
+            self.assertEqual(s1.get("tagging_status"), "completed")
+            self.assertEqual(s1.get("classification_status"), "completed")
+            self.assertEqual(s1.get("industry"), "SaaS") # untouched
+            
+            self.assertEqual(s2.get("tagging_status"), "completed")
+            self.assertEqual(s2.get("classification_status"), "completed")
+            self.assertEqual(s2.get("industry"), "Service Industry") # updated
             
         finally:
             if os.path.exists(db_path):
@@ -752,6 +713,86 @@ class TestZeroToleranceE2E(unittest.TestCase):
             lock_path = db_path + ".lock"
             if os.path.exists(lock_path):
                 os.remove(lock_path)
+
+    def test_crawling_runner_delta_limits(self):
+        """Verify crawling runner skips enqueuing startups whose age is less than the crawl interval."""
+        from data_acquisition.db_manager import DBManager
+        from data_acquisition.pipelines.crawling.crawl_queue import CrawlQueue
+        from datetime import datetime
+        import time
+        
+        db_filename = "test_startups_crawling.json"
+        db_path = os.path.join(os.path.dirname(__file__), "..", db_filename)
+        db_path = os.path.abspath(db_path)
+        
+        queue_db_filename = "test_crawl_queue_delta.db"
+        queue_db_path = os.path.join(os.path.dirname(__file__), "..", queue_db_filename)
+        queue_db_path = os.path.abspath(queue_db_path)
+        
+        current_time = time.time()
+        recent_time_str = datetime.fromtimestamp(current_time - 100).isoformat() # 100 seconds ago
+        old_time_str = datetime.fromtimestamp(current_time - 200000).isoformat() # > 2 days ago
+        
+        mock_data = [
+            {
+                "id": 1,
+                "name": "Recent Crawled Corp",
+                "city": "Bengaluru",
+                "last_crawled": recent_time_str
+            },
+            {
+                "id": 2,
+                "name": "Old Crawled Corp",
+                "city": "Bengaluru",
+                "last_crawled": old_time_str
+            }
+        ]
+        
+        with open(db_path, "w") as f:
+            json.dump(mock_data, f, indent=2)
+            
+        try:
+            python_exec = "/Users/singhujwal/starup_visualizer/venv/bin/python3"
+            script_path = os.path.join(os.path.dirname(__file__), "..", "data_acquisition", "pipelines", "crawling", "run_crawling.py")
+            script_path = os.path.abspath(script_path)
+            
+            # Run with --crawl-interval 86400 (1 day)
+            cmd = [python_exec, script_path, "--db-path", db_filename, "--queue-db-path", queue_db_filename, "--crawl-interval", "86400"]
+            
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            )
+            
+            self.assertEqual(result.returncode, 0, f"Crawling runner failed: {result.stderr}")
+            
+            # Verify queue content using CrawlQueue API
+            q = CrawlQueue(db_path=queue_db_path)
+            
+            # Since Recent Crawled Corp (100s ago) is within interval (86400s), it must be skipped.
+            # Old Crawled Corp (200000s ago) is beyond interval, so it must be enqueued.
+            tasks = []
+            while True:
+                t = q.pop_task("LinkedIn")
+                if not t:
+                    break
+                tasks.append(t)
+                
+            self.assertEqual(len(tasks), 1)
+            self.assertEqual(tasks[0]["company_id"], 2)
+            self.assertEqual(tasks[0]["company_name"], "Old Crawled Corp")
+            
+        finally:
+            if os.path.exists(db_path):
+                os.remove(db_path)
+            lock_path = db_path + ".lock"
+            if os.path.exists(lock_path):
+                os.remove(lock_path)
+            if os.path.exists(queue_db_path):
+                os.remove(queue_db_path)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

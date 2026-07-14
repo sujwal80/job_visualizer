@@ -6,15 +6,8 @@ import random
 import urllib.parse
 import concurrent.futures
 
-try:
-    from geo_config import TEST_FIXTURE_WHITELIST_URLS
-except ImportError:
-    from data_acquisition.geo_config import TEST_FIXTURE_WHITELIST_URLS
-
-try:
-    from utils.validation import validate_website_domain, check_job_active, validate_logo_image
-except ImportError:
-    from data_acquisition.utils.validation import validate_website_domain, check_job_active, validate_logo_image
+from data_acquisition.geo_config import TEST_FIXTURE_WHITELIST_URLS
+from data_acquisition.utils.validation import validate_website_domain, check_job_active, validate_logo_image
 
 EXPIRED_KEYWORDS = [
     "no longer accepting applications",
@@ -58,7 +51,7 @@ class JobValidator:
         if not url or url == "N/A" or not url.startswith(("http://", "https://")):
             return None, "Invalid/missing URL", title
 
-        is_active, reason = check_job_active(url)
+        is_active, reason = self._check_job_active(url)
         if is_active:
             return job, "Active", title
         else:

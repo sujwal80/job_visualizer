@@ -4,22 +4,39 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-data_acq_dir = os.path.join(workspace_root, 'data_acquisition')
-scrapers_dir = os.path.join(data_acq_dir, 'job_scrapers')
-tagging_dir = os.path.join(data_acq_dir, 'tagging')
+if workspace_root not in sys.path:
+    sys.path.insert(0, workspace_root)
 
-for _dir in [workspace_root, data_acq_dir, scrapers_dir, tagging_dir]:
-    if _dir not in sys.path:
-        sys.path.insert(0, _dir)
-
-from yc_scraper import YCScraper
-from naukri_scraper import NaukriScraper
-from db_manager import DBManager
-from job_validator import JobValidator
-from job_metadata_extractor import extract_job_metadata
+from data_acquisition.pipelines.crawling.job_scrapers.yc_scraper import YCScraper
+from data_acquisition.pipelines.crawling.job_scrapers.naukri_scraper import NaukriScraper
+from data_acquisition.db_manager import DBManager
+from data_acquisition.pipelines.validation.job_validator import JobValidator
+from data_acquisition.pipelines.crawling.job_scrapers.job_metadata_extractor import extract_job_metadata
 
 
 class TestDataAcquisitionPipeline(unittest.TestCase):
+
+    def setUp(self):
+        self.patch_val_web = patch(
+            "data_acquisition.db_manager.validate_website_domain",
+            side_effect=lambda url, *args, **kwargs: (True, url, None)
+        )
+        self.patch_val_web_validator = patch(
+            "data_acquisition.pipelines.validation.job_validator.validate_website_domain",
+            side_effect=lambda url, *args, **kwargs: (True, url, None)
+        )
+        self.patch_check_job = patch(
+            "data_acquisition.db_manager.check_job_active",
+            return_value=(True, "Active")
+        )
+        self.mock_val_web = self.patch_val_web.start()
+        self.mock_val_web_validator = self.patch_val_web_validator.start()
+        self.mock_check_job = self.patch_check_job.start()
+
+    def tearDown(self):
+        self.patch_val_web.stop()
+        self.patch_val_web_validator.stop()
+        self.patch_check_job.stop()
 
     def test_clean_environment_variable_loading_defaults(self):
         """
@@ -48,7 +65,7 @@ class TestDataAcquisitionPipeline(unittest.TestCase):
             "NAUKRI_APP_ID": "999",
             "NAUKRI_SYSTEM_ID": "888",
             "NAUKRI_USER_AGENT": "TestNaukriAgent/1.0",
-            "STARTUP_DB_PATH": "/custom/test/path/startups.json"
+            "STARTUP_DB_PATH": os.path.join(workspace_root, "tmp/custom/test/path/startups.json")
         }
         with patch.dict(os.environ, custom_env, clear=True):
             yc = YCScraper()
@@ -62,7 +79,7 @@ class TestDataAcquisitionPipeline(unittest.TestCase):
             self.assertEqual(naukri.headers["User-Agent"], "TestNaukriAgent/1.0")
 
             db = DBManager()
-            self.assertEqual(db.db_path, "/custom/test/path/startups.json")
+            self.assertEqual(db.db_path, os.path.join(workspace_root, "tmp/custom/test/path/startups.json"))
 
     def test_functional_pipeline_schema_normalization(self):
         """

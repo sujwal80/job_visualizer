@@ -27,12 +27,12 @@ from data_acquisition.geo_config import (
     get_city_center_coordinates,
     DEFAULT_TARGET_CITY,
 )
-from data_acquisition.tagging.remote_office_classifier import (
+from data_acquisition.pipelines.tagging.remote_office_classifier import (
     haversine_distance_km,
     check_remote_office_status,
 )
-from data_acquisition.tagging.location_enricher import LocationEnricher
-from data_acquisition.tagging.verify_location_tags import verify_location_tags
+from data_acquisition.pipelines.tagging.location_enricher import LocationEnricher
+from data_acquisition.pipelines.tagging.verify_location_tags import verify_location_tags
 
 
 class TestRemoteOfficeLocation(unittest.TestCase):

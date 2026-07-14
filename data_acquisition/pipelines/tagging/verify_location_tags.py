@@ -15,26 +15,10 @@ import sys
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
-DATA_ACQ_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if DATA_ACQ_DIR not in sys.path:
-    sys.path.insert(0, DATA_ACQ_DIR)
-
-try:
-    from db_manager import DBManager
-except ImportError:
-    from data_acquisition.db_manager import DBManager
-
-try:
-    from geo_config import DEFAULT_TARGET_CITY
-except ImportError:
-    from data_acquisition.geo_config import DEFAULT_TARGET_CITY
-
-try:
-    from tagging.remote_office_classifier import check_remote_office_status
-    from tagging.location_enricher import LocationEnricher
-except ImportError:
-    from data_acquisition.tagging.remote_office_classifier import check_remote_office_status
-    from data_acquisition.tagging.location_enricher import LocationEnricher
+from data_acquisition.db_manager import DBManager
+from data_acquisition.geo_config import DEFAULT_TARGET_CITY
+from data_acquisition.pipelines.tagging.remote_office_classifier import check_remote_office_status
+from data_acquisition.pipelines.tagging.location_enricher import LocationEnricher
 
 
 def _safe_float(val):

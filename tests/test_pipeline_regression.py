@@ -2,22 +2,19 @@ import os
 import sys
 from unittest.mock import patch, MagicMock
 
-# Add data_acquisition and workspace root to sys.path
+# Add workspace root to sys.path
 workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(os.path.join(workspace_root, "data_acquisition"))
-sys.path.append(os.path.join(workspace_root, "data_acquisition", "job_scrapers"))
-sys.path.append(os.path.join(workspace_root, "data_acquisition", "tagging"))
 sys.path.append(workspace_root)
 
-from logo_enricher import LogoEnricher
-from location_enricher import LocationEnricher
-from db_manager import DBManager
+from data_acquisition.pipelines.tagging.logo_enricher import LogoEnricher
+from data_acquisition.pipelines.tagging.location_enricher import LocationEnricher
+from data_acquisition.db_manager import DBManager
 
-from yc_scraper import YCScraper
-from ats_scraper import ATSScraper
-from indeed_scraper import IndeedScraper
-from job_validator import JobValidator
-from job_metadata_extractor import extract_job_metadata
+from data_acquisition.pipelines.crawling.job_scrapers.yc_scraper import YCScraper
+from data_acquisition.pipelines.crawling.job_scrapers.ats_scraper import ATSScraper
+from data_acquisition.pipelines.crawling.job_scrapers.indeed_scraper import IndeedScraper
+from data_acquisition.pipelines.validation.job_validator import JobValidator
+from data_acquisition.pipelines.crawling.job_scrapers.job_metadata_extractor import extract_job_metadata
 
 def test_short_circuiting():
     print("=== TESTING SHORT-CIRCUITING LOGIC ===")
@@ -30,7 +27,7 @@ def test_short_circuiting():
         "logo_svg_url": "https://testcorp.com/logo.svg",
         "website": "https://testcorp.com"
     }
-    with patch("logo_enricher.validate_logo_image", return_value=True):
+    with patch("data_acquisition.pipelines.tagging.logo_enricher.validate_logo_image", return_value=True):
         res = logo_enricher.enrich(startup_with_logo)
     assert res is False, "Expected LogoEnricher to short-circuit when logo_domain and logo_svg_url exist!"
     print(" [PASS] LogoEnricher short-circuits correctly when logo_domain exists.")
@@ -185,12 +182,12 @@ def test_multi_city_merge_isolation():
     assert len(blr_startup.get("job_openings", [])) == 1, "Bengaluru company should have received the job!"
     print(" [PASS] Multi-city merge isolates companies by target city without overwriting.")
 
-from indeed_scraper import IndeedScraper
-from wellfound_scraper import WellfoundScraper
-from naukri_scraper import NaukriScraper
-from glassdoor_scraper import GlassdoorScraper
-from cutshort_scraper import CutshortScraper
-from hirist_scraper import HiristScraper
+from data_acquisition.pipelines.crawling.job_scrapers.indeed_scraper import IndeedScraper
+from data_acquisition.pipelines.crawling.job_scrapers.wellfound_scraper import WellfoundScraper
+from data_acquisition.pipelines.crawling.job_scrapers.naukri_scraper import NaukriScraper
+from data_acquisition.pipelines.crawling.job_scrapers.glassdoor_scraper import GlassdoorScraper
+from data_acquisition.pipelines.crawling.job_scrapers.cutshort_scraper import CutshortScraper
+from data_acquisition.pipelines.crawling.job_scrapers.hirist_scraper import HiristScraper
 
 def test_universal_scrapers_init():
     print("\n=== TESTING UNIVERSAL SCRAPERS INITIALIZATION & PARSING ===")
@@ -331,7 +328,7 @@ def test_metadata_cleaning_on_dead_website():
         "hr_details": {"contact_email": "careers@deadcorp.com"}
     }
     
-    with patch("job_validator.validate_website_domain", return_value=(False, "https://deadcorp.com", "DNS failed")):
+    with patch("data_acquisition.pipelines.validation.job_validator.validate_website_domain", return_value=(False, "https://deadcorp.com", "DNS failed")):
         validator.validate_company_status(startup)
         
     assert startup["is_active_website"] is False
@@ -352,8 +349,8 @@ def test_logo_validation_for_active_website():
         "is_active_website": True
     }
     
-    with patch("job_validator.validate_website_domain", return_value=(True, "https://activecorp.com", None)), \
-         patch("job_validator.validate_logo_image", return_value=False):
+    with patch("data_acquisition.pipelines.validation.job_validator.validate_website_domain", return_value=(True, "https://activecorp.com", None)), \
+         patch("data_acquisition.pipelines.validation.job_validator.validate_logo_image", return_value=False):
         validator.validate_company_status(startup_a)
         
     assert startup_a["is_active_website"] is True
@@ -367,8 +364,8 @@ def test_logo_validation_for_active_website():
         "is_active_website": True
     }
     
-    with patch("job_validator.validate_website_domain", return_value=(True, "https://activecorp.com", None)), \
-         patch("job_validator.validate_logo_image", return_value=True):
+    with patch("data_acquisition.pipelines.validation.job_validator.validate_website_domain", return_value=(True, "https://activecorp.com", None)), \
+         patch("data_acquisition.pipelines.validation.job_validator.validate_logo_image", return_value=True):
         validator.validate_company_status(startup_b)
         
     assert startup_b["is_active_website"] is True
@@ -377,8 +374,8 @@ def test_logo_validation_for_active_website():
 
 def test_ingestion_gates():
     print("\n=== TESTING INGESTION GATES (MILESTONE 3) ===")
-    from db_manager import DBManager
-    from discovery_service import CompanyDiscoveryService
+    from data_acquisition.db_manager import DBManager
+    from data_acquisition.pipelines.discovery.discovery_service import CompanyDiscoveryService
     
     import os
     db_path = "/tmp/test_ingestion_gates.json"
@@ -404,8 +401,8 @@ def test_ingestion_gates():
     
     jobs = [{"title": "Software Engineer", "url": "https://deadnojobs.com/jobs/1"}]
     
-    with patch("db_manager.check_job_active", return_value=(False, "Closed")), \
-         patch("db_manager.validate_website_domain", return_value=(False, "https://deadnojobs.com", "DNS failed")):
+    with patch("data_acquisition.db_manager.check_job_active", return_value=(False, "Closed")), \
+         patch("data_acquisition.db_manager.validate_website_domain", return_value=(False, "https://deadnojobs.com", "DNS failed")):
         result = db.merge_startup(company_details, jobs)
         assert result is None, f"Expected merge_startup to return None for dead website and no active jobs, got {result}"
         assert len(db.startups) == 0, f"Expected 0 startups in DB, got {len(db.startups)}"
@@ -433,8 +430,8 @@ def test_ingestion_gates():
     jobs = [{"title": "Software Engineer", "url": "https://deadwithjobs.com/jobs/1"}]
     
     with patch.object(db, "geocode_address", return_value=(12.9, 77.6)), \
-         patch("db_manager.check_job_active", return_value=(True, "Active")), \
-         patch("db_manager.validate_website_domain", return_value=(False, "https://deadwithjobs.com", "DNS failed")):
+         patch("data_acquisition.db_manager.check_job_active", return_value=(True, "Active")), \
+         patch("data_acquisition.db_manager.validate_website_domain", return_value=(False, "https://deadwithjobs.com", "DNS failed")):
         result = db.merge_startup(company_details, jobs)
         assert result is not None, "Expected merge_startup to return merged startup record"
         assert result["is_active_website"] is False, "Expected website to remain inactive"
@@ -467,8 +464,8 @@ def test_ingestion_gates():
     jobs = [{"title": "Software Engineer", "url": "https://activecorp.com/jobs/1"}]
     
     with patch.object(db, "geocode_address", return_value=(12.9, 77.6)), \
-         patch("db_manager.check_job_active", return_value=(True, "Active")), \
-         patch("db_manager.validate_website_domain", return_value=(True, "https://activecorp.com", None)):
+         patch("data_acquisition.db_manager.check_job_active", return_value=(True, "Active")), \
+         patch("data_acquisition.db_manager.validate_website_domain", return_value=(True, "https://activecorp.com", None)):
         result = db.merge_startup(company_details, jobs)
         assert result is not None, "Expected merge_startup to return merged startup record"
         assert result["is_active_website"] is True

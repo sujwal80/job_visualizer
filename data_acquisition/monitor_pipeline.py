@@ -11,19 +11,8 @@ import json
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
-DATA_ACQ_DIR = os.path.abspath(os.path.dirname(__file__))
-if DATA_ACQ_DIR not in sys.path:
-    sys.path.insert(0, DATA_ACQ_DIR)
-
-try:
-    from crawl_queue import CrawlQueue
-except ImportError:
-    from data_acquisition.crawl_queue import CrawlQueue
-
-try:
-    from db_manager import DBManager
-except ImportError:
-    from data_acquisition.db_manager import DBManager
+from data_acquisition.pipelines.crawling.crawl_queue import CrawlQueue
+from data_acquisition.db_manager import DBManager
 
 
 def display_monitor(db_path=None, queue_db_path=None):

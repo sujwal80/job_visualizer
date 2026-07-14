@@ -12,7 +12,7 @@ if parent_dir not in sys.path:
     sys.path.append(parent_dir)
 
 from data_acquisition.db_manager import DBManager
-from data_acquisition.job_validator import JobValidator
+from data_acquisition.pipelines.validation.job_validator import JobValidator
 
 # Mock rules definition
 # socket.gethostbyname(domain)

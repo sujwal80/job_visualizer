@@ -1,10 +1,7 @@
 import os
 import time
 import random
-try:
-    from geo_config import DEFAULT_TARGET_CITY, DEFAULT_DISCOVERY_KEYWORDS, get_mock_jobs
-except ImportError:
-    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, DEFAULT_DISCOVERY_KEYWORDS, get_mock_jobs
+from data_acquisition.geo_config import DEFAULT_TARGET_CITY, DEFAULT_DISCOVERY_KEYWORDS, get_mock_jobs
 
 class CompanyDiscoveryService:
     """

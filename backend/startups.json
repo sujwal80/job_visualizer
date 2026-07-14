@@ -51,7 +51,10 @@
     "is_remote_office": false,
     "remote_office_distance_km": 5.11,
     "location_tagged": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 2,
@@ -105,7 +108,10 @@
     "is_remote_office": false,
     "remote_office_distance_km": 4.97,
     "location_tagged": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 3,
@@ -178,7 +184,10 @@
     "location_tagged": true,
     "verified_email": "join@hsrsaas.com",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 4,
@@ -209,7 +218,10 @@
     "location_tagged": true,
     "logo_svg_url": "",
     "verified_email": "info@whitefieldcleantech.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 5,
@@ -270,7 +282,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": false,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 6,
@@ -310,7 +325,10 @@
     "location_tagged": true,
     "verified_email": "careers@bengalurubiosystems.com",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 7,
@@ -350,7 +368,10 @@
     "location_tagged": true,
     "verified_email": "hr@quickpulse.health",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 8,
@@ -403,7 +424,10 @@
     "location_tagged": true,
     "verified_email": "talent@rupeeflow.com",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/rupeeflow.com"
+    "logo_svg_url": "https://unavatar.io/rupeeflow.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 9,
@@ -434,7 +458,10 @@
     "location_tagged": true,
     "logo_svg_url": "",
     "verified_email": "join@solargridindia.com",
-    "is_active_website": true
+    "is_active_website": true,
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 10,
@@ -482,7 +509,10 @@
     "location_tagged": true,
     "verified_email": "careers@zenithsaas.io",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 11,
@@ -573,7 +603,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/news.microsoft.com"
+    "logo_svg_url": "https://unavatar.io/news.microsoft.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 12,
@@ -924,7 +957,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/goo.gle"
+    "logo_svg_url": "https://unavatar.io/goo.gle",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 13,
@@ -1314,7 +1350,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/lenovo.com"
+    "logo_svg_url": "https://unavatar.io/lenovo.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 14,
@@ -1409,7 +1448,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/porter.in"
+    "logo_svg_url": "https://unavatar.io/porter.in",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 15,
@@ -1827,7 +1869,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/deloitte.com"
+    "logo_svg_url": "https://unavatar.io/deloitte.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 16,
@@ -2286,7 +2331,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/infosys.com"
+    "logo_svg_url": "https://unavatar.io/infosys.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 17,
@@ -2676,7 +2724,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://assets.aboutamazon.com/85/0b/a54bd5854c1b99512aa65180a2f0/result-2.svg"
+    "logo_svg_url": "https://assets.aboutamazon.com/85/0b/a54bd5854c1b99512aa65180a2f0/result-2.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 18,
@@ -2959,7 +3010,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/bairesdev.com"
+    "logo_svg_url": "https://unavatar.io/bairesdev.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 19,
@@ -3297,7 +3351,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/apple.com"
+    "logo_svg_url": "https://unavatar.io/apple.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 20,
@@ -3531,7 +3588,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/careers.linkedin.com"
+    "logo_svg_url": "https://unavatar.io/careers.linkedin.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 21,
@@ -3723,7 +3783,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 22,
@@ -3983,7 +4046,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.epiroc.com/etc.clientlibs/settings/wcm/designs/business/clientlib-preloaded/resources/favicon.svg"
+    "logo_svg_url": "https://www.epiroc.com/etc.clientlibs/settings/wcm/designs/business/clientlib-preloaded/resources/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 23,
@@ -4298,7 +4364,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.digicert.com/icon.svg"
+    "logo_svg_url": "https://www.digicert.com/icon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 24,
@@ -4519,7 +4588,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "http://www.millerknoll.com/favicon/favicon.svg"
+    "logo_svg_url": "http://www.millerknoll.com/favicon/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 25,
@@ -4792,7 +4864,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/jobs-ta.pwc.com"
+    "logo_svg_url": "https://unavatar.io/jobs-ta.pwc.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 26,
@@ -4846,7 +4921,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=wolkensoftware.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=wolkensoftware.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 27,
@@ -4880,7 +4958,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=yardstick.live&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=yardstick.live&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 28,
@@ -5361,7 +5442,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=life.myntra.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=life.myntra.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 29,
@@ -5738,7 +5822,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=capgemini.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=capgemini.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 30,
@@ -5803,7 +5890,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=openleaf.tech&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=openleaf.tech&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 31,
@@ -6141,7 +6231,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ebayinc.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ebayinc.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 32,
@@ -6377,7 +6470,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 33,
@@ -6624,7 +6720,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "http://www.honeywell.com/content/dam/honcorp/us-en/common-assets/logos/hon-honeywell-technologies-logo-mini.svg"
+    "logo_svg_url": "http://www.honeywell.com/content/dam/honcorp/us-en/common-assets/logos/hon-honeywell-technologies-logo-mini.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 34,
@@ -6975,7 +7074,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=tataelectronics.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=tataelectronics.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 35,
@@ -7040,7 +7142,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://accuristech.com/nitropack_static/bHdjIkhZtcHmsYKHlTSenzWyuqhznzWH/assets/images/optimized/rev-9e43878/accuristech.com/wp-content/themes/accuristech-wp/favicons/favicon.svg"
+    "logo_svg_url": "https://accuristech.com/nitropack_static/bHdjIkhZtcHmsYKHlTSenzWyuqhznzWH/assets/images/optimized/rev-9e43878/accuristech.com/wp-content/themes/accuristech-wp/favicons/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 36,
@@ -7074,7 +7179,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=merge.money&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=merge.money&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 37,
@@ -7256,7 +7364,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=gosats.io&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=gosats.io&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 38,
@@ -7360,7 +7471,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=razorpay.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=razorpay.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 39,
@@ -7394,7 +7508,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=axi.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=axi.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 40,
@@ -7576,7 +7693,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=snapmintbusiness.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=snapmintbusiness.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 41,
@@ -7628,7 +7748,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://kb-serve-img.gumlet.io/krazybee/kreditbee_in/logo_horizontal_BNqOuZWg_.svg"
+    "logo_svg_url": "https://kb-serve-img.gumlet.io/krazybee/kreditbee_in/logo_horizontal_BNqOuZWg_.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 42,
@@ -7793,7 +7916,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=glomopay.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=glomopay.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 43,
@@ -7858,7 +7984,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 44,
@@ -8066,7 +8195,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://navi.com/static/media/naviLogo.c2380d7b.svg"
+    "logo_svg_url": "https://navi.com/static/media/naviLogo.c2380d7b.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 45,
@@ -8404,7 +8536,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=groww.in&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=groww.in&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 46,
@@ -8521,7 +8656,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 47,
@@ -8690,7 +8828,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=wns.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=wns.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 48,
@@ -8796,7 +8937,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=mcafee.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=mcafee.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 49,
@@ -9479,7 +9623,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=meesho.io&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=meesho.io&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 50,
@@ -9674,7 +9821,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=smallcase.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=smallcase.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 51,
@@ -10473,7 +10623,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=phonepe.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=phonepe.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 52,
@@ -10539,7 +10692,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=rupeek.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=rupeek.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 53,
@@ -10738,7 +10894,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=endava.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=endava.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 54,
@@ -10898,7 +11057,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=cgvakindia.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=cgvakindia.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 55,
@@ -10963,7 +11125,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=jupiter.money&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=jupiter.money&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 56,
@@ -11132,7 +11297,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://goodscore.app/assets/good-coin.svg"
+    "logo_svg_url": "https://goodscore.app/assets/good-coin.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 57,
@@ -11262,7 +11430,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=piceapp.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=piceapp.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 58,
@@ -11496,7 +11667,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=pinelabs.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=pinelabs.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 59,
@@ -11704,7 +11878,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.ujjivansfb.bank.in/assets/svgviewer_output_6bc1ef1266.svg"
+    "logo_svg_url": "https://www.ujjivansfb.bank.in/assets/svgviewer_output_6bc1ef1266.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 60,
@@ -11886,7 +12063,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.signzy.com/_next/static/media/Logo.0740c233.svg"
+    "logo_svg_url": "https://www.signzy.com/_next/static/media/Logo.0740c233.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 61,
@@ -12107,7 +12287,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=straive.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=straive.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 62,
@@ -12250,7 +12433,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/sunpharma.com"
+    "logo_svg_url": "https://unavatar.io/sunpharma.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 63,
@@ -12497,7 +12683,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 64,
@@ -12731,7 +12920,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/iqvia.com"
+    "logo_svg_url": "https://unavatar.io/iqvia.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 65,
@@ -12926,7 +13118,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 66,
@@ -13214,7 +13409,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=eversana.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=eversana.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 67,
@@ -13409,7 +13607,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=himalayawellness.in&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=himalayawellness.in&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 68,
@@ -13578,7 +13779,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=thermofisher.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=thermofisher.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 69,
@@ -13825,7 +14029,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/itcportal.com"
+    "logo_svg_url": "https://unavatar.io/itcportal.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 70,
@@ -14007,7 +14214,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=turing.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=turing.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 71,
@@ -14124,7 +14334,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=leucine.io&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=leucine.io&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 72,
@@ -14158,7 +14371,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=esslsecurity.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=esslsecurity.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 73,
@@ -14192,7 +14408,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=biotechhealthcare.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=biotechhealthcare.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 74,
@@ -14400,7 +14619,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.eclinicalsol.com/wp-content/themes/eclinical-solutions/assets/build/images/pwa/icon.svg"
+    "logo_svg_url": "https://www.eclinicalsol.com/wp-content/themes/eclinical-solutions/assets/build/images/pwa/icon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 75,
@@ -14434,7 +14656,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "http://www.fico.com/assets/favicons/favicon.svg"
+    "logo_svg_url": "http://www.fico.com/assets/favicons/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 76,
@@ -14592,7 +14817,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=haystackanalytics.in&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=haystackanalytics.in&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 77,
@@ -14774,7 +15002,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=nykaa.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=nykaa.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 78,
@@ -14878,7 +15109,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=oracle.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=oracle.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 79,
@@ -15164,7 +15398,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://2025prodstorageaccount-eqdyc8g8hpccdfez.a02.azurefd.net/ltprod/media/d44ph50r/lt.svg"
+    "logo_svg_url": "https://2025prodstorageaccount-eqdyc8g8hpccdfez.a02.azurefd.net/ltprod/media/d44ph50r/lt.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 80,
@@ -15398,7 +15635,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=renesas.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=renesas.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 81,
@@ -15541,7 +15781,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sumologic.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sumologic.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 82,
@@ -15649,7 +15892,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=fortanix.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=fortanix.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 83,
@@ -15691,7 +15937,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.littlebigconnection.com/_next/static/media/five-stars.3c70fc87.svg"
+    "logo_svg_url": "https://www.littlebigconnection.com/_next/static/media/five-stars.3c70fc87.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 84,
@@ -15873,7 +16122,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=excelr.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=excelr.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 85,
@@ -15923,7 +16175,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "http://www.sugarfit.com/favicon.svg"
+    "logo_svg_url": "http://www.sugarfit.com/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 86,
@@ -16079,7 +16334,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/teradata.com"
+    "logo_svg_url": "https://unavatar.io/teradata.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 87,
@@ -17301,7 +17559,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=okta.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=okta.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 88,
@@ -17483,7 +17744,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.wisemonk.io/favicon.svg"
+    "logo_svg_url": "https://www.wisemonk.io/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 89,
@@ -17784,7 +18048,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/tcs.com"
+    "logo_svg_url": "https://unavatar.io/tcs.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 90,
@@ -17890,7 +18157,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/wati.io"
+    "logo_svg_url": "https://unavatar.io/wati.io",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 91,
@@ -17942,7 +18212,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=konghq.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=konghq.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 92,
@@ -18098,7 +18371,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=delhivery.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=delhivery.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 93,
@@ -18471,7 +18747,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=acceldata.io&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=acceldata.io&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 94,
@@ -18653,7 +18932,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=shorturl.at&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=shorturl.at&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 95,
@@ -18744,7 +19026,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=cisco.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=cisco.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 96,
@@ -18913,7 +19198,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/sprinto.com"
+    "logo_svg_url": "https://unavatar.io/sprinto.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 97,
@@ -19095,7 +19383,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=freshworks.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=freshworks.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 98,
@@ -19147,7 +19438,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=quickheal.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=quickheal.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 99,
@@ -19181,7 +19475,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/clari.com"
+    "logo_svg_url": "https://unavatar.io/clari.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 100,
@@ -19246,7 +19543,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=zoca.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=zoca.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 101,
@@ -19428,7 +19728,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/intuit.com"
+    "logo_svg_url": "https://unavatar.io/intuit.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 102,
@@ -19753,7 +20056,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=accenture.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=accenture.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 103,
@@ -19948,7 +20254,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/adobe.com"
+    "logo_svg_url": "https://unavatar.io/adobe.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 104,
@@ -20247,7 +20556,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/hcltech.com"
+    "logo_svg_url": "https://unavatar.io/hcltech.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 105,
@@ -20286,7 +20598,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.zibtek.com/assets/images/homepage/Spotlight-1.svg"
+    "logo_svg_url": "https://www.zibtek.com/assets/images/homepage/Spotlight-1.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 106,
@@ -20392,7 +20707,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.sourcingxpress.com/sxp-logo-1.svg"
+    "logo_svg_url": "https://www.sourcingxpress.com/sxp-logo-1.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 107,
@@ -20522,7 +20840,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/wipro.com"
+    "logo_svg_url": "https://unavatar.io/wipro.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 108,
@@ -20556,7 +20877,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=origin.tech&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=origin.tech&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 109,
@@ -20595,7 +20919,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=inceptlabs.ai&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=inceptlabs.ai&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 110,
@@ -20779,7 +21106,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=nightfall.ai&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=nightfall.ai&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 111,
@@ -21065,7 +21395,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://social.kpmg/etc.clientlibs/kpmg/clientlibs/clientlib-site/resources/images/favicons/favicon-96x96.svg"
+    "logo_svg_url": "https://social.kpmg/etc.clientlibs/kpmg/clientlibs/clientlib-site/resources/images/favicons/favicon-96x96.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 112,
@@ -21299,7 +21632,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://global.rakuten.com/corp/assets/img/site-icons/rakuten-black.svg"
+    "logo_svg_url": "https://global.rakuten.com/corp/assets/img/site-icons/rakuten-black.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 113,
@@ -21351,7 +21687,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=r3consultant.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=r3consultant.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 114,
@@ -21624,7 +21963,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=hitachids.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=hitachids.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 115,
@@ -21845,7 +22187,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ust.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ust.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 116,
@@ -21895,7 +22240,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sap.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sap.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 117,
@@ -21934,7 +22282,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=fanplayiot.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=fanplayiot.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 118,
@@ -22025,7 +22376,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=st.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=st.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 119,
@@ -22059,7 +22413,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=mindflix.ai&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=mindflix.ai&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 120,
@@ -22093,7 +22450,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://op.tech/wp-content/themes/op/resources/images/favicon/favicon.svg"
+    "logo_svg_url": "https://op.tech/wp-content/themes/op/resources/images/favicon/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 121,
@@ -22418,7 +22778,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=cult.fit&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=cult.fit&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 122,
@@ -22626,7 +22989,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=licious.in&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=licious.in&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 123,
@@ -22668,7 +23034,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ninjacart.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ninjacart.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 124,
@@ -22863,7 +23232,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/zeptonow.com"
+    "logo_svg_url": "https://unavatar.io/zeptonow.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 125,
@@ -23110,7 +23482,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=atherenergy.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=atherenergy.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 126,
@@ -23162,7 +23537,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ecofira.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ecofira.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 127,
@@ -23357,7 +23735,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=giva.co&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=giva.co&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 128,
@@ -23500,7 +23881,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=3m.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=3m.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 129,
@@ -23656,7 +24040,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 130,
@@ -23747,7 +24134,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "http://www.everkindconsumer.com/favicon.svg"
+    "logo_svg_url": "http://www.everkindconsumer.com/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 131,
@@ -23827,7 +24217,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=skillyt.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=skillyt.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 132,
@@ -23861,7 +24254,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=mcfadyen.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=mcfadyen.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 133,
@@ -24030,7 +24426,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=kyndryl.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=kyndryl.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 134,
@@ -24316,7 +24715,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "http://www.techmahindra.com/themes/custom/techm/favicon/favicon.svg"
+    "logo_svg_url": "http://www.techmahindra.com/themes/custom/techm/favicon/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 135,
@@ -24537,7 +24939,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 136,
@@ -24732,7 +25137,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=testsigma.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=testsigma.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 137,
@@ -24849,7 +25257,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=bayrocklabs.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=bayrocklabs.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 138,
@@ -25044,7 +25455,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ltm.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ltm.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 139,
@@ -25255,7 +25669,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=cyble.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=cyble.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 140,
@@ -25294,7 +25711,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://soar.inc/favicons/icon.svg"
+    "logo_svg_url": "https://soar.inc/favicons/icon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 141,
@@ -25489,7 +25909,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/bayer.com"
+    "logo_svg_url": "https://unavatar.io/bayer.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 142,
@@ -25658,7 +26081,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=exlservice.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=exlservice.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 143,
@@ -25866,7 +26292,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": false,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 144,
@@ -25918,7 +26347,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sequoia.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sequoia.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 145,
@@ -26165,7 +26597,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=commbank.com.au&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=commbank.com.au&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 146,
@@ -26215,7 +26650,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ikigailabs.io&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ikigailabs.io&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 147,
@@ -26384,7 +26822,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=hdfcsec.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=hdfcsec.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 148,
@@ -26436,7 +26877,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.hackajob.com/favicons/production/favicon.svg"
+    "logo_svg_url": "https://www.hackajob.com/favicons/production/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 149,
@@ -26494,7 +26938,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=impactanalytics.ai&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=impactanalytics.ai&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 150,
@@ -26663,7 +27110,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=dovercorporation.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=dovercorporation.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 151,
@@ -27029,7 +27479,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=weareroku.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=weareroku.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 152,
@@ -27263,7 +27716,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=tredence.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=tredence.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 153,
@@ -27518,7 +27974,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/harman.com"
+    "logo_svg_url": "https://unavatar.io/harman.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 154,
@@ -27784,7 +28243,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=about.gitlab.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=about.gitlab.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 155,
@@ -27966,7 +28428,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://clarivate.com/wp-content/themes/clarivate/src/favicon/safari-pinned-tab.svg"
+    "logo_svg_url": "https://clarivate.com/wp-content/themes/clarivate/src/favicon/safari-pinned-tab.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 156,
@@ -28184,7 +28649,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/aws.amazon.com"
+    "logo_svg_url": "https://unavatar.io/aws.amazon.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 157,
@@ -28314,7 +28782,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.slicebank.com/favicon.svg"
+    "logo_svg_url": "https://www.slicebank.com/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 158,
@@ -28392,7 +28863,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://juspay.io/favicon.png"
+    "logo_svg_url": "https://juspay.io/favicon.png",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 159,
@@ -28535,7 +29009,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=join.brightmoney.co&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=join.brightmoney.co&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 160,
@@ -28587,7 +29064,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 161,
@@ -28629,7 +29109,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.roma.global/images/roma-favicon.svg"
+    "logo_svg_url": "https://www.roma.global/images/roma-favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 162,
@@ -28663,7 +29146,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=peakxv.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=peakxv.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 163,
@@ -28793,7 +29279,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=harmonic.ai&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=harmonic.ai&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 164,
@@ -28945,7 +29434,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=aspora.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=aspora.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 165,
@@ -29036,7 +29528,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=xpaycheckout.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=xpaycheckout.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 166,
@@ -29361,7 +29856,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/openfx.com"
+    "logo_svg_url": "https://unavatar.io/openfx.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 167,
@@ -29517,7 +30015,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 168,
@@ -29764,7 +30265,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=vantive.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=vantive.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 169,
@@ -29846,7 +30350,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=pandorum.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=pandorum.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 170,
@@ -30002,7 +30509,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sartorius.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sartorius.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 171,
@@ -30210,7 +30720,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 172,
@@ -30431,7 +30944,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sigmaaldrich.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sigmaaldrich.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 173,
@@ -30639,7 +31155,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=apotex.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=apotex.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 174,
@@ -30834,7 +31353,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ltts.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ltts.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 175,
@@ -31107,7 +31629,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=eurofins.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=eurofins.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 176,
@@ -31367,7 +31892,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/syngeneintl.com"
+    "logo_svg_url": "https://unavatar.io/syngeneintl.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 177,
@@ -31627,7 +32155,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/tataelxsi.com"
+    "logo_svg_url": "https://unavatar.io/tataelxsi.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 178,
@@ -31679,7 +32210,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/guardanthealth.com"
+    "logo_svg_url": "https://unavatar.io/guardanthealth.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 179,
@@ -31713,7 +32247,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/uravulabs.com"
+    "logo_svg_url": "https://unavatar.io/uravulabs.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 180,
@@ -31819,7 +32356,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/citigroup.com"
+    "logo_svg_url": "https://unavatar.io/citigroup.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 181,
@@ -31885,7 +32425,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/pwc.in"
+    "logo_svg_url": "https://unavatar.io/pwc.in",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 182,
@@ -31975,7 +32518,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/hgs.com"
+    "logo_svg_url": "https://unavatar.io/hgs.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 183,
@@ -32033,7 +32579,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://saviynt.com/hubfs/favicon.svg"
+    "logo_svg_url": "https://saviynt.com/hubfs/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 184,
@@ -32067,7 +32616,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/smytten.com"
+    "logo_svg_url": "https://unavatar.io/smytten.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 185,
@@ -32165,7 +32717,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/thoucentric.com"
+    "logo_svg_url": "https://unavatar.io/thoucentric.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 186,
@@ -32207,7 +32762,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/servify.com"
+    "logo_svg_url": "https://unavatar.io/servify.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 187,
@@ -32249,7 +32807,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/prestigeconstructions.com"
+    "logo_svg_url": "https://unavatar.io/prestigeconstructions.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 188,
@@ -32363,7 +32924,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "http://about.puma.com/themes/custom/dreist/build/assets/images/favicon/safari-pinned-tab.svg"
+    "logo_svg_url": "http://about.puma.com/themes/custom/dreist/build/assets/images/favicon/safari-pinned-tab.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 189,
@@ -32469,7 +33033,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/tmrw.in"
+    "logo_svg_url": "https://unavatar.io/tmrw.in",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 190,
@@ -32519,7 +33086,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/kirana.club"
+    "logo_svg_url": "https://unavatar.io/kirana.club",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 191,
@@ -32577,7 +33147,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/pratilipi.com"
+    "logo_svg_url": "https://unavatar.io/pratilipi.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 192,
@@ -32651,7 +33224,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/career.hm.com"
+    "logo_svg_url": "https://unavatar.io/career.hm.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 193,
@@ -32685,7 +33261,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/sprig.store"
+    "logo_svg_url": "https://unavatar.io/sprig.store",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 194,
@@ -32799,7 +33378,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://lowes.co.in/wp-content/themes/lowesite/assets/img/favicon/favicon.svg"
+    "logo_svg_url": "https://lowes.co.in/wp-content/themes/lowesite/assets/img/favicon/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 195,
@@ -32897,7 +33479,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/relianceretail.com"
+    "logo_svg_url": "https://unavatar.io/relianceretail.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 196,
@@ -32939,7 +33524,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/mmoser.com"
+    "logo_svg_url": "https://unavatar.io/mmoser.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 197,
@@ -33037,7 +33625,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=bnpp.lk&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=bnpp.lk&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 198,
@@ -33071,7 +33662,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=archvi.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=archvi.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 199,
@@ -33113,7 +33707,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=letitbexai.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=letitbexai.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 200,
@@ -33155,7 +33752,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 201,
@@ -33245,7 +33845,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=careers.walmart.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=careers.walmart.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 202,
@@ -33351,7 +33954,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=kredivocorp.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=kredivocorp.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 203,
@@ -33385,7 +33991,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ewar.in&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ewar.in&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 204,
@@ -33435,7 +34044,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.rippling.com/favicons/favicon.svg"
+    "logo_svg_url": "https://www.rippling.com/favicons/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 205,
@@ -33469,7 +34081,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.side.inc/favicon-svg-512.svg"
+    "logo_svg_url": "https://www.side.inc/favicon-svg-512.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 206,
@@ -33575,7 +34190,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 207,
@@ -33609,7 +34227,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 208,
@@ -33707,7 +34328,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=playsimple.in&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=playsimple.in&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 209,
@@ -33757,7 +34381,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=weekday.works&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=weekday.works&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 210,
@@ -33823,7 +34450,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=jitterbit.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=jitterbit.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 211,
@@ -33921,7 +34551,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://res.cloudinary.com/hevo/image/upload/v1763716896/website-rewamp/favicon/SVG/light_sq6q2p.svg"
+    "logo_svg_url": "https://res.cloudinary.com/hevo/image/upload/v1763716896/website-rewamp/favicon/SVG/light_sq6q2p.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 212,
@@ -33987,7 +34620,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=niveussolutions.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=niveussolutions.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 213,
@@ -34093,7 +34729,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://links.sarvam.io/favicon.svg"
+    "logo_svg_url": "https://links.sarvam.io/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 214,
@@ -34167,7 +34806,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.clickhouse.com/icon0.svg?icon0.0b55wpn19lxsq.svg"
+    "logo_svg_url": "https://www.clickhouse.com/icon0.svg?icon0.0b55wpn19lxsq.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 215,
@@ -34201,7 +34843,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sheshi.ai&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=sheshi.ai&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 216,
@@ -34283,7 +34928,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/netskope.com"
+    "logo_svg_url": "https://unavatar.io/netskope.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 217,
@@ -34373,7 +35021,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=skyworksinc.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=skyworksinc.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 218,
@@ -34463,7 +35114,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=hackerrank.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=hackerrank.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 219,
@@ -34497,7 +35151,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ascendion.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=ascendion.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 220,
@@ -34603,7 +35260,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=spacematrix.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=spacematrix.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 221,
@@ -34693,7 +35353,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/hpe.com"
+    "logo_svg_url": "https://unavatar.io/hpe.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 222,
@@ -34783,7 +35446,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/teampumpkin.com"
+    "logo_svg_url": "https://unavatar.io/teampumpkin.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 223,
@@ -34849,7 +35515,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/stylishop.com"
+    "logo_svg_url": "https://unavatar.io/stylishop.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 224,
@@ -34923,7 +35592,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 225,
@@ -34973,7 +35645,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/oneretailgroup.com"
+    "logo_svg_url": "https://unavatar.io/oneretailgroup.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 226,
@@ -35007,7 +35682,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/scottinternational.com"
+    "logo_svg_url": "https://unavatar.io/scottinternational.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 227,
@@ -35041,7 +35719,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/dalvkot.com"
+    "logo_svg_url": "https://unavatar.io/dalvkot.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 228,
@@ -35075,7 +35756,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/varma.capital"
+    "logo_svg_url": "https://unavatar.io/varma.capital",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 229,
@@ -35165,7 +35849,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/commerceiq.ai"
+    "logo_svg_url": "https://unavatar.io/commerceiq.ai",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 230,
@@ -35207,7 +35894,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/himatsingka.com"
+    "logo_svg_url": "https://unavatar.io/himatsingka.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 231,
@@ -35241,7 +35931,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/mellowdesigns.co"
+    "logo_svg_url": "https://unavatar.io/mellowdesigns.co",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 232,
@@ -35331,7 +36024,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/vedantu.com"
+    "logo_svg_url": "https://unavatar.io/vedantu.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 233,
@@ -35389,7 +36085,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://www.google.com/s2/favicons?domain=furlenco.com&sz=128"
+    "logo_svg_url": "https://www.google.com/s2/favicons?domain=furlenco.com&sz=128",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 234,
@@ -35423,7 +36122,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/tech.walmart.com"
+    "logo_svg_url": "https://unavatar.io/tech.walmart.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 235,
@@ -35457,7 +36159,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/algonox.com"
+    "logo_svg_url": "https://unavatar.io/algonox.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 236,
@@ -35491,7 +36196,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/deccan.ai"
+    "logo_svg_url": "https://unavatar.io/deccan.ai",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 237,
@@ -35516,7 +36224,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/zamp.ai"
+    "logo_svg_url": "https://unavatar.io/zamp.ai",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 238,
@@ -35550,7 +36261,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/landeed.com"
+    "logo_svg_url": "https://unavatar.io/landeed.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 239,
@@ -35584,7 +36298,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/weekday.works"
+    "logo_svg_url": "https://unavatar.io/weekday.works",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 240,
@@ -35618,7 +36335,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/algonox.com"
+    "logo_svg_url": "https://unavatar.io/algonox.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 241,
@@ -35652,7 +36372,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/goo.gle"
+    "logo_svg_url": "https://unavatar.io/goo.gle",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 242,
@@ -35686,7 +36409,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 243,
@@ -35720,7 +36446,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": "https://cdn.prod.website-files.com/65c292289fb0ea1ff3a84bd3/6807f0d918342111b78873bd_gushwork-fav-con-32X32px.svg"
+    "logo_svg_url": "https://cdn.prod.website-files.com/65c292289fb0ea1ff3a84bd3/6807f0d918342111b78873bd_gushwork-fav-con-32X32px.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 244,
@@ -35754,7 +36483,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 245,
@@ -35788,7 +36520,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 246,
@@ -35826,7 +36561,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 247,
@@ -35864,7 +36602,10 @@
     "location_tagged": true,
     "verified_email": "",
     "is_active_website": true,
-    "logo_svg_url": ""
+    "logo_svg_url": "",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 248,
@@ -35900,7 +36641,10 @@
     "location_tagged": true,
     "verified_email": "jobs@openai.com",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/openai.com"
+    "logo_svg_url": "https://unavatar.io/openai.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 249,
@@ -35936,7 +36680,10 @@
     "location_tagged": true,
     "verified_email": "careers@anthropic.com",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/anthropic.com"
+    "logo_svg_url": "https://unavatar.io/anthropic.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 250,
@@ -35986,7 +36733,10 @@
     "location_tagged": true,
     "verified_email": "recruiting@stripe.com",
     "is_active_website": true,
-    "logo_svg_url": "https://images.stripeassets.com/fzn2n1nzq965/1hgcBNd12BfT9VLgbId7By/01d91920114b124fb4cf6d448f9f06eb/favicon.svg"
+    "logo_svg_url": "https://images.stripeassets.com/fzn2n1nzq965/1hgcBNd12BfT9VLgbId7By/01d91920114b124fb4cf6d448f9f06eb/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 251,
@@ -36017,7 +36767,10 @@
     "location_tagged": true,
     "verified_email": "jobs@scale.com",
     "is_active_website": true,
-    "logo_svg_url": "https://scale.com/favicon.svg"
+    "logo_svg_url": "https://scale.com/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 252,
@@ -36048,7 +36801,10 @@
     "location_tagged": true,
     "verified_email": "careers@vercel.com",
     "is_active_website": true,
-    "logo_svg_url": "https://vercel.com/vc-ap-vercel-marketing/_next/static/immutable/media/vercel-light.3_gxxexgi1nmy.svg"
+    "logo_svg_url": "https://vercel.com/vc-ap-vercel-marketing/_next/static/immutable/media/vercel-light.3_gxxexgi1nmy.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 253,
@@ -36098,7 +36854,10 @@
     "location_tagged": true,
     "verified_email": "careers@deepmind.com",
     "is_active_website": true,
-    "logo_svg_url": "https://storage.googleapis.com/gdm-deepmind-com-prod-public/icons/google_deepmind_48dp.svg"
+    "logo_svg_url": "https://storage.googleapis.com/gdm-deepmind-com-prod-public/icons/google_deepmind_48dp.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 254,
@@ -36134,7 +36893,10 @@
     "location_tagged": true,
     "verified_email": "jobs@revolut.com",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/revolut.com"
+    "logo_svg_url": "https://unavatar.io/revolut.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 255,
@@ -36165,7 +36927,10 @@
     "location_tagged": true,
     "verified_email": "careers@monzo.com",
     "is_active_website": true,
-    "logo_svg_url": "https://static-assets.monzo.com/monzo-com/6842b3188b2cc0064b8bceeaf52ff7960fed011e/_next/static/media/favicon.4c6ebc6f.svg"
+    "logo_svg_url": "https://static-assets.monzo.com/monzo-com/6842b3188b2cc0064b8bceeaf52ff7960fed011e/_next/static/media/favicon.4c6ebc6f.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 256,
@@ -36196,7 +36961,10 @@
     "location_tagged": true,
     "verified_email": "talent@wayve.ai",
     "is_active_website": true,
-    "logo_svg_url": "https://unavatar.io/wayve.ai"
+    "logo_svg_url": "https://unavatar.io/wayve.ai",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 257,
@@ -36236,7 +37004,10 @@
     "is_remote_office": false,
     "remote_office_distance_km": null,
     "location_tagged": true,
-    "logo_svg_url": "https://unavatar.io/lyzr.ai"
+    "logo_svg_url": "https://unavatar.io/lyzr.ai",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 258,
@@ -36276,7 +37047,10 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1739.8,
     "location_tagged": true,
-    "logo_svg_url": "https://unavatar.io/mivoya.in"
+    "logo_svg_url": "https://unavatar.io/mivoya.in",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 259,
@@ -36316,7 +37090,10 @@
     "is_remote_office": true,
     "remote_office_distance_km": 735.44,
     "location_tagged": true,
-    "logo_svg_url": "https://unavatar.io/hello.pricelabs.co"
+    "logo_svg_url": "https://unavatar.io/hello.pricelabs.co",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 260,
@@ -36356,7 +37133,10 @@
     "is_remote_office": false,
     "remote_office_distance_km": 15.59,
     "location_tagged": true,
-    "logo_svg_url": "https://unavatar.io/infosys.com"
+    "logo_svg_url": "https://unavatar.io/infosys.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 261,
@@ -36396,7 +37176,10 @@
     "is_remote_office": false,
     "remote_office_distance_km": null,
     "location_tagged": true,
-    "logo_svg_url": "http://www.echovane.com/favicon.svg"
+    "logo_svg_url": "http://www.echovane.com/favicon.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 262,
@@ -36436,7 +37219,10 @@
     "is_remote_office": false,
     "remote_office_distance_km": 5.11,
     "location_tagged": true,
-    "logo_svg_url": "https://unavatar.io/signeasy.com"
+    "logo_svg_url": "https://unavatar.io/signeasy.com",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 263,
@@ -36476,7 +37262,10 @@
     "is_remote_office": false,
     "remote_office_distance_km": 21.2,
     "location_tagged": true,
-    "logo_svg_url": "https://unavatar.io/binary.so"
+    "logo_svg_url": "https://unavatar.io/binary.so",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 264,
@@ -36516,7 +37305,10 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1049.12,
     "location_tagged": true,
-    "logo_svg_url": "https://www.credhive.in/logo.svg"
+    "logo_svg_url": "https://www.credhive.in/logo.svg",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 265,
@@ -36544,7 +37336,10 @@
     "is_active_website": true,
     "logo_domain": "ken42.com",
     "logo_svg_url": "https://unavatar.io/ken42.com",
-    "industry": "Artificial Intelligence"
+    "industry": "Artificial Intelligence",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 266,
@@ -36572,7 +37367,10 @@
     "is_active_website": true,
     "logo_domain": "skitai.com",
     "logo_svg_url": "",
-    "industry": "Artificial Intelligence"
+    "industry": "Artificial Intelligence",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 267,
@@ -36600,7 +37398,10 @@
     "is_active_website": true,
     "logo_domain": "synthycs21.com",
     "logo_svg_url": "",
-    "industry": "Artificial Intelligence"
+    "industry": "Artificial Intelligence",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 268,
@@ -36628,7 +37429,10 @@
     "is_active_website": true,
     "logo_domain": "pypeai.com",
     "logo_svg_url": "https://www.google.com/s2/favicons?domain=pypeai.com&sz=128",
-    "industry": "Artificial Intelligence"
+    "industry": "Artificial Intelligence",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 269,
@@ -36656,7 +37460,10 @@
     "is_active_website": true,
     "logo_domain": "samoraaiycw26.com",
     "logo_svg_url": "",
-    "industry": "Artificial Intelligence"
+    "industry": "Artificial Intelligence",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 270,
@@ -36684,7 +37491,10 @@
     "is_active_website": true,
     "logo_domain": "2careai.com",
     "logo_svg_url": "",
-    "industry": "Artificial Intelligence"
+    "industry": "Artificial Intelligence",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 271,
@@ -36712,7 +37522,10 @@
     "is_active_website": true,
     "logo_domain": "eloelo.com",
     "logo_svg_url": "https://unavatar.io/eloelo.com",
-    "industry": "Artificial Intelligence"
+    "industry": "Artificial Intelligence",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 272,
@@ -36740,7 +37553,10 @@
     "is_active_website": true,
     "logo_domain": "healthasyst.com",
     "logo_svg_url": "https://www.google.com/s2/favicons?domain=healthasyst.com&sz=128",
-    "industry": "Artificial Intelligence"
+    "industry": "Artificial Intelligence",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 273,
@@ -36791,7 +37607,10 @@
     "is_active_website": true,
     "logo_domain": "bengaluruinnovationlabs.com",
     "logo_svg_url": "",
-    "industry": "Artificial Intelligence"
+    "industry": "Artificial Intelligence",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 274,
@@ -36805,7 +37624,10 @@
     "is_active_website": true,
     "logo_domain": "wissentechnology.com",
     "logo_svg_url": "",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 275,
@@ -36819,7 +37641,10 @@
     "is_active_website": true,
     "logo_domain": "echos.com",
     "logo_svg_url": "",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 276,
@@ -36833,7 +37658,10 @@
     "is_active_website": true,
     "logo_domain": "appviewx.com",
     "logo_svg_url": "",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 277,
@@ -36847,7 +37675,10 @@
     "is_active_website": true,
     "logo_domain": "kickdrum.com",
     "logo_svg_url": "https://unavatar.io/kickdrum.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 278,
@@ -36861,7 +37692,10 @@
     "is_active_website": true,
     "logo_domain": "epsilon.com",
     "logo_svg_url": "https://unavatar.io/epsilon.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 279,
@@ -36875,7 +37709,10 @@
     "is_active_website": true,
     "logo_domain": "equitigroup.com",
     "logo_svg_url": "https://unavatar.io/equitigroup.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 280,
@@ -36889,7 +37726,10 @@
     "is_active_website": true,
     "logo_domain": "wizzme.com",
     "logo_svg_url": "",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 281,
@@ -36903,7 +37743,10 @@
     "is_active_website": true,
     "logo_domain": "myhq.com",
     "logo_svg_url": "",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 282,
@@ -36917,7 +37760,10 @@
     "is_active_website": true,
     "logo_domain": "nielsen.com",
     "logo_svg_url": "https://unavatar.io/nielsen.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 283,
@@ -36931,7 +37777,10 @@
     "is_active_website": true,
     "logo_domain": "mihup.com",
     "logo_svg_url": "https://unavatar.io/mihup.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 284,
@@ -37037,7 +37886,10 @@
     "is_active_website": true,
     "logo_domain": "zenplusfleet.com",
     "logo_svg_url": "",
-    "industry": "Fintech"
+    "industry": "Fintech",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 285,
@@ -37065,7 +37917,10 @@
     "is_active_website": true,
     "logo_domain": "rapido.com",
     "logo_svg_url": "https://unavatar.io/rapido.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 286,
@@ -37093,7 +37948,10 @@
     "is_active_website": true,
     "logo_domain": "yulu.com",
     "logo_svg_url": "",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 287,
@@ -37121,7 +37979,10 @@
     "is_active_website": true,
     "logo_domain": "scano.com",
     "logo_svg_url": "",
-    "industry": "Logistics"
+    "industry": "Logistics",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 288,
@@ -37162,7 +38023,10 @@
     "is_active_website": true,
     "logo_domain": "healthify.com",
     "logo_svg_url": "https://unavatar.io/healthify.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 289,
@@ -37190,7 +38054,10 @@
     "is_active_website": true,
     "logo_domain": "noorahealth.com",
     "logo_svg_url": "https://unavatar.io/noorahealth.com",
-    "industry": "HealthTech"
+    "industry": "HealthTech",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 290,
@@ -37231,7 +38098,10 @@
     "is_active_website": true,
     "logo_domain": "visithealth.com",
     "logo_svg_url": "https://unavatar.io/visithealth.com",
-    "industry": "HealthTech"
+    "industry": "HealthTech",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 291,
@@ -37259,7 +38129,10 @@
     "is_active_website": true,
     "logo_domain": "resoluteai.com",
     "logo_svg_url": "https://unavatar.io/resoluteai.com",
-    "industry": "HealthTech"
+    "industry": "HealthTech",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 292,
@@ -37287,7 +38160,10 @@
     "is_active_website": true,
     "logo_domain": "egovfoundation.com",
     "logo_svg_url": "https://unavatar.io/egovfoundation.com",
-    "industry": "HealthTech"
+    "industry": "HealthTech",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 293,
@@ -37315,7 +38191,10 @@
     "is_active_website": true,
     "logo_domain": "healthedge.com",
     "logo_svg_url": "https://unavatar.io/healthedge.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 294,
@@ -37343,7 +38222,10 @@
     "is_active_website": true,
     "logo_domain": "even.com",
     "logo_svg_url": "https://unavatar.io/even.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 295,
@@ -37371,7 +38253,10 @@
     "is_active_website": true,
     "logo_domain": "plum.com",
     "logo_svg_url": "https://unavatar.io/plum.com",
-    "industry": "HealthTech"
+    "industry": "HealthTech",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 296,
@@ -37399,7 +38284,10 @@
     "is_active_website": true,
     "logo_domain": "decathlon.com",
     "logo_svg_url": "https://unavatar.io/decathlon.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 297,
@@ -37427,7 +38315,10 @@
     "is_active_website": true,
     "logo_domain": "payoneer.com",
     "logo_svg_url": "https://unavatar.io/payoneer.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 298,
@@ -37468,7 +38359,10 @@
     "is_active_website": true,
     "logo_domain": "ibm.com",
     "logo_svg_url": "https://unavatar.io/ibm.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 299,
@@ -37522,7 +38416,10 @@
     "is_active_website": true,
     "logo_domain": "questglobal.com",
     "logo_svg_url": "https://unavatar.io/questglobal.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 300,
@@ -37550,7 +38447,10 @@
     "is_active_website": true,
     "logo_domain": "intel.com",
     "logo_svg_url": "https://unavatar.io/intel.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 301,
@@ -37578,7 +38478,10 @@
     "is_active_website": true,
     "logo_domain": "goldmansachs.com",
     "logo_svg_url": "https://unavatar.io/goldmansachs.com",
-    "industry": "Fintech"
+    "industry": "Fintech",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 302,
@@ -37606,7 +38509,10 @@
     "is_active_website": true,
     "logo_domain": "idfcfirstbank.com",
     "logo_svg_url": "https://unavatar.io/idfcfirstbank.com",
-    "industry": "Fintech"
+    "industry": "Fintech",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 303,
@@ -37634,7 +38540,10 @@
     "is_active_website": true,
     "logo_domain": "univers.com",
     "logo_svg_url": "https://unavatar.io/univers.com",
-    "industry": "CleanTech"
+    "industry": "CleanTech",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 304,
@@ -37662,7 +38571,10 @@
     "is_active_website": true,
     "logo_domain": "cgi.com",
     "logo_svg_url": "https://unavatar.io/cgi.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 305,
@@ -37690,7 +38602,10 @@
     "is_active_website": true,
     "logo_domain": "jacobs.com",
     "logo_svg_url": "https://unavatar.io/jacobs.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 306,
@@ -37718,7 +38633,10 @@
     "is_active_website": true,
     "logo_domain": "siemensgamesa.com",
     "logo_svg_url": "https://unavatar.io/siemensgamesa.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 307,
@@ -37746,7 +38664,10 @@
     "is_active_website": true,
     "logo_domain": "capgeminiengineering.com",
     "logo_svg_url": "",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 308,
@@ -37774,7 +38695,10 @@
     "is_active_website": true,
     "logo_domain": "tatahousingdevelopmentcompanylimited.com",
     "logo_svg_url": "",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 309,
@@ -37802,7 +38726,10 @@
     "is_active_website": true,
     "logo_domain": "hindustancocacolabeverages.com",
     "logo_svg_url": "",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 310,
@@ -37816,7 +38743,10 @@
     "is_active_website": true,
     "logo_domain": "wayfair.com",
     "logo_svg_url": "https://unavatar.io/wayfair.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 311,
@@ -37857,7 +38787,10 @@
     "is_active_website": true,
     "logo_domain": "marriottinternational.com",
     "logo_svg_url": "https://unavatar.io/marriottinternational.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 312,
@@ -37885,7 +38818,10 @@
     "is_active_website": true,
     "logo_domain": "hilton.com",
     "logo_svg_url": "https://unavatar.io/hilton.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 313,
@@ -37913,7 +38849,10 @@
     "is_active_website": true,
     "logo_domain": "jwmarriott.com",
     "logo_svg_url": "https://unavatar.io/jwmarriott.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 314,
@@ -37967,7 +38906,10 @@
     "is_active_website": true,
     "logo_domain": "accor.com",
     "logo_svg_url": "https://www.google.com/s2/favicons?domain=accor.com&sz=128",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 315,
@@ -37995,7 +38937,10 @@
     "is_active_website": true,
     "logo_domain": "innovititechnologies.com",
     "logo_svg_url": "",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 316,
@@ -38023,7 +38968,10 @@
     "is_active_website": true,
     "logo_domain": "skillz.com",
     "logo_svg_url": "https://unavatar.io/skillz.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 317,
@@ -38051,7 +38999,10 @@
     "is_active_website": true,
     "logo_domain": "prodigal.com",
     "logo_svg_url": "https://unavatar.io/prodigal.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 318,
@@ -38065,7 +39016,10 @@
     "is_active_website": true,
     "logo_domain": "scispace.com",
     "logo_svg_url": "https://unavatar.io/scispace.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 319,
@@ -38158,7 +39112,10 @@
     "is_active_website": true,
     "logo_domain": "infiniteconvergencesolutions.com",
     "logo_svg_url": "https://unavatar.io/infiniteconvergencesolutions.com",
-    "industry": "SaaS"
+    "industry": "SaaS",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 320,
@@ -38277,7 +39234,10 @@
     "is_active_website": true,
     "logo_domain": "honeywelltechnologies.com",
     "logo_svg_url": "https://unavatar.io/honeywelltechnologies.com",
-    "industry": "Fintech"
+    "industry": "Fintech",
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   },
   {
     "id": 321,
@@ -38314,6 +39274,9 @@
         "skills": [],
         "posted_date": "18 hours ago"
       }
-    ]
+    ],
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null
   }
 ]

@@ -1,12 +1,19 @@
 import unittest
 import os
+import sys
+
+# Add project root to path
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
 from data_acquisition.geo_config import (
     CITY_SYNONYMS,
     match_target_city,
     get_mock_jobs,
 )
-from data_acquisition.tagging.heal_geocodes import clean_snippet_to_address
-from data_acquisition.job_validator import JobValidator
+from data_acquisition.pipelines.tagging.heal_geocodes import clean_snippet_to_address
+from data_acquisition.pipelines.validation.job_validator import JobValidator
 
 
 class TestIndiaRemediation(unittest.TestCase):

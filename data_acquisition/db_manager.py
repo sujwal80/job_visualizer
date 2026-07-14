@@ -91,6 +91,31 @@ class DBManager:
                 try:
                     with open(self.db_path, 'r') as f:
                         self.startups = json.load(f)
+                    
+                    # Backfill logic for existing startups lacking new status tracking fields
+                    for s in self.startups:
+                        if not isinstance(s, dict):
+                            continue
+                        
+                        if "tagging_status" not in s:
+                            has_valid_coords = (
+                                s.get("lat") is not None and
+                                s.get("lng") is not None and
+                                not is_fallback_coordinate(s.get("lat"), s.get("lng"))
+                            )
+                            if s.get("location_tagged") is True or has_valid_coords:
+                                s["tagging_status"] = "completed"
+                            else:
+                                s["tagging_status"] = "pending"
+                        
+                        if "classification_status" not in s:
+                            if s.get("industry") and str(s.get("industry")).strip():
+                                s["classification_status"] = "completed"
+                            else:
+                                s["classification_status"] = "pending"
+                                
+                        if "last_crawled" not in s:
+                            s["last_crawled"] = None
                 except (json.JSONDecodeError, OSError) as e:
                     # Do not swallow/reset to empty list. Raise to halt execution and avoid destructive overwrite.
                     raise e
@@ -372,6 +397,12 @@ class DBManager:
                     existing["total_raised"] = company_details["total_raised"]
                 if company_details.get("is_active_website") is not None:
                     existing["is_active_website"] = company_details["is_active_website"]
+                if company_details.get("tagging_status") is not None:
+                    existing["tagging_status"] = company_details["tagging_status"]
+                if company_details.get("classification_status") is not None:
+                    existing["classification_status"] = company_details["classification_status"]
+                if company_details.get("last_crawled") is not None:
+                    existing["last_crawled"] = company_details["last_crawled"]
                     
                 # Verified email merge protection: only overwrite if candidate has valid email format
                 cand_email = company_details.get("verified_email")
@@ -433,6 +464,9 @@ class DBManager:
                         "contact_email": "",
                         "benefits": ""
                     },
+                    "tagging_status": company_details.get("tagging_status") or "pending",
+                    "classification_status": company_details.get("classification_status") or "pending",
+                    "last_crawled": company_details.get("last_crawled") or None,
                     "job_openings": []
                 }
                 

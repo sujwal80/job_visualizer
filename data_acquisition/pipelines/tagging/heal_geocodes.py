@@ -10,18 +10,9 @@ import re
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
-DATA_ACQ_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if DATA_ACQ_DIR not in sys.path:
-    sys.path.insert(0, DATA_ACQ_DIR)
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from db_manager import DBManager
-try:
-    from geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate, CITY_SYNONYMS
-    from tagging.remote_office_classifier import check_remote_office_status
-except ImportError:
-    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate, CITY_SYNONYMS
-    from data_acquisition.tagging.remote_office_classifier import check_remote_office_status
+from data_acquisition.db_manager import DBManager
+from data_acquisition.geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate, CITY_SYNONYMS
+from data_acquisition.pipelines.tagging.remote_office_classifier import check_remote_office_status
 
 def clean_snippet_to_address(snippet, target_city=None):
     if target_city is None:

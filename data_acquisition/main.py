@@ -3,20 +3,12 @@ import sys
 import time
 import random
 
-_curr_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(_curr_dir)
-sys.path.append(os.path.join(_curr_dir, "job_scrapers"))
-sys.path.append(os.path.join(_curr_dir, "tagging"))
-
-from job_scrapers import LinkedInScraper
-from db_manager import DBManager
-from discovery_service import CompanyDiscoveryService
-from tagging import LogoEnricher, LocationEnricher, run_classification
-from job_validator import JobValidator
-try:
-    from geo_config import DEFAULT_TARGET_CITY
-except ImportError:
-    from data_acquisition.geo_config import DEFAULT_TARGET_CITY
+from data_acquisition.pipelines.crawling.job_scrapers.linkedin_scraper import LinkedInScraper
+from data_acquisition.db_manager import DBManager
+from data_acquisition.pipelines.discovery.discovery_service import CompanyDiscoveryService
+from data_acquisition.pipelines.tagging import LogoEnricher, LocationEnricher, run_classification
+from data_acquisition.pipelines.validation.job_validator import JobValidator
+from data_acquisition.geo_config import DEFAULT_TARGET_CITY
 
 def load_env_file():
     workspace_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

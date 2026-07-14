@@ -5,20 +5,9 @@ import re
 import urllib.parse
 import time
 import random
-try:
-    from job_metadata_extractor import extract_job_metadata
-except ImportError:
-    from data_acquisition.job_metadata_extractor import extract_job_metadata
-
-try:
-    from geo_config import DEFAULT_TARGET_CITY, match_target_city, get_mock_jobs
-except ImportError:
-    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city, get_mock_jobs
-
-try:
-    from scraper_base import ScraperBase
-except ImportError:
-    from data_acquisition.job_scrapers.scraper_base import ScraperBase
+from data_acquisition.pipelines.crawling.job_scrapers.job_metadata_extractor import extract_job_metadata
+from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city, get_mock_jobs
+from data_acquisition.pipelines.crawling.job_scrapers.scraper_base import ScraperBase
 
 class LinkedInScraper(ScraperBase):
     def __init__(self, validator=None):
@@ -161,7 +150,7 @@ class LinkedInScraper(ScraperBase):
                 description = desc_meta_og['content'] if desc_meta_og else ""
             
             # 3. Parse Logo Domain or Delayed Image
-            logo_domain = ""
+            logo_src = ""
             if top_card:
                 img_el = top_card.find('img', class_='artdeco-entity-image')
                 if img_el:
@@ -231,7 +220,8 @@ class LinkedInScraper(ScraperBase):
                 "description": description,
                 "bangalore_address": bangalore_address,
                 "office_address": bangalore_address,
-                "logo_domain": self._extract_domain(website)
+                "logo_domain": self._extract_domain(website),
+                "logo_svg_url": logo_src
             }
         except Exception as e:
             print(f"[LinkedIn Scraper] Error fetching company details for '{company_slug}': {str(e)}")

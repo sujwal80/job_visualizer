@@ -37,7 +37,10 @@ def main():
         ("10. Client-Side Caching Milestone 2 Backend Verification", os.path.join(tests_dir, "test_backend_m2.py")),
         ("11. Client-Side Caching Milestone 3 Frontend Verification", os.path.join(tests_dir, "test_frontend_m3_caching.py")),
         ("12. Client-Side Caching Milestone 4 Master Verification Suite", os.path.join(tests_dir, "test_client_side_api_caching.py")),
-        ("13. Industry Classification Verification", os.path.join(tests_dir, "test_industry_classification.py"))
+        ("13. Industry Classification Verification", os.path.join(tests_dir, "test_industry_classification.py")),
+        ("14. Remote Office Location Verification", os.path.join(tests_dir, "test_remote_office_location.py")),
+        ("15. Data Acquisition Pipeline Verification", os.path.join(tests_dir, "test_data_acquisition_pipeline.py")),
+        ("16. India Remediation Verification", os.path.join(tests_dir, "test_india_remediation.py"))
     ]
     
     print("\n⚡ WORLDTECH MAP // FULL-STACK MASTER TEST RUNNER ⚡")

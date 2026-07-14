@@ -1,15 +1,8 @@
 import os
 import random
 import time
-try:
-    from job_metadata_extractor import extract_job_metadata
-except ImportError:
-    from data_acquisition.job_scrapers.job_metadata_extractor import extract_job_metadata
-
-try:
-    from job_validator import JobValidator
-except ImportError:
-    from data_acquisition.job_validator import JobValidator
+from data_acquisition.pipelines.crawling.job_scrapers.job_metadata_extractor import extract_job_metadata
+from data_acquisition.pipelines.validation.job_validator import JobValidator
 
 
 class ScraperBase:

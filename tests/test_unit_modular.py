@@ -143,7 +143,7 @@ class TestScraperBaseIntegratedValidation(unittest.TestCase):
     """Verifies ScraperBase integrates metadata extraction and job validation."""
 
     def test_validate_and_enrich_jobs_filters_inactive(self):
-        from data_acquisition.job_scrapers.scraper_base import ScraperBase
+        from data_acquisition.pipelines.crawling.job_scrapers.scraper_base import ScraperBase
         from unittest.mock import MagicMock
         
         mock_validator = MagicMock()

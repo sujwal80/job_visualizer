@@ -4,20 +4,9 @@ import os
 import sys
 import time
 
-try:
-    from data_acquisition.crawl_queue import CrawlQueue
-except ImportError:
-    from crawl_queue import CrawlQueue
-
-try:
-    from data_acquisition.db_manager import DBManager
-except ImportError:
-    from db_manager import DBManager
-
-try:
-    import data_acquisition.job_scrapers as scrapers
-except ImportError:
-    import job_scrapers as scrapers
+from data_acquisition.pipelines.crawling.crawl_queue import CrawlQueue
+from data_acquisition.db_manager import DBManager
+import data_acquisition.pipelines.crawling.job_scrapers as scrapers
 
 
 SCRAPER_MAP = {

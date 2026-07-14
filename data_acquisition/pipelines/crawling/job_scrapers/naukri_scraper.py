@@ -5,20 +5,9 @@ import urllib.parse
 import time
 import random
 import re
-try:
-    from job_metadata_extractor import extract_job_metadata
-except ImportError:
-    from data_acquisition.job_metadata_extractor import extract_job_metadata
-
-try:
-    from geo_config import DEFAULT_TARGET_CITY, match_target_city
-except ImportError:
-    from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
-
-try:
-    from scraper_base import ScraperBase
-except ImportError:
-    from data_acquisition.job_scrapers.scraper_base import ScraperBase
+from data_acquisition.pipelines.crawling.job_scrapers.job_metadata_extractor import extract_job_metadata
+from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city
+from data_acquisition.pipelines.crawling.job_scrapers.scraper_base import ScraperBase
 
 class NaukriScraper(ScraperBase):
     """

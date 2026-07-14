@@ -9,11 +9,11 @@ from unittest.mock import patch
 workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if workspace_root not in sys.path:
     sys.path.insert(0, workspace_root)
-from data_acquisition.crawl_queue import CrawlQueue
-from data_acquisition.dispatch_crawlers import dispatch
-from data_acquisition.crawler_worker import run_worker
+from data_acquisition.pipelines.crawling.crawl_queue import CrawlQueue
+from data_acquisition.pipelines.crawling.dispatch_crawlers import dispatch
+from data_acquisition.pipelines.crawling.crawler_worker import run_worker
 from data_acquisition.db_manager import DBManager
-from data_acquisition.job_scrapers import IndeedScraper
+from data_acquisition.pipelines.crawling.job_scrapers.indeed_scraper import IndeedScraper
 import multiprocessing
 
 

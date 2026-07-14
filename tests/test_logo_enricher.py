@@ -12,17 +12,15 @@ from unittest.mock import patch, MagicMock
 # Add project root to path
 workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, workspace_root)
-sys.path.insert(0, os.path.join(workspace_root, "data_acquisition"))
-sys.path.insert(0, os.path.join(workspace_root, "data_acquisition", "tagging"))
 
-from logo_enricher import LogoEnricher
+from data_acquisition.pipelines.tagging.logo_enricher import LogoEnricher
 from backend.services.startup_service import format_startup_summary, format_startup_details, format_lightweight_summary
 
 
 class TestLogoEnricher(unittest.TestCase):
     def setUp(self):
         self.logo_enricher = LogoEnricher()
-        self.patcher = patch("logo_enricher.validate_logo_image", return_value=True)
+        self.patcher = patch("data_acquisition.pipelines.tagging.logo_enricher.validate_logo_image", return_value=True)
         self.mock_validate = self.patcher.start()
 
     def tearDown(self):

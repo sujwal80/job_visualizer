@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 """
 Job Link Validation and Pruning Runner
-Validates all job links across the startup database, checks active status,
-and removes invalid, expired, or closed job postings.
+Path: data_acquisition/pipelines/validation/run_validation.py
 """
 
 import argparse
 import os
 import sys
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
+
 from data_acquisition.db_manager import DBManager
 from data_acquisition.pipelines.validation.job_validator import JobValidator
-
 
 def main():
     parser = argparse.ArgumentParser(description="Run JobValidator to verify and prune invalid/expired job links.")

@@ -3,15 +3,8 @@ import argparse
 import os
 import sys
 
-try:
-    from data_acquisition.crawl_queue import CrawlQueue
-except ImportError:
-    from crawl_queue import CrawlQueue
-
-try:
-    from data_acquisition.db_manager import DBManager
-except ImportError:
-    from db_manager import DBManager
+from data_acquisition.pipelines.crawling.crawl_queue import CrawlQueue
+from data_acquisition.db_manager import DBManager
 
 
 ALL_SOURCES = [
