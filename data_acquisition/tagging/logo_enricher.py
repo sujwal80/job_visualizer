@@ -2,6 +2,10 @@ import urllib.parse
 import re
 import requests
 from bs4 import BeautifulSoup
+try:
+    from data_acquisition.utils.validation import safe_http_request, validate_logo_image
+except ImportError:
+    from utils.validation import safe_http_request, validate_logo_image
 
 BLACKLISTED_DOMAINS = {
     "bit.ly", "linktr.ee", "tinyurl.com", "t.co", "buff.ly", "goo.gl", "ow.ly",
@@ -65,9 +69,12 @@ class LogoEnricher:
                         has_valid_domain = True
                         current_domain = candidate
                         
-        # 2. Check and enrich logo_svg_url if missing, empty, or invalid (does not start with http)
+        # 2. Check and enrich logo_svg_url if missing, empty, or invalid (does not start with http or fails validation)
         current_svg = str(company_record.get("logo_svg_url") or "").strip()
         is_valid_svg = current_svg.startswith("http")
+        if is_valid_svg:
+            if not validate_logo_image(current_svg):
+                is_valid_svg = False
         
         if not is_valid_svg:
             logo_url = ""
@@ -75,19 +82,19 @@ class LogoEnricher:
             # Priority A: SVG Scraping
             if website:
                 svg_url = self._scrape_svg_logo(website)
-                if svg_url:
+                if svg_url and validate_logo_image(svg_url):
                     logo_url = svg_url
             
             # Priority B: Unavatar API check (200 status code)
             if not logo_url and current_domain:
                 unavatar_url = self._check_unavatar(current_domain)
-                if unavatar_url:
+                if unavatar_url and validate_logo_image(unavatar_url):
                     logo_url = unavatar_url
             
             # Priority C: Google Favicon API check (200 status code)
             if not logo_url and current_domain:
                 google_url = self._check_google_favicon(current_domain)
-                if google_url:
+                if google_url and validate_logo_image(google_url):
                     logo_url = google_url
             
             company_record["logo_svg_url"] = logo_url
@@ -102,7 +109,7 @@ class LogoEnricher:
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             }
-            resp = requests.get(url, timeout=5, headers=headers, allow_redirects=True)
+            resp = safe_http_request("GET", url, timeout=5, headers=headers)
             if resp.status_code == 200:
                 return f"https://unavatar.io/{domain}"
             elif resp.status_code == 429:
@@ -117,7 +124,7 @@ class LogoEnricher:
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             }
-            resp = requests.get(url, timeout=5, headers=headers, allow_redirects=True)
+            resp = safe_http_request("GET", url, timeout=5, headers=headers)
             if resp.status_code == 200:
                 return url
         except Exception as e:
@@ -136,7 +143,7 @@ class LogoEnricher:
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             }
-            response = requests.get(website_url, timeout=5, headers=headers, allow_redirects=True)
+            response = safe_http_request("GET", website_url, timeout=5, headers=headers)
             if response.status_code != 200:
                 return self._check_fallback_svg(website_url)
                 
@@ -184,7 +191,7 @@ class LogoEnricher:
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             }
-            resp = requests.get(favicon_url, timeout=5, headers=headers, allow_redirects=True)
+            resp = safe_http_request("GET", favicon_url, timeout=5, headers=headers)
             if resp.status_code == 200:
                 content_type = resp.headers.get("content-type", "").lower()
                 preview = resp.text[:1000].strip()

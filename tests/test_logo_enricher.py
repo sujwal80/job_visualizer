@@ -22,6 +22,11 @@ from backend.services.startup_service import format_startup_summary, format_star
 class TestLogoEnricher(unittest.TestCase):
     def setUp(self):
         self.logo_enricher = LogoEnricher()
+        self.patcher = patch("logo_enricher.validate_logo_image", return_value=True)
+        self.mock_validate = self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
 
     @patch("requests.get")
     def test_enrich_with_rel_icon_svg(self, mock_get):

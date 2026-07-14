@@ -148,20 +148,25 @@ def heal_geocodes(target_city=None):
         # If it resolved successfully to a non-fallback coordinate
         if not is_fallback(new_lat, new_lng):
             print(f"  [SUCCESS] Resolved '{name}' -> ({new_lat}, {new_lng})")
-            s["lat"] = new_lat
-            s["lng"] = new_lng
             
-            # Save the resolved address back to the city field (truncated if too long)
-            resolved_addr = ddg_address if 'ddg_address' in locals() and ddg_address else address
-            city_label = resolved_addr
-            if len(city_label) > 60:
-                city_label = city_label.split(',')[0] + f", {target_city}"
-            s["city"] = city_label
-            check_remote_office_status(s, target_city=target_city)
-            s["location_tagged"] = True
-            
-            success_count += 1
-            db.save_db()
+            with db.file_lock(db.db_path):
+                db.load_db()
+                record = next((x for x in db.startups if x.get("id") == s.get("id")), None)
+                if record and is_fallback(record.get("lat"), record.get("lng")):
+                    record["lat"] = new_lat
+                    record["lng"] = new_lng
+                    
+                    # Save the resolved address back to the city field (truncated if too long)
+                    resolved_addr = ddg_address if 'ddg_address' in locals() and ddg_address else address
+                    city_label = resolved_addr
+                    if len(city_label) > 60:
+                        city_label = city_label.split(',')[0] + f", {target_city}"
+                    record["city"] = city_label
+                    check_remote_office_status(record, target_city=target_city)
+                    record["location_tagged"] = True
+                    
+                    success_count += 1
+                    db.save_db()
         else:
             print(f"  [FAILED] Could not resolve '{name}' to specific coordinates.")
             

@@ -30,7 +30,8 @@ def test_short_circuiting():
         "logo_svg_url": "https://testcorp.com/logo.svg",
         "website": "https://testcorp.com"
     }
-    res = logo_enricher.enrich(startup_with_logo)
+    with patch("logo_enricher.validate_logo_image", return_value=True):
+        res = logo_enricher.enrich(startup_with_logo)
     assert res is False, "Expected LogoEnricher to short-circuit when logo_domain and logo_svg_url exist!"
     print(" [PASS] LogoEnricher short-circuits correctly when logo_domain exists.")
     
@@ -74,6 +75,7 @@ def test_job_validator():
             ]
         }
     ]
+    db.save_db()
     validator = JobValidator(db)
     pruned = validator.validate_and_prune()
     remaining = len(db.startups[0]["job_openings"])
@@ -170,6 +172,7 @@ def test_multi_city_merge_isolation():
             "job_openings": []
         }
     ]
+    db.save_db()
     mock_response = MagicMock(status_code=200, url="http://apex.ai/job", text="<html><body><button>Apply Now</button></body></html>")
     with patch.object(db, "geocode_address", return_value=(12.9716, 77.5946)), \
          patch("requests.get", return_value=mock_response):
@@ -377,8 +380,16 @@ def test_ingestion_gates():
     from db_manager import DBManager
     from discovery_service import CompanyDiscoveryService
     
+    import os
+    db_path = "/tmp/test_ingestion_gates.json"
+    if os.path.exists(db_path):
+        try:
+            os.remove(db_path)
+        except OSError:
+            pass
+            
     # 1. Case 1: Dead Website + No Active Jobs -> returns None, not merged
-    db = DBManager("/tmp/test_ingestion_gates.json")
+    db = DBManager(db_path)
     db.startups = []
     
     company_details = {
@@ -400,7 +411,12 @@ def test_ingestion_gates():
     print(" [PASS] Case 1: Dead Website + No Active Jobs rejected successfully.")
 
     # 2. Case 2: Dead Website + Active Jobs -> merged successfully, logo/email fields cleared, website marked inactive
-    db = DBManager("/tmp/test_ingestion_gates.json")
+    if os.path.exists(db_path):
+        try:
+            os.remove(db_path)
+        except OSError:
+            pass
+    db = DBManager(db_path)
     db.startups = []
     
     company_details = {
@@ -428,7 +444,12 @@ def test_ingestion_gates():
     print(" [PASS] Case 2: Dead Website + Active Jobs merged & cleared successfully.")
 
     # 3. Case 3: Active Website -> merged successfully with logo/email preserved
-    db = DBManager("/tmp/test_ingestion_gates.json")
+    if os.path.exists(db_path):
+        try:
+            os.remove(db_path)
+        except OSError:
+            pass
+    db = DBManager(db_path)
     db.startups = []
     
     company_details = {
@@ -454,7 +475,12 @@ def test_ingestion_gates():
     print(" [PASS] Case 3: Active Website merged and preserved successfully.")
 
     # 4. Case 4: Discovery service integration -> does not save DB or increment count when merge_startup returns None
-    db = DBManager("/tmp/test_ingestion_gates.json")
+    if os.path.exists(db_path):
+        try:
+            os.remove(db_path)
+        except OSError:
+            pass
+    db = DBManager(db_path)
     db.startups = []
     
     mock_scraper = MagicMock()

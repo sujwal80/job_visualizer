@@ -4,8 +4,155 @@ import urllib.parse
 import socket
 import requests
 import logging
+import ipaddress
+import contextlib
+import urllib3.util.connection as urllib3_conn
+import xml.etree.ElementTree as ET
 
 logger = logging.getLogger(__name__)
+
+def is_safe_ip(ip_str):
+    """Verify if the IP address is public and safe (not loopback, private, link-local, multicast, etc.)."""
+    try:
+        ip = ipaddress.ip_address(ip_str)
+        if ip.is_loopback or ip.is_private or ip.is_link_local or ip.is_reserved or ip.is_multicast or ip.is_unspecified:
+            return False
+        return True
+    except ValueError:
+        return False
+
+def resolve_and_verify_host(host):
+    """
+    Resolves a hostname to its IP address.
+    Returns (ip, status) where status is:
+      - "safe" if resolved to a safe public IP.
+      - "unsafe" if resolved to an unsafe loopback/private IP.
+      - "failed" if DNS resolution raised an exception.
+    """
+    try:
+        ip = socket.gethostbyname(host)
+        if not is_safe_ip(ip):
+            logger.warning(f"Domain {host} resolved to unsafe IP {ip}. Blocked.")
+            return None, "unsafe"
+        return ip, "safe"
+    except Exception as e:
+        logger.warning(f"DNS resolution failed for {host}: {e}")
+        return None, "failed"
+
+@contextlib.contextmanager
+def dns_resolver_override(dns_map):
+    """Context manager to force socket connection creation to use pre-resolved IP addresses."""
+    orig_create_connection = urllib3_conn.create_connection
+
+    def patched_create_connection(address, *args, **kwargs):
+        host, port = address
+        if host in dns_map:
+            resolved_ip = dns_map[host]
+            return orig_create_connection((resolved_ip, port), *args, **kwargs)
+        return orig_create_connection(address, *args, **kwargs)
+
+    urllib3_conn.create_connection = patched_create_connection
+    try:
+        yield
+    finally:
+        urllib3_conn.create_connection = orig_create_connection
+
+def safe_http_request(method, url, headers=None, timeout=5, stream=False, max_redirects=5, **kwargs):
+    """
+    Executes HTTP request securely against SSRF and DNS Rebinding.
+    Follows redirects manually up to max_redirects, checking IP safety at each hop.
+    """
+    headers = headers or {}
+    current_url = url
+    dns_map = {}
+    
+    for redirect_hop in range(max_redirects + 1):
+        parsed = urllib.parse.urlparse(current_url)
+        if not parsed.scheme or parsed.scheme not in ["http", "https"]:
+            raise requests.exceptions.RequestException(f"Unsupported URL scheme: {parsed.scheme}")
+            
+        host = parsed.hostname
+        if not host:
+            raise requests.exceptions.RequestException(f"Invalid URL host: {current_url}")
+            
+        # Resolve and verify host IP safety
+        resolved_ip, status = resolve_and_verify_host(host)
+        if status == "unsafe":
+            raise requests.exceptions.RequestException(f"Private IP range blocked for host: {host}")
+            
+        # Request handling
+        if status == "safe":
+            dns_map[host] = resolved_ip
+            # Request with DNS override active
+            with dns_resolver_override(dns_map):
+                if method.upper() == "GET":
+                    response = requests.get(
+                        current_url, 
+                        headers=headers, 
+                        timeout=timeout, 
+                        stream=stream, 
+                        allow_redirects=False, 
+                        **kwargs
+                    )
+                elif method.upper() == "HEAD":
+                    response = requests.head(
+                        current_url, 
+                        headers=headers, 
+                        timeout=timeout, 
+                        allow_redirects=False, 
+                        **kwargs
+                    )
+                else:
+                    response = requests.request(
+                        method, 
+                        current_url, 
+                        headers=headers, 
+                        timeout=timeout, 
+                        stream=stream, 
+                        allow_redirects=False, 
+                        **kwargs
+                    )
+        else:
+            # DNS resolution failed. Let requests handle it directly so the proper connection error is raised.
+            if method.upper() == "GET":
+                response = requests.get(
+                    current_url, 
+                    headers=headers, 
+                    timeout=timeout, 
+                    stream=stream, 
+                    allow_redirects=False, 
+                    **kwargs
+                )
+            elif method.upper() == "HEAD":
+                response = requests.head(
+                    current_url, 
+                    headers=headers, 
+                    timeout=timeout, 
+                    allow_redirects=False, 
+                    **kwargs
+                )
+            else:
+                response = requests.request(
+                    method, 
+                    current_url, 
+                    headers=headers, 
+                    timeout=timeout, 
+                    stream=stream, 
+                    allow_redirects=False, 
+                    **kwargs
+                )
+            
+        # Manual redirection handling
+        if response.status_code in [301, 302, 303, 307, 308]:
+            location = response.headers.get("Location")
+            if not location:
+                return response
+            current_url = urllib.parse.urljoin(current_url, location)
+            continue
+        else:
+            return response
+            
+    raise requests.exceptions.TooManyRedirects(f"Exceeded max redirects ({max_redirects})")
 
 def is_cloudflare_response(res):
     """Detect if response is served/blocked by Cloudflare."""
@@ -72,16 +219,14 @@ def perform_url_check(test_url, headers, timeout=5):
         try:
             parsed = urllib.parse.urlparse(test_url)
             domain = parsed.netloc.split(':')[0]
-            ip_str = socket.gethostbyname(domain)
-            import ipaddress
-            ip = ipaddress.ip_address(ip_str)
-            if ip.is_loopback or ip.is_private or ip.is_link_local:
+            ip, status = resolve_and_verify_host(domain)
+            if status == "unsafe":
                 return False, test_url, "Private IP range blocked"
         except Exception:
             pass
 
         # 1. Try HEAD first
-        res = requests.head(test_url, headers=headers, timeout=timeout, allow_redirects=True)
+        res = safe_http_request("HEAD", test_url, headers=headers, timeout=timeout)
         
         # Cloudflare handling on 403 or 200
         if res.status_code in [200, 403] and is_cloudflare_response(res):
@@ -91,7 +236,7 @@ def perform_url_check(test_url, headers, timeout=5):
             # Perform GET to check for parking pages if status < 400
             if res.status_code < 400:
                 try:
-                    res_get = requests.get(test_url, headers=headers, timeout=timeout, allow_redirects=True)
+                    res_get = safe_http_request("GET", test_url, headers=headers, timeout=timeout)
                     if is_cloudflare_response(res_get):
                         return True, res_get.url, None
                     if is_parking_page(res_get.text, len(res_get.content)):
@@ -103,7 +248,7 @@ def perform_url_check(test_url, headers, timeout=5):
             return True, res.url, None
             
         # 2. Fallback to GET
-        res_get = requests.get(test_url, headers=headers, timeout=timeout, allow_redirects=True)
+        res_get = safe_http_request("GET", test_url, headers=headers, timeout=timeout)
         if res_get.status_code in [200, 403] and is_cloudflare_response(res_get):
             return True, res_get.url, None
             
@@ -152,15 +297,8 @@ DEFAULT_HEADERS = {
 
 def check_dns(domain):
     """Verify if a domain resolves via DNS and is not a private/loopback/link-local IP (SSRF protection)."""
-    try:
-        ip_str = socket.gethostbyname(domain)
-        import ipaddress
-        ip = ipaddress.ip_address(ip_str)
-        if ip.is_loopback or ip.is_private or ip.is_link_local:
-            return False
-        return True
-    except (socket.gaierror, ValueError):
-        return False
+    ip, status = resolve_and_verify_host(domain)
+    return status == "safe"
 
 def validate_website_domain(url, headers=None):
     """
@@ -241,7 +379,7 @@ def check_job_active(url, headers=None):
         
     headers = headers or DEFAULT_HEADERS
     try:
-        res = requests.get(url, headers=headers, allow_redirects=True, timeout=8)
+        res = safe_http_request("GET", url, headers=headers, timeout=8)
         
         # 1. Check status code
         if res.status_code in [404, 410]:
@@ -316,13 +454,81 @@ def inspect_html_content(html, url):
 
     return False
 
+def is_safe_svg(content_bytes):
+    """
+    Checks if SVG content is safe: parses it securely, rejecting DTDs/DOCTYPEs,
+    external entities, event handler attributes, blacklisted tags, and style URLs/imports.
+    """
+    if not content_bytes:
+        return False
+        
+    try:
+        content_str = content_bytes.decode('utf-8', errors='ignore')
+    except Exception:
+        return False
+        
+    content_str_lower = content_str.lower()
+    
+    # Reject DTDs and Entity declarations to prevent XXE / Billion Laughs (XML Bomb)
+    if '<!doctype' in content_str_lower or '<!entity' in content_str_lower:
+        logger.warning("Rejected SVG containing DTD or Entity declaration.")
+        return False
+        
+    try:
+        root = ET.fromstring(content_str)
+    except Exception as e:
+        logger.warning(f"XML parse failed: {e}")
+        return False
+        
+    for elem in root.iter():
+        tag = elem.tag
+        local_tag = tag.split('}', 1)[1].lower() if '}' in tag else tag.lower()
+        
+        # Blacklisted tags
+        if local_tag in ('script', 'foreignobject', 'iframe', 'object', 'embed', 'html'):
+            logger.warning(f"Rejected SVG containing blacklisted tag: {local_tag}")
+            return False
+            
+        # Style tag content scanning
+        if local_tag == 'style':
+            style_text = elem.text or ""
+            if re.search(r'url\s*\(', style_text, re.IGNORECASE):
+                logger.warning("Rejected SVG containing external URL reference in style tag.")
+                return False
+            if re.search(r'@import', style_text, re.IGNORECASE):
+                logger.warning("Rejected SVG containing @import reference in style tag.")
+                return False
+                
+        # Attributes validation
+        for name, value in elem.attrib.items():
+            local_attr = name.split('}', 1)[1].lower() if '}' in name else name.lower()
+            
+            # Event handlers
+            if local_attr.startswith('on'):
+                logger.warning(f"Rejected SVG containing event handler attribute: {local_attr}")
+                return False
+                
+            # Javascript URIs in href / xlink:href
+            if local_attr in ('href', 'xlink:href'):
+                if value.strip().lower().startswith('javascript:'):
+                    logger.warning("Rejected SVG containing javascript URI in href.")
+                    return False
+                    
+            # Inline style attribute scanning
+            if local_attr == 'style':
+                if re.search(r'url\s*\(', value, re.IGNORECASE):
+                    logger.warning("Rejected SVG containing external URL reference in inline style.")
+                    return False
+                    
+    return True
+
 def validate_logo_image(logo_url):
     """
     Validate logo image URL.
     Checks requests.head with 5s timeout and allow_redirects=True.
     Returns False on 404/403 or non-image (content-type not starting with 'image/').
     If it fails due to transient connection drops/timeouts (e.g., ConnectionError, Timeout),
-    log warning and return True (resilient retention).
+    log warning and return False.
     """
     if not logo_url or not isinstance(logo_url, str) or not logo_url.startswith(("http://", "https://")):
         return False
@@ -333,51 +539,52 @@ def validate_logo_image(logo_url):
         
         # SSRF Private IP protection
         try:
-            ip_str = socket.gethostbyname(domain)
-            import ipaddress
-            ip = ipaddress.ip_address(ip_str)
-            if ip.is_loopback or ip.is_private or ip.is_link_local:
+            if not resolve_and_verify_host(domain):
                 return False
         except Exception:
             pass
 
-        # Call requests.head first to satisfy existing tests and check headers
-        res = requests.head(logo_url, timeout=5, allow_redirects=True)
+        # Call safe_http_request for HEAD first to satisfy existing tests and check headers
+        res = safe_http_request("HEAD", logo_url, timeout=5)
         if res.status_code == 404:
             return False
 
         # If it is 403 or 405, do GET fallback
         if res.status_code in [403, 405]:
             try:
-                with requests.get(logo_url, timeout=5, allow_redirects=True, stream=True) as res_get:
+                with safe_http_request("GET", logo_url, timeout=5, stream=True) as res_get:
                     if res_get.status_code in [403, 404, 405]:
                         return False
                     content_type = res_get.headers.get("Content-Type", "").lower()
                     
-                    # Read first 10KB to inspect content for SVG/HTML scripts
-                    content_chunk = res_get.raw.read(10240)
+                    # Read first chunk
+                    content_chunk = res_get.raw.read(4096)
                     if not content_chunk:
                         return False
                     try:
-                        content_str = content_chunk.decode('utf-8', errors='ignore')
+                        content_str_chunk = content_chunk.decode('utf-8', errors='ignore')
                     except Exception:
-                        content_str = ""
-                    content_str_lower = content_str.lower()
+                        content_str_chunk = ""
+                    content_str_lower = content_str_chunk.lower()
                     
-                    is_svg = "image/svg+xml" in content_type or "<svg" in content_str_lower
+                    is_svg = "image/svg+xml" in content_type or "<svg" in content_str_lower or "<?xml" in content_str_lower
                     is_html = "text/html" in content_type or "<html" in content_str_lower or "<!doctype html" in content_str_lower
                     
-                    dangerous_patterns = ["<script", "onload=", "onerror=", "onclick=", "javascript:", "href=\"javascript:", "href='javascript:"]
-                    if is_svg or is_html:
-                        if any(pat in content_str_lower for pat in dangerous_patterns):
+                    if is_svg:
+                        # Read the remaining bytes up to 1MB limit for safe SVG parsing
+                        remaining_bytes = res_get.raw.read(1024 * 1024)
+                        full_content = content_chunk + remaining_bytes
+                        if not is_safe_svg(full_content):
                             return False
-                            
-                    # Spoofing check
-                    is_claimed_standard_image = any(img_type in content_type for img_type in ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"])
-                    if is_claimed_standard_image:
-                        if "<svg" in content_str_lower or "<html" in content_str_lower or "<script" in content_str_lower:
-                            return False
-                            
+                    elif is_html:
+                        return False
+                    else:
+                        # Spoofing check for standard images
+                        is_claimed_standard_image = any(img_type in content_type for img_type in ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"])
+                        if is_claimed_standard_image:
+                            if "<svg" in content_str_lower or "<html" in content_str_lower or "<script" in content_str_lower:
+                                return False
+                                
                     if not content_type.startswith("image/"):
                         if not is_svg:
                             return False
@@ -386,8 +593,8 @@ def validate_logo_image(logo_url):
                 logger.warning(f"SSL error validating logo via GET fallback {logo_url}: {ssl_err}")
                 return False
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
-                logger.warning(f"Transient error validating logo via GET fallback {logo_url}: {e}. Resiliently returning True.")
-                return True
+                logger.warning(f"Error validating logo via GET fallback {logo_url}: {e}")
+                return False
             except requests.exceptions.RequestException as e:
                 logger.warning(f"Request exception validating logo via GET fallback {logo_url}: {e}")
                 return False
@@ -398,34 +605,37 @@ def validate_logo_image(logo_url):
         # If HEAD returned 200/success, we check the Content-Type
         content_type = res.headers.get("Content-Type", "").lower()
         
-        # Fetch the content chunk to verify there is no script injection or spoofed SVG content
+        # Fetch the content to verify there is no script injection or spoofed SVG content
         try:
-            with requests.get(logo_url, timeout=5, allow_redirects=True, stream=True) as res_get:
+            with safe_http_request("GET", logo_url, timeout=5, stream=True) as res_get:
                 if res_get.status_code == 200:
                     content_type = res_get.headers.get("Content-Type", "").lower()
-                    content_chunk = res_get.raw.read(10240)
+                    content_chunk = res_get.raw.read(4096)
                     if content_chunk:
                         try:
-                            content_str = content_chunk.decode('utf-8', errors='ignore')
+                            content_str_chunk = content_chunk.decode('utf-8', errors='ignore')
                         except Exception:
-                            content_str = ""
-                        content_str_lower = content_str.lower()
+                            content_str_chunk = ""
+                        content_str_lower = content_str_chunk.lower()
                         
-                        is_svg = "image/svg+xml" in content_type or "<svg" in content_str_lower
+                        is_svg = "image/svg+xml" in content_type or "<svg" in content_str_lower or "<?xml" in content_str_lower
                         is_html = "text/html" in content_type or "<html" in content_str_lower or "<!doctype html" in content_str_lower
                         
-                        dangerous_patterns = ["<script", "onload=", "onerror=", "onclick=", "javascript:", "href=\"javascript:", "href='javascript:"]
-                        if is_svg or is_html:
-                            if any(pat in content_str_lower for pat in dangerous_patterns):
+                        if is_svg:
+                            remaining_bytes = res_get.raw.read(1024 * 1024)
+                            full_content = content_chunk + remaining_bytes
+                            if not is_safe_svg(full_content):
                                 return False
-                                
-                        is_claimed_standard_image = any(img_type in content_type for img_type in ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"])
-                        if is_claimed_standard_image:
-                            if "<svg" in content_str_lower or "<html" in content_str_lower or "<script" in content_str_lower:
-                                return False
-        except Exception:
-            # Fall back to successful HEAD response if GET fails (e.g. not mocked)
-            pass
+                        elif is_html:
+                            return False
+                        else:
+                            is_claimed_standard_image = any(img_type in content_type for img_type in ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"])
+                            if is_claimed_standard_image:
+                                if "<svg" in content_str_lower or "<html" in content_str_lower or "<script" in content_str_lower:
+                                    return False
+        except Exception as e:
+            logger.warning(f"GET check failed for {logo_url}: {e}")
+            return False
 
         if not content_type.startswith("image/"):
             if "image/svg+xml" not in content_type:
@@ -437,8 +647,8 @@ def validate_logo_image(logo_url):
         logger.warning(f"SSL error validating logo {logo_url}: {ssl_err}")
         return False
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
-        logger.warning(f"Transient error validating logo {logo_url}: {e}. Resiliently returning True.")
-        return True
+        logger.warning(f"Error validating logo {logo_url}: {e}")
+        return False
     except requests.exceptions.RequestException as e:
         logger.warning(f"Request exception validating logo {logo_url}: {e}")
         return False

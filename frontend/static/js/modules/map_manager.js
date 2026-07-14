@@ -5,12 +5,15 @@ import { selectAndOpenStartup } from './ui_manager.js';
 export const industryColors = {
     "Artificial Intelligence": "#7e22ce",
     "CleanTech": "#15803d",
-    "Biotech": "#047857",
+    "HealthTech": "#047857",
     "Fintech": "#c2410c",
     "B2B": "#0e7490",
     "SaaS": "#0369a1",
     "E-commerce": "#be185d",
-    "Software Development": "#334155"
+    "Service Industry": "#ea580c",
+    "EdTech": "#b45309",
+    "Cybersecurity": "#475569",
+    "Logistics": "#4f46e5"
 };
 export const defaultColor = "#2563eb";
 

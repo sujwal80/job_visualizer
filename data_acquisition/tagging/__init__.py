@@ -10,8 +10,10 @@ if _parent_dir not in sys.path:
 
 from .logo_enricher import LogoEnricher
 from .location_enricher import LocationEnricher
+from .classify_industries import run_classification
 
 __all__ = [
     "LogoEnricher",
     "LocationEnricher",
+    "run_classification",
 ]

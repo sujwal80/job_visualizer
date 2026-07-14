@@ -11,7 +11,7 @@ sys.path.append(os.path.join(_curr_dir, "tagging"))
 from job_scrapers import LinkedInScraper
 from db_manager import DBManager
 from discovery_service import CompanyDiscoveryService
-from tagging import LogoEnricher, LocationEnricher
+from tagging import LogoEnricher, LocationEnricher, run_classification
 from job_validator import JobValidator
 try:
     from geo_config import DEFAULT_TARGET_CITY
@@ -30,7 +30,7 @@ def load_env_file():
                     key, val = line.split('=', 1)
                     os.environ[key.strip()] = val.strip().strip('"').strip("'")
 
-def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=None, max_tagging=None, max_validation=None, target_city=None, db_path=None):
+def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=None, max_tagging=None, max_validation=None, target_city=None, db_path=None, force=False):
     if target_city is None:
         target_city = DEFAULT_TARGET_CITY
     load_env_file()
@@ -63,27 +63,46 @@ def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_
         logo_enricher = LogoEnricher()
         location_enricher = LocationEnricher(db)
         
-        total_startups = len(db.startups)
+        db.load_db()
+        startups_to_tag = list(db.startups)
+        total_startups = len(startups_to_tag)
         print(f"[Tagging Phase] Loaded {total_startups} startups from DB for enrichment.")
         
         processed = 0
-        for startup in db.startups:
+        for startup in startups_to_tag:
             processed += 1
             if max_tagging and processed > max_tagging:
                 print(f"[Tagging Phase] Reached max_tagging limit ({max_tagging}). Stopping tagging loop.")
                 break
                 
             comp_name = startup.get("name", "N/A")
-            print(f"\n[Enriching {processed}/{total_startups}] Company: '{comp_name}' (ID: {startup.get('id')})")
+            comp_id = startup.get("id")
+            print(f"\n[Enriching {processed}/{total_startups}] Company: '{comp_name}' (ID: {comp_id})")
             
             if not comp_name or comp_name == "N/A":
                 continue
                 
-            logo_changed = logo_enricher.enrich(startup)
-            loc_changed = location_enricher.enrich(startup, target_city=target_city)
+            startup_copy = dict(startup)
+            logo_changed = logo_enricher.enrich(startup_copy)
+            loc_changed = location_enricher.enrich(startup_copy, target_city=target_city)
             
             if logo_changed or loc_changed:
-                db.save_db()
+                with db.file_lock(db.db_path):
+                    db.load_db()
+                    record = next((x for x in db.startups if x.get("id") == comp_id), None)
+                    if record:
+                        if logo_changed:
+                            record["logo_domain"] = startup_copy.get("logo_domain")
+                            record["logo_svg_url"] = startup_copy.get("logo_svg_url")
+                        if loc_changed:
+                            record["lat"] = startup_copy.get("lat")
+                            record["lng"] = startup_copy.get("lng")
+                            record["city"] = startup_copy.get("city")
+                            if "is_remote_office" in startup_copy:
+                                record["is_remote_office"] = startup_copy.get("is_remote_office")
+                            if "remote_office_distance_km" in startup_copy:
+                                record["remote_office_distance_km"] = startup_copy.get("remote_office_distance_km")
+                        db.save_db()
                 
             if not os.environ.get("NO_RATE_LIMIT"):
                 time.sleep(random.uniform(1.0, 2.0))
@@ -93,6 +112,12 @@ def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_
     # 3. Validation & Pruning Phase
     if run_validation:
         validator.validate_and_prune(max_startups=max_validation)
+        
+    # 4. Industry Classification Phase
+    if run_tagging:
+        print("\n=== STARTING AUTOMATIC INDUSTRY CLASSIFICATION ===")
+        run_classification(db_path, force=force)
+        print("=== INDUSTRY CLASSIFICATION COMPLETED ===")
         
     print(f"\nPipeline execution finished successfully. Total startups in DB: {len(db.startups)}")
 
@@ -125,8 +150,10 @@ if __name__ == "__main__":
                 except ValueError:
                     max_discovery_arg = None
 
+    force_classification = "--force-classification" in args or "--force" in args
+
     if test_mode:
         print(f"[CLI] Running in TEST MODE for city '{target_city}' (max 1 discovery, max 2 tagging, max 2 validation)...")
-        run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=1, max_tagging=2, max_validation=2, target_city=target_city, db_path=db_path)
+        run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=1, max_tagging=2, max_validation=2, target_city=target_city, db_path=db_path, force=force_classification)
     else:
-        run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=max_discovery_arg, max_tagging=None, max_validation=None, target_city=target_city, db_path=db_path)
+        run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_discovery=max_discovery_arg, max_tagging=None, max_validation=None, target_city=target_city, db_path=db_path, force=force_classification)

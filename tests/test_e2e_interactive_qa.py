@@ -594,6 +594,71 @@ class TestE2EInteractiveQA(unittest.TestCase):
         self.assertNotEqual(center_before[0], center_after[0], "Longitude should have panned and remained changed")
         self.assertNotEqual(center_before[1], center_after[1], "Latitude should have panned and remained changed")
 
+    def test_frontend_industry_tab_clicks(self):
+        """Verify tab interaction filters by Service Industry and updates the UI."""
+        self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
+        self.page.wait_for_load_state("domcontentloaded")
+
+        # Wait until WorldTechApp and state are fully loaded and not empty
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && window.WorldTechApp.state && window.WorldTechApp.state.startupsData && window.WorldTechApp.state.startupsData.length > 0",
+            timeout=10000
+        )
+
+        # Click the "Service Industry" tab-btn
+        tab_btn = self.page.locator("button[data-industry='Service Industry']")
+        self.assertTrue(tab_btn.is_visible(), "Service Industry tab button should be visible")
+        tab_btn.click()
+        self.page.wait_for_timeout(1000)
+
+        # Verify the tab button became active
+        self.assertTrue(tab_btn.evaluate("el => el.classList.contains('active')"), "Service Industry tab should be active")
+
+        # Verify that only startups with Service Industry are rendered in the directory list
+        items = self.page.locator("#directory-list .directory-item")
+        count = items.count()
+        self.assertTrue(count > 0, "There should be at least one Service Industry startup in Bangalore")
+
+        # Get industries of visible items in the DOM by cross-referencing names with startupsData
+        industries = self.page.evaluate("""() => {
+            const visibleNames = Array.from(document.querySelectorAll('#directory-list .directory-item .card-title')).map(el => el.textContent.trim());
+            const startups = WorldTechApp.state.startupsData;
+            return visibleNames.map(name => {
+                const s = startups.find(x => x.name === name);
+                return s ? s.industry : null;
+            });
+        }""")
+        self.assertTrue(all(ind == "Service Industry" for ind in industries), f"All filtered startups must be in Service Industry, found: {industries}")
+
+    def test_frontend_color_rendering(self):
+        """Verify that startups classified under 'Service Industry' are colored using the correct color on MapLibre markers."""
+        self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
+        self.page.wait_for_load_state("domcontentloaded")
+
+        # Wait until WorldTechApp and state are fully loaded
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && window.WorldTechApp.state && window.WorldTechApp.state.startupsData && window.WorldTechApp.state.startupsData.length > 0",
+            timeout=10000
+        )
+
+        # Retrieve color mapping of Service Industry markers on the map
+        colors = self.page.evaluate("""() => {
+            const res = [];
+            for (const [id, marker] of WorldTechApp.state.markersMap.entries()) {
+                const startup = WorldTechApp.state.startupsData.find(s => s.id == id);
+                if (startup && startup.industry === 'Service Industry') {
+                    const el = marker.getElement();
+                    const fallbackEl = el.querySelector('.logo-marker-fallback');
+                    const bg = fallbackEl ? fallbackEl.style.backgroundColor : null;
+                    res.push({ id, name: startup.name, color: bg });
+                }
+            }
+            return res;
+        }""")
+
+        self.assertTrue(len(colors) > 0, "Should have at least one Service Industry marker")
+        for marker_info in colors:
+            self.assertIn("rgb(234, 88, 12)", marker_info['color'], f"Marker for {marker_info['name']} should have color rgb(234, 88, 12) (#ea580c)")
 
 
 

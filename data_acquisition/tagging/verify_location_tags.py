@@ -65,33 +65,55 @@ def verify_location_tags(db_path=None, target_city=None, idempotent=True, enrich
 
     db = DBManager(db_path=db_path)
     enricher = LocationEnricher(db) if enrich else None
-    total_count = 0
+    
+    # 1. Read the list of startups initially
+    db.load_db()
+    startups_to_process = list(db.startups)
+    
+    total_count = len(startups_to_process)
     updated_count = 0
     skipped_count = 0
 
-    with DBManager.file_lock(db_path):
-        startups = db.get_all_startups()
-        total_count = len(startups)
+    for temp_record in startups_to_process:
+        if not isinstance(temp_record, dict):
+            continue
 
-        for record in startups:
-            if not isinstance(record, dict):
+        if idempotent and temp_record.get("location_tagged") is True:
+            skipped_count += 1
+            continue
+
+        comp_id = temp_record.get("id")
+
+        # 2. Geocode outside lock
+        if enrich and enricher:
+            rec_copy = dict(temp_record)
+            if not idempotent:
+                rec_copy["location_tagged"] = False
+            enricher.enrich(rec_copy, target_city=target_city)
+            new_lat = rec_copy.get("lat")
+            new_lng = rec_copy.get("lng")
+            new_city = rec_copy.get("city")
+        else:
+            new_lat = temp_record.get("lat")
+            new_lng = temp_record.get("lng")
+            new_city = temp_record.get("city")
+
+        # 3. Enter lock, reload, apply updates, and save
+        with DBManager.file_lock(db_path):
+            db.load_db()
+            record = next((x for x in db.startups if x.get("id") == comp_id), None)
+            if not record:
                 continue
 
             if idempotent and record.get("location_tagged") is True:
                 skipped_count += 1
                 continue
 
-            # Sanitize coordinates before processing
-            if "lat" in record:
-                record["lat"] = _safe_float(record.get("lat"))
-            if "lng" in record:
-                record["lng"] = _safe_float(record.get("lng"))
-
-            if enrich and enricher:
-                # If force (not idempotent), clear location_tagged temporarily so enricher can geocode
-                if not idempotent:
-                    record["location_tagged"] = False
-                enricher.enrich(record, target_city=target_city)
+            # Apply coordinate updates
+            record["lat"] = _safe_float(new_lat)
+            record["lng"] = _safe_float(new_lng)
+            if new_city:
+                record["city"] = new_city
 
             # Run remote office classification
             check_remote_office_status(record, target_city=target_city)
@@ -102,10 +124,11 @@ def verify_location_tags(db_path=None, target_city=None, idempotent=True, enrich
 
             record["location_tagged"] = True
             updated_count += 1
+            db.save_db()
 
-        db.save_db()
-
-    remote_count = sum(1 for s in startups if isinstance(s, dict) and s.get("is_remote_office") is True)
+    # Get final remote count
+    db.load_db()
+    remote_count = sum(1 for s in db.startups if isinstance(s, dict) and s.get("is_remote_office") is True)
 
     return {
         "total": total_count,

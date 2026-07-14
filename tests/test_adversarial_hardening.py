@@ -22,7 +22,8 @@ from data_acquisition.utils.validation import (
     validate_website_domain,
     validate_logo_image,
     check_dns,
-    perform_url_check
+    perform_url_check,
+    is_safe_svg
 )
 from backend.utils.validators import _sanitize_string
 from data_acquisition.db_manager import DBManager
@@ -229,6 +230,55 @@ class TestCollisionMetadataHijackingProtection(unittest.TestCase):
         self.assertEqual(updated["logo_svg_url"], "https://target.com/logo.png")
         self.assertEqual(updated["verified_email"], "admin@target.com")
         self.assertEqual(updated["description"], "Super secure startup.")
+
+
+class TestSafeSVGParser(unittest.TestCase):
+    """Tier 5: Verifies strict SVG sanitization features directly on is_safe_svg."""
+
+    def test_safe_svg_valid(self):
+        svg = b'<svg><circle cx="50" cy="50" r="40" fill="red" /></svg>'
+        self.assertTrue(is_safe_svg(svg))
+
+    def test_svg_script_tag_rejected(self):
+        svg = b'<svg><script type="text/javascript">alert(1)</script><circle cx="50" cy="50" r="40" fill="red" /></svg>'
+        self.assertFalse(is_safe_svg(svg))
+
+    def test_svg_nested_script_tag_rejected(self):
+        svg = b'<svg><g><script>alert(1)</script></g></svg>'
+        self.assertFalse(is_safe_svg(svg))
+
+    def test_svg_doctype_rejected(self):
+        svg = b'<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg></svg>'
+        self.assertFalse(is_safe_svg(svg))
+
+    def test_svg_entity_xxe_rejected(self):
+        svg = b'<!DOCTYPE svg [ <!ENTITY xxe SYSTEM "http://attacker.com/evt"> ]><svg>&xxe;</svg>'
+        self.assertFalse(is_safe_svg(svg))
+
+    def test_svg_onload_event_handler_rejected(self):
+        svg = b'<svg onload="alert(1)"></svg>'
+        self.assertFalse(is_safe_svg(svg))
+
+    def test_svg_javascript_href_rejected(self):
+        svg = b'<svg><a href="javascript:alert(1)">Click me</a></svg>'
+        self.assertFalse(is_safe_svg(svg))
+
+    def test_svg_foreignobject_rejected(self):
+        svg = b'<svg><foreignObject width="100" height="100"><iframe src="http://attacker.com"></iframe></foreignObject></svg>'
+        self.assertFalse(is_safe_svg(svg))
+
+    def test_svg_style_external_url_rejected(self):
+        # <style> tag URL reference
+        svg1 = b'<svg><style>rect { fill: url(https://attacker.com/image.png); }</style></svg>'
+        self.assertFalse(is_safe_svg(svg1))
+
+        # <style> tag @import
+        svg2 = b'<svg><style>@import "https://attacker.com/style.css";</style></svg>'
+        self.assertFalse(is_safe_svg(svg2))
+
+        # Inline style attribute URL reference
+        svg3 = b'<svg><circle cx="50" cy="50" r="40" style="fill: url(https://attacker.com/bg.png);" /></svg>'
+        self.assertFalse(is_safe_svg(svg3))
 
 
 if __name__ == '__main__':

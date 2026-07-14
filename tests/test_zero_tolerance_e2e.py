@@ -50,7 +50,7 @@ class TestZeroToleranceE2E(unittest.TestCase):
         with patch('requests.head', return_value=mock_response) as mock_head:
             result = validate_logo_image('https://example.com/logo.png')
             self.assertTrue(result)
-            mock_head.assert_called_once_with('https://example.com/logo.png', timeout=5, allow_redirects=True)
+            mock_head.assert_called_once_with('https://example.com/logo.png', headers={}, timeout=5, allow_redirects=False)
 
     def test_ingestion_gate_allow_active_site(self):
         """Test db_manager.merge_startup with mocked active website and job."""
@@ -219,14 +219,14 @@ class TestZeroToleranceE2E(unittest.TestCase):
         self.assertEqual(result, (False, 'https://example.com', 'Parking page detected'))
 
     @patch('requests.head')
-    def test_logo_validation_transient_failure(self, mock_head):
-        """Test validate_logo_image resiliently returns True on transient timeout."""
+    def test_logo_validation_timeout_rejected(self, mock_head):
+        """Test validate_logo_image returns False on transient timeout."""
         from data_acquisition.utils.validation import validate_logo_image
 
         mock_head.side_effect = requests.exceptions.Timeout("Connection timed out")
 
         result = validate_logo_image('https://example.com/logo.png')
-        self.assertTrue(result)
+        self.assertFalse(result)
 
     def test_ingestion_gate_partial_retention(self):
         """Test db_manager.merge_startup partial retention when website is dead but has active jobs."""
@@ -482,6 +482,7 @@ class TestZeroToleranceE2E(unittest.TestCase):
 
         db = DBManager(db_path="test_startups_dummy.json")
         db.save_db = MagicMock()
+        db.load_db = MagicMock()
         
         # Test default/custom initialization
         validator_default = JobValidator(db)
@@ -501,24 +502,35 @@ class TestZeroToleranceE2E(unittest.TestCase):
             ]
         }
         db.startups = [company]
+        company_expected = dict(company)
 
         # Case 1: concurrency = 1 (Sequential path should be taken, ThreadPoolExecutor should NOT be used)
         validator_seq = JobValidator(db, concurrency=1)
         
         with patch('concurrent.futures.ThreadPoolExecutor') as mock_executor, \
-             patch.object(validator_seq, '_validate_flat_job_worker', return_value=(company, {"title": "Job 1"}, "Active", "Job 1")) as mock_job_worker, \
+             patch.object(validator_seq, '_validate_job_worker', return_value=({"title": "Job 1"}, "Active", "Job 1")) as mock_job_worker, \
              patch.object(validator_seq, 'validate_company_status') as mock_comp_worker:
             
             validator_seq.validate_and_prune()
             mock_executor.assert_not_called()
             self.assertEqual(mock_job_worker.call_count, 2)
-            mock_comp_worker.assert_called_once_with(company)
+            mock_comp_worker.assert_called_once_with(company_expected)
 
         # Case 2: concurrency = 3 (Parallel path should be taken, ThreadPoolExecutor should be used)
+        company = {
+            "id": 1,
+            "name": "Test Corp",
+            "website": "https://example.com",
+            "job_openings": [
+                {"title": "Job 1", "url": "https://example.com/job1"},
+                {"title": "Job 2", "url": "https://example.com/job2"}
+            ]
+        }
+        db.startups = [company]
         validator_par = JobValidator(db, concurrency=3)
         
         with patch('concurrent.futures.ThreadPoolExecutor') as mock_executor, \
-             patch.object(validator_par, '_validate_flat_job_worker', return_value=(company, {"title": "Job 1"}, "Active", "Job 1")) as mock_job_worker, \
+             patch.object(validator_par, '_validate_job_worker', return_value=({"title": "Job 1"}, "Active", "Job 1")) as mock_job_worker, \
              patch.object(validator_par, 'validate_company_status') as mock_comp_worker:
             
             # Setup mock_executor context manager behavior
@@ -526,8 +538,8 @@ class TestZeroToleranceE2E(unittest.TestCase):
             
             validator_par.validate_and_prune()
             mock_executor.assert_any_call(max_workers=3)
-            # Both job validation and company validation pools should be constructed
-            self.assertEqual(mock_executor.call_count, 2)
+            # Only job validation pool should be constructed
+            self.assertEqual(mock_executor.call_count, 1)
 
     def test_cli_live_sweep_options(self):
         """Test that the CLI validator parses and applies different flag combinations correctly."""
@@ -612,6 +624,7 @@ class TestZeroToleranceE2E(unittest.TestCase):
 
         db = DBManager(db_path="test_startups_dummy.json")
         db.save_db = MagicMock()
+        db.load_db = MagicMock()
         
         # Test default/custom initialization
         validator_default = JobValidator(db)
@@ -630,26 +643,36 @@ class TestZeroToleranceE2E(unittest.TestCase):
             ]
         }
         db.startups = [company]
+        company_expected = dict(company)
 
         # Case 1: Sequential Execution (concurrency=1)
         validator_seq = JobValidator(db, concurrency=1)
         with patch('concurrent.futures.ThreadPoolExecutor') as mock_executor:
-            with patch.object(validator_seq, '_validate_flat_job_worker', return_value=(company, True, 'Active', 'Job 1')) as mock_val_job, \
+            with patch.object(validator_seq, '_validate_job_worker', return_value=(True, 'Active', 'Job 1')) as mock_val_job, \
                  patch.object(validator_seq, 'validate_company_status') as mock_val_company:
                  
                  validator_seq.validate_and_prune()
                  mock_executor.assert_not_called()
                  mock_val_job.assert_called_once()
-                 mock_val_company.assert_called_once_with(company)
+                 mock_val_company.assert_called_once_with(company_expected)
 
         # Case 2: Parallel Execution (concurrency > 1)
+        company = {
+            "id": 1,
+            "name": "Test Corp",
+            "website": "https://example.com",
+            "job_openings": [
+                {"title": "Job 1", "url": "https://example.com/job1"}
+            ]
+        }
+        db.startups = [company]
         validator_par = JobValidator(db, concurrency=3)
         with patch('concurrent.futures.ThreadPoolExecutor') as mock_executor:
             mock_executor.return_value.__enter__.return_value.map.return_value = []
             
             validator_par.validate_and_prune()
             mock_executor.assert_any_call(max_workers=3)
-            self.assertEqual(mock_executor.call_count, 2)
+            self.assertEqual(mock_executor.call_count, 1)
 
     def test_cli_live_sweep_options(self):
         """Execute the CLI validator run_validator.py under various flag combinations and verify configuration."""

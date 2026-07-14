@@ -36,7 +36,8 @@ def main():
         ("9. Asynchronous Crawler Queue & Atomic Locking Verification", os.path.join(tests_dir, "test_async_crawler_queue.py")),
         ("10. Client-Side Caching Milestone 2 Backend Verification", os.path.join(tests_dir, "test_backend_m2.py")),
         ("11. Client-Side Caching Milestone 3 Frontend Verification", os.path.join(tests_dir, "test_frontend_m3_caching.py")),
-        ("12. Client-Side Caching Milestone 4 Master Verification Suite", os.path.join(tests_dir, "test_client_side_api_caching.py"))
+        ("12. Client-Side Caching Milestone 4 Master Verification Suite", os.path.join(tests_dir, "test_client_side_api_caching.py")),
+        ("13. Industry Classification Verification", os.path.join(tests_dir, "test_industry_classification.py"))
     ]
     
     print("\n⚡ WORLDTECH MAP // FULL-STACK MASTER TEST RUNNER ⚡")

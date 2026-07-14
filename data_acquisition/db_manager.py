@@ -102,31 +102,34 @@ class DBManager:
             
     def save_db(self):
         with self.file_lock(self.db_path):
-            os.makedirs(os.path.dirname(os.path.abspath(self.db_path)), exist_ok=True)
-            mode = 'r+' if os.path.exists(self.db_path) else 'w+'
-            with open(self.db_path, mode) as f:
-                if HAS_FCNTL:
-                    try:
-                        fcntl.flock(f, fcntl.LOCK_EX)
-                    except Exception:
-                        pass
-                try:
-                    f.seek(0)
-                    f.truncate(0)
+            abs_db_path = os.path.abspath(self.db_path)
+            db_dir = os.path.dirname(abs_db_path)
+            os.makedirs(db_dir, exist_ok=True)
+            tmp_path = abs_db_path + ".tmp"
+            
+            try:
+                with open(tmp_path, 'w') as f:
                     json.dump(self.startups, f, indent=2)
                     f.flush()
                     os.fsync(f.fileno())
-                finally:
-                    if HAS_FCNTL:
-                        try:
-                            fcntl.flock(f, fcntl.LOCK_UN)
-                        except Exception:
-                            pass
+                # Atomic rename replacement
+                os.replace(tmp_path, abs_db_path)
+            except Exception as e:
+                # Clean up temporary file if write or sync failed
+                if os.path.exists(tmp_path):
+                    try:
+                        os.remove(tmp_path)
+                    except Exception:
+                        pass
+                raise e
 
     def merge_job_openings(self, jobs):
         if not isinstance(jobs, list) or not jobs:
             return 0
             
+        # Recursively sanitize all input nested parameters to prevent injection
+        jobs = self._sanitize_value_recursive(jobs)
+
         # Parallel validate job URLs
         valid_jobs = []
         if jobs:
@@ -204,14 +207,30 @@ class DBManager:
         text = text.replace('<', '').replace('>', '').replace('\x00', '')
         return text.strip()
 
-    def _sanitize_value_recursive(self, val):
+    def _sanitize_url(self, url):
+        if not url or not isinstance(url, str):
+            return ""
+        url_clean = url.strip()
+        lower = re.sub(r'[\x00-\x20\x7f\u200b-\u200f\u2028\u2029\ufeff]', '', url_clean).lower()
+        dangerous_schemes = ("javascript:", "data:", "vbscript:", "file:", "about:", "blob:", "view-source:", "mhtml:")
+        if any(lower.startswith(scheme) for scheme in dangerous_schemes):
+            return ""
+        decoded_lower = lower.replace("&#58;", ":").replace("%3a", ":").replace("&#x3a;", ":").replace("&colon;", ":")
+        if any(decoded_lower.startswith(scheme) for scheme in dangerous_schemes):
+            return ""
+        return url_clean
+
+    def _sanitize_value_recursive(self, val, key_name=None):
         if isinstance(val, str):
+            if key_name in ("url", "job_url", "logo_url", "website", "logo_svg_url"):
+                return self._sanitize_url(val)
             return self._sanitize_string(val)
         elif isinstance(val, dict):
-            return {k: self._sanitize_value_recursive(v) for k, v in val.items()}
+            return {k: self._sanitize_value_recursive(v, k) for k, v in val.items()}
         elif isinstance(val, list):
-            return [self._sanitize_value_recursive(v) for v in val]
+            return [self._sanitize_value_recursive(v, key_name) for v in val]
         return val
+
 
     def merge_startup(self, company_details, jobs, target_city=None):
         """
@@ -253,11 +272,13 @@ class DBManager:
         if logo_domain:
             company_details["logo_domain"] = logo_domain
 
-        existing = self.find_startup(name, logo_domain, target_city=target_city)
+        # 1. Look up matching startup in current memory representation (outside lock)
+        existing_temp = self.find_startup(name, logo_domain, target_city=target_city)
         
+        # 2. Ingestion gate: validation/checks (network requests outside lock)
         is_active_website = company_details.get("is_active_website", True)
+        has_active_job = False
         if not is_active_website:
-            has_active_job = False
             for job in jobs:
                 if isinstance(job, dict):
                     url = str(job.get("url") or job.get("job_url") or "").strip()
@@ -266,8 +287,8 @@ class DBManager:
                         if active:
                             has_active_job = True
                             break
-            if not has_active_job and existing:
-                for job in existing.get("job_openings", []):
+            if not has_active_job and existing_temp:
+                for job in existing_temp.get("job_openings", []):
                     if isinstance(job, dict):
                         url = str(job.get("url") or job.get("job_url") or "").strip()
                         if url:
@@ -285,109 +306,141 @@ class DBManager:
                 company_details["verified_email"] = ""
                 if "hr_details" in company_details and isinstance(company_details["hr_details"], dict):
                     company_details["hr_details"]["contact_email"] = ""
-                
                 logo_domain = ""
-                
+
+        # 3. Geocoding coordinates calculation (network requests outside lock)
+        new_lat, new_lng = None, None
+        address = company_details.get("office_address") or company_details.get("bangalore_address") or target_city
+        if existing_temp:
+            is_at_fallback = (
+                is_fallback_coordinate(existing_temp.get("lat"), existing_temp.get("lng")) or
+                (existing_temp.get("lat") is None or existing_temp.get("lng") is None)
+            )
+            if is_at_fallback:
+                new_lat, new_lng = self.geocode_address(address, existing_temp.get("name"), target_city=target_city)
+        else:
+            new_lat, new_lng = self.geocode_address(address, name, target_city=target_city)
+
+        # 4. Enter lock, reload latest DB, apply modifications, and save
+        with self.file_lock(self.db_path):
+            self.load_db()
+            
+            # Re-evaluate matching with the latest state
+            clean_web, clean_dom = self._clean_url_and_domain(company_details.get("website") or "")
+            logo_domain = company_details.get("logo_domain") or clean_dom
+            
+            if not is_active_website:
+                logo_domain = ""
+                company_details["logo_svg_url"] = ""
+                company_details["logo_domain"] = ""
+                company_details["verified_email"] = ""
+                if "hr_details" in company_details and isinstance(company_details["hr_details"], dict):
+                    company_details["hr_details"]["contact_email"] = ""
+                    
+            existing = self.find_startup(name, logo_domain, target_city=target_city)
+            
+            if not is_active_website:
                 if existing:
                     existing["logo_svg_url"] = ""
                     existing["logo_domain"] = ""
                     existing["verified_email"] = ""
                     if "hr_details" in existing and isinstance(existing["hr_details"], dict):
                         existing["hr_details"]["contact_email"] = ""
-        
-        if existing:
-            print(f"[DB Manager] Merging existing company: '{existing['name']}' (ID: {existing['id']})")
-            
-            # Website merge protection: only overwrite if candidate is active and non-empty
-            cand_web = company_details.get("website")
-            cand_active = company_details.get("is_active_website", False)
-            if cand_web and cand_web != "N/A" and cand_active:
-                existing["website"] = cand_web
-                if company_details.get("logo_domain"):
-                    existing["logo_domain"] = company_details["logo_domain"]
 
-            # Logo SVG URL merge protection: only overwrite if candidate is valid
-            cand_logo = company_details.get("logo_svg_url")
-            if cand_logo and cand_logo != "N/A":
-                if validate_logo_image(cand_logo):
-                    existing["logo_svg_url"] = cand_logo
+            if existing:
+                print(f"[DB Manager] Merging existing company: '{existing['name']}' (ID: {existing['id']})")
+                
+                # Website merge protection: only overwrite if candidate is active and non-empty
+                cand_web = company_details.get("website")
+                cand_active = company_details.get("is_active_website", False)
+                if cand_web and cand_web != "N/A" and cand_active:
+                    existing["website"] = cand_web
+                    if company_details.get("logo_domain"):
+                        existing["logo_domain"] = company_details["logo_domain"]
+
+                # Logo SVG URL merge protection: only overwrite if candidate is valid
+                cand_logo = company_details.get("logo_svg_url")
+                if cand_logo and cand_logo != "N/A":
+                    if validate_logo_image(cand_logo):
+                        existing["logo_svg_url"] = cand_logo
+                        
+                if not existing.get("description") and company_details.get("description"):
+                    existing["description"] = company_details["description"]
+                if (not existing.get("funding_stage") or existing.get("funding_stage") == "N/A") and company_details.get("funding_stage"):
+                    existing["funding_stage"] = company_details["funding_stage"]
+                if not existing.get("total_raised") and company_details.get("total_raised"):
+                    existing["total_raised"] = company_details["total_raised"]
+                if company_details.get("is_active_website") is not None:
+                    existing["is_active_website"] = company_details["is_active_website"]
                     
-            if not existing.get("description") and company_details.get("description"):
-                existing["description"] = company_details["description"]
-            if (not existing.get("funding_stage") or existing.get("funding_stage") == "N/A") and company_details.get("funding_stage"):
-                existing["funding_stage"] = company_details["funding_stage"]
-            if not existing.get("total_raised") and company_details.get("total_raised"):
-                existing["total_raised"] = company_details["total_raised"]
-            if company_details.get("is_active_website") is not None:
-                existing["is_active_website"] = company_details["is_active_website"]
+                # Verified email merge protection: only overwrite if candidate has valid email format
+                cand_email = company_details.get("verified_email")
+                if cand_email and cand_email != "N/A":
+                    if '@' in cand_email and '.' in cand_email:
+                        existing["verified_email"] = cand_email
                 
-            # Verified email merge protection: only overwrite if candidate has valid email format
-            cand_email = company_details.get("verified_email")
-            if cand_email and cand_email != "N/A":
-                if '@' in cand_email and '.' in cand_email:
-                    existing["verified_email"] = cand_email
-            
-            if company_details.get("head_count", 0) > existing.get("head_count", 0):
-                existing["head_count"] = company_details["head_count"]
-                
-            is_at_fallback = (
-                is_fallback_coordinate(existing.get("lat"), existing.get("lng")) or
-                (existing.get("lat") is None or existing.get("lng") is None)
-            )
-            if is_at_fallback:
-                address = company_details.get("office_address") or company_details.get("bangalore_address") or target_city
-                new_lat, new_lng = self.geocode_address(address, existing.get("name"), target_city=target_city)
-                if new_lat is not None and new_lng is not None:
+                if company_details.get("head_count", 0) > existing.get("head_count", 0):
+                    existing["head_count"] = company_details["head_count"]
+                    
+                is_at_fallback = (
+                    is_fallback_coordinate(existing.get("lat"), existing.get("lng")) or
+                    (existing.get("lat") is None or existing.get("lng") is None)
+                )
+                if is_at_fallback and new_lat is not None and new_lng is not None:
                     existing["lat"] = new_lat
                     existing["lng"] = new_lng
                     city_label = address
                     if len(city_label) > 60:
                         city_label = city_label.split(',')[0] + f", {target_city}"
                     existing["city"] = city_label
+                    
+                self._merge_job_openings(existing, jobs)
+                self.save_db()
+                return existing
+            else:
+                new_id = self._generate_new_id()
+                print(f"[DB Manager] Registering NEW company: '{name}' (ID: {new_id})")
                 
-            self._merge_job_openings(existing, jobs)
-            return existing
-        else:
-            new_id = self._generate_new_id()
-            print(f"[DB Manager] Registering NEW company: '{name}' (ID: {new_id})")
-            
-            address = company_details.get("office_address") or company_details.get("bangalore_address") or target_city
-            lat, lng = self.geocode_address(address, name, target_city=target_city)
-            
-            city_label = address
-            if len(city_label) > 60:
-                city_label = city_label.split(',')[0] + f", {target_city}"
-            elif not city_label or city_label == "N/A":
-                city_label = target_city
-            
-            new_startup = {
-                "id": new_id,
-                "name": name,
-                "lat": lat,
-                "lng": lng,
-                "city": city_label,
-                "industry": company_details.get("industry") or "Software",
-                "description": company_details.get("description") or "",
-                "website": company_details.get("website") or "",
-                "logo_domain": logo_domain or "",
-                "logo_svg_url": company_details.get("logo_svg_url") or "",
-                "funding_stage": company_details.get("funding_stage") or "Seed / Active",
-                "total_raised": company_details.get("total_raised") or "Undisclosed",
-                "is_active_website": company_details.get("is_active_website", True),
-                "verified_email": company_details.get("verified_email") or "",
-                "head_count": company_details.get("head_count") or 10,
-                "founders": company_details.get("founders") or [],
-                "hr_details": company_details.get("hr_details") or {
-                    "contact_email": "",
-                    "benefits": ""
-                },
-                "job_openings": []
-            }
-            
-            # Append jobs
-            self._merge_job_openings(new_startup, jobs)
-            self.startups.append(new_startup)
-            return new_startup
+                city_label = address
+                if len(city_label) > 60:
+                    city_label = city_label.split(',')[0] + f", {target_city}"
+                elif not city_label or city_label == "N/A":
+                    city_label = target_city
+                
+                cand_logo = company_details.get("logo_svg_url") or ""
+                if cand_logo and cand_logo != "N/A":
+                    if not validate_logo_image(cand_logo):
+                        cand_logo = ""
+
+                new_startup = {
+                    "id": new_id,
+                    "name": name,
+                    "lat": new_lat,
+                    "lng": new_lng,
+                    "city": city_label,
+                    "industry": company_details.get("industry") or "Software",
+                    "description": company_details.get("description") or "",
+                    "website": company_details.get("website") or "",
+                    "logo_domain": logo_domain or "",
+                    "logo_svg_url": cand_logo,
+                    "funding_stage": company_details.get("funding_stage") or "Seed / Active",
+                    "total_raised": company_details.get("total_raised") or "Undisclosed",
+                    "is_active_website": company_details.get("is_active_website", True),
+                    "verified_email": company_details.get("verified_email") or "",
+                    "head_count": company_details.get("head_count") or 10,
+                    "founders": company_details.get("founders") or [],
+                    "hr_details": company_details.get("hr_details") or {
+                        "contact_email": "",
+                        "benefits": ""
+                    },
+                    "job_openings": []
+                }
+                
+                # Append jobs
+                self._merge_job_openings(new_startup, jobs)
+                self.startups.append(new_startup)
+                self.save_db()
+                return new_startup
             
     def geocode_address(self, address, company_name=None, target_city=None):
         """

@@ -161,11 +161,12 @@
 
             <div class="navbar-center">
                 <div id="quick-industry-tabs" class="quick-tabs">
-                    <button class="tab-btn active" onclick="applyIndustryTab('')">🌐 All Industries</button>
-                    <button class="tab-btn" onclick="applyIndustryTab('sales')">💼 Sales</button>
-                    <button class="tab-btn" onclick="applyIndustryTab('marketing')">📢 Marketing</button>
-                    <button class="tab-btn" onclick="applyIndustryTab('dev')">💻 Tech & Dev</button>
-                    <button class="tab-btn" onclick="applyIndustryTab('healthcare')">🏥 Healthcare</button>
+                    <button class="tab-btn active" data-industry="">🌐 All Industries</button>
+                    <button class="tab-btn" data-industry="SaaS">☁️ SaaS</button>
+                    <button class="tab-btn" data-industry="Fintech">💳 Fintech</button>
+                    <button class="tab-btn" data-industry="Artificial Intelligence">🤖 AI</button>
+                    <button class="tab-btn" data-industry="HealthTech">🏥 HealthTech</button>
+                    <button class="tab-btn" data-industry="Service Industry">💼 Service Industry</button>
                 </div>
             </div>
 
@@ -306,15 +307,6 @@
             window.location.href = '/';
         }
 
-        function applyIndustryTab(category) {
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                searchInput.value = category;
-                searchInput.dispatchEvent(new Event('input'));
-            }
-            document.querySelectorAll('#quick-industry-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
-            if (event && event.target) event.target.classList.add('active');
-        }
     </script>
 </body>
 </html>

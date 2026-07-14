@@ -439,12 +439,12 @@ class TestValidationUtils(unittest.TestCase):
         self.assertFalse(validate_logo_image("https://startup.com/logo.png"))
 
     @patch('requests.head')
-    def test_validate_logo_image_resilient_on_timeout(self, mock_head):
+    def test_validate_logo_image_rejection_on_timeout(self, mock_head):
         mock_head.side_effect = requests.exceptions.Timeout("Connection timed out")
 
         from data_acquisition.utils.validation import validate_logo_image
-        # Timeout/Connection errors log warning and return True resiliently
-        self.assertTrue(validate_logo_image("https://startup.com/logo.png"))
+        # Timeout/Connection errors return False
+        self.assertFalse(validate_logo_image("https://startup.com/logo.png"))
 
     @patch('requests.get')
     @patch('requests.head')
@@ -496,14 +496,14 @@ class TestValidationUtils(unittest.TestCase):
 
     @patch('requests.get')
     @patch('requests.head')
-    def test_validate_logo_image_head_403_get_timeout_resilient(self, mock_head, mock_get):
+    def test_validate_logo_image_head_403_get_timeout_rejected(self, mock_head, mock_get):
         mock_head_res = MagicMock(status_code=403)
         mock_head.return_value = mock_head_res
 
         mock_get.side_effect = requests.exceptions.Timeout("Connection timed out on GET")
 
         from data_acquisition.utils.validation import validate_logo_image
-        self.assertTrue(validate_logo_image("https://startup.com/logo.png"))
+        self.assertFalse(validate_logo_image("https://startup.com/logo.png"))
         mock_head.assert_called_once()
         mock_get.assert_called_once()
 
