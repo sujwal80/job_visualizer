@@ -36,10 +36,6 @@ class HiristScraper(ScraperBase):
         proxy = os.environ.get("PROXY_URL")
         return {"http": proxy, "https": proxy} if proxy else None
 
-    def _sleep_throttle(self, min_s=1.0, max_s=2.0):
-        mult = float(os.environ.get("DELAY_MULTIPLIER", 1.0))
-        time.sleep(random.uniform(min_s, max_s) * mult)
-
     def _match_city(self, loc, target_city):
         return match_target_city(loc, target_city)
 

@@ -104,8 +104,9 @@ def run_pipeline(run_discovery=True, run_tagging=True, run_validation=True, max_
                                 record["remote_office_distance_km"] = startup_copy.get("remote_office_distance_km")
                         db.save_db()
                 
-            if not os.environ.get("NO_RATE_LIMIT"):
-                time.sleep(random.uniform(1.0, 2.0))
+            delay_mult = float(os.environ.get("DELAY_MULTIPLIER", 0.0))
+            if delay_mult > 0 and not os.environ.get("NO_RATE_LIMIT"):
+                time.sleep(random.uniform(1.0, 2.0) * delay_mult)
             
         print("\n=== TAGGING & ENRICHMENT PHASE COMPLETED ===")
         

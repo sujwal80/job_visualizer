@@ -91,6 +91,8 @@ class CompanyDiscoveryService:
                     self.db.save_db()
                     new_added += 1
                 
-                time.sleep(random.uniform(1.5, 3.0))
+                delay_mult = float(os.environ.get("DELAY_MULTIPLIER", 0.0))
+                if delay_mult > 0:
+                    time.sleep(random.uniform(1.5, 3.0) * delay_mult)
                 
         print(f"\n[Discovery] Acquisition phase finished. Added {new_added} new startup records to database.")

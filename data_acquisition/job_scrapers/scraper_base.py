@@ -1,4 +1,6 @@
 import os
+import random
+import time
 try:
     from job_metadata_extractor import extract_job_metadata
 except ImportError:
@@ -48,3 +50,9 @@ class ScraperBase:
                 print(f"[{self.__class__.__name__}] Filtered inactive job '{title}' -> {reason}")
 
         return valid_jobs
+
+    def _sleep_throttle(self, min_s=1.0, max_s=2.0):
+        mult = float(os.environ.get("DELAY_MULTIPLIER", 0.0))
+        if mult > 0:
+            time.sleep(random.uniform(min_s, max_s) * mult)
+

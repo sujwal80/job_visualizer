@@ -580,7 +580,12 @@ class DBManager:
         for attempt in range(3):
             try:
                 # Sleep to satisfy OSM usage policy
-                time.sleep(1.2 if attempt == 0 else backoff)
+                delay_mult = float(os.environ.get("DELAY_MULTIPLIER", 0.0))
+                if attempt == 0:
+                    if delay_mult > 0:
+                        time.sleep(1.2 * delay_mult)
+                else:
+                    time.sleep(backoff)
                 response = requests.get(url, params=params, headers=headers, timeout=10)
                 if response.status_code == 429 or response.status_code >= 500:
                     print(f"  [ OSM Rate limit/Error HTTP {response.status_code} (Attempt {attempt+1}/3). Backing off {backoff}s...")

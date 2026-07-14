@@ -29,10 +29,6 @@ class ATSScraper(ScraperBase):
         proxy = os.environ.get("PROXY_URL")
         return {"http": proxy, "https": proxy} if proxy else None
 
-    def _sleep_throttle(self, min_s=0.5, max_s=1.2):
-        mult = float(os.environ.get("DELAY_MULTIPLIER", 1.0))
-        time.sleep(random.uniform(min_s, max_s) * mult)
-
     def _slugify(self, name):
         if not name:
             return ""

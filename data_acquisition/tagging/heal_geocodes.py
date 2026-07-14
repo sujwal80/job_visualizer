@@ -75,8 +75,9 @@ def get_address_from_ddg(company_name, target_city=None):
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
     try:
-        # Sleep to be polite to DDG
-        time.sleep(1.5)
+        delay_mult = float(os.environ.get("DELAY_MULTIPLIER", 0.0))
+        if delay_mult > 0:
+            time.sleep(1.5 * delay_mult)
         res = requests.get(url, headers=headers, timeout=10)
         if res.status_code == 200:
             soup = BeautifulSoup(res.text, 'html.parser')

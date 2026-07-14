@@ -33,10 +33,6 @@ class LinkedInScraper(ScraperBase):
         proxy = os.environ.get("PROXY_URL")
         return {"http": proxy, "https": proxy} if proxy else None
 
-    def _sleep_throttle(self, min_s=1.0, max_s=2.0):
-        mult = float(os.environ.get("DELAY_MULTIPLIER", 1.0))
-        time.sleep(random.uniform(min_s, max_s) * mult)
-
     def _get_with_retry(self, url, params=None, allow_redirects=True, timeout=10):
         backoff = 1.0
         for attempt in range(3):

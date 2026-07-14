@@ -94,8 +94,9 @@ def get_wikidata_industry(company_name):
     return res
 
 def _query_wikidata_industry(company_name):
-    """Query Wikidata API to find the industry of a company, verifying it is a business."""
-    time.sleep(0.5)
+    delay_mult = float(os.environ.get("DELAY_MULTIPLIER", 0.0))
+    if delay_mult > 0:
+        time.sleep(0.5 * delay_mult)
     search_url = "https://www.wikidata.org/w/api.php"
     headers = {
         "User-Agent": "JobVisualizerBot/1.0 (singhujwal@gmail.com) Python-Requests"
