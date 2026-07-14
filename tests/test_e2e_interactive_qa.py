@@ -225,16 +225,19 @@ class TestE2EInteractiveQA(unittest.TestCase):
         """Verify clicking industry filter tabs updates job directory and marker pins."""
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
         self.page.wait_for_load_state("domcontentloaded")
-        self.page.wait_for_timeout(1000)
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && window.WorldTechApp.state && window.WorldTechApp.state.startupsData && window.WorldTechApp.state.startupsData.length > 0",
+            timeout=10000
+        )
 
         # Total items initially
         total_items = self.page.locator("#directory-list .directory-item").count()
 
-        # Click Sales tab
-        self.page.click("button:has-text('Sales')")
+        # Click Fintech tab
+        self.page.click("button:has-text('Fintech')")
         self.page.wait_for_timeout(500)
-        sales_items = self.page.locator("#directory-list .directory-item").count()
-        self.assertTrue(sales_items < total_items, "Sales filter should reduce matching items")
+        fintech_items = self.page.locator("#directory-list .directory-item").count()
+        self.assertTrue(fintech_items < total_items, "Fintech filter should reduce matching items")
 
         # Reset to All
         self.page.click("button:has-text('All Industries')")
@@ -247,20 +250,23 @@ class TestE2EInteractiveQA(unittest.TestCase):
         """Verify typing into live search input dynamically filters directory."""
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
         self.page.wait_for_load_state("domcontentloaded")
-        self.page.wait_for_timeout(1000)
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && window.WorldTechApp.state && window.WorldTechApp.state.startupsData && window.WorldTechApp.state.startupsData.length > 0",
+            timeout=10000
+        )
 
         total_items = self.page.locator("#directory-list .directory-item").count()
 
         # Search for a specific company name that exists, has job openings and is unique, e.g., "Indira Pay"
         self.page.fill("#search-input", "Indira Pay")
-        self.page.wait_for_timeout(500)
+        self.page.wait_for_timeout(1000)
 
         matches = self.page.locator("#directory-list .directory-item").count()
         self.assertEqual(matches, 1)
 
         # Clear search
         self.page.fill("#search-input", "")
-        self.page.wait_for_timeout(500)
+        self.page.wait_for_timeout(1000)
         
         cleared_items = self.page.locator("#directory-list .directory-item").count()
         self.assertEqual(cleared_items, total_items)
@@ -428,10 +434,13 @@ class TestE2EInteractiveQA(unittest.TestCase):
         """Verify rapid successive industry filter toggling causes zero JS runtime errors or crashes."""
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
         self.page.wait_for_load_state("domcontentloaded")
-        self.page.wait_for_timeout(1000)
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && window.WorldTechApp.state && window.WorldTechApp.state.startupsData && window.WorldTechApp.state.startupsData.length > 0",
+            timeout=10000
+        )
 
         # Rapidly click filters
-        tabs = ["Sales", "Marketing", "Tech & Dev", "Healthcare", "All Industries"]
+        tabs = ["SaaS", "Fintech", "AI", "HealthTech", "Service Industry", "All Industries"]
         for tab in tabs:
             self.page.click(f"button:has-text('{tab}')")
 

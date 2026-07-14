@@ -404,7 +404,8 @@ def test_ingestion_gates():
     
     jobs = [{"title": "Software Engineer", "url": "https://deadnojobs.com/jobs/1"}]
     
-    with patch("db_manager.check_job_active", return_value=(False, "Closed")):
+    with patch("db_manager.check_job_active", return_value=(False, "Closed")), \
+         patch("db_manager.validate_website_domain", return_value=(False, "https://deadnojobs.com", "DNS failed")):
         result = db.merge_startup(company_details, jobs)
         assert result is None, f"Expected merge_startup to return None for dead website and no active jobs, got {result}"
         assert len(db.startups) == 0, f"Expected 0 startups in DB, got {len(db.startups)}"
@@ -432,7 +433,8 @@ def test_ingestion_gates():
     jobs = [{"title": "Software Engineer", "url": "https://deadwithjobs.com/jobs/1"}]
     
     with patch.object(db, "geocode_address", return_value=(12.9, 77.6)), \
-         patch("db_manager.check_job_active", return_value=(True, "Active")):
+         patch("db_manager.check_job_active", return_value=(True, "Active")), \
+         patch("db_manager.validate_website_domain", return_value=(False, "https://deadwithjobs.com", "DNS failed")):
         result = db.merge_startup(company_details, jobs)
         assert result is not None, "Expected merge_startup to return merged startup record"
         assert result["is_active_website"] is False, "Expected website to remain inactive"
@@ -465,7 +467,8 @@ def test_ingestion_gates():
     jobs = [{"title": "Software Engineer", "url": "https://activecorp.com/jobs/1"}]
     
     with patch.object(db, "geocode_address", return_value=(12.9, 77.6)), \
-         patch("db_manager.check_job_active", return_value=(True, "Active")):
+         patch("db_manager.check_job_active", return_value=(True, "Active")), \
+         patch("db_manager.validate_website_domain", return_value=(True, "https://activecorp.com", None)):
         result = db.merge_startup(company_details, jobs)
         assert result is not None, "Expected merge_startup to return merged startup record"
         assert result["is_active_website"] is True

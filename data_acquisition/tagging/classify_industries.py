@@ -29,9 +29,13 @@ LINKEDIN_MAPPING = {
     "Engineering Services": "Service Industry",
     "Financial Services": "Fintech",
     "Banking": "Fintech",
+    "Investment Management": "Fintech",
+    "Venture Capital and Private Equity Principals": "Fintech",
     "Hospitals and Health Care": "HealthTech",
     "Biotechnology": "HealthTech",
     "Biotechnology Research": "HealthTech",
+    "Biotech": "HealthTech",
+    "Pharmaceutical Manufacturing": "HealthTech",
     "Retail": "E-commerce",
     "Retail Luxury Goods and Jewelry": "E-commerce",
 }
@@ -60,10 +64,10 @@ VALID_COMPANY_QIDS = {
 }
 
 TAXONOMY = [
-    ("Service Industry", r'\b(?:it\s*services|technology\s+(?:[\w\s&]+\s+)?services|information\s*technology\s*services|technology\s*consulting|system\s*integration|managed\s*services|outsourcing|digital\s*transformation)\b'),
+    ("Service Industry", r'\b(?:it\s*services|technology\s+(?:[\w&]+\s+){0,3}services|information\s*technology\s*services|technology\s*consulting|system\s*integration|managed\s*services|outsourcing|digital\s*transformation)\b'),
     ("Fintech", r'\b(?:fintech|payment|payments|bank|banking|credit|lending|insurance|insurtech|wealth|crypto|blockchain|finance|financial\s+services|neobank|accounting)\b'),
     ("HealthTech", r'\b(?:health|healthtech|biotech|medical|pharma|clinical|healthcare|wellness|genomics)\b'),
-    ("E-commerce", r'\b(?:e-commerce|ecommerce|marketplace|d2c|retail(?:er)?s?|shopping|q-commerce|quick\s*commerce|rapid\s*commerce)\b'),
+    ("E-commerce", r'\b(?:e\s*commerce|ecommerce|marketplace|d2c|retail(?:er)?s?|shopping|q\s*commerce|quick\s*commerce|rapid\s*commerce)\b'),
     ("EdTech", r'\b(?:edtech|education|(?<!machine\s)(?<!deep\s)learning|upskilling|tutor|university|course)\b'),
     ("CleanTech", r'\b(?:cleantech|climate|solar|ev|electric\s*vehicle|battery|renewable|sustainability|carbon)\b'),
     ("Cybersecurity", r'\b(?:security|cybersecurity|infosec|encryption|identity|firewall|compliance)\b'),
@@ -77,6 +81,11 @@ wikidata_cache = {}
 def get_wikidata_industry(company_name):
     """Get company industry from cache or query Wikidata."""
     if not company_name or company_name == "N/A":
+        return None
+    disable_wiki = os.environ.get("DISABLE_WIKIDATA")
+    offline_mode = os.environ.get("OFFLINE_MODE")
+    if (disable_wiki is not None and disable_wiki.lower() not in ('', '0', 'false', 'no')) or \
+       (offline_mode is not None and offline_mode.lower() not in ('', '0', 'false', 'no')):
         return None
     if company_name in wikidata_cache:
         return wikidata_cache[company_name]
@@ -174,6 +183,9 @@ def classify_startup(startup, force=False):
         for j in jobs:
             if isinstance(j, dict):
                 text += f" {j.get('title', '')} {j.get('department', '')}".lower()
+
+    text = re.sub(r'[^a-zA-Z0-9]', ' ', text)
+    text = re.sub(r'\s+', ' ', text)
 
     for sector, pattern in TAXONOMY:
         if re.search(pattern, text, re.IGNORECASE):

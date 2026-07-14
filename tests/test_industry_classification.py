@@ -128,6 +128,29 @@ class TestIndustryClassification(unittest.TestCase):
         result = classify_startup(startup)
         self.assertEqual(result, "EdTech")
 
+    def test_text_normalization_and_ecommerce_keyword_matching(self):
+        """Tier 1: Text normalization converts punctuation/multiple spaces and matches e/q-commerce variations."""
+        startup = self.dummy_startup.copy()
+        startup["industry"] = "Unknown"
+        startup["description"] = "We run an e-commerce platform for handmade goods."
+        self.assertEqual(classify_startup(startup), "E-commerce")
+
+        # Test e commerce variation with spaces and non-alphanumeric chars
+        startup["description"] = "We run an e!@#$commerce platform."
+        self.assertEqual(classify_startup(startup), "E-commerce")
+
+        # Test e commerce with multiple spaces
+        startup["description"] = "We run an e    commerce platform."
+        self.assertEqual(classify_startup(startup), "E-commerce")
+
+        # Test q-commerce variation with hyphen
+        startup["description"] = "A next-gen q-commerce company."
+        self.assertEqual(classify_startup(startup), "E-commerce")
+
+        # Test q commerce with space
+        startup["description"] = "A next-gen q commerce company."
+        self.assertEqual(classify_startup(startup), "E-commerce")
+
     def test_classification_skip_already_set(self):
         """Tier 1: Skips classification if the company has a valid sector."""
         startup = self.dummy_startup.copy()
@@ -429,10 +452,8 @@ class TestIndustryClassification(unittest.TestCase):
             # Wait! In CODE_ONLY network mode, there is no internet access. So any real requests.get in the subprocess will fail immediately (DNS resolution error or connection error).
             # The script has `try ... except Exception as e` which catches the error, logs a warning, and falls back to keyword matching.
             # For CustomIT, the keyword search will match "it services" and assign "Service Industry".
-            # So the subprocess will exit successfully and update the database even without internet connection!
-            # Let's verify this behavior.
-            
-            res = subprocess.run(cmd, capture_output=True, text=True)
+            env = {**os.environ, "DISABLE_WIKIDATA": "1"}
+            res = subprocess.run(cmd, capture_output=True, text=True, env=env)
             self.assertEqual(res.returncode, 0, f"CLI exited with error: {res.stderr}\nStdout: {res.stdout}")
 
             # Load the database and check classifications
