@@ -75,6 +75,8 @@ def _check_has_pin(s):
     Returns:
         bool: True if specific coordinates are present, False if unpinned or general city hub.
     """
+    if s.get("is_remote_office") is True:
+        return False
     lat = _safe_float(s.get("lat"))
     lng = _safe_float(s.get("lng"))
     if lat is None or lng is None:

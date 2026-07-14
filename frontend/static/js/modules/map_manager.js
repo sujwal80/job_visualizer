@@ -19,20 +19,14 @@ export const defaultColor = "#2563eb";
 
 const coordinatesRegistry = {};
 
-const INDIA_BOUNDS = [
-    [67.0, 5.0],  // Southwest coordinates
-    [99.0, 37.0]  // Northeast coordinates
-];
-
 // Initialize MapLibre Map centered on India
 export const map = new maplibregl.Map({
     container: 'map',
     style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
     center: [78.9629, 22.5937],
     zoom: 4.5,
-    minZoom: 4,
+    minZoom: 3.8,
     maxZoom: 18,
-    maxBounds: INDIA_BOUNDS,
     dragRotate: false,
     touchZoomRotate: false
 });
@@ -42,6 +36,72 @@ map.on('style.load', () => {
     if (map.getLayer('water')) map.setPaintProperty('water', 'fill-color', '#89bceb');
     if (map.getLayer('waterway')) map.setPaintProperty('waterway', 'line-color', '#7aafe0');
     if (map.getLayer('water_shadow')) map.setPaintProperty('water_shadow', 'fill-color', '#98c6f0');
+
+    // Fetch detailed India GeoJSON (MultiPolygon) to construct the world mask
+    fetch('/static/data/india_high_res.geojson')
+        .then(res => res.json())
+        .then(indiaGeojson => {
+            const worldCoords = [
+                [-180, -90],
+                [180, -90],
+                [180, 90],
+                [-180, 90],
+                [-180, -90]
+            ];
+            
+            const maskCoords = [worldCoords];
+            
+            // Loop through all polygons of India and add their exterior rings as holes in the mask
+            const geom = indiaGeojson.features[0].geometry;
+            if (geom.type === 'MultiPolygon') {
+                geom.coordinates.forEach(polygon => {
+                    maskCoords.push(polygon[0]); // Exterior ring of this polygon segment
+                });
+            } else if (geom.type === 'Polygon') {
+                maskCoords.push(geom.coordinates[0]);
+            }
+            
+            // Add World Mask source (covers everything EXCEPT India)
+            map.addSource('world-mask', {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: maskCoords
+                    }
+                }
+            });
+
+            // Add Mask Layer to color everything outside India as water
+            map.addLayer({
+                id: 'world-mask-layer',
+                type: 'fill',
+                source: 'world-mask',
+                paint: {
+                    'fill-color': '#89bceb', // Matches water color
+                    'fill-opacity': 1.0     // Fully opaque mask
+                }
+            });
+
+            // Add India GeoJSON source and outline layer on top of the mask
+            map.addSource('india-boundary', {
+                type: 'geojson',
+                data: indiaGeojson
+            });
+
+            map.addLayer({
+                id: 'india-outline-on-mask',
+                type: 'line',
+                source: 'india-boundary',
+                paint: {
+                    'line-color': '#2563eb', // Blue outline
+                    'line-width': 1.8,
+                    'line-opacity': 0.8
+                }
+            });
+        })
+        .catch(err => console.error("Error loading India GeoJSON for mask:", err));
 });
 
 // Add navigation controls

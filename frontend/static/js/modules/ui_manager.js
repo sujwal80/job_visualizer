@@ -527,8 +527,8 @@ export function _processOpenStartup(fullStartup) {
         let flyZoom = 16;
 
         if (fullStartup.has_pin === false) {
-            const centerLng = 77.5946;
-            const centerLat = 12.9716;
+            const centerLng = state.defaultLocation ? state.defaultLocation[0] : 77.5946;
+            const centerLat = state.defaultLocation ? state.defaultLocation[1] : 12.9716;
             fullStartup.lng = centerLng;
             fullStartup.lat = centerLat;
             flyCenter = [centerLng, centerLat];
