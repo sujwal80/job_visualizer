@@ -86,9 +86,10 @@ class CompanyDiscoveryService:
                     
                 if self.validator is not None:
                     self.validator.validate_company_status(details)
-                self.db.merge_startup(details, [job], target_city=target_city)
-                self.db.save_db()
-                new_added += 1
+                merged = self.db.merge_startup(details, [job], target_city=target_city)
+                if merged is not None:
+                    self.db.save_db()
+                    new_added += 1
                 
                 time.sleep(random.uniform(1.5, 3.0))
                 

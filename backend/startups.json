@@ -46,7 +46,7 @@
         "posted_date": "1 day ago"
       }
     ],
-    "verified_email": "careers@kora.ai",
+    "verified_email": "",
     "is_active_website": false,
     "is_remote_office": false,
     "remote_office_distance_km": 5.11,
@@ -100,7 +100,7 @@
         "posted_date": "1 day ago"
       }
     ],
-    "verified_email": "jobs@indirapay.in",
+    "verified_email": "",
     "is_active_website": false,
     "is_remote_office": false,
     "remote_office_distance_km": 4.97,
@@ -268,7 +268,7 @@
     "is_remote_office": false,
     "remote_office_distance_km": 5.11,
     "location_tagged": true,
-    "verified_email": "work@nammacart.co.in",
+    "verified_email": "",
     "is_active_website": false,
     "logo_svg_url": ""
   },
@@ -25865,7 +25865,7 @@
     "remote_office_distance_km": 7.94,
     "location_tagged": true,
     "verified_email": "",
-    "is_active_website": true,
+    "is_active_website": false,
     "logo_svg_url": ""
   },
   {

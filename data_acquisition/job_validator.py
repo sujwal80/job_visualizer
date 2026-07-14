@@ -12,9 +12,9 @@ except ImportError:
     from data_acquisition.geo_config import TEST_FIXTURE_WHITELIST_URLS
 
 try:
-    from utils.validation import validate_website_domain, check_job_active
+    from utils.validation import validate_website_domain, check_job_active, validate_logo_image
 except ImportError:
-    from data_acquisition.utils.validation import validate_website_domain, check_job_active
+    from data_acquisition.utils.validation import validate_website_domain, check_job_active, validate_logo_image
 
 EXPIRED_KEYWORDS = [
     "no longer accepting applications",
@@ -39,8 +39,9 @@ class JobValidator:
     Pings active job URLs in the database to verify if they are still open.
     Prunes expired links, closed applications, or broken URLs.
     """
-    def __init__(self, db_manager):
+    def __init__(self, db_manager, concurrency=1):
         self.db = db_manager
+        self.concurrency = concurrency
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
@@ -93,8 +94,11 @@ class JobValidator:
 
         total_pruned = 0
         if job_tasks:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
-                results = list(executor.map(self._validate_flat_job_worker, job_tasks))
+            if self.concurrency > 1:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=self.concurrency) as executor:
+                    results = list(executor.map(self._validate_flat_job_worker, job_tasks))
+            else:
+                results = [self._validate_flat_job_worker(task) for task in job_tasks]
                 
             valid_jobs_map = {id(startup): [] for startup in startups_to_validate_website}
             for startup, res_job, reason, title in results:
@@ -113,8 +117,12 @@ class JobValidator:
                     startup["job_openings"] = valid_jobs
 
         if startups_to_validate_website:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
-                list(executor.map(self.validate_company_status, startups_to_validate_website))
+            if self.concurrency > 1:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=self.concurrency) as executor:
+                    list(executor.map(self.validate_company_status, startups_to_validate_website))
+            else:
+                for startup in startups_to_validate_website:
+                    self.validate_company_status(startup)
 
         self.db.save_db()
                 
@@ -137,6 +145,16 @@ class JobValidator:
             startup["website"] = healed_url
         else:
             startup["is_active_website"] = True
+
+        # Metadata Auto-cleaning
+        if not startup.get("is_active_website", True):
+            startup["logo_svg_url"] = ""
+            startup["verified_email"] = ""
+        else:
+            logo_svg_url = startup.get("logo_svg_url")
+            if logo_svg_url:
+                if not validate_logo_image(logo_svg_url):
+                    startup["logo_svg_url"] = ""
 
     def _check_job_active(self, url):
         is_active, reason = check_job_active(url)

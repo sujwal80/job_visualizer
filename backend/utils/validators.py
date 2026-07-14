@@ -20,7 +20,7 @@ REQUIRED_FIELDS = {
 
 def _sanitize_string(val):
     """
-    Sanitize raw text strings by stripping HTML tags, brackets, and null bytes.
+    Sanitize raw text strings by stripping HTML tags recursively, brackets, and null bytes.
 
     Args:
         val: The input value to sanitize (typically a string, int, or None).
@@ -32,11 +32,13 @@ def _sanitize_string(val):
         return ""
     if not isinstance(val, str):
         return val
-    # Strip HTML tags using regex pattern matching anything enclosed in angle brackets
-    cleaned = re.sub(r'<[^>]*>', '', val)
+    prev = ""
+    while prev != val:
+        prev = val
+        val = re.sub(r'<[^<>]*>', '', val)
     # Remove leftover brackets and null bytes that could be used in bypass attacks
-    cleaned = cleaned.replace('<', '').replace('>', '').replace('\x00', '')
-    return cleaned.strip()
+    val = val.replace('<', '').replace('>', '').replace('\x00', '')
+    return val.strip()
 
 def _safe_float(val, default=None):
     """

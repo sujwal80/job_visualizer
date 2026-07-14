@@ -315,6 +315,160 @@ def test_candidate_validation_features():
     assert s2["verified_email"] == "", f"Expected empty verified email for invalid syntax, got {s2['verified_email']}"
     print(" [PASS] Candidate validation features verified email syntax and website status cleanly.")
 
+def test_metadata_cleaning_on_dead_website():
+    print("\n=== TESTING METADATA AUTO-CLEANING ON DEAD WEBSITE ===")
+    db = DBManager("/tmp/test_metadata_cleaning.json")
+    validator = JobValidator(db)
+    
+    startup = {
+        "name": "DeadCorp",
+        "website": "https://deadcorp.com",
+        "logo_svg_url": "https://deadcorp.com/logo.svg",
+        "verified_email": "careers@deadcorp.com",
+        "hr_details": {"contact_email": "careers@deadcorp.com"}
+    }
+    
+    with patch("job_validator.validate_website_domain", return_value=(False, "https://deadcorp.com", "DNS failed")):
+        validator.validate_company_status(startup)
+        
+    assert startup["is_active_website"] is False
+    assert startup["logo_svg_url"] == ""
+    assert startup["verified_email"] == ""
+    print(" [PASS] Metadata auto-cleaning on dead website cleared logo_svg_url and verified_email.")
+
+def test_logo_validation_for_active_website():
+    print("\n=== TESTING LOGO IMAGE VALIDATION FOR ACTIVE WEBSITE ===")
+    db = DBManager("/tmp/test_logo_val.json")
+    validator = JobValidator(db)
+    
+    # Case A: validate_logo_image returns False -> clear logo_svg_url
+    startup_a = {
+        "name": "ActiveCorpA",
+        "website": "https://activecorp.com",
+        "logo_svg_url": "https://activecorp.com/bad_logo.svg",
+        "is_active_website": True
+    }
+    
+    with patch("job_validator.validate_website_domain", return_value=(True, "https://activecorp.com", None)), \
+         patch("job_validator.validate_logo_image", return_value=False):
+        validator.validate_company_status(startup_a)
+        
+    assert startup_a["is_active_website"] is True
+    assert startup_a["logo_svg_url"] == ""
+    
+    # Case B: validate_logo_image returns True -> keep logo_svg_url
+    startup_b = {
+        "name": "ActiveCorpB",
+        "website": "https://activecorp.com",
+        "logo_svg_url": "https://activecorp.com/good_logo.svg",
+        "is_active_website": True
+    }
+    
+    with patch("job_validator.validate_website_domain", return_value=(True, "https://activecorp.com", None)), \
+         patch("job_validator.validate_logo_image", return_value=True):
+        validator.validate_company_status(startup_b)
+        
+    assert startup_b["is_active_website"] is True
+    assert startup_b["logo_svg_url"] == "https://activecorp.com/good_logo.svg"
+    print(" [PASS] Logo image validation for active website correctly prunes or retains logo_svg_url.")
+
+def test_ingestion_gates():
+    print("\n=== TESTING INGESTION GATES (MILESTONE 3) ===")
+    from db_manager import DBManager
+    from discovery_service import CompanyDiscoveryService
+    
+    # 1. Case 1: Dead Website + No Active Jobs -> returns None, not merged
+    db = DBManager("/tmp/test_ingestion_gates.json")
+    db.startups = []
+    
+    company_details = {
+        "name": "DeadNoJobsCorp",
+        "website": "https://deadnojobs.com",
+        "logo_svg_url": "https://deadnojobs.com/logo.svg",
+        "logo_domain": "deadnojobs.com",
+        "verified_email": "hr@deadnojobs.com",
+        "is_active_website": False,
+        "hr_details": {"contact_email": "hr@deadnojobs.com"}
+    }
+    
+    jobs = [{"title": "Software Engineer", "url": "https://deadnojobs.com/jobs/1"}]
+    
+    with patch("db_manager.check_job_active", return_value=(False, "Closed")):
+        result = db.merge_startup(company_details, jobs)
+        assert result is None, f"Expected merge_startup to return None for dead website and no active jobs, got {result}"
+        assert len(db.startups) == 0, f"Expected 0 startups in DB, got {len(db.startups)}"
+    print(" [PASS] Case 1: Dead Website + No Active Jobs rejected successfully.")
+
+    # 2. Case 2: Dead Website + Active Jobs -> merged successfully, logo/email fields cleared, website marked inactive
+    db = DBManager("/tmp/test_ingestion_gates.json")
+    db.startups = []
+    
+    company_details = {
+        "name": "DeadWithJobsCorp",
+        "website": "https://deadwithjobs.com",
+        "logo_svg_url": "https://deadwithjobs.com/logo.svg",
+        "logo_domain": "deadwithjobs.com",
+        "verified_email": "hr@deadwithjobs.com",
+        "is_active_website": False,
+        "hr_details": {"contact_email": "hr@deadwithjobs.com"}
+    }
+    
+    jobs = [{"title": "Software Engineer", "url": "https://deadwithjobs.com/jobs/1"}]
+    
+    with patch.object(db, "geocode_address", return_value=(12.9, 77.6)), \
+         patch("db_manager.check_job_active", return_value=(True, "Active")):
+        result = db.merge_startup(company_details, jobs)
+        assert result is not None, "Expected merge_startup to return merged startup record"
+        assert result["is_active_website"] is False, "Expected website to remain inactive"
+        assert result["logo_svg_url"] == "", f"Expected logo_svg_url to be cleared, got {result['logo_svg_url']}"
+        assert result["logo_domain"] == "", f"Expected logo_domain to be cleared, got {result['logo_domain']}"
+        assert result["verified_email"] == "", f"Expected verified_email to be cleared, got {result['verified_email']}"
+        assert result["hr_details"]["contact_email"] == "", f"Expected contact_email to be cleared, got {result['hr_details']['contact_email']}"
+        assert len(db.startups) == 1, "Expected startup to be added to DB"
+    print(" [PASS] Case 2: Dead Website + Active Jobs merged & cleared successfully.")
+
+    # 3. Case 3: Active Website -> merged successfully with logo/email preserved
+    db = DBManager("/tmp/test_ingestion_gates.json")
+    db.startups = []
+    
+    company_details = {
+        "name": "ActiveCorp",
+        "website": "https://activecorp.com",
+        "logo_svg_url": "https://activecorp.com/logo.svg",
+        "logo_domain": "activecorp.com",
+        "verified_email": "hr@activecorp.com",
+        "is_active_website": True,
+        "hr_details": {"contact_email": "hr@activecorp.com"}
+    }
+    
+    jobs = [{"title": "Software Engineer", "url": "https://activecorp.com/jobs/1"}]
+    
+    with patch.object(db, "geocode_address", return_value=(12.9, 77.6)), \
+         patch("db_manager.check_job_active", return_value=(True, "Active")):
+        result = db.merge_startup(company_details, jobs)
+        assert result is not None, "Expected merge_startup to return merged startup record"
+        assert result["is_active_website"] is True
+        assert result["logo_domain"] == "activecorp.com", f"Expected logo_domain to be preserved, got {result['logo_domain']}"
+        assert result["verified_email"] == "hr@activecorp.com", f"Expected verified_email to be preserved, got {result['verified_email']}"
+        assert len(db.startups) == 1, "Expected startup to be added to DB"
+    print(" [PASS] Case 3: Active Website merged and preserved successfully.")
+
+    # 4. Case 4: Discovery service integration -> does not save DB or increment count when merge_startup returns None
+    db = DBManager("/tmp/test_ingestion_gates.json")
+    db.startups = []
+    
+    mock_scraper = MagicMock()
+    mock_scraper.get_jobs.return_value = [{"company_name": "DeadNoJobsCorp", "title": "Eng", "url": "https://deadnojobs.com/job"}]
+    mock_validator = MagicMock()
+    
+    service = CompanyDiscoveryService(db, mock_scraper, validator=mock_validator)
+    
+    with patch.object(db, "merge_startup", return_value=None), \
+         patch.object(db, "save_db") as mock_save:
+        service.discover_new_companies(keywords_list=["TestKW"], max_new_companies=1, target_city="Bengaluru")
+        assert mock_save.call_count == 0, "Expected db.save_db to NOT be called when merge_startup returns None"
+    print(" [PASS] Case 4: Discovery Service Integration verified successfully.")
+
 if __name__ == "__main__":
     test_short_circuiting()
     test_sanitization()
@@ -332,4 +486,7 @@ if __name__ == "__main__":
     test_deep_apply_ability_validation()
     test_inline_job_metadata_extraction()
     test_candidate_validation_features()
+    test_metadata_cleaning_on_dead_website()
+    test_logo_validation_for_active_website()
+    test_ingestion_gates()
     print("\nALL VERIFICATION TESTS PASSED SUCCESSFULLY!")

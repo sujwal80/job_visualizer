@@ -227,6 +227,31 @@ class TestLogoEnricher(unittest.TestCase):
         self.assertEqual(company["logo_svg_url"], "https://www.google.com/s2/favicons?domain=testcorp.com&sz=128")
         self.assertEqual(mock_get.call_count, 4)
 
+    def test_enrich_skips_when_is_active_website_is_false(self):
+        company = {
+            "name": "DeadCorp",
+            "website": "https://deadcorp.com",
+            "logo_svg_url": "https://deadcorp.com/logo.svg",
+            "is_active_website": False
+        }
+        
+        # Do not mock requests.get; if it triggers a network request, it will raise an error.
+        res = self.logo_enricher.enrich(company)
+        
+        self.assertTrue(res)
+        self.assertEqual(company["logo_svg_url"], "")
+        
+        # Verify that it returns False if it was already empty
+        company_cleared = {
+            "name": "DeadCorp",
+            "website": "https://deadcorp.com",
+            "logo_svg_url": "",
+            "is_active_website": False
+        }
+        res_cleared = self.logo_enricher.enrich(company_cleared)
+        self.assertFalse(res_cleared)
+        self.assertEqual(company_cleared["logo_svg_url"], "")
+
 
 class TestBackendStartupLogoUrl(unittest.TestCase):
     def test_format_startup_summary_uses_svg(self):

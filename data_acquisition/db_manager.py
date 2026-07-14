@@ -14,10 +14,10 @@ except ImportError:
     HAS_FCNTL = False
 
 try:
-    from utils.validation import validate_website_domain, check_job_active
+    from utils.validation import validate_website_domain, check_job_active, validate_logo_image
 except ImportError:
     try:
-        from data_acquisition.utils.validation import validate_website_domain, check_job_active
+        from data_acquisition.utils.validation import validate_website_domain, check_job_active, validate_logo_image
     except ImportError:
         pass
 
@@ -88,11 +88,12 @@ class DBManager:
     def load_db(self):
         with self.file_lock(self.db_path):
             if os.path.exists(self.db_path):
-                with open(self.db_path, 'r') as f:
-                    try:
+                try:
+                    with open(self.db_path, 'r') as f:
                         self.startups = json.load(f)
-                    except json.JSONDecodeError:
-                        self.startups = []
+                except (json.JSONDecodeError, OSError) as e:
+                    # Do not swallow/reset to empty list. Raise to halt execution and avoid destructive overwrite.
+                    raise e
             else:
                 self.startups = []
 
@@ -196,9 +197,21 @@ class DBManager:
     def _sanitize_string(self, text):
         if not isinstance(text, str):
             return text
-        # Strip dangerous tags and attributes to prevent XSS injection
-        cleaned = re.sub(r'<[^>]*>', '', text)
-        return cleaned.strip()
+        prev = ""
+        while prev != text:
+            prev = text
+            text = re.sub(r'<[^<>]*>', '', text)
+        text = text.replace('<', '').replace('>', '').replace('\x00', '')
+        return text.strip()
+
+    def _sanitize_value_recursive(self, val):
+        if isinstance(val, str):
+            return self._sanitize_string(val)
+        elif isinstance(val, dict):
+            return {k: self._sanitize_value_recursive(v) for k, v in val.items()}
+        elif isinstance(val, list):
+            return [self._sanitize_value_recursive(v) for v in val]
+        return val
 
     def merge_startup(self, company_details, jobs, target_city=None):
         """
@@ -210,6 +223,11 @@ class DBManager:
             return
         if not isinstance(jobs, list):
             jobs = []
+
+        # Recursively sanitize all input nested parameters to prevent injection
+        company_details = self._sanitize_value_recursive(company_details)
+        jobs = self._sanitize_value_recursive(jobs)
+
         name = self._sanitize_string(company_details.get("name", "N/A"))
         company_details["name"] = name
         if company_details.get("description"):
@@ -237,12 +255,63 @@ class DBManager:
 
         existing = self.find_startup(name, logo_domain, target_city=target_city)
         
+        is_active_website = company_details.get("is_active_website", True)
+        if not is_active_website:
+            has_active_job = False
+            for job in jobs:
+                if isinstance(job, dict):
+                    url = str(job.get("url") or job.get("job_url") or "").strip()
+                    if url:
+                        active, _ = check_job_active(url)
+                        if active:
+                            has_active_job = True
+                            break
+            if not has_active_job and existing:
+                for job in existing.get("job_openings", []):
+                    if isinstance(job, dict):
+                        url = str(job.get("url") or job.get("job_url") or "").strip()
+                        if url:
+                            active, _ = check_job_active(url)
+                            if active:
+                                has_active_job = True
+                                break
+            if not has_active_job:
+                print(f"[Ingestion Gate] Rejecting merge for '{name}' because website is dead and has no active jobs.")
+                return None
+            else:
+                print(f"[Ingestion Gate] Merging '{name}' with dead website because active jobs exist. Cleaning metadata.")
+                company_details["logo_svg_url"] = ""
+                company_details["logo_domain"] = ""
+                company_details["verified_email"] = ""
+                if "hr_details" in company_details and isinstance(company_details["hr_details"], dict):
+                    company_details["hr_details"]["contact_email"] = ""
+                
+                logo_domain = ""
+                
+                if existing:
+                    existing["logo_svg_url"] = ""
+                    existing["logo_domain"] = ""
+                    existing["verified_email"] = ""
+                    if "hr_details" in existing and isinstance(existing["hr_details"], dict):
+                        existing["hr_details"]["contact_email"] = ""
+        
         if existing:
             print(f"[DB Manager] Merging existing company: '{existing['name']}' (ID: {existing['id']})")
-            if not existing.get("website") and company_details.get("website"):
-                existing["website"] = company_details["website"]
-            if not existing.get("logo_domain") and company_details.get("logo_domain"):
-                existing["logo_domain"] = company_details["logo_domain"]
+            
+            # Website merge protection: only overwrite if candidate is active and non-empty
+            cand_web = company_details.get("website")
+            cand_active = company_details.get("is_active_website", False)
+            if cand_web and cand_web != "N/A" and cand_active:
+                existing["website"] = cand_web
+                if company_details.get("logo_domain"):
+                    existing["logo_domain"] = company_details["logo_domain"]
+
+            # Logo SVG URL merge protection: only overwrite if candidate is valid
+            cand_logo = company_details.get("logo_svg_url")
+            if cand_logo and cand_logo != "N/A":
+                if validate_logo_image(cand_logo):
+                    existing["logo_svg_url"] = cand_logo
+                    
             if not existing.get("description") and company_details.get("description"):
                 existing["description"] = company_details["description"]
             if (not existing.get("funding_stage") or existing.get("funding_stage") == "N/A") and company_details.get("funding_stage"):
@@ -251,8 +320,12 @@ class DBManager:
                 existing["total_raised"] = company_details["total_raised"]
             if company_details.get("is_active_website") is not None:
                 existing["is_active_website"] = company_details["is_active_website"]
-            if company_details.get("verified_email"):
-                existing["verified_email"] = company_details["verified_email"]
+                
+            # Verified email merge protection: only overwrite if candidate has valid email format
+            cand_email = company_details.get("verified_email")
+            if cand_email and cand_email != "N/A":
+                if '@' in cand_email and '.' in cand_email:
+                    existing["verified_email"] = cand_email
             
             if company_details.get("head_count", 0) > existing.get("head_count", 0):
                 existing["head_count"] = company_details["head_count"]
@@ -273,6 +346,7 @@ class DBManager:
                     existing["city"] = city_label
                 
             self._merge_job_openings(existing, jobs)
+            return existing
         else:
             new_id = self._generate_new_id()
             print(f"[DB Manager] Registering NEW company: '{name}' (ID: {new_id})")
@@ -296,6 +370,7 @@ class DBManager:
                 "description": company_details.get("description") or "",
                 "website": company_details.get("website") or "",
                 "logo_domain": logo_domain or "",
+                "logo_svg_url": company_details.get("logo_svg_url") or "",
                 "funding_stage": company_details.get("funding_stage") or "Seed / Active",
                 "total_raised": company_details.get("total_raised") or "Undisclosed",
                 "is_active_website": company_details.get("is_active_website", True),
@@ -312,6 +387,7 @@ class DBManager:
             # Append jobs
             self._merge_job_openings(new_startup, jobs)
             self.startups.append(new_startup)
+            return new_startup
             
     def geocode_address(self, address, company_name=None, target_city=None):
         """

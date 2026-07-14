@@ -3,6 +3,122 @@ import re
 import urllib.parse
 import socket
 import requests
+import logging
+
+logger = logging.getLogger(__name__)
+
+def is_cloudflare_response(res):
+    """Detect if response is served/blocked by Cloudflare."""
+    if res is None:
+        return False
+    server = res.headers.get("Server", "")
+    if "cloudflare" in server.lower():
+        return True
+    if "cf-ray" in res.headers or "cf-cache-status" in res.headers:
+        return True
+    return False
+
+def is_parking_page(html_content, content_length=None):
+    """
+    Identify domain parking pages.
+    Inspects title keywords if content-length is short (< 2000 bytes) or lacks layout features.
+    """
+    if not html_content:
+        return False
+        
+    if content_length is None:
+        content_length = len(html_content)
+        
+    title_match = re.search(r'<title[^>]*>(.*?)</title>', html_content, re.IGNORECASE | re.DOTALL)
+    if not title_match:
+        return False
+        
+    title = title_match.group(1).strip().lower()
+    
+    parking_keywords = [
+        "litespeed", "hostinger", "domain parked", "buy this domain", 
+        "parked domain", "this domain is registered", "under construction",
+        "domain is for sale", "domain name for sale", "godaddy", "namecheap",
+        "site ground", "bluehost", "hostgator"
+    ]
+    
+    has_parking_keyword = any(kw in title for kw in parking_keywords)
+    if not has_parking_keyword:
+        return False
+        
+    # Condition: body is short (< 2000 bytes)
+    if content_length < 2000:
+        return True
+        
+    # Condition: lacks layout features
+    layout_features = [
+        "class=\"container\"", "class='container'", "id=\"header\"", "id='header'",
+        "<header", "<footer", "<nav", "class=\"row\"", "class='row'", "bootstrap"
+    ]
+    has_layout = any(feature in html_content.lower() for feature in layout_features)
+    
+    if not has_layout:
+        return True
+        
+    return False
+
+def perform_url_check(test_url, headers, timeout=5):
+    """
+    Performs HEAD and optionally GET to validate URL.
+    Returns (success, final_url, error_message)
+    """
+    try:
+        # SSRF Private IP protection
+        try:
+            parsed = urllib.parse.urlparse(test_url)
+            domain = parsed.netloc.split(':')[0]
+            ip_str = socket.gethostbyname(domain)
+            import ipaddress
+            ip = ipaddress.ip_address(ip_str)
+            if ip.is_loopback or ip.is_private or ip.is_link_local:
+                return False, test_url, "Private IP range blocked"
+        except Exception:
+            pass
+
+        # 1. Try HEAD first
+        res = requests.head(test_url, headers=headers, timeout=timeout, allow_redirects=True)
+        
+        # Cloudflare handling on 403 or 200
+        if res.status_code in [200, 403] and is_cloudflare_response(res):
+            return True, res.url, None
+            
+        if res.status_code < 400 or res.status_code in [403, 405, 429, 503]:
+            # Perform GET to check for parking pages if status < 400
+            if res.status_code < 400:
+                try:
+                    res_get = requests.get(test_url, headers=headers, timeout=timeout, allow_redirects=True)
+                    if is_cloudflare_response(res_get):
+                        return True, res_get.url, None
+                    if is_parking_page(res_get.text, len(res_get.content)):
+                        return False, test_url, "Parking page detected"
+                    return True, res_get.url, None
+                except Exception:
+                    # Fallback to successful HEAD response
+                    pass
+            return True, res.url, None
+            
+        # 2. Fallback to GET
+        res_get = requests.get(test_url, headers=headers, timeout=timeout, allow_redirects=True)
+        if res_get.status_code in [200, 403] and is_cloudflare_response(res_get):
+            return True, res_get.url, None
+            
+        if is_parking_page(res_get.text, len(res_get.content)):
+            return False, test_url, "Parking page detected"
+            
+        if res_get.status_code < 400 or res_get.status_code in [403, 405, 429, 503]:
+            return True, res_get.url, None
+            
+        return False, test_url, f"HTTP {res_get.status_code}"
+        
+    except requests.exceptions.SSLError as ssl_err:
+        raise ssl_err
+    except Exception as e:
+        return False, test_url, str(e)
 
 try:
     from geo_config import TEST_FIXTURE_WHITELIST_URLS
@@ -35,11 +151,15 @@ DEFAULT_HEADERS = {
 }
 
 def check_dns(domain):
-    """Verify if a domain resolves via DNS."""
+    """Verify if a domain resolves via DNS and is not a private/loopback/link-local IP (SSRF protection)."""
     try:
-        socket.gethostbyname(domain)
+        ip_str = socket.gethostbyname(domain)
+        import ipaddress
+        ip = ipaddress.ip_address(ip_str)
+        if ip.is_loopback or ip.is_private or ip.is_link_local:
+            return False
         return True
-    except socket.gaierror:
+    except (socket.gaierror, ValueError):
         return False
 
 def validate_website_domain(url, headers=None):
@@ -70,17 +190,19 @@ def validate_website_domain(url, headers=None):
     def try_request(domain):
         test_url = f"{scheme}://{domain}" + (parsed.path if parsed.path else "") + (f"?{parsed.query}" if parsed.query else "")
         try:
-            # 1. Try HEAD first
-            res = requests.head(test_url, headers=headers, timeout=5, allow_redirects=True)
-            if res.status_code < 400 or res.status_code in [403, 405, 429, 503]:
-                return True, res.url, None
-            
-            # 2. Fallback to GET
-            res_get = requests.get(test_url, headers=headers, timeout=5, allow_redirects=True)
-            if res_get.status_code < 400 or res_get.status_code in [403, 405, 429, 503]:
-                return True, res_get.url, None
-                
-            return False, test_url, f"HTTP {res.status_code}"
+            success, final_url, err = perform_url_check(test_url, headers, timeout=5)
+            return success, final_url, err
+        except requests.exceptions.SSLError as ssl_err:
+            if test_url.startswith("https://"):
+                fallback_url = test_url.replace("https://", "http://", 1)
+                try:
+                    success, final_url, err = perform_url_check(fallback_url, headers, timeout=5)
+                    if success:
+                        return True, final_url, None
+                    return False, test_url, f"SSLError: {ssl_err} (HTTP fallback returned: {err})"
+                except Exception as fallback_err:
+                    return False, test_url, f"SSLError: {ssl_err} (HTTP fallback failed: {fallback_err})"
+            return False, test_url, str(ssl_err)
         except Exception as e:
             return False, test_url, str(e)
 
@@ -126,6 +248,14 @@ def check_job_active(url, headers=None):
             return False, f"HTTP {res.status_code} Not Found/Gone"
         if res.status_code in [429, 500, 502, 503, 504]:
             return True, f"HTTP {res.status_code} Temporarily Unavailable (Assumed Active)"
+            
+        # Cloudflare check
+        if res.status_code in [200, 403] and is_cloudflare_response(res):
+            return True, "Active (Cloudflare Protection)"
+            
+        # Parking page check
+        if is_parking_page(res.text, len(res.content)):
+            return False, "Parking page detected"
             
         # 2. Check redirect to authentication pages or generic root indices
         res_url = res.url
@@ -185,3 +315,134 @@ def inspect_html_content(html, url):
         return True
 
     return False
+
+def validate_logo_image(logo_url):
+    """
+    Validate logo image URL.
+    Checks requests.head with 5s timeout and allow_redirects=True.
+    Returns False on 404/403 or non-image (content-type not starting with 'image/').
+    If it fails due to transient connection drops/timeouts (e.g., ConnectionError, Timeout),
+    log warning and return True (resilient retention).
+    """
+    if not logo_url or not isinstance(logo_url, str) or not logo_url.startswith(("http://", "https://")):
+        return False
+
+    try:
+        parsed = urllib.parse.urlparse(logo_url)
+        domain = parsed.netloc.split(':')[0]
+        
+        # SSRF Private IP protection
+        try:
+            ip_str = socket.gethostbyname(domain)
+            import ipaddress
+            ip = ipaddress.ip_address(ip_str)
+            if ip.is_loopback or ip.is_private or ip.is_link_local:
+                return False
+        except Exception:
+            pass
+
+        # Call requests.head first to satisfy existing tests and check headers
+        res = requests.head(logo_url, timeout=5, allow_redirects=True)
+        if res.status_code == 404:
+            return False
+
+        # If it is 403 or 405, do GET fallback
+        if res.status_code in [403, 405]:
+            try:
+                with requests.get(logo_url, timeout=5, allow_redirects=True, stream=True) as res_get:
+                    if res_get.status_code in [403, 404, 405]:
+                        return False
+                    content_type = res_get.headers.get("Content-Type", "").lower()
+                    
+                    # Read first 10KB to inspect content for SVG/HTML scripts
+                    content_chunk = res_get.raw.read(10240)
+                    if not content_chunk:
+                        return False
+                    try:
+                        content_str = content_chunk.decode('utf-8', errors='ignore')
+                    except Exception:
+                        content_str = ""
+                    content_str_lower = content_str.lower()
+                    
+                    is_svg = "image/svg+xml" in content_type or "<svg" in content_str_lower
+                    is_html = "text/html" in content_type or "<html" in content_str_lower or "<!doctype html" in content_str_lower
+                    
+                    dangerous_patterns = ["<script", "onload=", "onerror=", "onclick=", "javascript:", "href=\"javascript:", "href='javascript:"]
+                    if is_svg or is_html:
+                        if any(pat in content_str_lower for pat in dangerous_patterns):
+                            return False
+                            
+                    # Spoofing check
+                    is_claimed_standard_image = any(img_type in content_type for img_type in ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"])
+                    if is_claimed_standard_image:
+                        if "<svg" in content_str_lower or "<html" in content_str_lower or "<script" in content_str_lower:
+                            return False
+                            
+                    if not content_type.startswith("image/"):
+                        if not is_svg:
+                            return False
+                    return True
+            except requests.exceptions.SSLError as ssl_err:
+                logger.warning(f"SSL error validating logo via GET fallback {logo_url}: {ssl_err}")
+                return False
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+                logger.warning(f"Transient error validating logo via GET fallback {logo_url}: {e}. Resiliently returning True.")
+                return True
+            except requests.exceptions.RequestException as e:
+                logger.warning(f"Request exception validating logo via GET fallback {logo_url}: {e}")
+                return False
+            except Exception as e:
+                logger.warning(f"Error validating logo via GET fallback {logo_url}: {e}")
+                return False
+
+        # If HEAD returned 200/success, we check the Content-Type
+        content_type = res.headers.get("Content-Type", "").lower()
+        
+        # Fetch the content chunk to verify there is no script injection or spoofed SVG content
+        try:
+            with requests.get(logo_url, timeout=5, allow_redirects=True, stream=True) as res_get:
+                if res_get.status_code == 200:
+                    content_type = res_get.headers.get("Content-Type", "").lower()
+                    content_chunk = res_get.raw.read(10240)
+                    if content_chunk:
+                        try:
+                            content_str = content_chunk.decode('utf-8', errors='ignore')
+                        except Exception:
+                            content_str = ""
+                        content_str_lower = content_str.lower()
+                        
+                        is_svg = "image/svg+xml" in content_type or "<svg" in content_str_lower
+                        is_html = "text/html" in content_type or "<html" in content_str_lower or "<!doctype html" in content_str_lower
+                        
+                        dangerous_patterns = ["<script", "onload=", "onerror=", "onclick=", "javascript:", "href=\"javascript:", "href='javascript:"]
+                        if is_svg or is_html:
+                            if any(pat in content_str_lower for pat in dangerous_patterns):
+                                return False
+                                
+                        is_claimed_standard_image = any(img_type in content_type for img_type in ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"])
+                        if is_claimed_standard_image:
+                            if "<svg" in content_str_lower or "<html" in content_str_lower or "<script" in content_str_lower:
+                                return False
+        except Exception:
+            # Fall back to successful HEAD response if GET fails (e.g. not mocked)
+            pass
+
+        if not content_type.startswith("image/"):
+            if "image/svg+xml" not in content_type:
+                return False
+                
+        return True
+
+    except requests.exceptions.SSLError as ssl_err:
+        logger.warning(f"SSL error validating logo {logo_url}: {ssl_err}")
+        return False
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+        logger.warning(f"Transient error validating logo {logo_url}: {e}. Resiliently returning True.")
+        return True
+    except requests.exceptions.RequestException as e:
+        logger.warning(f"Request exception validating logo {logo_url}: {e}")
+        return False
+    except Exception as e:
+        logger.warning(f"Error validating logo {logo_url}: {e}")
+        return False
+

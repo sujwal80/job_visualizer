@@ -24,7 +24,7 @@ def mock_gethostbyname(domain):
     if domain_lower == "www.rupeek.com":
         raise socket.gaierror("Mocked DNS resolution failure")
     stripped = domain_lower[4:] if domain_lower.startswith("www.") else domain_lower
-    if stripped in ["kora.ai", "indirapay.in", "nammacart.co.in"]:
+    if stripped in ["kora.ai", "indirapay.in", "nammacart.co.in", "abinbev-india.com"]:
         raise socket.gaierror("Mocked DNS resolution failure")
     return "1.2.3.4"
 
@@ -35,6 +35,19 @@ class MockResponse:
         self.url = url
         self.status_code = status_code
         self.text = text
+        parsed_url = urllib.parse.urlparse(url)
+        path = parsed_url.path.lower()
+        url_lower = url.lower()
+        is_image = (
+            "unavatar.io" in url_lower or
+            "favicons" in url_lower or
+            any(path.endswith(ext) for ext in [".png", ".jpg", ".jpeg", ".svg", ".gif"])
+        )
+        if is_image:
+            self.headers = {"Server": "gunicorn", "Content-Type": "image/png"}
+        else:
+            self.headers = {"Server": "gunicorn", "Content-Type": "text/html; charset=utf-8"}
+        self.content = text.encode("utf-8")
 
 def mock_requests_head(url, *args, **kwargs):
     parsed = urllib.parse.urlparse(url)
@@ -42,7 +55,7 @@ def mock_requests_head(url, *args, **kwargs):
     if domain == "www.rupeek.com":
         raise requests.exceptions.ConnectionError("Mocked Connection Error")
     stripped = domain[4:] if domain.startswith("www.") else domain
-    if stripped in ["kora.ai", "indirapay.in", "nammacart.co.in"]:
+    if stripped in ["kora.ai", "indirapay.in", "nammacart.co.in", "abinbev-india.com"]:
         raise requests.exceptions.ConnectionError("Mocked Connection Error")
     
     if stripped == "rupeek.com":
@@ -55,7 +68,7 @@ def mock_requests_get(url, *args, **kwargs):
     if domain == "www.rupeek.com":
         raise requests.exceptions.ConnectionError("Mocked Connection Error")
     stripped = domain[4:] if domain.startswith("www.") else domain
-    if stripped in ["kora.ai", "indirapay.in", "nammacart.co.in"]:
+    if stripped in ["kora.ai", "indirapay.in", "nammacart.co.in", "abinbev-india.com"]:
         raise requests.exceptions.ConnectionError("Mocked Connection Error")
     
     if stripped == "rupeek.com":

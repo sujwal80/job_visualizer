@@ -32,18 +32,30 @@ def main():
     parser.add_argument("--db-path", default="backend/startups.json", help="Path to startup database JSON")
     parser.add_argument("--max-startups", type=int, default=None, help="Maximum number of startups to validate")
     parser.add_argument("--mock", action="store_true", help="Enable mock/fast validation mode")
+    parser.add_argument("--live-sweep", action="store_true", help="Bypass mock validation and run a live sweep")
+    parser.add_argument("--concurrency", type=int, default=None, help="Set concurrency thread count override")
     args = parser.parse_args()
 
-    if args.mock:
+    if args.mock or not args.live_sweep:
         os.environ["MOCK_SCRAPER_FALLBACK"] = "true"
+    else:
+        os.environ["MOCK_SCRAPER_FALLBACK"] = "false"
+
+    if args.concurrency is not None:
+        concurrency = args.concurrency
+    elif args.live_sweep:
+        concurrency = 15
+    else:
+        concurrency = 1
 
     db_path = args.db_path
     if not os.path.isabs(db_path):
         db_path = os.path.join(PROJECT_ROOT, db_path)
 
     print(f"[Run Validator] Loading database from: {db_path}")
+    print(f"[Run Validator] Concurrency: {concurrency} | Live Sweep: {args.live_sweep} | Mock Scraper Fallback: {os.environ.get('MOCK_SCRAPER_FALLBACK')}")
     db = DBManager(db_path=db_path)
-    validator = JobValidator(db)
+    validator = JobValidator(db, concurrency=concurrency)
 
     total_before_jobs = sum(len(s.get("job_openings", [])) for s in db.startups if isinstance(s, dict))
     print(f"[Run Validator] Total Startups: {len(db.startups)} | Total Job Openings Before: {total_before_jobs}")

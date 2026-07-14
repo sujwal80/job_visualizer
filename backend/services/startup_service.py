@@ -22,8 +22,7 @@ def load_startups():
     """
     Load startup records from the JSON filesystem database with mtime-based in-memory caching.
 
-    Enforces data sanitization across all startup fields (names, descriptions, websites, founders, and jobs)
-    when data is first loaded into memory from disk.
+    Uses shared read flock to prevent reading partially written or truncated files.
 
     Returns:
         list: A list of sanitized startup dictionary objects.
@@ -36,8 +35,28 @@ def load_startups():
         # Return cached dataset if file modification timestamp hasn't changed
         if _cache_data is not None and current_mtime == _cache_mtime:
             return _cache_data
+            
+        try:
+            import fcntl
+            HAS_FCNTL = True
+        except ImportError:
+            HAS_FCNTL = False
+
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+            if HAS_FCNTL:
+                try:
+                    fcntl.flock(f, fcntl.LOCK_SH)
+                except Exception:
+                    pass
+            try:
+                data = json.load(f)
+            finally:
+                if HAS_FCNTL:
+                    try:
+                        fcntl.flock(f, fcntl.LOCK_UN)
+                    except Exception:
+                        pass
+
             if not isinstance(data, list):
                 data = []
             for s in data:

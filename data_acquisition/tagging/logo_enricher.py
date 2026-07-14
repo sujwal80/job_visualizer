@@ -23,6 +23,13 @@ class LogoEnricher:
         if not isinstance(company_record, dict):
             return False
             
+        # Short-circuit and clear fields if website is dead
+        if company_record.get("is_active_website") is False:
+            if company_record.get("logo_svg_url") != "":
+                company_record["logo_svg_url"] = ""
+                return True
+            return False
+            
         name = str(company_record.get("name") or "").strip()
         website = str(company_record.get("website") or "").strip()
         if (not name or name == "N/A") and not website:
