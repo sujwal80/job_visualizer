@@ -136,7 +136,7 @@ class TestClientSideApiCachingMasterSuite(unittest.TestCase):
         self.assertIsInstance(data, list)
         self.assertGreater(len(data), 0, "has_jobs=true should return active hiring companies")
 
-        expected_9_fields = {"id", "name", "lat", "lng", "city", "logo_url", "industry", "job_count", "has_pin"}
+        expected_9_fields = {"id", "name", "lat", "lng", "city", "logo_url", "industry", "job_count", "has_pin", "head_count", "funding_stage", "verified_email", "founder_names"}
 
         for startup in data:
             # Strictly filter out 0-job companies
@@ -147,7 +147,7 @@ class TestClientSideApiCachingMasterSuite(unittest.TestCase):
             # Exactly 9 lightweight summary fields
             self.assertEqual(
                 set(startup.keys()), expected_9_fields,
-                f"Startup summary keys {set(startup.keys())} do not match expected 9-field schema"
+                f"Startup summary keys {set(startup.keys())} do not match expected 13-field schema"
             )
 
         # 2. No limit truncation check

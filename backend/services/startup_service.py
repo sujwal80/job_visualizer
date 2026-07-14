@@ -248,8 +248,8 @@ def format_startup_summary(s):
     return {
         "id": s.get("id"),
         "name": _sanitize_string(s.get("name")),
-        "lat": lat_val if (has_pin_val and lat_val is not None) else DEFAULT_MAP_CENTER_LAT,
-        "lng": lng_val if (has_pin_val and lng_val is not None) else DEFAULT_MAP_CENTER_LNG,
+        "lat": lat_val if lat_val is not None else DEFAULT_MAP_CENTER_LAT,
+        "lng": lng_val if lng_val is not None else DEFAULT_MAP_CENTER_LNG,
         "city": _sanitize_string(s.get("city")),
         "experience": experiences,
         "salary": salaries,
@@ -366,13 +366,17 @@ def format_lightweight_summary(s):
     return {
         "id": s.get("id"),
         "name": _sanitize_string(s.get("name")),
-        "lat": lat_val if (has_pin_val and lat_val is not None) else DEFAULT_MAP_CENTER_LAT,
-        "lng": lng_val if (has_pin_val and lng_val is not None) else DEFAULT_MAP_CENTER_LNG,
+        "lat": lat_val if lat_val is not None else DEFAULT_MAP_CENTER_LAT,
+        "lng": lng_val if lng_val is not None else DEFAULT_MAP_CENTER_LNG,
         "city": _sanitize_string(s.get("city")),
         "logo_url": logo_url,
         "industry": _sanitize_string(s.get("industry")),
         "job_count": job_count,
-        "has_pin": has_pin_val
+        "has_pin": has_pin_val,
+        "head_count": s.get("head_count"),
+        "funding_stage": _sanitize_string(s.get("funding_stage", "Seed / Active")),
+        "verified_email": _sanitize_string(s.get("verified_email")),
+        "founder_names": [_sanitize_string(f.get("name", "")) for f in (s.get("founders") or []) if isinstance(f, dict)]
     }
 
 def get_data_version():

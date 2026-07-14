@@ -28,10 +28,10 @@ class TestMilestone2Backend(unittest.TestCase):
         self.assertIsInstance(data, list)
         self.assertGreater(len(data), 0, "Should return active hiring startups when has_jobs=true")
 
-        expected_keys = {"id", "name", "lat", "lng", "city", "logo_url", "industry", "job_count", "has_pin"}
+        expected_keys = {"id", "name", "lat", "lng", "city", "logo_url", "industry", "job_count", "has_pin", "head_count", "funding_stage", "verified_email", "founder_names"}
         for s in data:
             self.assertGreater(s["job_count"], 0, f"Startup {s.get('name')} should have job_count > 0")
-            self.assertEqual(set(s.keys()), expected_keys, f"Expected 9 lightweight keys, got {set(s.keys())}")
+            self.assertEqual(set(s.keys()), expected_keys, f"Expected 13 lightweight keys, got {set(s.keys())}")
 
     def test_02_has_jobs_true_ignores_limit_truncation(self):
         """

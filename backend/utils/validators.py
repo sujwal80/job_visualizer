@@ -15,7 +15,8 @@ except ImportError:
 # Essential fields that must never be stripped from startup payload objects during serialization.
 REQUIRED_FIELDS = {
     'id', 'name', 'lat', 'lng', 'city', 'experience', 
-    'salary', 'job_type', 'skills', 'logo_url', 'url', 'description'
+    'salary', 'job_type', 'skills', 'logo_url', 'url', 'description',
+    'head_count', 'funding_stage', 'verified_email', 'founder_names'
 }
 
 def _sanitize_string(val):
