@@ -40,7 +40,8 @@ def main():
         ("13. Industry Classification Verification", os.path.join(tests_dir, "test_industry_classification.py")),
         ("14. Remote Office Location Verification", os.path.join(tests_dir, "test_remote_office_location.py")),
         ("15. Data Acquisition Pipeline Verification", os.path.join(tests_dir, "test_data_acquisition_pipeline.py")),
-        ("16. India Remediation Verification", os.path.join(tests_dir, "test_india_remediation.py"))
+        ("16. India Remediation Verification", os.path.join(tests_dir, "test_india_remediation.py")),
+        ("17. Database State Tracking & Logo Extraction Unit Tests", os.path.join(tests_dir, "test_database_state_tracking.py"))
     ]
     
     print("\n⚡ WORLDTECH MAP // FULL-STACK MASTER TEST RUNNER ⚡")

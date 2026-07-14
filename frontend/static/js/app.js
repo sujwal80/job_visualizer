@@ -43,19 +43,8 @@ let currentSelectedIndustry = "";
 const urlParams = new URLSearchParams(window.location.search);
 state.searchedCity = (urlParams.get('city') || '').toLowerCase();
 
-const usaTerms = ["san", "francisco", "sf", "ca", "usa", "us", "united states", "america", "california"];
-const ukTerms = ["london", "uk", "england", "united kingdom", "gb", "great britain"];
-
 let isHub = false;
-if (usaTerms.some(term => state.searchedCity.includes(term))) {
-    state.defaultLocation = [-122.4194, 37.7749];
-    state.defaultZoom = 12;
-    isHub = true;
-} else if (ukTerms.some(term => state.searchedCity.includes(term))) {
-    state.defaultLocation = [-0.1276, 51.5072];
-    state.defaultZoom = 12;
-    isHub = true;
-} else if (state.searchedCity.includes('bengaluru') || state.searchedCity.includes('bangalore') || state.searchedCity.includes('india') || state.searchedCity === 'in' || state.searchedCity === 'blr') {
+if (state.searchedCity.includes('bengaluru') || state.searchedCity.includes('bangalore') || state.searchedCity.includes('india') || state.searchedCity === 'in' || state.searchedCity === 'blr') {
     state.defaultLocation = [77.5946, 12.9716];
     state.defaultZoom = 11;
     isHub = true;
@@ -86,7 +75,7 @@ if (isHub || !state.searchedCity) {
             essential: true
         });
     } else {
-        const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(state.searchedCity)}&format=json&limit=1`;
+        const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(state.searchedCity)}&countrycodes=in&format=json&limit=1`;
         fetch(geoUrl, {
             headers: {
                 'Accept': 'application/json',

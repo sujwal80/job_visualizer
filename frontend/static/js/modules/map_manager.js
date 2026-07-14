@@ -19,14 +19,20 @@ export const defaultColor = "#2563eb";
 
 const coordinatesRegistry = {};
 
-// Initialize MapLibre Map
+const INDIA_BOUNDS = [
+    [67.0, 5.0],  // Southwest coordinates
+    [99.0, 37.0]  // Northeast coordinates
+];
+
+// Initialize MapLibre Map centered on India
 export const map = new maplibregl.Map({
     container: 'map',
     style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-    center: [0, 20],
-    zoom: 2,
-    minZoom: 1,
+    center: [78.9629, 22.5937],
+    zoom: 4.5,
+    minZoom: 4,
     maxZoom: 18,
+    maxBounds: INDIA_BOUNDS,
     dragRotate: false,
     touchZoomRotate: false
 });

@@ -54,7 +54,7 @@
     "logo_svg_url": "",
     "tagging_status": "completed",
     "classification_status": "completed",
-    "last_crawled": null
+    "last_crawled": "2026-07-14T22:05:47.433322"
   },
   {
     "id": 2,
@@ -39278,5 +39278,48 @@
     "tagging_status": "completed",
     "classification_status": "completed",
     "last_crawled": null
+  },
+  {
+    "id": 322,
+    "name": "Signeasy",
+    "lat": 12.9357366,
+    "lng": 77.624081,
+    "city": "2nd Floor, Bengaluru",
+    "industry": "Fintech",
+    "description": "Signeasy | 124,155 followers on LinkedIn. Sign effortlessly, manage contracts intelligently. | Signeasy is an intelligent contract management platform for every team that works with contracts. 48,000+ businesses across across 100+ countries run their contract operations on Signeasy. Finance, HR, Operations, IT, Legal Ops, Sales, and Supply chain teams use Signeasy to keep contracts moving, without the overhead of an enterprise CLM. \n\nWith eSignatures, a contract repository, AI-powered contract insights, renewal reminders, downloadable reports, and powerful search that lets you find any key term hidden in your contracts \u2014 your team has everything they need to manage contracts end to end.",
+    "website": "https://signeasy.com",
+    "logo_domain": "signeasy.com",
+    "logo_svg_url": "https://unavatar.io/signeasy.com",
+    "funding_stage": "Seed / Active",
+    "total_raised": "Undisclosed",
+    "is_active_website": true,
+    "verified_email": "",
+    "head_count": 125,
+    "founders": [],
+    "hr_details": {
+      "contact_email": "",
+      "benefits": ""
+    },
+    "tagging_status": "completed",
+    "classification_status": "completed",
+    "last_crawled": null,
+    "job_openings": [
+      {
+        "title": "Founding BDR",
+        "department": "Sales",
+        "location": "Bengaluru, Karnataka, India",
+        "source": "LinkedIn",
+        "url": "https://in.linkedin.com/jobs/view/founding-bdr-at-signeasy-4433082950?position=5&pageNum=0&refId=Cllzr9X8rSSyDkk6VC0gLA%3D%3D&trackingId=FMWLrLqQljA%2FQLa1MsZ8Pw%3D%3D",
+        "job_url": "https://in.linkedin.com/jobs/view/founding-bdr-at-signeasy-4433082950?position=5&pageNum=0&refId=Cllzr9X8rSSyDkk6VC0gLA%3D%3D&trackingId=FMWLrLqQljA%2FQLa1MsZ8Pw%3D%3D",
+        "experience": "Not specified",
+        "salary": "Not specified",
+        "job_type": "Not Specified",
+        "skills": [],
+        "posted_date": "2 weeks ago"
+      }
+    ],
+    "is_remote_office": false,
+    "remote_office_distance_km": 5.11,
+    "location_tagged": true
   }
 ]
