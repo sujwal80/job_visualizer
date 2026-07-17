@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import os
-import sys
 import time
 
 from data_acquisition.pipelines.crawling.crawl_queue import CrawlQueue

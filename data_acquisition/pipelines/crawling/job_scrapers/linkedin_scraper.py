@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 import re
 import urllib.parse
 import time
-import random
 from data_acquisition.pipelines.crawling.job_scrapers.job_metadata_extractor import extract_job_metadata
 from data_acquisition.geo_config import DEFAULT_TARGET_CITY, match_target_city, get_mock_jobs
 from data_acquisition.pipelines.crawling.job_scrapers.scraper_base import ScraperBase

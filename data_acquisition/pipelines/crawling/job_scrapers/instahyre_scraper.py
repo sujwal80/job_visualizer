@@ -1,7 +1,6 @@
 import os
 import requests
 import time
-import random
 import re
 import urllib.parse
 from data_acquisition.pipelines.crawling.job_scrapers.job_metadata_extractor import extract_job_metadata

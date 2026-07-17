@@ -22,7 +22,8 @@ import {
 } from './modules/ui_manager.js';
 import {
     handleHashRouting,
-    updateSearchCity
+    updateSearchCity,
+    executeUnifiedSearch
 } from './modules/router.js';
 
 // DOM Elements
@@ -30,7 +31,7 @@ const directoryList = document.getElementById('directory-list');
 const detailsDrawer = document.getElementById('details-drawer');
 const drawerContent = document.getElementById('drawer-content');
 const closeDrawerBtn = document.getElementById('close-drawer-btn');
-const searchInput = document.getElementById('search-input');
+const searchInput = document.getElementById('unified-search-input');
 
 const quickTabs = document.querySelectorAll('#quick-industry-tabs .tab-btn');
 const mobileToggleBtn = document.getElementById('mobile-toggle-btn');
@@ -42,6 +43,7 @@ let currentSelectedIndustry = "";
 // Initialize geocode/hub routing on load
 const urlParams = new URLSearchParams(window.location.search);
 state.searchedCity = (urlParams.get('city') || '').toLowerCase();
+state.lastQueryString = window.location.search;
 
 let isHub = false;
 if (state.searchedCity.includes('bengaluru') || state.searchedCity.includes('bangalore') || state.searchedCity.includes('india') || state.searchedCity === 'in' || state.searchedCity === 'blr') {
@@ -76,6 +78,7 @@ if (isHub || !state.searchedCity) {
         });
     } else {
         const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(state.searchedCity)}&countrycodes=in&format=json&limit=1`;
+        console.log('[DEBUG app.js geocode] fetching geocode for ' + state.searchedCity);
         fetch(geoUrl, {
             headers: {
                 'Accept': 'application/json',
@@ -143,20 +146,23 @@ function _processFilteredStartupsResult(startups, preventScroll = false) {
 
 function fetchFilteredStartups(preventScroll = false) {
     const queryParams = new URLSearchParams();
-    if (state.searchedCity) {
-        queryParams.set('city', state.searchedCity);
-    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const qParam = urlParams.get('q');
+    const cityParam = urlParams.get('city');
 
-    const searchText = searchInput.value.trim();
-    if (searchText) {
-        queryParams.set('search', searchText);
+    if (qParam) {
+        queryParams.set('search', qParam);
+        state.searchedCity = '';
+    } else if (cityParam) {
+        state.searchedCity = cityParam.toLowerCase();
+        queryParams.set('city', cityParam);
+    } else if (state.searchedCity) {
+        queryParams.set('city', state.searchedCity);
     }
 
     if (currentSelectedIndustry) {
         queryParams.set('industry', currentSelectedIndustry);
     }
-
-    const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('has_jobs') === 'true' || urlParams.get('has_jobs') === '1') {
         queryParams.set('has_jobs', 'true');
     }
@@ -280,6 +286,12 @@ map.on('moveend', (e) => {
 
 function checkStartupMatch(startup, searchText) {
     if (!startup || typeof startup !== 'object') return false;
+    const tokens = searchText.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    if (tokens.length === 0) {
+        const matchesIndustry = currentSelectedIndustry === '' || (startup.industry || '') === currentSelectedIndustry;
+        return matchesIndustry;
+    }
+
     const name = (startup.name || '').toString().toLowerCase();
     const desc = (startup.description || '').toString().toLowerCase();
     const city = (startup.city || '').toString().toLowerCase();
@@ -288,26 +300,36 @@ function checkStartupMatch(startup, searchText) {
     const jTitles = Array.isArray(startup.job_titles) ? startup.job_titles : [];
     const jobs = Array.isArray(startup.jobs) ? startup.jobs : (Array.isArray(startup.job_openings) ? startup.job_openings : []);
 
-    const matchesSearch = searchText === '' ||
-        name.includes(searchText) ||
-        desc.includes(searchText) ||
-        city.includes(searchText) ||
-        fNames.some(fn => (fn || '').toString().toLowerCase().includes(searchText)) ||
-        founders.some(f => f && (f.name || '').toString().toLowerCase().includes(searchText)) ||
-        jTitles.some(jt => (jt || '').toString().toLowerCase().includes(searchText)) ||
-        jobs.some(j => j && (
-            ((j.title || '').toString().toLowerCase().includes(searchText)) ||
-            ((j.department || '').toString().toLowerCase().includes(searchText)) ||
-            (Array.isArray(j.skills) && j.skills.some(s => (s || '').toString().toLowerCase().includes(searchText))) ||
-            ((j.salary || '').toString().toLowerCase().includes(searchText)) ||
-            ((j.experience || '').toString().toLowerCase().includes(searchText))
-        ));
+    const matchesSearch = tokens.every(token => {
+        return name.includes(token) ||
+            desc.includes(token) ||
+            city.includes(token) ||
+            fNames.some(fn => (fn || '').toString().toLowerCase().includes(token)) ||
+            founders.some(f => f && (f.name || '').toString().toLowerCase().includes(token)) ||
+            jTitles.some(jt => (jt || '').toString().toLowerCase().includes(token)) ||
+            jobs.some(j => j && (
+                ((j.title || '').toString().toLowerCase().includes(token)) ||
+                ((j.department || '').toString().toLowerCase().includes(token)) ||
+                (Array.isArray(j.skills) && j.skills.some(s => (s || '').toString().toLowerCase().includes(token))) ||
+                ((j.salary || '').toString().toLowerCase().includes(token)) ||
+                ((j.experience || '').toString().toLowerCase().includes(token))
+            ));
+    });
+
     const matchesIndustry = currentSelectedIndustry === '' || (startup.industry || '') === currentSelectedIndustry;
     return matchesSearch && matchesIndustry;
 }
 
+function getSearchText() {
+    const rawSearch = searchInput.value.toLowerCase().trim();
+    if (state.searchedCity && rawSearch === state.searchedCity.toLowerCase().trim()) {
+        return '';
+    }
+    return rawSearch;
+}
+
 function updateLocalMarkersVisualState() {
-    const searchText = searchInput.value.toLowerCase().trim();
+    const searchText = getSearchText();
     const isFilteringActive = searchText !== '' || currentSelectedIndustry !== '';
 
     state.startupsData.forEach(startup => {
@@ -343,9 +365,9 @@ function updateLocalMarkersVisualState() {
 }
 
 function applyFiltering() {
-    const searchText = searchInput.value.toLowerCase().trim();
-
+    const searchText = getSearchText();
     const filtered = state.startupsData.filter(startup => checkStartupMatch(startup, searchText));
+    console.log(`[DEBUG applyFiltering] searchText="${searchText}" currentSelectedIndustry="${currentSelectedIndustry}" startupsData.length=${state.startupsData.length} filtered.length=${filtered.length}`);
 
     renderDirectory(filtered, (searchText || currentSelectedIndustry) ? 'No companies match your criteria' : null);
     updateDashboardStats(filtered);
@@ -389,11 +411,13 @@ quickTabs.forEach(btn => {
 });
 
 map.on('click', () => {
+    console.log('[DEBUG map click] clearing hash');
     window.location.hash = '';
 });
 
 if (closeDrawerBtn) {
     closeDrawerBtn.addEventListener('click', () => {
+        console.log('[DEBUG closeDrawerBtn click] clearing hash');
         window.location.hash = '';
     });
 }
@@ -499,9 +523,55 @@ if (navLogoutBtn) {
 checkAuthStatus();
 handleHashRouting();
 
+window.addEventListener('popstate', () => {
+    console.log('[DEBUG popstate event] window.location.search="' + window.location.search + '" state.lastQueryString="' + state.lastQueryString + '" hash="' + window.location.hash + '" currentSelectedId=' + state.currentSelectedId);
+    if (window.location.search === state.lastQueryString) {
+        console.log('[DEBUG popstate event] search matches lastQueryString, calling handleHashRouting');
+        handleHashRouting();
+        return;
+    }
+    console.log('[DEBUG popstate event] search changed, processing full search popstate');
+    state.lastQueryString = window.location.search;
+    const urlParams = new URLSearchParams(window.location.search);
+    const cityParam = urlParams.get('city');
+    const qParam = urlParams.get('q');
+    const query = cityParam || qParam || '';
+
+    const unifiedInput = document.getElementById('unified-search-input');
+    if (unifiedInput) {
+        unifiedInput.value = query;
+    }
+
+    const titleEl = document.getElementById('activeMapTitle');
+    if (titleEl) {
+        titleEl.textContent = query || 'All locations';
+    }
+
+    const detailsDrawer = document.getElementById('details-drawer');
+    if (detailsDrawer && detailsDrawer.classList.contains('active')) {
+        detailsDrawer.classList.remove('active');
+        detailsDrawer.setAttribute('aria-hidden', 'true');
+    }
+    state.currentSelectedId = null;
+    if (window.location.hash) {
+        const urlWithoutHash = window.location.pathname + window.location.search;
+        window.history.replaceState({ path: urlWithoutHash }, '', urlWithoutHash);
+    }
+
+    if (cityParam) {
+        executeUnifiedSearch(cityParam, { skipPushState: true });
+    } else if (qParam) {
+        executeUnifiedSearch(qParam, { skipPushState: true });
+    } else {
+        state.searchedCity = '';
+        fetchFilteredStartups(true);
+    }
+});
+
 // Expose interface to window for E2E tests and index.html compatibility
 window.updateSearchCity = updateSearchCity;
 window.resetMapView = resetMapView;
+window.executeUnifiedSearch = executeUnifiedSearch;
 
 window.WorldTechApp = {
     createElement,
@@ -541,5 +611,6 @@ window.WorldTechApp = {
     lockProgrammaticMove,
     getTempRemoteMarker: () => state.tempRemoteMarker,
     resetMapView,
+    executeUnifiedSearch,
     state
 };

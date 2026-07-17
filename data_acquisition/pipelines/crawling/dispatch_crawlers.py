@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import os
-import sys
 
 from data_acquisition.pipelines.crawling.crawl_queue import CrawlQueue
 from data_acquisition.db_manager import DBManager

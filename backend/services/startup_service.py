@@ -163,34 +163,51 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
             if industry_query not in industry_val:
                 continue
         if search_query:
-            name_val = str(s.get("name") or "").lower()
-            desc_val = str(s.get("description") or "").lower()
-            city_val = str(s.get("city") or s.get("location") or "").lower()
-            founder_names = [str(f.get("name") or "").lower() for f in (s.get("founders") or []) if isinstance(f, dict)]
-            
-            job_matches = False
-            for j in (s.get("job_openings") or []):
-                if not isinstance(j, dict):
+            tokens = [t.lower() for t in search_query.split()]
+            if tokens:
+                startup_matches = True
+                for token in tokens:
+                    name_val = str(s.get("name") or "").lower()
+                    desc_val = str(s.get("description") or "").lower()
+                    city_val = str(s.get("city") or s.get("location") or "").lower()
+                    
+                    token_matched = (token in name_val or token in desc_val or token in city_val)
+                    
+                    if not token_matched:
+                        s_skills = s.get("skills")
+                        if isinstance(s_skills, list):
+                            token_matched = any(token in str(sk).lower() for sk in s_skills if sk is not None)
+                        elif isinstance(s_skills, str):
+                            token_matched = token in s_skills.lower()
+                    
+                    if not token_matched:
+                        founder_names = [str(f.get("name") or "").lower() for f in (s.get("founders") or []) if isinstance(f, dict)]
+                        token_matched = any(token in fn for fn in founder_names)
+                    
+                    if not token_matched:
+                        for j in (s.get("job_openings") or []):
+                            if not isinstance(j, dict):
+                                continue
+                            j_title = str(j.get("title") or "").lower()
+                            j_dept = str(j.get("department") or "").lower()
+                            j_salary = str(j.get("salary") or "").lower()
+                            j_exp = str(j.get("experience") or "").lower()
+                            j_skills = j.get("skills") or []
+                            
+                            if (token in j_title or 
+                                token in j_dept or 
+                                token in j_salary or 
+                                token in j_exp or
+                                (isinstance(j_skills, list) and any(token in str(sk).lower() for sk in j_skills if isinstance(sk, str)))):
+                                token_matched = True
+                                break
+                    
+                    if not token_matched:
+                        startup_matches = False
+                        break
+                        
+                if not startup_matches:
                     continue
-                j_title = str(j.get("title") or "").lower()
-                j_dept = str(j.get("department") or "").lower()
-                j_skills = [str(sk).lower() for sk in (j.get("skills") or []) if isinstance(sk, str)]
-                j_salary = str(j.get("salary") or "").lower()
-                j_exp = str(j.get("experience") or "").lower()
-                if (search_query in j_title or 
-                    search_query in j_dept or 
-                    any(search_query in sk for sk in j_skills) or 
-                    search_query in j_salary or 
-                    search_query in j_exp):
-                    job_matches = True
-                    break
-            
-            if not (search_query in name_val or 
-                    search_query in desc_val or 
-                    search_query in city_val or 
-                    any(search_query in fn for fn in founder_names) or 
-                    job_matches):
-                continue
         if dept_query:
             jobs = s.get("job_openings") or []
             if not any(dept_query in str(j.get("department") or "").lower() for j in jobs if isinstance(j, dict)):

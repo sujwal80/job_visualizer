@@ -6,19 +6,14 @@ classification (`check_remote_office_status`), and enforces idempotency
 (`location_tagged: True` short-circuiting).
 """
 
-from data_acquisition.geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate, get_city_center_coordinates
+from data_acquisition.geo_config import DEFAULT_TARGET_CITY, is_fallback_coordinate
 from data_acquisition.pipelines.tagging.remote_office_classifier import (
-    REMOTE_OFFICE_DISTANCE_THRESHOLD_KM,
-    haversine_distance_km,
     check_remote_office_status,
 )
 
 __all__ = [
     "LocationEnricher",
     "check_remote_office_status",
-    "haversine_distance_km",
-    "get_city_center_coordinates",
-    "REMOTE_OFFICE_DISTANCE_THRESHOLD_KM",
 ]
 
 

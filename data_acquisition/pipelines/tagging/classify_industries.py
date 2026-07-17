@@ -6,7 +6,6 @@ Analyzes startup records in backend/startups.json and assigns accurate startup s
 Artificial Intelligence, Fintech, SaaS, E-commerce, HealthTech, EdTech, CleanTech, Cybersecurity, Logistics, B2B.
 """
 
-import json
 import os
 import re
 import sys

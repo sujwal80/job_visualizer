@@ -16,7 +16,6 @@ if PROJECT_ROOT not in sys.path:
 
 from data_acquisition.db_manager import DBManager
 from data_acquisition.pipelines.crawling.crawl_queue import CrawlQueue
-from data_acquisition.geo_config import DEFAULT_TARGET_CITY
 
 ALL_SOURCES = [
     "LinkedIn", "YC", "Indeed", "ATS", "Instahyre",

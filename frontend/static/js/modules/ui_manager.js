@@ -423,6 +423,11 @@ export function renderDrawerDetails(startup) {
 }
 
 export function selectAndOpenStartup(id) {
+    console.log('[DEBUG selectAndOpenStartup] id=' + id + ' state.currentSelectedId=' + state.currentSelectedId);
+    if (state.activeGeocodeController) {
+        state.activeGeocodeController.abort();
+        state.activeGeocodeController = null;
+    }
     state.currentSelectedId = id;
     const cacheKey = String(id);
 
@@ -509,6 +514,7 @@ export function selectAndOpenStartup(id) {
 export function _processOpenStartup(fullStartup) {
     if (fullStartup && !fullStartup.error) {
         const id = fullStartup.id;
+        console.log('[DEBUG _processOpenStartup] id=' + id + ' state.currentSelectedId=' + state.currentSelectedId);
         const idx = state.startupsData.findIndex(s => s.id === id);
         if (idx !== -1) state.startupsData[idx] = fullStartup;
         else state.startupsData.push(fullStartup);

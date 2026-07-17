@@ -98,7 +98,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
         self.page.on("pageerror", lambda err: self.js_errors.append(str(err)))
         self.page.on("console", lambda msg: print(f"Browser Console {msg.type}: {msg.text}"))
         self.page.on("requestfailed", lambda req: print(f"Request Failed: {req.method} {req.url} - Error: {req.failure}"))
-        self.page.on("response", lambda resp: print(f"Response: {resp.status} {resp.url}") if resp.status >= 400 else None)
+        self.page.on("response", lambda resp: print(f"Response: {resp.status} {resp.url}"))
 
     def tearDown(self):
         """Close page and context after each test case."""
@@ -255,20 +255,31 @@ class TestE2EInteractiveQA(unittest.TestCase):
             timeout=10000
         )
 
+        # Wait for at least one directory item to be visible/present
+        self.page.locator("#directory-list .directory-item").first.wait_for(state="visible", timeout=5000)
         total_items = self.page.locator("#directory-list .directory-item").count()
+        state_len = self.page.evaluate("() => window.WorldTechApp.state.startupsData.length")
+        initial_names = self.page.evaluate("() => Array.from(document.querySelectorAll('#directory-list .directory-item .card-title')).map(el => el.textContent.trim())")
+        print(f"\nDEBUG test_c3: total_items={total_items}, state_startupsData_length={state_len}")
+        print(f"DEBUG test_c3 initial names (len={len(initial_names)}): {initial_names}")
 
         # Search for a specific company name that exists, has job openings and is unique, e.g., "Indira Pay"
-        self.page.fill("#search-input", "Indira Pay")
+        self.page.fill("#unified-search-input", "Indira Pay")
         self.page.wait_for_timeout(1000)
+
+        names = self.page.evaluate("() => Array.from(document.querySelectorAll('#directory-list .directory-item .card-title')).map(el => el.textContent.trim())")
+        print(f"DEBUG test_c3 after search: names={names}")
 
         matches = self.page.locator("#directory-list .directory-item").count()
         self.assertEqual(matches, 1)
 
         # Clear search
-        self.page.fill("#search-input", "")
+        self.page.fill("#unified-search-input", "")
         self.page.wait_for_timeout(1000)
         
         cleared_items = self.page.locator("#directory-list .directory-item").count()
+        cleared_state_len = self.page.evaluate("() => window.WorldTechApp.state.startupsData.length")
+        print(f"DEBUG test_c3 after clear: cleared_items={cleared_items}, cleared_state_len={cleared_state_len}")
         self.assertEqual(cleared_items, total_items)
         self.assertEqual(self.js_errors, [])
 
@@ -287,15 +298,15 @@ class TestE2EInteractiveQA(unittest.TestCase):
         company_name = first_item.locator(".card-title").text_content()
         first_item.click()
 
-        # Wait for drawer content to become visible
-        drawer_content = self.page.locator("#drawer-content")
-        drawer_content.wait_for(state="visible", timeout=5000)
+        # Wait for details drawer to become active
+        self.page.wait_for_selector("#details-drawer.active", timeout=5000)
 
         # Details drawer should be active
         drawer = self.page.locator("#details-drawer")
         self.assertTrue(drawer.evaluate("el => el.classList.contains('active')"), "Drawer should have active class")
 
         # Drawer content should contain company name
+        drawer_content = self.page.locator("#drawer-content")
         self.assertIn(company_name.strip(), drawer_content.text_content())
 
         # Close drawer
@@ -453,7 +464,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
         self.page.wait_for_load_state("domcontentloaded")
         self.page.wait_for_timeout(1000)
 
-        self.page.fill("#search-input", "NONEXISTENT_XYZ_99999")
+        self.page.fill("#unified-search-input", "NONEXISTENT_XYZ_99999")
         self.page.wait_for_timeout(600)
 
         # Directory should show empty message
@@ -461,7 +472,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
         self.assertIn("No companies match your criteria", dir_text)
 
         # Clear search
-        self.page.fill("#search-input", "")
+        self.page.fill("#unified-search-input", "")
         self.page.wait_for_timeout(600)
 
         self.assertTrue(self.page.locator("#directory-list .directory-item").count() > 0)

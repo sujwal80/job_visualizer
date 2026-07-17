@@ -4,9 +4,11 @@ import {
     updateMarkersVisualState
 } from './map_manager.js';
 import { selectAndOpenStartup, showDirectoryLoading } from './ui_manager.js';
+import { showToast } from './utils.js';
 
 export function handleHashRouting() {
     const hash = window.location.hash;
+    console.log('[DEBUG handleHashRouting] hash="' + hash + '" state.currentSelectedId=' + state.currentSelectedId);
     const urlParams = new URLSearchParams(window.location.search);
     const queryCompanyId = urlParams.get('company_id');
 
@@ -44,18 +46,168 @@ export function handleHashRouting() {
     }
 }
 
-export function updateSearchCity(cityTitle) {
+export function executeUnifiedSearch(query, options = {}) {
+    const skipPushState = !!options.skipPushState;
+
+    // 1. Close any open details drawer programmatically (updating url hash without triggering hashchange)
+    const detailsDrawer = document.getElementById('details-drawer');
+    if (detailsDrawer && detailsDrawer.classList.contains('active')) {
+        detailsDrawer.classList.remove('active');
+        detailsDrawer.setAttribute('aria-hidden', 'true');
+    }
+    state.currentSelectedId = null;
+    if (window.location.hash) {
+        const urlWithoutHash = window.location.pathname + window.location.search;
+        window.history.replaceState({ path: urlWithoutHash }, '', urlWithoutHash);
+    }
+
+    const queryTrimmed = (query || '').trim();
+    if (!queryTrimmed) {
+        // Clear parameters
+        const newUrlParams = new URLSearchParams(window.location.search);
+        newUrlParams.delete('city');
+        newUrlParams.delete('q');
+        const newUrl = `${window.location.pathname}?${newUrlParams.toString()}`;
+        if (!skipPushState) {
+            window.history.pushState({ path: newUrl }, '', newUrl);
+        } else {
+            window.history.replaceState({ path: newUrl }, '', newUrl);
+        }
+        state.lastQueryString = window.location.search;
+        state.searchedCity = '';
+        const titleEl = document.getElementById('activeMapTitle');
+        if (titleEl) titleEl.textContent = 'All locations';
+        const navInput = document.getElementById('unified-search-input');
+        if (navInput) navInput.value = '';
+        if (window.WorldTechApp && typeof window.WorldTechApp.fetchFilteredStartups === 'function') {
+            window.WorldTechApp.fetchFilteredStartups();
+        }
+        return;
+    }
+
+    // Update active title and navbar input value
+    const titleEl = document.getElementById('activeMapTitle');
+    if (titleEl) titleEl.textContent = queryTrimmed;
+    const navInput = document.getElementById('unified-search-input');
+    if (navInput) navInput.value = queryTrimmed;
+
+    // Geocode query using Nominatim restricted to India (countrycodes=in)
+    const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(queryTrimmed)}&countrycodes=in&format=json&limit=1`;
+    
+    showDirectoryLoading();
+
+    if (state.activeGeocodeController) {
+        state.activeGeocodeController.abort();
+    }
+    state.activeGeocodeController = new AbortController();
+    const signal = state.activeGeocodeController.signal;
+    console.log('[DEBUG router.js executeUnifiedSearch geocode] fetching geocode for ' + queryTrimmed);
+    fetch(geoUrl, {
+        signal,
+        headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'WorldTechMap-JobVisualizer/1.0 (sujwal80@gmail.com)'
+        }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        return res.json();
+    })
+    .then(data => {
+        if (signal.aborted) return;
+        if (Array.isArray(data) && data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
+            if (!isNaN(lat) && !isNaN(lon)) {
+                // On success: zoom and fly map to coordinates
+                state.defaultLocation = [lon, lat];
+                state.defaultZoom = 11;
+
+                lockProgrammaticMove(2500);
+                map.flyTo({
+                    center: state.defaultLocation,
+                    zoom: state.defaultZoom,
+                    speed: 3.0,
+                    essential: true
+                });
+
+                // set URL parameter city=query (clearing q)
+                const newUrlParams = new URLSearchParams(window.location.search);
+                newUrlParams.set('city', queryTrimmed);
+                newUrlParams.delete('q');
+                const currentHash = window.location.hash || '';
+                const newUrl = `${window.location.pathname}?${newUrlParams.toString()}${currentHash}`;
+                
+                if (!skipPushState) {
+                    window.history.pushState({ path: newUrl }, '', newUrl);
+                } else {
+                    window.history.replaceState({ path: newUrl }, '', newUrl);
+                }
+                state.lastQueryString = window.location.search;
+
+                state.searchedCity = queryTrimmed.toLowerCase();
+                
+                if (window.WorldTechApp && typeof window.WorldTechApp.fetchFilteredStartups === 'function') {
+                    window.WorldTechApp.fetchFilteredStartups();
+                }
+                return;
+            }
+        }
+        throw new Error('No coordinates returned');
+    })
+    .catch(err => {
+        if (err.name === 'AbortError') return;
+        console.warn('[Geocoder] Failed to geocode unified query, falling back to keyword search:', err);
+        // On failure: do NOT fly the map. Set URL parameter q=query (clearing city)
+        const newUrlParams = new URLSearchParams(window.location.search);
+        newUrlParams.set('q', queryTrimmed);
+        newUrlParams.delete('city');
+        const currentHash = window.location.hash || '';
+        const newUrl = `${window.location.pathname}?${newUrlParams.toString()}${currentHash}`;
+        
+        if (!skipPushState) {
+            window.history.pushState({ path: newUrl }, '', newUrl);
+        } else {
+            window.history.replaceState({ path: newUrl }, '', newUrl);
+        }
+        state.lastQueryString = window.location.search;
+
+        // clear state.searchedCity (so bounding boxes are sent)
+        state.searchedCity = '';
+
+        // show a warning toast using showToast notifying that keyword search is run inside the current viewport
+        showToast('Location not found. Showing keyword matches inside current viewport.', 'warning');
+
+        if (window.WorldTechApp && typeof window.WorldTechApp.fetchFilteredStartups === 'function') {
+            window.WorldTechApp.fetchFilteredStartups();
+        }
+    })
+    .finally(() => {
+        if (state.activeGeocodeController && state.activeGeocodeController.signal === signal) {
+            state.activeGeocodeController = null;
+        }
+    });
+}
+
+export function updateSearchCity(cityTitle, options = {}) {
+    const skipPushState = !!options.skipPushState;
     const lowerCity = (cityTitle || '').trim().toLowerCase();
 
     // Update active title and navbar input value
     const titleEl = document.getElementById('activeMapTitle');
     if (titleEl) titleEl.textContent = cityTitle;
-    const navInput = document.getElementById('navbar-city-input');
+    const navInput = document.getElementById('navbar-city-input') || document.getElementById('unified-search-input');
     if (navInput) navInput.value = cityTitle;
 
     // Update URL query parameters without reloading
-    const newUrl = `${window.location.pathname}?city=${encodeURIComponent(cityTitle)}`;
-    window.history.pushState({ path: newUrl }, '', newUrl);
+    const currentHash = window.location.hash || '';
+    const newUrl = `${window.location.pathname}?city=${encodeURIComponent(cityTitle)}${currentHash}`;
+    if (!skipPushState) {
+        window.history.pushState({ path: newUrl }, '', newUrl);
+    } else {
+        window.history.replaceState({ path: newUrl }, '', newUrl);
+    }
+    state.lastQueryString = window.location.search;
     state.searchedCity = lowerCity;
 
     // Resolve location coordinates (either hub or geocode)

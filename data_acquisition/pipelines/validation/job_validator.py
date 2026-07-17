@@ -1,12 +1,6 @@
-import os
-import requests
 import re
-import time
-import random
-import urllib.parse
 import concurrent.futures
 
-from data_acquisition.geo_config import TEST_FIXTURE_WHITELIST_URLS
 from data_acquisition.utils.validation import validate_website_domain, check_job_active, validate_logo_image
 
 EXPIRED_KEYWORDS = [

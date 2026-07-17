@@ -172,12 +172,8 @@
 
             <div class="navbar-right">
                 <div class="search-box">
-                    <i class="fa-solid fa-location-dot search-icon text-[#ea4335]"></i>
-                    <input id="navbar-city-input" type="text" placeholder="Search city or ZIP..." onkeydown="if(event.key === 'Enter') handleSearchFromNavbar()">
-                </div>
-                <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input id="search-input" type="text" placeholder="Filter jobs by title or company...">
+                    <input id="unified-search-input" type="text" placeholder="Search city or keywords..." onkeydown="if(event.key === 'Enter') handleUnifiedSearch()">
                 </div>
                 <button onclick="resetToLandingState()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs py-2 px-3 rounded-xl transition-all">
                     <i class="fa-solid fa-arrow-left mr-1"></i> Back
@@ -267,39 +263,23 @@
             window.location.href = '/jobs?city=' + encodeURIComponent(cityTitle);
         }
 
-        function handleSearchFromNavbar() {
-            const rawVal = document.getElementById('navbar-city-input').value.trim().toLowerCase();
-            let cityTitle = 'Bengaluru, KA';
-            const usaSynonyms = ["usa", "us", "united states", "america", "sf", "san francisco", "california", "bay area"];
-            const ukSynonyms = ["uk", "united kingdom", "england", "london", "gb", "great britain"];
-            const indiaSynonyms = ["india", "in", "bengaluru", "bangalore", "karnataka", "blr"];
-
-            if (usaSynonyms.some(s => rawVal.includes(s)) || rawVal.includes('san') || rawVal.includes('francisco')) {
-                cityTitle = 'San Francisco, CA';
-            } else if (ukSynonyms.some(s => rawVal.includes(s))) {
-                cityTitle = 'London, UK';
-            } else if (indiaSynonyms.some(s => rawVal.includes(s))) {
-                cityTitle = 'Bengaluru, KA';
-            } else if (rawVal) {
-                cityTitle = rawVal.charAt(0).toUpperCase() + rawVal.slice(1);
-            }
-
-            const path = window.location.pathname.toLowerCase();
-            if ((path === '/jobs' || path === '/map') && typeof window.updateSearchCity === 'function') {
-                window.updateSearchCity(cityTitle);
-            } else {
-                window.location.href = '/jobs?city=' + encodeURIComponent(cityTitle);
+        function handleUnifiedSearch() {
+            const rawVal = document.getElementById('unified-search-input').value.trim();
+            if (window.WorldTechApp && typeof window.WorldTechApp.executeUnifiedSearch === 'function') {
+                window.WorldTechApp.executeUnifiedSearch(rawVal);
             }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
             const cityParam = params.get('city');
-            if (cityParam) {
+            const qParam = params.get('q');
+            const query = cityParam || qParam;
+            if (query) {
                 const titleEl = document.getElementById('activeMapTitle');
-                if (titleEl) titleEl.textContent = cityParam;
-                const navInput = document.getElementById('navbar-city-input');
-                if (navInput) navInput.value = cityParam;
+                if (titleEl) titleEl.textContent = query;
+                const navInput = document.getElementById('unified-search-input');
+                if (navInput) navInput.value = query;
             }
         });
 

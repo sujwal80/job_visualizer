@@ -4,21 +4,16 @@ Houses Flask routing endpoints for interactive map queries, individual startup d
 Google OAuth 2.0 authentication flows, session management, and HTTP security/caching middleware.
 """
 
-from flask import Flask, jsonify, render_template, request, make_response, g, redirect
-import json
+from flask import Flask, jsonify, render_template, request, make_response, g
 import os
-import time
-import math
 import gzip
 import io
-import re
-from collections import defaultdict
 from functools import wraps
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Import modular utilities and services
-from backend.utils.validators import REQUIRED_FIELDS, _sanitize_string, _safe_float, _check_has_pin, _sanitize_url, _validate_query_params, _strip_redundant
-from backend.utils.rate_limiter import _rate_limits, _check_rate_limit
+from backend.utils.validators import _safe_float, _validate_query_params, _strip_redundant
+from backend.utils.rate_limiter import _check_rate_limit
 from backend.services.startup_service import load_startups, filter_and_sort_startups, format_startup_summary, format_startup_details, format_lightweight_summary, get_data_version
 from backend.services.auth_service import (
     generate_oauth_state, validate_oauth_state, get_google_auth_url,

@@ -12,7 +12,6 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 from data_acquisition.pipelines.crawling.crawl_queue import CrawlQueue
-from data_acquisition.db_manager import DBManager
 
 
 def display_monitor(db_path=None, queue_db_path=None):

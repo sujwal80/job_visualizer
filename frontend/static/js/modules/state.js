@@ -140,6 +140,8 @@ export const state = {
     tempRemoteMarker: null,
     rateLimitedUntil: 0,
     activeFetchController: null,
+    activeGeocodeController: null,
+    lastQueryString: '',
     inFlightRequests: new Map(),
     inFlightPromises: new Map(),
     queryCache: new LRUCacheWithTTL({ capacity: 50, defaultTTL: 120000, storage: null }),

@@ -1,6 +1,5 @@
 import urllib.parse
 import re
-import requests
 from bs4 import BeautifulSoup
 try:
     from data_acquisition.utils.validation import safe_http_request, validate_logo_image
