@@ -1,4 +1,4 @@
-name = "startup-visualizer"
+name = "jobvisualizer"
 main = "entrypoint.py"
 compatibility_date = "2024-09-19"
 compatibility_flags = ["python_workers"]
