@@ -518,6 +518,84 @@ class TestValidationUtils(unittest.TestCase):
         mock_head.assert_called_once()
         mock_get.assert_not_called()
 
+class TestModularStartupServiceUnified(unittest.IsolatedAsyncioTestCase):
+    """Unit tests for the async unified startup data loader."""
+
+    @patch('backend.services.startup_service.load_startups')
+    @patch('backend.services.startup_service.load_startups_from_assets')
+    async def test_load_startups_unified_no_env(self, mock_load_assets, mock_load_local):
+        from backend.services.startup_service import load_startups_unified
+        mock_load_local.return_value = [{"id": 1, "name": "Local Startup"}]
+
+        result = await load_startups_unified(env=None)
+
+        self.assertEqual(result, [{"id": 1, "name": "Local Startup"}])
+        mock_load_local.assert_called_once()
+        mock_load_assets.assert_not_called()
+
+    @patch('backend.services.startup_service.load_startups')
+    @patch('backend.services.startup_service.load_startups_from_assets')
+    async def test_load_startups_unified_env_dict_with_assets(self, mock_load_assets, mock_load_local):
+        from backend.services.startup_service import load_startups_unified
+        mock_load_assets.return_value = [{"id": 2, "name": "Assets Startup"}]
+        mock_assets_binding = MagicMock()
+        env = {"ASSETS": mock_assets_binding}
+
+        result = await load_startups_unified(env=env)
+
+        self.assertEqual(result, [{"id": 2, "name": "Assets Startup"}])
+        mock_load_assets.assert_called_once_with(mock_assets_binding)
+        mock_load_local.assert_not_called()
+
+    @patch('backend.services.startup_service.load_startups')
+    @patch('backend.services.startup_service.load_startups_from_assets')
+    async def test_load_startups_unified_env_obj_with_assets(self, mock_load_assets, mock_load_local):
+        from backend.services.startup_service import load_startups_unified
+        mock_load_assets.return_value = [{"id": 3, "name": "Assets Obj Startup"}]
+        mock_assets_binding = MagicMock()
+        
+        class EnvMock:
+            ASSETS = mock_assets_binding
+        
+        env = EnvMock()
+
+        result = await load_startups_unified(env=env)
+
+        self.assertEqual(result, [{"id": 3, "name": "Assets Obj Startup"}])
+        mock_load_assets.assert_called_once_with(mock_assets_binding)
+        mock_load_local.assert_not_called()
+
+    @patch('backend.services.startup_service.load_startups')
+    @patch('backend.services.startup_service.load_startups_from_assets')
+    async def test_load_startups_unified_env_dict_without_assets(self, mock_load_assets, mock_load_local):
+        from backend.services.startup_service import load_startups_unified
+        mock_load_local.return_value = [{"id": 4, "name": "Local Fallback Startup"}]
+        env = {"OTHER_KEY": "some_value"}
+
+        result = await load_startups_unified(env=env)
+
+        self.assertEqual(result, [{"id": 4, "name": "Local Fallback Startup"}])
+        mock_load_local.assert_called_once()
+        mock_load_assets.assert_not_called()
+
+    @patch('backend.services.startup_service.load_startups')
+    @patch('backend.services.startup_service.load_startups_from_assets')
+    async def test_load_startups_unified_env_obj_without_assets(self, mock_load_assets, mock_load_local):
+        from backend.services.startup_service import load_startups_unified
+        mock_load_local.return_value = [{"id": 5, "name": "Local Fallback Obj Startup"}]
+        
+        class EnvMock:
+            pass
+        
+        env = EnvMock()
+
+        result = await load_startups_unified(env=env)
+
+        self.assertEqual(result, [{"id": 5, "name": "Local Fallback Obj Startup"}])
+        mock_load_local.assert_called_once()
+        mock_load_assets.assert_not_called()
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
+

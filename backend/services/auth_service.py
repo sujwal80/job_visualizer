@@ -10,12 +10,12 @@ import time
 import secrets
 import jwt
 from urllib.parse import urlencode
+from backend import config
 
 # Default secure key and mock OAuth credentials
 SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "worldtech_map_default_jwt_secret_key_2026_super_secure")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "1234567890-worldtechmapmockclientid.apps.googleusercontent.com")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "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")
-GOOGLE_REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI", "http://127.0.0.1:5001/api/auth/callback")
 
 # In-memory storage for stateless verification & revocation tracking
 _csrf_state_store = {}  # state_token -> timestamp
@@ -117,7 +117,7 @@ def get_google_auth_url(state, redirect_uri=None):
     """
     params = {
         "client_id": GOOGLE_CLIENT_ID,
-        "redirect_uri": redirect_uri or GOOGLE_REDIRECT_URI,
+        "redirect_uri": redirect_uri or config.GOOGLE_REDIRECT_URI,
         "response_type": "code",
         "scope": "openid email profile",
         "state": state,

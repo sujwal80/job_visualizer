@@ -143,7 +143,7 @@ class TestR1ViewportAndLayoutResilience(unittest.TestCase):
 
     def test_r1_15_backend_viewport_remote_startups_retention(self):
         """Verify remote/hub startups (has_pin=False) remain discoverable when viewport moves outside Bengaluru."""
-        with patch('backend.app.load_startups') as mock_load:
+        with patch('backend.services.startup_service.load_startups') as mock_load:
             mock_load.return_value = [{
                 "id": 9991,
                 "name": "Global Remote Corp",
@@ -273,7 +273,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
 
     def test_r2_01_backend_missing_coordinates(self):
         """Test API resilience when startup payload has None/missing lat and lng coordinates."""
-        with patch('backend.app.load_startups') as mock_load:
+        with patch('backend.services.startup_service.load_startups') as mock_load:
             mock_load.return_value = [{
                 "id": 5001,
                 "name": "NoCoords Inc",
@@ -291,7 +291,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
 
     def test_r2_02_backend_null_description(self):
         """Test API resilience when startup has description: None, ensuring no NoneType slicing TypeError occurs."""
-        with patch('backend.app.load_startups') as mock_load:
+        with patch('backend.services.startup_service.load_startups') as mock_load:
             mock_load.return_value = [{
                 "id": 5002,
                 "name": "NullDesc Corp",
@@ -309,7 +309,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
 
     def test_r2_03_backend_unicode_emojis(self):
         """Test API resilience against unicode emojis in startup name, city, industry, and description."""
-        with patch('backend.app.load_startups') as mock_load:
+        with patch('backend.services.startup_service.load_startups') as mock_load:
             mock_load.return_value = [{
                 "id": 5003,
                 "name": "🚀 EmojiTech AI 🔥",
@@ -328,7 +328,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
 
     def test_r2_04_backend_empty_and_null_job_arrays(self):
         """Test endpoint when job_openings is empty list [] or None, ensuring no IndexError or KeyError occurs."""
-        with patch('backend.app.load_startups') as mock_load:
+        with patch('backend.services.startup_service.load_startups') as mock_load:
             mock_load.return_value = [
                 {"id": 5004, "name": "EmptyJobs Corp", "lat": 12.97, "lng": 77.59, "job_openings": [], "has_pin": True},
                 {"id": 5005, "name": "NullJobs Corp", "lat": 12.98, "lng": 77.60, "job_openings": None, "has_pin": True}
@@ -342,7 +342,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
 
     def test_r2_05_backend_negative_salaries_and_invalid_numbers(self):
         """Test API resilience when jobs contain corrupted salary strings or negative values."""
-        with patch('backend.app.load_startups') as mock_load:
+        with patch('backend.services.startup_service.load_startups') as mock_load:
             mock_load.return_value = [{
                 "id": 5006,
                 "name": "NegativeSalary AI",
@@ -394,7 +394,7 @@ class TestR2DataInjectionAndPayloadResilience(unittest.TestCase):
 
     def test_r2_09_backend_xss_javascript_uri_sanitization(self):
         """Verify API details endpoint strips or sanitizes javascript:, data:, and vbscript: URI schemes in links."""
-        with patch('backend.app.load_startups') as mock_load:
+        with patch('backend.services.startup_service.load_startups') as mock_load:
             mock_load.return_value = [{
                 "id": 5009,
                 "name": "URI Hacker",

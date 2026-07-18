@@ -122,7 +122,7 @@ class TestProductionAuditE2E(unittest.TestCase):
 
     def test_06_rate_limit_boundary_zero_limit(self):
         """Verify boundary condition: limit=0 should safely return 429 without throwing 500 IndexError."""
-        from backend.app import _check_rate_limit
+        from backend.utils.rate_limiter import _check_rate_limit
         allowed, retry_after, remaining, limit_val = _check_rate_limit("203.0.113.55", limit=0)
         self.assertFalse(allowed, "Expected allowed=False for limit=0")
         self.assertEqual(remaining, 0)
@@ -143,7 +143,7 @@ class TestProductionAuditE2E(unittest.TestCase):
 
     def test_09_xss_uri_scheme_sanitization(self):
         """Verify API endpoints reject or sanitize javascript: and data: URI schemes in links."""
-        with patch('backend.app.load_startups') as mock_load:
+        with patch('backend.services.startup_service.load_startups') as mock_load:
             mock_load.return_value = [{
                 "id": 8888,
                 "name": "Adversarial AI",
@@ -176,7 +176,7 @@ class TestProductionAuditE2E(unittest.TestCase):
 
     def test_10_lean_payload_non_required_fields_handling(self):
         """Verify empty string fields (like industry) are not stripped to prevent UI 'undefined' text."""
-        with patch('backend.app.load_startups') as mock_load:
+        with patch('backend.services.startup_service.load_startups') as mock_load:
             mock_load.return_value = [{
                 "id": 7777,
                 "name": "EmptyIndustry Corp",
@@ -197,7 +197,7 @@ class TestProductionAuditE2E(unittest.TestCase):
 
     def test_11_viewport_bounding_box_remote_startups(self):
         """Verify remote startups (has_pin=False) remain discoverable when viewport moves outside Bangalore."""
-        with patch('backend.app.load_startups') as mock_load:
+        with patch('backend.services.startup_service.load_startups') as mock_load:
             mock_load.return_value = [{
                 "id": 6666,
                 "name": "Remote Only Hub",

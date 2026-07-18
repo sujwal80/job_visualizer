@@ -399,17 +399,18 @@ def format_lightweight_summary(s):
 
 def get_data_version():
     """
-    Retrieve the dataset version derived from the disk file modification timestamp of startups.json.
+    Retrieve the dataset version derived from the disk file modification timestamp of startups.json,
+    falling back to a static version string in edge worker environments.
 
     Returns:
-        str: String representation of int(mtime) of DATA_FILE, or "0" if file missing or error occurs.
+        str: String representation of int(mtime) of DATA_FILE, or "v1.0.0" if file missing or error occurs.
     """
     try:
         if os.path.exists(DATA_FILE):
             return str(int(os.path.getmtime(DATA_FILE)))
     except Exception:
         pass
-    return "0"
+    return "v1.0.0"
 
 async def load_startups_from_assets(assets_binding):
     """
@@ -476,4 +477,24 @@ async def load_startups_from_assets(assets_binding):
 
     _cache_startups = data
     return data
+
+
+async def load_startups_unified(env=None):
+    """
+    Unified helper to load startup records.
+    If env is provided and contains Pages static assets binding (`ASSETS`),
+    call and return the result of `await load_startups_from_assets(assets_binding)`.
+    Otherwise, fall back to synchronous `load_startups()`.
+    """
+    assets_binding = None
+    if env is not None:
+        if isinstance(env, dict):
+            assets_binding = env.get("ASSETS")
+        elif hasattr(env, "ASSETS"):
+            assets_binding = getattr(env, "ASSETS")
+
+    if assets_binding is not None:
+        return await load_startups_from_assets(assets_binding)
+    return load_startups()
+
 

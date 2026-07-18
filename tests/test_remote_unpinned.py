@@ -22,7 +22,7 @@ class TestRemoteUnpinnedBehavior(unittest.TestCase):
         app.testing = True
         self.client = app.test_client()
 
-    @patch('backend.app.load_startups')
+    @patch('backend.services.startup_service.load_startups')
     def test_remote_office_is_unpinned_but_retains_coordinates(self, mock_load_startups):
         """
         Verify that a startup with `is_remote_office: true` results in `has_pin: false`

@@ -219,7 +219,7 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
         and vbscript: in job URLs, requested with Accept-Encoding: gzip.
         Verifies backend strips all malicious URI schemes to empty string "", prunes job_openings, and Gzips cleanly.
         """
-        with patch('backend.app.load_startups') as mock_load:
+        with patch('backend.services.startup_service.load_startups') as mock_load:
             mock_load.return_value = [{
                 "id": 8801,
                 "name": "URI Hacker Corp",
@@ -265,7 +265,7 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
         and job_openings are all None. Verifies returns 200 OK with safe defaults without TypeError,
         while attaching X-RateLimit-Limit and X-RateLimit-Remaining headers.
         """
-        with patch('backend.app.load_startups') as mock_load:
+        with patch('backend.services.startup_service.load_startups') as mock_load:
             mock_load.return_value = [{
                 "id": 8802,
                 "name": None,

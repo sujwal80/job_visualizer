@@ -78,6 +78,7 @@ FALLBACK_COORDINATES = None
 PIN_DELTA_THRESHOLD = None
 GENERIC_HUB_LABELS = None
 REGION_SYNONYM_MAP = None
+GOOGLE_REDIRECT_URI = None
 
 def setup_config(env):
     """
@@ -85,6 +86,7 @@ def setup_config(env):
     """
     global DEFAULT_TARGET_CITY, DEFAULT_MAP_CENTER_LAT, DEFAULT_MAP_CENTER_LNG
     global FALLBACK_COORDINATES, PIN_DELTA_THRESHOLD, GENERIC_HUB_LABELS, REGION_SYNONYM_MAP
+    global GOOGLE_REDIRECT_URI
 
     DEFAULT_TARGET_CITY = get_config_value("DEFAULT_TARGET_CITY", env, "Bengaluru")
     
@@ -108,6 +110,8 @@ def setup_config(env):
     GENERIC_HUB_LABELS = parse_generic_hub_labels(get_config_value("GENERIC_HUB_LABELS", env, None))
     
     REGION_SYNONYM_MAP = parse_region_synonym_map(get_config_value("REGION_SYNONYM_MAP", env, None))
+
+    GOOGLE_REDIRECT_URI = get_config_value("GOOGLE_REDIRECT_URI", env, "http://127.0.0.1:5001/api/auth/callback")
 
 # Initialize with default environment variables on module load
 setup_config(None)

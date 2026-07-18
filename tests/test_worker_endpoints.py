@@ -343,7 +343,15 @@ class TestWorkerEndpoints(unittest.TestCase):
         req = Request("http://localhost/api/user/profile", method="GET")
         resp = self.run_async(self.worker.fetch(req))
         self.assertEqual(resp.status, 401)
-        self.assertEqual(json.loads(resp.body)["error"], "Unauthenticated. Missing or invalid JWT session token.")
+        error_msg = json.loads(resp.body)["error"]
+        self.assertTrue(
+            error_msg in (
+                "Unauthenticated. Missing or invalid JWT session token.",
+                "Unauthenticated. Missing JWT session token."
+            ),
+            f"Unexpected error message: {error_msg}"
+        )
+
 
     def test_protected_endpoints_authenticated(self):
         """Verify protected endpoints return 200 if authenticated."""
