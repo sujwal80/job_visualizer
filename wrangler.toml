@@ -1,5 +1,5 @@
 name = "startup-visualizer"
-main = "backend/worker.py"
+main = "entrypoint.py"
 compatibility_date = "2024-09-19"
 compatibility_flags = ["python_workers"]
 
