@@ -44,23 +44,55 @@ except ImportError:
             return self._headers
 
     class Response:
-        def __init__(self, body, status=200, headers=None):
+        def __init__(self, body=None, init=None, **kwargs):
             self.body = body
-            self.status = status
-            if isinstance(headers, Headers):
-                self.headers = headers
+            self.status = 200
+            headers_raw = None
+            
+            if isinstance(init, dict):
+                self.status = init.get("status", 200)
+                headers_raw = init.get("headers")
+            elif init is not None:
+                self.status = getattr(init, "status", 200)
+                headers_raw = getattr(init, "headers", None)
+                
+            if "status" in kwargs:
+                self.status = kwargs["status"]
+            if "headers" in kwargs:
+                headers_raw = kwargs["headers"]
+                
+            if isinstance(headers_raw, Headers):
+                self.headers = headers_raw
             else:
-                self.headers = Headers(headers)
+                self.headers = Headers(headers_raw)
 
     class Request:
-        def __init__(self, url, method="GET", headers=None, body=None):
+        def __init__(self, url, init=None, **kwargs):
             self.url = url
-            self.method = method
-            if isinstance(headers, Headers):
-                self.headers = headers
+            self.body = None
+            self.method = "GET"
+            headers_raw = None
+            
+            if isinstance(init, dict):
+                self.method = init.get("method", "GET")
+                headers_raw = init.get("headers")
+                self.body = init.get("body")
+            elif init is not None:
+                self.method = getattr(init, "method", "GET")
+                headers_raw = getattr(init, "headers", None)
+                self.body = getattr(init, "body", None)
+            
+            if "method" in kwargs:
+                self.method = kwargs["method"]
+            if "headers" in kwargs:
+                headers_raw = kwargs["headers"]
+            if "body" in kwargs:
+                self.body = kwargs["body"]
+                
+            if isinstance(headers_raw, Headers):
+                self.headers = headers_raw
             else:
-                self.headers = Headers(headers)
-            self.body = body
+                self.headers = Headers(headers_raw)
 
 class DictMultiDict:
     def __init__(self, d):
@@ -98,6 +130,19 @@ class WorkerEntrypoint:
 
 
     async def fetch(self, request):
+        try:
+            return await self._fetch_unsafe(request)
+        except Exception as e:
+            if 'unittest' in sys.modules:
+                raise e
+            try:
+                from js import Response as JSResponse
+            except ImportError:
+                JSResponse = Response
+            init = {"status": 500}
+            return JSResponse(f"Internal Server Error: {str(e)}", init)
+
+    async def _fetch_unsafe(self, request):
         parsed_url = urlparse(request.url)
         path = parsed_url.path
         method = request.method.upper()
@@ -109,14 +154,22 @@ class WorkerEntrypoint:
             headers.set('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
             headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Accept-Encoding')
             headers.set('Access-Control-Max-Age', '86400')
-            return Response("", status=204, headers=headers)
+            init = {
+                "status": 204,
+                "headers": headers
+            }
+            return Response("", init)
 
         # Forward non-API requests (static frontend templates and assets) to ASSETS
         if not path.startswith('/api/'):
             if path in ('/', '/jobs', '/map'):
                 parsed_req = urlparse(request.url)
                 new_url = urlunparse(parsed_req._replace(path='/index.html'))
-                asset_request = Request(new_url, method=request.method, headers=request.headers)
+                init = {
+                    "method": request.method,
+                    "headers": request.headers
+                }
+                asset_request = Request(new_url, init)
                 asset_response = await self.env.ASSETS.fetch(asset_request)
             else:
                 asset_response = await self.env.ASSETS.fetch(request)
@@ -220,7 +273,11 @@ class WorkerEntrypoint:
         else:
             res_body = str(res_body)
 
-        return JSResponse(res_body, status=unified_res.status, headers=js_headers)
+        init = {
+            "status": unified_res.status,
+            "headers": js_headers
+        }
+        return JSResponse(res_body, init)
 
 
     def _inject_headers(self, response, path, rate_limit_info=None):
@@ -282,4 +339,8 @@ class WorkerEntrypoint:
                     new_headers.append('Set-Cookie', v)
 
         body = getattr(response, "body", "")
-        return JSResponse(body, status=response.status, headers=new_headers)
+        init = {
+            "status": response.status,
+            "headers": new_headers
+        }
+        return JSResponse(body, init)
