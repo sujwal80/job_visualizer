@@ -42,6 +42,10 @@ except ImportError:
             return None
         def entries(self):
             return self._headers
+        @classmethod
+        def new(cls, *args, **kwargs):
+            return cls(*args, **kwargs)
+
 
     class Response:
         def __init__(self, body=None, init=None, **kwargs):
@@ -65,6 +69,10 @@ except ImportError:
                 self.headers = headers_raw
             else:
                 self.headers = Headers(headers_raw)
+        @classmethod
+        def new(cls, *args, **kwargs):
+            return cls(*args, **kwargs)
+
 
     class Request:
         def __init__(self, url, init=None, **kwargs):
@@ -93,6 +101,10 @@ except ImportError:
                 self.headers = headers_raw
             else:
                 self.headers = Headers(headers_raw)
+        @classmethod
+        def new(cls, *args, **kwargs):
+            return cls(*args, **kwargs)
+
 
 class DictMultiDict:
     def __init__(self, d):
@@ -140,7 +152,7 @@ class WorkerEntrypoint:
             except ImportError:
                 JSResponse = Response
             init = {"status": 500}
-            return JSResponse(f"Internal Server Error: {str(e)}", init)
+            return JSResponse.new(f"Internal Server Error: {str(e)}", init)
 
     async def _fetch_unsafe(self, request):
         parsed_url = urlparse(request.url)
@@ -149,7 +161,7 @@ class WorkerEntrypoint:
 
         # CORS preflight options
         if method == "OPTIONS":
-            headers = Headers()
+            headers = Headers.new()
             headers.set('Access-Control-Allow-Origin', '*')
             headers.set('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
             headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Accept-Encoding')
@@ -158,7 +170,7 @@ class WorkerEntrypoint:
                 "status": 204,
                 "headers": headers
             }
-            return Response("", init)
+            return Response.new("", init)
 
         # Forward non-API requests (static frontend templates and assets) to ASSETS
         if not path.startswith('/api/'):
@@ -169,7 +181,7 @@ class WorkerEntrypoint:
                     "method": request.method,
                     "headers": request.headers
                 }
-                asset_request = Request(new_url, init)
+                asset_request = Request.new(new_url, init)
                 asset_response = await self.env.ASSETS.fetch(asset_request)
             else:
                 asset_response = await self.env.ASSETS.fetch(request)
@@ -238,7 +250,7 @@ class WorkerEntrypoint:
             JSHeaders = Headers
             JSResponse = Response
 
-        js_headers = JSHeaders()
+        js_headers = JSHeaders.new()
         for k, v in unified_res.headers.items():
             if k.lower() == 'set-cookie':
                 pass
@@ -277,7 +289,7 @@ class WorkerEntrypoint:
             "status": unified_res.status,
             "headers": js_headers
         }
-        return JSResponse(res_body, init)
+        return JSResponse.new(res_body, init)
 
 
     def _inject_headers(self, response, path, rate_limit_info=None):
@@ -314,11 +326,11 @@ class WorkerEntrypoint:
 
         try:
             from js import Headers as JSHeaders, Response as JSResponse
-            new_headers = JSHeaders()
+            new_headers = JSHeaders.new()
         except ImportError:
             JSHeaders = Headers
             JSResponse = Response
-            new_headers = JSHeaders()
+            new_headers = JSHeaders.new()
 
         for k, v in headers_dict.items():
             if k == 'set-cookie':
@@ -343,4 +355,4 @@ class WorkerEntrypoint:
             "status": response.status,
             "headers": new_headers
         }
-        return JSResponse(body, init)
+        return JSResponse.new(body, init)
