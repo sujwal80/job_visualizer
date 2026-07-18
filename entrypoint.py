@@ -1,1 +1,4 @@
-from backend.worker import WorkerEntrypoint
+from backend.worker import WorkerEntrypoint as BackendWorkerEntrypoint
+
+class WorkerEntrypoint(BackendWorkerEntrypoint):
+    pass
