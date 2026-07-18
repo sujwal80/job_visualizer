@@ -424,11 +424,14 @@ async def load_startups_from_assets(assets_binding):
         from js import Request
     except ImportError:
         class Request:
-            def __init__(self, url):
+            def __init__(self, url, init=None, **kwargs):
                 self.url = url
                 self.method = "GET"
+            @classmethod
+            def new(cls, *args, **kwargs):
+                return cls(*args, **kwargs)
 
-    req = Request("http://assets/static/data/startups.json")
+    req = Request.new("http://assets/static/data/startups.json")
     resp = await assets_binding.fetch(req)
     
     # Check if resp is mock or real
