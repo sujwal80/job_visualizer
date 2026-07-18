@@ -50,46 +50,59 @@ def reset_auth_stores():
     _csrf_state_store.clear()
     _revoked_tokens.clear()
 
-def generate_oauth_state(expires_in=600):
+async def generate_oauth_state(expires_in=600, session_store=None):
     """
     Generate a cryptographically secure random CSRF state token and store it with expiration.
 
     Args:
         expires_in (int): Time-to-live in seconds for the generated state token (default 600s).
+        session_store: Cloudflare KV namespace binding.
 
     Returns:
         str: A URL-safe 32-byte cryptographic random string token.
     """
     state = secrets.token_urlsafe(32)
-    _csrf_state_store[state] = time.time() + expires_in
-    # Automated cleanup: sweep expired state records during token generation
-    now = time.time()
-    expired = [k for k, exp in _csrf_state_store.items() if exp < now]
-    for k in expired:
-        _csrf_state_store.pop(k, None)
-    # Enforce strict memory bounds on state store (max 10,000 pending logins)
-    while len(_csrf_state_store) > 10000:
-        _csrf_state_store.pop(next(iter(_csrf_state_store)), None)
+    if session_store is not None:
+        await session_store.put(f"csrf:{state}", "1", expirationTtl=expires_in)
+    else:
+        _csrf_state_store[state] = time.time() + expires_in
+        # Automated cleanup: sweep expired state records during token generation
+        now = time.time()
+        expired = [k for k, exp in _csrf_state_store.items() if exp < now]
+        for k in expired:
+            _csrf_state_store.pop(k, None)
+        # Enforce strict memory bounds on state store (max 10,000 pending logins)
+        while len(_csrf_state_store) > 10000:
+            _csrf_state_store.pop(next(iter(_csrf_state_store)), None)
     return state
 
-def validate_oauth_state(state):
+async def validate_oauth_state(state, session_store=None):
     """
     Validate and consume an OAuth CSRF state token.
 
     Args:
         state (str): The state token returned by the Google OAuth callback parameter.
+        session_store: Cloudflare KV namespace binding.
 
     Returns:
         bool: True if the token exists in the store and has not expired, False otherwise.
     """
     if not state or not isinstance(state, str):
         return False
-    exp = _csrf_state_store.pop(state, None)
-    if exp is None:
-        return False
-    if time.time() > exp:
-        return False
-    return True
+    if session_store is not None:
+        key = f"csrf:{state}"
+        val = await session_store.get(key)
+        if val is None:
+            return False
+        await session_store.delete(key)
+        return True
+    else:
+        exp = _csrf_state_store.pop(state, None)
+        if exp is None:
+            return False
+        if time.time() > exp:
+            return False
+        return True
 
 def get_google_auth_url(state, redirect_uri=None):
     """
@@ -181,13 +194,14 @@ def issue_jwt_token(user_data, expires_in=3600, custom_secret=None):
         token = token.decode("utf-8")
     return token
 
-def verify_jwt_token(token, custom_secret=None):
+async def verify_jwt_token(token, custom_secret=None, session_store=None):
     """
     Verify and decode a JWT session token against expiration and revocation blacklists.
 
     Args:
         token (str): The raw JWT token string to verify.
         custom_secret (str, optional): Custom HMAC secret key override for verification.
+        session_store: Cloudflare KV namespace binding.
 
     Returns:
         dict or None: The decoded token payload dictionary if valid and active, or None if invalid/revoked.
@@ -199,19 +213,30 @@ def verify_jwt_token(token, custom_secret=None):
         payload = jwt.decode(token, secret, algorithms=["HS256"])
         jti = payload.get("jti")
         # Check if the unique token ID or signature has been revoked in the blacklist
-        if jti in _revoked_tokens or token in _revoked_tokens:
-            return None
+        sig = token.split('.')[2] if len(token.split('.')) == 3 else token
+        if session_store is not None:
+            if jti:
+                val_jti = await session_store.get(f"revoked:{jti}")
+                if val_jti is not None:
+                    return None
+            val_sig = await session_store.get(f"revoked:{sig}")
+            if val_sig is not None:
+                return None
+        else:
+            if jti in _revoked_tokens or token in _revoked_tokens or sig in _revoked_tokens:
+                return None
         return payload
     except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, jwt.PyJWTError):
         return None
 
-def revoke_jwt_token(token, custom_secret=None):
+async def revoke_jwt_token(token, custom_secret=None, session_store=None):
     """
     Revoke an active session JWT token by adding its unique `jti` or signature to the blacklist.
 
     Args:
         token (str): The JWT session token to revoke during user logout.
         custom_secret (str, optional): Custom HMAC secret key override for decoding.
+        session_store: Cloudflare KV namespace binding.
 
     Returns:
         bool: True if the token was successfully added to the revocation blacklist.
@@ -223,11 +248,27 @@ def revoke_jwt_token(token, custom_secret=None):
         # Decode without verifying expiration so we can still revoke an already expired token
         payload = jwt.decode(token, secret, algorithms=["HS256"], options={"verify_exp": False})
         jti = payload.get("jti")
-        if jti:
-            _revoked_tokens.add(jti)
-        _revoked_tokens.add(token)
-        return True
+        exp = payload.get("exp")
+        now = int(time.time())
+        ttl = max(60, exp - now) if exp else 86400
+        sig = token.split('.')[2] if len(token.split('.')) == 3 else token
+        
+        if session_store is not None:
+            if jti:
+                await session_store.put(f"revoked:{jti}", "1", expirationTtl=ttl)
+            await session_store.put(f"revoked:{sig}", "1", expirationTtl=ttl)
+            return True
+        else:
+            if jti:
+                _revoked_tokens.add(jti)
+            _revoked_tokens.add(token)
+            _revoked_tokens.add(sig)
+            return True
     except Exception:
-        # Even if decode fails completely, add raw token string to blacklist
-        _revoked_tokens.add(token)
+        sig = token.split('.')[2] if len(token.split('.')) == 3 else token
+        if session_store is not None:
+            await session_store.put(f"revoked:{sig}", "1", expirationTtl=86400)
+        else:
+            _revoked_tokens.add(token)
+            _revoked_tokens.add(sig)
         return True

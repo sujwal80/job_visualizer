@@ -17,6 +17,7 @@ DATA_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'start
 # In-memory database cache to prevent redundant disk I/O across API requests
 _cache_data = None
 _cache_mtime = 0
+_cache_startups = None
 
 def load_startups():
     """
@@ -409,4 +410,70 @@ def get_data_version():
     except Exception:
         pass
     return "0"
+
+async def load_startups_from_assets(assets_binding):
+    """
+    Load startup records from Cloudflare Pages static ASSETS binding.
+    """
+    global _cache_startups
+    if _cache_startups is not None:
+        return _cache_startups
+
+    try:
+        from js import Request
+    except ImportError:
+        class Request:
+            def __init__(self, url):
+                self.url = url
+                self.method = "GET"
+
+    req = Request("http://assets/static/data/startups.json")
+    resp = await assets_binding.fetch(req)
+    
+    # Check if resp is mock or real
+    if hasattr(resp, "json"):
+        data = await resp.json()
+    else:
+        # standard mock fallback in case mock doesn't support json method as a coroutine
+        data = resp
+
+    if not isinstance(data, list):
+        try:
+            if hasattr(data, "to_py"):
+                data = data.to_py()
+        except Exception:
+            pass
+
+    if not isinstance(data, list):
+        data = []
+
+    for s in data:
+        if not isinstance(s, dict):
+            continue
+        s["has_pin"] = _check_has_pin(s)
+        for f_key in ["name", "city", "description", "industry", "funding_stage", "total_raised", "verified_email"]:
+            if f_key in s:
+                s[f_key] = _sanitize_string(s[f_key])
+        if "website" in s:
+            s["website"] = _sanitize_url(s.get("website"))
+        if "url" in s:
+            s["url"] = _sanitize_url(s.get("url"))
+        for f_obj in (s.get("founders") or []):
+            if isinstance(f_obj, dict):
+                if "name" in f_obj:
+                    f_obj["name"] = _sanitize_string(f_obj.get("name"))
+                if "linkedin" in f_obj:
+                    f_obj["linkedin"] = _sanitize_url(f_obj.get("linkedin"))
+        for j_obj in (s.get("job_openings") or []):
+            if isinstance(j_obj, dict):
+                for j_key in ["title", "department", "experience", "salary", "job_type", "location", "posted_date", "source"]:
+                    if j_key in j_obj:
+                        j_obj[j_key] = _sanitize_string(j_obj[j_key])
+                if "url" in j_obj:
+                    j_obj["url"] = _sanitize_url(j_obj.get("url"))
+                if isinstance(j_obj.get("skills"), list):
+                    j_obj["skills"] = [_sanitize_string(sk) for sk in j_obj["skills"] if isinstance(sk, str)]
+
+    _cache_startups = data
+    return data
 

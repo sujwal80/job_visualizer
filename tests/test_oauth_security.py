@@ -19,6 +19,7 @@ from urllib.parse import urlparse, parse_qs
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from backend.app import app
 from backend.services import auth_service
+import asyncio
 
 class TestOAuthAndSessionSecurity(unittest.TestCase):
     """Exhaustive automated verification harness for Google OAuth & Session Security."""
@@ -127,7 +128,7 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         self.assertIsInstance(token, str)
         self.assertEqual(len(token.split('.')), 3, "JWT must contain 3 dot-separated segments (header.payload.signature)")
         
-        decoded = auth_service.verify_jwt_token(token)
+        decoded = asyncio.run(auth_service.verify_jwt_token(token))
         self.assertIsNotNone(decoded, "verify_jwt_token failed on valid token!")
         self.assertEqual(decoded["sub"], "test_user_888")
         self.assertEqual(decoded["email"], "sec@worldtech.map")
@@ -140,7 +141,7 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         user_payload = {"sub": "expired_user", "email": "old@worldtech.map"}
         expired_token = auth_service.issue_jwt_token(user_payload, expires_in=-10) # 10 seconds in the past
         
-        self.assertIsNone(auth_service.verify_jwt_token(expired_token), "verify_jwt_token should return None for expired token!")
+        self.assertIsNone(asyncio.run(auth_service.verify_jwt_token(expired_token)), "verify_jwt_token should return None for expired token!")
         
         # Test against protected API endpoint
         self.client.set_cookie('session_token', expired_token)

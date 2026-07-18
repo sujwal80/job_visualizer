@@ -19,6 +19,26 @@ from backend.services.auth_service import (
     generate_oauth_state, validate_oauth_state, get_google_auth_url,
     exchange_code_for_user, issue_jwt_token, verify_jwt_token, revoke_jwt_token
 )
+from backend import config
+import asyncio
+
+def get_session_store():
+    """Retrieve session_store from Flask request context or config globals."""
+    try:
+        if 'SESSION_STORE' in request.environ:
+            return request.environ['SESSION_STORE']
+        if 'env' in request.environ:
+            env = request.environ['env']
+            if hasattr(env, 'SESSION_STORE'):
+                return env.SESSION_STORE
+            if isinstance(env, dict) and 'SESSION_STORE' in env:
+                return env['SESSION_STORE']
+    except Exception:
+        pass
+    try:
+        return config.SESSION_STORE
+    except AttributeError:
+        return None
 
 app = Flask(
     __name__, 
@@ -45,7 +65,9 @@ def login_required(f):
                 token = auth_header.split(' ', 1)[1]
         if not token:
             return jsonify({"error": "Unauthenticated. Missing JWT session token."}), 401
-        user = verify_jwt_token(token)
+        
+        session_store = get_session_store()
+        user = asyncio.run(verify_jwt_token(token, session_store=session_store))
         if not user:
             return jsonify({"error": "Unauthenticated. Invalid, expired, or revoked JWT session token."}), 401
         # Store verified user claims on Flask application context global `g`
@@ -278,7 +300,8 @@ def auth_google():
     Generates a CSRF state token stored in an `HttpOnly, Secure, SameSite=Strict` cookie
     and redirects or returns the Google consent URL.
     """
-    state = generate_oauth_state()
+    session_store = get_session_store()
+    state = asyncio.run(generate_oauth_state(session_store=session_store))
     redirect_uri = request.args.get('redirect_uri')
     auth_url = get_google_auth_url(state, redirect_uri=redirect_uri)
     
@@ -302,7 +325,8 @@ def auth_callback():
     state = data.get('state')
     code = data.get('code')
     
-    valid_in_store = validate_oauth_state(state)
+    session_store = get_session_store()
+    valid_in_store = asyncio.run(validate_oauth_state(state, session_store=session_store))
     cookie_state = request.cookies.get('oauth_state')
     valid_in_cookie = (state is not None and cookie_state is not None and cookie_state == state)
     
@@ -377,7 +401,8 @@ def auth_status():
     if not token:
         return jsonify({"authenticated": False, "user": None, "message": "No session cookie present."}), 200
         
-    user = verify_jwt_token(token)
+    session_store = get_session_store()
+    user = asyncio.run(verify_jwt_token(token, session_store=session_store))
     if not user:
         return jsonify({"authenticated": False, "user": None, "message": "Invalid, expired, or revoked session cookie."}), 200
         
@@ -404,7 +429,8 @@ def auth_logout():
             token = auth_header.split(' ', 1)[1]
             
     if token:
-        revoke_jwt_token(token)
+        session_store = get_session_store()
+        asyncio.run(revoke_jwt_token(token, session_store=session_store))
         
     resp = make_response(jsonify({"message": "Successfully logged out.", "authenticated": False}), 200)
     resp.set_cookie('session_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
