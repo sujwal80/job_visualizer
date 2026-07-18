@@ -1,4 +1,9 @@
-from backend.worker import WorkerEntrypoint as BackendWorkerEntrypoint
+from backend.worker import WorkerEntrypoint
 
-class WorkerEntrypoint(BackendWorkerEntrypoint):
-    pass
+_worker = None
+
+async def on_fetch(request, env):
+    global _worker
+    if _worker is None:
+        _worker = WorkerEntrypoint(env)
+    return await _worker.fetch(request)
