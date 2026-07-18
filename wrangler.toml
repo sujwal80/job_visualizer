@@ -9,4 +9,4 @@ binding = "ASSETS"
 
 [[kv_namespaces]]
 binding = "SESSION_STORE"
-id = "session_store_dummy_id"
+id = "a1b2c3d4e5f678901234567890abcdef"
