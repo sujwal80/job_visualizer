@@ -5,3 +5,5 @@ beautifulsoup4==4.15.0
 urllib3==2.6.3
 gunicorn==23.0.0
 packaging==26.2
+PyJWT==2.8.0
+

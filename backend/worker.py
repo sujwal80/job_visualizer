@@ -4,9 +4,17 @@ Implements WorkerEntrypoint to route API endpoints, handle OAuth callbacks,
 session KV verification, and static asset delivery via the ASSETS binding.
 """
 
-import json
+import os
 import sys
+# Ensure parent directory is in path to resolve 'backend' package imports
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+_parent_dir = os.path.abspath(os.path.join(_current_dir, '..'))
+if _parent_dir not in sys.path:
+    sys.path.insert(0, _parent_dir)
+
+import json
 from http.cookies import SimpleCookie
+
 from urllib.parse import urlparse, parse_qs, urlunparse
 from backend.config import setup_config
 from backend.services.startup_service import get_data_version
