@@ -441,7 +441,7 @@ class UnifiedRouter:
             return self._inject_headers(res, req, rate_limit_info)
 
         except Exception as e:
-            res = UnifiedResponse({"error": "Internal server error"}, status=500)
+            res = UnifiedResponse({"error": "Internal server error", "details": str(e)}, status=500)
             return self._inject_headers(res, req, rate_limit_info)
 
     def _inject_headers(self, response: UnifiedResponse, req: UnifiedRequest, rate_limit_info=None) -> UnifiedResponse:
