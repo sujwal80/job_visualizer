@@ -8,7 +8,7 @@ and managing stateless JWT session tokens with revocation blacklisting.
 import os
 import time
 import secrets
-import jwt
+from backend.utils import jwt_helper as jwt
 from urllib.parse import urlencode
 from backend import config
 
