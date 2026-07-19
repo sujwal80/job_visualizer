@@ -150,7 +150,11 @@ export const state = {
     currentDataVersion: null,
     currentFilters: {
         industry: 'all',
-        query: ''
+        query: '',
+        role: '',
+        work_type: '',
+        exp_level: '',
+        salary_min: ''
     },
     filterRafId: null,
     inputTimeout: null,

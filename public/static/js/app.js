@@ -38,6 +38,13 @@ const mobileToggleBtn = document.getElementById('mobile-toggle-btn');
 const sidebar = document.getElementById('sidebar');
 const resetMapBtn = document.getElementById('reset-map-btn');
 
+const filterRoleInput = document.getElementById('filter-role-input');
+const filterWorkType = document.getElementById('filter-work-type');
+const filterExpLevel = document.getElementById('filter-exp-level');
+const filterSalaryMin = document.getElementById('filter-salary-min');
+const clearFiltersBtn = document.getElementById('clear-filters-btn');
+const sidebarSearchInput = document.getElementById('sidebar-search-input');
+
 let currentSelectedIndustry = "";
 
 // Initialize geocode/hub routing on load
@@ -162,6 +169,18 @@ function fetchFilteredStartups(preventScroll = false) {
 
     if (currentSelectedIndustry) {
         queryParams.set('industry', currentSelectedIndustry);
+    }
+    if (state.currentFilters.role) {
+        queryParams.set('role', state.currentFilters.role);
+    }
+    if (state.currentFilters.salary_min) {
+        queryParams.set('salary_min', state.currentFilters.salary_min);
+    }
+    if (state.currentFilters.exp_level) {
+        queryParams.set('exp_level', state.currentFilters.exp_level);
+    }
+    if (state.currentFilters.work_type) {
+        queryParams.set('work_type', state.currentFilters.work_type);
     }
     if (urlParams.get('has_jobs') === 'true' || urlParams.get('has_jobs') === '1') {
         queryParams.set('has_jobs', 'true');
@@ -330,7 +349,8 @@ function getSearchText() {
 
 function updateLocalMarkersVisualState() {
     const searchText = getSearchText();
-    const isFilteringActive = searchText !== '' || currentSelectedIndustry !== '';
+    const sidebarSearchText = sidebarSearchInput ? sidebarSearchInput.value.toLowerCase().trim() : '';
+    const isFilteringActive = searchText !== '' || currentSelectedIndustry !== '' || sidebarSearchText !== '';
 
     state.startupsData.forEach(startup => {
         const marker = state.markersMap.get(startup.id) || (state.currentSelectedId === startup.id ? state.tempRemoteMarker : null);
@@ -338,7 +358,21 @@ function updateLocalMarkersVisualState() {
         const element = marker.getElement();
         if (!element) return;
         const isSelected = state.currentSelectedId === startup.id;
-        const isMatch = checkStartupMatch(startup, searchText);
+        
+        let isMatch = checkStartupMatch(startup, searchText);
+        if (isMatch && sidebarSearchText) {
+            const name = (startup.name || '').toLowerCase();
+            const desc = (startup.description || '').toLowerCase();
+            const industry = (startup.industry || '').toLowerCase();
+            const skills = Array.isArray(startup.skills) ? startup.skills.map(s => String(s).toLowerCase()) : [];
+            const titles = Array.isArray(startup.job_titles) ? startup.job_titles.map(t => String(t).toLowerCase()) : [];
+            
+            isMatch = name.includes(sidebarSearchText) ||
+                      desc.includes(sidebarSearchText) ||
+                      industry.includes(sidebarSearchText) ||
+                      skills.some(s => s.includes(sidebarSearchText)) ||
+                      titles.some(t => t.includes(sidebarSearchText));
+        }
 
         const isFaded = isFilteringActive && !isMatch;
         const img = element.querySelector('.logo-marker-thumbnail');
@@ -366,10 +400,28 @@ function updateLocalMarkersVisualState() {
 
 function applyFiltering() {
     const searchText = getSearchText();
-    const filtered = state.startupsData.filter(startup => checkStartupMatch(startup, searchText));
-    console.log(`[DEBUG applyFiltering] searchText="${searchText}" currentSelectedIndustry="${currentSelectedIndustry}" startupsData.length=${state.startupsData.length} filtered.length=${filtered.length}`);
+    const sidebarSearchText = sidebarSearchInput ? sidebarSearchInput.value.toLowerCase().trim() : '';
 
-    renderDirectory(filtered, (searchText || currentSelectedIndustry) ? 'No companies match your criteria' : null);
+    const filtered = state.startupsData.filter(startup => checkStartupMatch(startup, searchText)).filter(startup => {
+        if (sidebarSearchText) {
+            const name = (startup.name || '').toLowerCase();
+            const desc = (startup.description || '').toLowerCase();
+            const industry = (startup.industry || '').toLowerCase();
+            const skills = Array.isArray(startup.skills) ? startup.skills.map(s => String(s).toLowerCase()) : [];
+            const titles = Array.isArray(startup.job_titles) ? startup.job_titles.map(t => String(t).toLowerCase()) : [];
+            
+            return name.includes(sidebarSearchText) ||
+                   desc.includes(sidebarSearchText) ||
+                   industry.includes(sidebarSearchText) ||
+                   skills.some(s => s.includes(sidebarSearchText)) ||
+                   titles.some(t => t.includes(sidebarSearchText));
+        }
+        return true;
+    });
+
+    console.log(`[DEBUG applyFiltering] searchText="${searchText}" sidebarSearchText="${sidebarSearchText}" currentSelectedIndustry="${currentSelectedIndustry}" startupsData.length=${state.startupsData.length} filtered.length=${filtered.length}`);
+
+    renderDirectory(filtered, (searchText || sidebarSearchText || currentSelectedIndustry) ? 'No companies match your criteria' : null);
     updateDashboardStats(filtered);
     updateLocalMarkersVisualState();
     if (state.currentSelectedId !== null && detailsDrawer.classList.contains('active')) {
@@ -395,10 +447,51 @@ function handleDebouncedInput() {
     inputTimeout = setTimeout(scheduleFiltering, 150);
 }
 
+function handleFiltersChange() {
+    state.currentFilters.role = filterRoleInput ? filterRoleInput.value.trim() : '';
+    state.currentFilters.work_type = filterWorkType ? filterWorkType.value : '';
+    state.currentFilters.exp_level = filterExpLevel ? filterExpLevel.value : '';
+    state.currentFilters.salary_min = filterSalaryMin ? filterSalaryMin.value : '';
+    
+    fetchFilteredStartups().then(() => {
+        if (state.currentSelectedId !== null) {
+            selectAndOpenStartup(state.currentSelectedId);
+        }
+    });
+}
+
+let filtersTimeout = null;
+function handleDebouncedFiltersChange() {
+    if (filtersTimeout) clearTimeout(filtersTimeout);
+    filtersTimeout = setTimeout(handleFiltersChange, 200);
+}
+
 // Attach Event Listeners
 window.addEventListener('hashchange', handleHashRouting);
 
-searchInput.addEventListener('input', handleDebouncedInput);
+if (searchInput) searchInput.addEventListener('input', handleDebouncedInput);
+if (sidebarSearchInput) sidebarSearchInput.addEventListener('input', handleDebouncedInput);
+
+if (filterRoleInput) filterRoleInput.addEventListener('input', handleDebouncedFiltersChange);
+if (filterWorkType) filterWorkType.addEventListener('change', handleFiltersChange);
+if (filterExpLevel) filterExpLevel.addEventListener('change', handleFiltersChange);
+if (filterSalaryMin) filterSalaryMin.addEventListener('change', handleFiltersChange);
+
+if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener('click', () => {
+        if (filterRoleInput) filterRoleInput.value = '';
+        if (filterWorkType) filterWorkType.value = '';
+        if (filterExpLevel) filterExpLevel.value = '';
+        if (filterSalaryMin) filterSalaryMin.value = '';
+        
+        state.currentFilters.role = '';
+        state.currentFilters.work_type = '';
+        state.currentFilters.exp_level = '';
+        state.currentFilters.salary_min = '';
+        
+        handleFiltersChange();
+    });
+}
 
 
 quickTabs.forEach(btn => {

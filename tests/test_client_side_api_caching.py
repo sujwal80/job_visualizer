@@ -105,10 +105,10 @@ class TestClientSideApiCachingMasterSuite(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.state_js_path = os.path.join(PROJECT_ROOT, "frontend", "static", "js", "modules", "state.js")
-        cls.api_js_path = os.path.join(PROJECT_ROOT, "frontend", "static", "js", "modules", "api.js")
-        cls.ui_manager_js_path = os.path.join(PROJECT_ROOT, "frontend", "static", "js", "modules", "ui_manager.js")
-        cls.app_js_path = os.path.join(PROJECT_ROOT, "frontend", "static", "js", "app.js")
+        cls.state_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "modules", "state.js")
+        cls.api_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "modules", "api.js")
+        cls.ui_manager_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "modules", "ui_manager.js")
+        cls.app_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "app.js")
 
         with open(cls.state_js_path, "r", encoding="utf-8") as f:
             cls.state_js = f.read()
@@ -190,8 +190,8 @@ class TestClientSideApiCachingMasterSuite(unittest.TestCase):
             for field in required_job_fields:
                 self.assertIn(field, job, f"Missing structured job attribute: {field}")
 
-        # 2. Frontend JS check: selectAndOpenStartup requests /api/companies/<id>
-        self.assertIn("safeFetch(`/api/company/${id}`", self.ui_manager_js)
+        self.assertIn("`/api/company/${id}", self.ui_manager_js)
+        self.assertIn("safeFetch(url", self.ui_manager_js)
 
     def test_03_ac3_lru_cache_with_ttl_zero_http_requests_within_ttl(self):
         """

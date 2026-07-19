@@ -191,7 +191,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
     def test_b2_interactive_map_controls_and_zooming(self):
         """Verify Back to Search button returns to landing state."""
         self.page.goto(f"{self.BASE_URL}/")
-        self.page.click("button[onclick=\"handlePresetSearch('san francisco')\"]")
+        self.page.click("button[onclick=\"handlePresetSearch('mumbai')\"]")
         self.page.wait_for_timeout(1000)
 
         self.assertIn("/jobs", self.page.url)
@@ -234,13 +234,13 @@ class TestE2EInteractiveQA(unittest.TestCase):
         total_items = self.page.locator("#directory-list .directory-item").count()
 
         # Click Fintech tab
-        self.page.click("button:has-text('Fintech')")
+        self.page.click("#quick-industry-tabs button:has-text('Fintech')")
         self.page.wait_for_timeout(500)
         fintech_items = self.page.locator("#directory-list .directory-item").count()
         self.assertTrue(fintech_items < total_items, "Fintech filter should reduce matching items")
 
         # Reset to All
-        self.page.click("button:has-text('All Industries')")
+        self.page.click("#quick-industry-tabs button:has-text('All Industries')")
         self.page.wait_for_timeout(500)
         all_items = self.page.locator("#directory-list .directory-item").count()
         self.assertEqual(all_items, total_items, "Reset filter should restore all items")
@@ -453,7 +453,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
         # Rapidly click filters
         tabs = ["SaaS", "Fintech", "AI", "HealthTech", "Service Industry", "All Industries"]
         for tab in tabs:
-            self.page.click(f"button:has-text('{tab}')")
+            self.page.click(f"#quick-industry-tabs button:has-text('{tab}')")
 
         self.page.wait_for_timeout(500)
         self.assertEqual(self.js_errors, [], "Rapid filter clicks should produce 0 JS runtime errors")
@@ -509,7 +509,12 @@ class TestE2EInteractiveQA(unittest.TestCase):
 
         # Click preset city Bengaluru
         self.page.click("button[onclick=\"handlePresetSearch('bengaluru')\"]")
-        self.page.wait_for_timeout(2000)
+        self.page.wait_for_url("**/jobs?city=Bengaluru%2C%20KA")
+        self.page.wait_for_load_state("domcontentloaded")
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && window.WorldTechApp.state && window.WorldTechApp.state.startupsData && window.WorldTechApp.state.startupsData.length > 0",
+            timeout=10000
+        )
 
         # Set up a spy on map.flyTo to capture options
         self.page.evaluate("""() => {

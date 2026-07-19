@@ -11,7 +11,7 @@ from backend.app import app
 
 
 def load_all_js_contents(workspace_root):
-    js_dir = os.path.join(workspace_root, 'frontend', 'static', 'js')
+    js_dir = os.path.join(workspace_root, 'public', 'static', 'js')
     contents = []
     
     app_js = os.path.join(js_dir, 'app.js')
@@ -40,8 +40,8 @@ class TestR1ViewportAndLayoutResilience(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        cls.css_path = os.path.join(cls.workspace_root, 'frontend', 'static', 'css', 'style.css')
-        cls.html_path = os.path.join(cls.workspace_root, 'frontend', 'templates', 'index.html')
+        cls.css_path = os.path.join(cls.workspace_root, 'public', 'static', 'css', 'style.css')
+        cls.html_path = os.path.join(cls.workspace_root, 'public', 'index.html')
 
         with open(cls.css_path, 'r', encoding='utf-8') as f:
             cls.css_content = f.read()
@@ -620,8 +620,8 @@ class TestM1UIUXModernizationAndSecurityResilience(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        cls.css_path = os.path.join(cls.workspace_root, 'frontend', 'static', 'css', 'style.css')
-        cls.js_path = os.path.join(cls.workspace_root, 'frontend', 'static', 'js', 'modules', 'ui_manager.js')
+        cls.css_path = os.path.join(cls.workspace_root, 'public', 'static', 'css', 'style.css')
+        cls.js_path = os.path.join(cls.workspace_root, 'public', 'static', 'js', 'modules', 'ui_manager.js')
 
         with open(cls.css_path, 'r', encoding='utf-8') as f:
             cls.css_content = f.read()

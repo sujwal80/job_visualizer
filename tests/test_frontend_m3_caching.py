@@ -18,10 +18,10 @@ class TestMilestone3FrontendCachingAndCoalescing(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.state_js_path = os.path.join(PROJECT_ROOT, "frontend", "static", "js", "modules", "state.js")
-        cls.api_js_path = os.path.join(PROJECT_ROOT, "frontend", "static", "js", "modules", "api.js")
-        cls.ui_manager_js_path = os.path.join(PROJECT_ROOT, "frontend", "static", "js", "modules", "ui_manager.js")
-        cls.app_js_path = os.path.join(PROJECT_ROOT, "frontend", "static", "js", "app.js")
+        cls.state_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "modules", "state.js")
+        cls.api_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "modules", "api.js")
+        cls.ui_manager_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "modules", "ui_manager.js")
+        cls.app_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "app.js")
 
         with open(cls.state_js_path, "r", encoding="utf-8") as f:
             cls.state_js = f.read()

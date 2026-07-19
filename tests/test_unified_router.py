@@ -355,6 +355,273 @@ class TestUnifiedRouter(unittest.IsolatedAsyncioTestCase):
         enriched_api = UnifiedRouter.inject_security_headers(headers, "/api/some-endpoint")
         self.assertNotIn("unsafe-inline", enriched_api["content-security-policy"]) # API avoids unsafe-inline
 
+    @patch('backend.services.startup_service.load_startups')
+    async def test_job_query_filters(self, mock_load_startups):
+        mock_load_startups.return_value = [
+            {
+                "id": "1",
+                "name": "Dev Startup",
+                "lat": 12.95,
+                "lng": 77.60,
+                "city": "Bengaluru",
+                "has_pin": True,
+                "job_openings": [
+                    {"title": "Senior React Developer", "experience": "3-5 yrs", "salary": "20-30 LPA", "job_type": "Full-time", "location": "Remote"},
+                    {"title": "QA Engineer", "experience": "1-3 yrs", "salary": "10-15 LPA", "job_type": "Contract", "location": "Bangalore"}
+                ]
+            }
+        ]
+
+        # 1. Test role filtering
+        req_role = UnifiedRequest(
+            method="GET",
+            path="/api/companies",
+            url="http://localhost/api/companies",
+            query_params={"role": "react"},
+            testing=True
+        )
+        res_role = await self.router.handle_request(req_role)
+        self.assertEqual(res_role.status, 200)
+        self.assertEqual(len(res_role.body), 1)
+        self.assertEqual(res_role.body[0]["job_count"], 1)
+        self.assertEqual(res_role.body[0]["job_titles"], ["Senior React Developer"])
+
+        # 2. Test salary_min filtering
+        req_sal = UnifiedRequest(
+            method="GET",
+            path="/api/companies",
+            url="http://localhost/api/companies",
+            query_params={"salary_min": "18"},
+            testing=True
+        )
+        res_sal = await self.router.handle_request(req_sal)
+        self.assertEqual(res_sal.status, 200)
+        self.assertEqual(len(res_sal.body), 1)
+        self.assertEqual(res_sal.body[0]["job_titles"], ["Senior React Developer"])
+
+        # 3. Test exp_level filtering (categorical)
+        req_exp = UnifiedRequest(
+            method="GET",
+            path="/api/companies",
+            url="http://localhost/api/companies",
+            query_params={"exp_level": "entry"},
+            testing=True
+        )
+        res_exp = await self.router.handle_request(req_exp)
+        self.assertEqual(res_exp.status, 200)
+        self.assertEqual(res_exp.body[0]["job_titles"], ["QA Engineer"])
+
+        # 4. Test work_type filtering
+        req_wt = UnifiedRequest(
+            method="GET",
+            path="/api/companies",
+            url="http://localhost/api/companies",
+            query_params={"work_type": "remote"},
+            testing=True
+        )
+        res_wt = await self.router.handle_request(req_wt)
+        self.assertEqual(res_wt.status, 200)
+        self.assertEqual(res_wt.body[0]["job_titles"], ["Senior React Developer"])
+
+        # 5. Test detail view consistency and no cache mutation
+        req_detail = UnifiedRequest(
+            method="GET",
+            path="/api/company/1",
+            url="http://localhost/api/company/1",
+            query_params={"role": "react"},
+            testing=True
+        )
+        res_detail = await self.router.handle_request(req_detail)
+        self.assertEqual(res_detail.status, 200)
+        self.assertEqual(len(res_detail.body["jobs"]), 1)
+        self.assertEqual(res_detail.body["jobs"][0]["title"], "Senior React Developer")
+
+        # Query detail without filters and check cache wasn't mutated
+        req_no_filter = UnifiedRequest(
+            method="GET",
+            path="/api/company/1",
+            url="http://localhost/api/company/1",
+            testing=True
+        )
+        res_no_filter = await self.router.handle_request(req_no_filter)
+        self.assertEqual(res_no_filter.status, 200)
+        self.assertEqual(len(res_no_filter.body["jobs"]), 2)
+
+    @patch('backend.services.startup_service.load_startups')
+    async def test_advanced_filtering_regressions(self, mock_load_startups):
+        mock_load_startups.return_value = [
+            {
+                "id": "1",
+                "name": "Tech Startup A",
+                "lat": 12.95,
+                "lng": 77.60,
+                "city": "Bengaluru",
+                "has_pin": True,
+                "is_remote_office": False,
+                "job_openings": [
+                    {"title": "React Dev", "experience": "2-3 yrs", "salary": "20-30 LPA", "job_type": "Full-time", "location": "Bengaluru"},
+                    {"title": "Intern", "experience": "fresher", "salary": "₹8,000", "job_type": "Full-time", "location": "Bengaluru"}
+                ]
+            },
+            {
+                "id": "2",
+                "name": "Remote Startup B",
+                "lat": 12.95,
+                "lng": 77.60,
+                "city": "Bengaluru",
+                "has_pin": False,
+                "is_remote_office": True,
+                "job_openings": [
+                    {"title": "Support Specialist", "experience": "1 yr", "salary": "6 LPA", "job_type": "Full-time", "location": "Bengaluru"},
+                ]
+            },
+            {
+                "id": "3",
+                "name": "Hybrid/Onsite Startup C",
+                "lat": 12.95,
+                "lng": 77.60,
+                "city": "Bengaluru",
+                "has_pin": True,
+                "is_remote_office": False,
+                "job_openings": [
+                    {"title": "Hybrid Engineer", "experience": "5+ yrs", "salary": "35-45 LPA", "job_type": "Hybrid", "location": "Bengaluru"},
+                    {"title": "Onsite Architect", "experience": "10-15 yrs", "salary": "50 LPA", "job_type": "Onsite", "location": "Bengaluru"},
+                    {"title": "Mid Dev", "experience": "1-5 yrs", "salary": "15 LPA", "job_type": "Full-time", "location": "Bengaluru"}
+                ]
+            },
+            {
+                "id": "4",
+                "name": "Remote-First with Onsite Job D",
+                "lat": 12.95,
+                "lng": 77.60,
+                "city": "Bengaluru",
+                "has_pin": True,
+                "is_remote_office": True,
+                "job_openings": [
+                    {"title": "Onsite Specialist", "experience": "3 yrs", "salary": "12 LPA", "job_type": "Onsite", "location": "Bengaluru"}
+                ]
+            }
+        ]
+
+        # 1. Test salary_min query against ranges without spaces (salary_min=25)
+        req_sal25 = UnifiedRequest(
+            method="GET",
+            path="/api/companies",
+            url="http://localhost/api/companies",
+            query_params={"salary_min": "25"},
+            testing=True
+        )
+        res_sal25 = await self.router.handle_request(req_sal25)
+        self.assertEqual(res_sal25.status, 200)
+        # Should match Tech Startup A (React Dev: max 30) and Hybrid/Onsite Startup C (Hybrid: max 45, Onsite: max 50)
+        self.assertEqual(len(res_sal25.body), 2)
+        names = [s["name"] for s in res_sal25.body]
+        self.assertIn("Tech Startup A", names)
+        self.assertIn("Hybrid/Onsite Startup C", names)
+        
+        # 2. Test absolute INR salary threshold (₹8,000 -> 0.08 LPA)
+        # salary_min = 0.05 -> Intern matches
+        req_sal_low = UnifiedRequest(
+            method="GET",
+            path="/api/companies",
+            url="http://localhost/api/companies",
+            query_params={"salary_min": "0.05"},
+            testing=True
+        )
+        res_sal_low = await self.router.handle_request(req_sal_low)
+        self.assertEqual(res_sal_low.status, 200)
+        startup_a_low = [s for s in res_sal_low.body if s["name"] == "Tech Startup A"][0]
+        self.assertIn("Intern", startup_a_low["job_titles"])
+
+        # salary_min = 0.1 -> Intern excluded
+        req_sal_high = UnifiedRequest(
+            method="GET",
+            path="/api/companies",
+            url="http://localhost/api/companies",
+            query_params={"salary_min": "0.1"},
+            testing=True
+        )
+        res_sal_high = await self.router.handle_request(req_sal_high)
+        self.assertEqual(res_sal_high.status, 200)
+        startup_a_high = [s for s in res_sal_high.body if s["name"] == "Tech Startup A"]
+        if startup_a_high:
+            self.assertNotIn("Intern", startup_a_high[0]["job_titles"])
+
+        # 3. Test fallback to company's is_remote_office=True (work_type=remote)
+        req_remote = UnifiedRequest(
+            method="GET",
+            path="/api/companies",
+            url="http://localhost/api/companies",
+            query_params={"work_type": "remote"},
+            testing=True
+        )
+        res_remote = await self.router.handle_request(req_remote)
+        self.assertEqual(res_remote.status, 200)
+        self.assertEqual(len(res_remote.body), 1)
+        self.assertEqual(res_remote.body[0]["name"], "Remote Startup B")
+        self.assertEqual(res_remote.body[0]["job_titles"], ["Support Specialist"])
+        
+        # Querying work_type=remote must NOT return 'Remote-First with Onsite Job D'
+        names_remote = [s["name"] for s in res_remote.body]
+        self.assertNotIn("Remote-First with Onsite Job D", names_remote)
+
+        # 4. Test onsite query excluding hybrid/remote jobs (work_type=onsite)
+        req_onsite = UnifiedRequest(
+            method="GET",
+            path="/api/companies",
+            url="http://localhost/api/companies",
+            query_params={"work_type": "onsite"},
+            testing=True
+        )
+        res_onsite = await self.router.handle_request(req_onsite)
+        self.assertEqual(res_onsite.status, 200)
+        self.assertEqual(len(res_onsite.body), 3)
+        names_onsite = [s["name"] for s in res_onsite.body]
+        self.assertIn("Tech Startup A", names_onsite)
+        self.assertIn("Hybrid/Onsite Startup C", names_onsite)
+        self.assertIn("Remote-First with Onsite Job D", names_onsite)
+        
+        # Verify Hybrid Engineer is excluded from Hybrid/Onsite Startup C
+        startup_c_onsite = [s for s in res_onsite.body if s["name"] == "Hybrid/Onsite Startup C"][0]
+        self.assertNotIn("Hybrid Engineer", startup_c_onsite["job_titles"])
+        self.assertIn("Onsite Architect", startup_c_onsite["job_titles"])
+        self.assertIn("Mid Dev", startup_c_onsite["job_titles"])
+        
+        # Verify Onsite Specialist is present in Remote-First with Onsite Job D
+        startup_d_onsite = [s for s in res_onsite.body if s["name"] == "Remote-First with Onsite Job D"][0]
+        self.assertIn("Onsite Specialist", startup_d_onsite["job_titles"])
+
+        # 5. Test experience level categories: senior (exp_level=senior)
+        req_senior = UnifiedRequest(
+            method="GET",
+            path="/api/companies",
+            url="http://localhost/api/companies",
+            query_params={"exp_level": "senior"},
+            testing=True
+        )
+        res_senior = await self.router.handle_request(req_senior)
+        self.assertEqual(res_senior.status, 200)
+        startup_c_senior = [s for s in res_senior.body if s["name"] == "Hybrid/Onsite Startup C"][0]
+        self.assertIn("Hybrid Engineer", startup_c_senior["job_titles"]) # 5+ yrs
+        self.assertIn("Onsite Architect", startup_c_senior["job_titles"]) # 10-15 yrs
+        self.assertNotIn("Mid Dev", startup_c_senior["job_titles"]) # 1-5 yrs (mid)
+
+        # 6. Test experience level categories: mid (exp_level=mid)
+        req_mid = UnifiedRequest(
+            method="GET",
+            path="/api/companies",
+            url="http://localhost/api/companies",
+            query_params={"exp_level": "mid"},
+            testing=True
+        )
+        res_mid = await self.router.handle_request(req_mid)
+        self.assertEqual(res_mid.status, 200)
+        startup_c_mid = [s for s in res_mid.body if s["name"] == "Hybrid/Onsite Startup C"][0]
+        self.assertNotIn("Hybrid Engineer", startup_c_mid["job_titles"]) # senior
+        self.assertNotIn("Onsite Architect", startup_c_mid["job_titles"]) # senior
+        self.assertIn("Mid Dev", startup_c_mid["job_titles"]) # mid
+
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

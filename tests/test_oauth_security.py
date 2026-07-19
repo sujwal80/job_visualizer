@@ -246,8 +246,11 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         cb_data = json.loads(self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}').data)
         valid_token = cb_data["token"]
         
-        # 1. Tampered signature (change last character)
-        tampered_token = valid_token[:-1] + ('a' if valid_token[-1] != 'a' else 'b')
+        # 1. Tampered signature (change first character of signature segment)
+        parts = valid_token.split('.')
+        sig = parts[2]
+        tampered_sig = ('a' if sig[0] != 'a' else 'b') + sig[1:]
+        tampered_token = f"{parts[0]}.{parts[1]}.{tampered_sig}"
         # 2. Completely malformed token
         malformed_token = "invalid.jwt.token.string"
         # 3. Token signed with attacker secret key

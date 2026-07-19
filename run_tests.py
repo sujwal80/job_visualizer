@@ -44,7 +44,8 @@ def main():
         ("17. Database State Tracking & Logo Extraction Unit Tests", os.path.join(tests_dir, "test_database_state_tracking.py")),
         ("18. Remote Office Unpinned Coordinate Retention Verification", os.path.join(tests_dir, "test_remote_unpinned.py")),
         ("19. Cloudflare KV Session Store Integration", os.path.join(tests_dir, "test_oauth_kv.py")),
-        ("20. Cloudflare Workers Endpoint Integration", os.path.join(tests_dir, "test_worker_endpoints.py"))
+        ("20. Cloudflare Workers Endpoint Integration", os.path.join(tests_dir, "test_worker_endpoints.py")),
+        ("21. E2E Search, Filtering, and Map boundaries Suite", os.path.join(tests_dir, "test_e2e_search_filtering.py"))
     ]
     
     print("\n⚡ WORLDTECH MAP // FULL-STACK MASTER TEST RUNNER ⚡")

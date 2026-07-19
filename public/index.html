@@ -135,9 +135,9 @@
                 <span class="text-slate-400 font-bold text-[10px] uppercase tracking-wider mr-1">Popular:</span>
                 <button onclick="handlePresetSearch('bengaluru')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2.5 py-1 rounded-md font-bold transition-all">Bengaluru</button>
                 <span class="text-slate-300">•</span>
-                <button onclick="handlePresetSearch('san francisco')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2.5 py-1 rounded-md font-bold transition-all">San Francisco</button>
+                <button onclick="handlePresetSearch('mumbai')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2.5 py-1 rounded-md font-bold transition-all">Mumbai</button>
                 <span class="text-slate-300">•</span>
-                <button onclick="handlePresetSearch('london')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2.5 py-1 rounded-md font-bold transition-all">London</button>
+                <button onclick="handlePresetSearch('delhi')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2.5 py-1 rounded-md font-bold transition-all">Delhi</button>
             </div>
         </div>
     </div>
@@ -181,6 +181,49 @@
             </div>
         </nav>
 
+        <!-- Filter Bar -->
+        <div class="filter-bar bg-white border-b border-slate-200 px-6 py-3 flex flex-wrap items-center gap-4 z-40">
+            <!-- Role Search -->
+            <div class="relative flex items-center bg-slate-100 rounded-xl px-3 py-2 border border-slate-200 focus-within:border-blue-500 focus-within:bg-white transition-all w-64 shadow-sm">
+                <i class="fa-solid fa-briefcase text-slate-400 mr-2 text-xs"></i>
+                <input id="filter-role-input" type="text" placeholder="Filter by job role..." class="bg-transparent text-xs outline-none w-full text-slate-700">
+            </div>
+            <!-- Work Type Dropdown -->
+            <div class="flex items-center bg-slate-100 rounded-xl px-3 py-2 border border-slate-200 shadow-sm">
+                <select id="filter-work-type" class="bg-transparent text-xs outline-none cursor-pointer text-slate-700 font-medium">
+                    <option value="">💼 All Work Types</option>
+                    <option value="remote">🏠 Remote</option>
+                    <option value="hybrid">🏢 Hybrid</option>
+                    <option value="onsite">🏢 On-site</option>
+                </select>
+            </div>
+            <!-- Experience Level Dropdown -->
+            <div class="flex items-center bg-slate-100 rounded-xl px-3 py-2 border border-slate-200 shadow-sm">
+                <select id="filter-exp-level" class="bg-transparent text-xs outline-none cursor-pointer text-slate-700 font-medium">
+                    <option value="">⏳ All Experience</option>
+                    <option value="entry">Fresh / Entry (0-2 yrs)</option>
+                    <option value="mid">Mid-Level (2-5 yrs)</option>
+                    <option value="senior">Senior / Lead (5+ yrs)</option>
+                </select>
+            </div>
+            <!-- Min Salary Dropdown -->
+            <div class="flex items-center bg-slate-100 rounded-xl px-3 py-2 border border-slate-200 shadow-sm">
+                <select id="filter-salary-min" class="bg-transparent text-xs outline-none cursor-pointer text-slate-700 font-medium">
+                    <option value="">💰 All Salaries</option>
+                    <option value="5">₹5+ LPA</option>
+                    <option value="10">₹10+ LPA</option>
+                    <option value="15">₹15+ LPA</option>
+                    <option value="20">₹20+ LPA</option>
+                    <option value="30">₹30+ LPA</option>
+                    <option value="50">₹50+ LPA</option>
+                </select>
+            </div>
+            <!-- Clear Filters Button -->
+            <button id="clear-filters-btn" class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-all ml-auto">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Clear Filters
+            </button>
+        </div>
+
         <!-- Main Content Area -->
         <div class="main-content">
             <!-- Left Sidebar with Scrollable Job Directory -->
@@ -206,7 +249,13 @@
                     </div>
                 </div>
 
-
+                <!-- Local Directory Search Box -->
+                <div class="p-3 border-b border-slate-100 bg-slate-50/50">
+                    <div class="relative flex items-center bg-white rounded-xl border border-slate-200/80 p-2 shadow-inner focus-within:border-blue-400">
+                        <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm mr-2 pl-1"></i>
+                        <input id="sidebar-search-input" type="text" placeholder="Search companies or skills locally..." class="w-full bg-transparent text-xs text-slate-800 placeholder-slate-400 focus:outline-none">
+                    </div>
+                </div>
 
                 <!-- Scrollable Job Directory List -->
                 <div id="directory-list" class="directory-list">
@@ -259,7 +308,11 @@
         function handlePresetSearch(cityKey) {
             let cityTitle = 'Bengaluru, KA';
             if (cityKey === 'san francisco') cityTitle = 'San Francisco, CA';
-            if (cityKey === 'london') cityTitle = 'London, UK';
+            else if (cityKey === 'london') cityTitle = 'London, UK';
+            else if (cityKey === 'bengaluru') cityTitle = 'Bengaluru, KA';
+            else if (cityKey) {
+                cityTitle = cityKey.charAt(0).toUpperCase() + cityKey.slice(1);
+            }
             window.location.href = '/jobs?city=' + encodeURIComponent(cityTitle);
         }
 

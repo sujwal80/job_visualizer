@@ -7,10 +7,9 @@ filtering and sorting against viewport queries and metadata criteria, and format
 import os
 import json
 from backend.utils.validators import _safe_float, _check_has_pin, _sanitize_string, _sanitize_url, _strip_redundant
-try:
-    from backend.config import DEFAULT_MAP_CENTER_LAT, DEFAULT_MAP_CENTER_LNG, DEFAULT_TARGET_CITY, REGION_SYNONYM_MAP
-except ImportError:
-    from config import DEFAULT_MAP_CENTER_LAT, DEFAULT_MAP_CENTER_LNG, DEFAULT_TARGET_CITY, REGION_SYNONYM_MAP
+from backend.utils.compatibility import safe_flock, LOCK_SH, LOCK_UN, JSRequest as Request
+
+from backend.config import DEFAULT_MAP_CENTER_LAT, DEFAULT_MAP_CENTER_LNG, DEFAULT_TARGET_CITY, REGION_SYNONYM_MAP
 
 DATA_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'startups.json'))
 
@@ -37,26 +36,12 @@ def load_startups():
         if _cache_data is not None and current_mtime == _cache_mtime:
             return _cache_data
             
-        try:
-            import fcntl
-            HAS_FCNTL = True
-        except ImportError:
-            HAS_FCNTL = False
-
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            if HAS_FCNTL:
-                try:
-                    fcntl.flock(f, fcntl.LOCK_SH)
-                except Exception:
-                    pass
+            safe_flock(f, LOCK_SH)
             try:
                 data = json.load(f)
             finally:
-                if HAS_FCNTL:
-                    try:
-                        fcntl.flock(f, fcntl.LOCK_UN)
-                    except Exception:
-                        pass
+                safe_flock(f, LOCK_UN)
 
             if not isinstance(data, list):
                 data = []
@@ -92,7 +77,7 @@ def load_startups():
     except Exception:
         return _cache_data or []
 
-def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit, city_query="", skill_query="", industry_query="", search_query="", dept_query="", exp_query="", has_jobs=False):
+def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit, city_query="", skill_query="", industry_query="", search_query="", dept_query="", exp_query="", has_jobs=False, role_query="", salary_min_query=None, exp_level_query="", work_type_query=""):
     """
     Filter and sort startup records by geographic viewport bounding boxes and text criteria.
 
@@ -209,20 +194,45 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
                         
                 if not startup_matches:
                     continue
+        has_job_filters = bool(role_query or salary_min_query is not None or exp_level_query or work_type_query)
+        job_openings = s.get("job_openings") or []
+        
+        filtered_jobs = []
+        for j in job_openings:
+            if not isinstance(j, dict):
+                continue
+            if role_query and role_query not in str(j.get("title") or "").lower():
+                continue
+            if salary_min_query is not None:
+                max_sal = _parse_max_salary(j.get("salary"))
+                if max_sal is None or max_sal < salary_min_query:
+                    continue
+            if exp_level_query and not _match_exp_level(str(j.get("experience") or ""), exp_level_query):
+                continue
+            if work_type_query and not _match_work_type(j, work_type_query, is_remote_office=s.get("is_remote_office")):
+                continue
+            filtered_jobs.append(j)
+
+        if has_job_filters:
+            if not filtered_jobs:
+                continue
+            s_copy = dict(s)
+            s_copy["job_openings"] = filtered_jobs
+        else:
+            s_copy = s
+
+        effective_jobs = s_copy.get("job_openings") or s_copy.get("jobs") or []
         if dept_query:
-            jobs = s.get("job_openings") or []
-            if not any(dept_query in str(j.get("department") or "").lower() for j in jobs if isinstance(j, dict)):
+            if not any(dept_query in str(j.get("department") or "").lower() for j in effective_jobs if isinstance(j, dict)):
                 continue
         if exp_query:
-            jobs = s.get("job_openings") or []
-            if not any(exp_query in str(j.get("experience") or "").lower() or exp_query in str(j.get("job_type") or "").lower() for j in jobs if isinstance(j, dict)):
+            if not any(exp_query in str(j.get("experience") or "").lower() or exp_query in str(j.get("job_type") or "").lower() for j in effective_jobs if isinstance(j, dict)):
                 continue
         if has_jobs:
-            jobs = s.get("job_openings") or s.get("jobs") or []
-            job_cnt = len(jobs) if len(jobs) > 0 else (s.get("job_count") or 0)
+            job_cnt = len(effective_jobs) if len(effective_jobs) > 0 else (s_copy.get("job_count") or 0)
             if job_cnt == 0:
                 continue
-        filtered.append(s)
+        filtered.append(s_copy)
         
     # Sort startups descending by active job opening count
     filtered.sort(key=lambda x: len(x.get("job_openings") or x.get("jobs") or []), reverse=True)
@@ -420,16 +430,6 @@ async def load_startups_from_assets(assets_binding):
     if _cache_startups is not None:
         return _cache_startups
 
-    try:
-        from js import Request
-    except ImportError:
-        class Request:
-            def __init__(self, url, init=None, **kwargs):
-                self.url = url
-                self.method = "GET"
-            @classmethod
-            def new(cls, *args, **kwargs):
-                return cls(*args, **kwargs)
 
     req = Request.new("http://assets/static/data/startups.json")
     resp = await assets_binding.fetch(req)
@@ -499,5 +499,115 @@ async def load_startups_unified(env=None):
     if assets_binding is not None:
         return await load_startups_from_assets(assets_binding)
     return load_startups()
+
+
+def _parse_max_salary(salary_str):
+    if not salary_str:
+        return None
+    s = salary_str.strip().lower()
+    if any(x in s for x in ["not specified", "not disclosed", "undisclosed", "competitive", "negotiable"]):
+        return None
+    
+    s = s.replace("₹", "").replace(",", "")
+    
+    import re
+    numbers = [float(x) for x in re.findall(r'\d+\.?\d*', s)]
+    if not numbers:
+        return None
+    
+    processed_numbers = []
+    for num in numbers:
+        if num >= 1000:
+            processed_numbers.append(num / 100000.0)
+        else:
+            processed_numbers.append(num)
+            
+    return max(processed_numbers) if processed_numbers else None
+
+
+def _parse_experience_years(exp_str):
+    if not exp_str:
+        return None, None
+    s = exp_str.strip().lower()
+    if s in ("fresher", "entry"):
+        return 0, 0
+    if "not specified" in s or "not disclosed" in s:
+        return None, None
+    
+    import re
+    numbers = [int(x) for x in re.findall(r'\d+', s)]
+    if not numbers:
+        return None, None
+        
+    if len(numbers) >= 2:
+        return numbers[0], numbers[1]
+    elif "+" in s or "above" in s or "more" in s:
+        return numbers[0], 100
+    else:
+        return numbers[0], numbers[0]
+
+
+def _match_exp_level(exp_str, exp_level_query):
+    if not exp_level_query:
+        return True
+    q = exp_level_query.strip().lower()
+    
+    try:
+        q_num = float(q)
+        min_years, max_years = _parse_experience_years(exp_str)
+        if min_years is None:
+            return False
+        return min_years <= q_num <= max_years
+    except ValueError:
+        min_years, max_years = _parse_experience_years(exp_str)
+        if min_years is None:
+            return q in exp_str.strip().lower()
+            
+        if q in ("entry", "fresher"):
+            return min_years <= 2
+        elif q in ("mid", "intermediate"):
+            return min_years < 5 and max_years >= 2
+        elif q in ("senior", "lead"):
+            return min_years >= 5
+        else:
+            return q in exp_str.strip().lower()
+
+
+def _match_work_type(job, work_type_query, is_remote_office=None):
+    if not work_type_query:
+        return True
+    q = work_type_query.strip().lower()
+    
+    job_type = str(job.get("job_type") or "").lower()
+    location = str(job.get("location") or "").lower()
+    title = str(job.get("title") or "").lower()
+    
+    has_remote = "remote" in job_type or "remote" in location or "remote" in title
+    has_hybrid = "hybrid" in job_type or "hybrid" in location or "hybrid" in title
+    has_onsite = any(keyword in job_type or keyword in location or keyword in title for keyword in ("onsite", "on-site", "in-office", "in office"))
+    
+    if q == "remote":
+        if has_onsite:
+            return False
+        if has_remote:
+            return True
+        if not has_remote and not has_hybrid:
+            if is_remote_office is True:
+                return True
+        return False
+        
+    if q == "hybrid":
+        return has_hybrid
+        
+    if q in ("on-site", "onsite"):
+        if has_onsite:
+            return True
+        if has_remote or has_hybrid:
+            return False
+        if is_remote_office is True:
+            return False
+        return True
+        
+    return q in location
 
 

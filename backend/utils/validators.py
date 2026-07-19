@@ -7,10 +7,7 @@ query parameter inspection, floating-point validation, and payload pruning.
 import re
 import math
 
-try:
-    from backend.config import FALLBACK_COORDINATES, PIN_DELTA_THRESHOLD, GENERIC_HUB_LABELS
-except ImportError:
-    from config import FALLBACK_COORDINATES, PIN_DELTA_THRESHOLD, GENERIC_HUB_LABELS
+from backend.config import FALLBACK_COORDINATES, PIN_DELTA_THRESHOLD, GENERIC_HUB_LABELS
 
 # Essential fields that must never be stripped from startup payload objects during serialization.
 REQUIRED_FIELDS = {
@@ -129,7 +126,11 @@ def _validate_query_params(args):
     Returns:
         tuple: (bool valid, str error_message). If valid is True, error_message is None.
     """
-    allowed_params = {'min_lat', 'max_lat', 'min_lng', 'max_lng', 'limit', 'city', 'skill', 'industry', 'search', 'dept', 'experience', 'exp', 'has_jobs'}
+    allowed_params = {
+        'min_lat', 'max_lat', 'min_lng', 'max_lng', 'limit', 'city', 'skill',
+        'industry', 'search', 'dept', 'experience', 'exp', 'has_jobs',
+        'role', 'salary_min', 'exp_level', 'work_type'
+    }
     
     # Prevent parameter flooding attacks by capping total parameter values across all keys
     total_params = sum(len(args.getlist(k)) for k in args.keys())
@@ -179,6 +180,16 @@ def _validate_query_params(args):
                 except (ValueError, TypeError):
                     return False, "Parameter 'limit' must be a valid integer"
             
+    if 'salary_min' in args:
+        for item in args.getlist('salary_min'):
+            if item != '':
+                try:
+                    val = float(item)
+                    if val < 0:
+                        return False, "Parameter 'salary_min' must be a non-negative number"
+                except (ValueError, TypeError):
+                    return False, "Parameter 'salary_min' must be a valid number"
+
     return True, None
 
 def _strip_redundant(obj):

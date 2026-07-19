@@ -6,9 +6,7 @@ Compatible with Flask and Cloudflare Workers environments.
 """
 
 import json
-import math
 from http.cookies import SimpleCookie
-from urllib.parse import urlparse
 
 from backend.utils.validators import _validate_query_params, _strip_redundant, _safe_float
 from backend.utils.rate_limiter import _check_rate_limit
@@ -163,13 +161,8 @@ class UnifiedRouter:
 
             # Helper functions
             async def load_all_startups():
-                assets = req.env.get("ASSETS") if isinstance(req.env, dict) else getattr(req.env, "ASSETS", None)
-                if assets is not None:
-                    from backend.services.startup_service import load_startups_from_assets
-                    return await load_startups_from_assets(assets)
-                else:
-                    from backend.services.startup_service import load_startups
-                    return load_startups()
+                from backend.services.startup_service import load_startups_unified
+                return await load_startups_unified(req.env)
 
             def _ids_match(id1, id2):
                 if id1 is None or id2 is None:
@@ -227,13 +220,19 @@ class UnifiedRouter:
                 dept_query = (req.query_params.get('dept') or '').strip().lower()
                 exp_query = (req.query_params.get('experience') or req.query_params.get('exp') or '').strip().lower()
                 has_jobs = str(req.query_params.get('has_jobs', 'false')).strip().lower() in ('true', '1', 'yes')
+                role_query = (req.query_params.get('role') or '').strip().lower()
+                salary_min_query = _safe_float(req.query_params.get('salary_min'))
+                exp_level_query = (req.query_params.get('exp_level') or '').strip().lower()
+                work_type_query = (req.query_params.get('work_type') or '').strip().lower()
 
                 from backend.services.startup_service import filter_and_sort_startups, format_startup_summary, format_lightweight_summary
                 filtered = filter_and_sort_startups(
                     startups, min_lat, max_lat, min_lng, max_lng, limit,
                     city_query=city_query, skill_query=skill_query, industry_query=industry_query,
                     search_query=search_query, dept_query=dept_query, exp_query=exp_query,
-                    has_jobs=has_jobs
+                    has_jobs=has_jobs,
+                    role_query=role_query, salary_min_query=salary_min_query,
+                    exp_level_query=exp_level_query, work_type_query=work_type_query
                 )
 
                 if has_jobs:
@@ -254,10 +253,40 @@ class UnifiedRouter:
                     return self._inject_headers(res, req, rate_limit_info)
 
                 startups = await load_all_startups()
-                from backend.services.startup_service import format_startup_details
+                from backend.services.startup_service import format_startup_details, _parse_max_salary, _match_exp_level, _match_work_type
+                
+                role_query = (req.query_params.get('role') or '').strip().lower()
+                salary_min_query = _safe_float(req.query_params.get('salary_min'))
+                exp_level_query = (req.query_params.get('exp_level') or '').strip().lower()
+                work_type_query = (req.query_params.get('work_type') or '').strip().lower()
+                has_job_filters = bool(role_query or salary_min_query is not None or exp_level_query or work_type_query)
+                
                 for s in startups:
                     if _ids_match(s.get("id"), startup_id):
-                        lean_payload = format_startup_details(s)
+                        if has_job_filters:
+                            job_openings = s.get("job_openings") or []
+                            filtered_jobs = []
+                            for j in job_openings:
+                                if not isinstance(j, dict):
+                                    continue
+                                if role_query and role_query not in str(j.get("title") or "").lower():
+                                    continue
+                                if salary_min_query is not None:
+                                    max_sal = _parse_max_salary(j.get("salary"))
+                                    if max_sal is None or max_sal < salary_min_query:
+                                        continue
+                                if exp_level_query and not _match_exp_level(str(j.get("experience") or ""), exp_level_query):
+                                    continue
+                                if work_type_query and not _match_work_type(j, work_type_query, is_remote_office=s.get("is_remote_office")):
+                                    continue
+                                filtered_jobs.append(j)
+                            
+                            target_startup = dict(s)
+                            target_startup["job_openings"] = filtered_jobs
+                        else:
+                            target_startup = s
+                            
+                        lean_payload = format_startup_details(target_startup)
                         res = UnifiedResponse(lean_payload, status=200, headers={'Cache-Control': 'public, max-age=60'})
                         return self._inject_headers(res, req, rate_limit_info)
 

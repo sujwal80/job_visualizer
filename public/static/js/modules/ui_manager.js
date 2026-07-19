@@ -54,6 +54,7 @@ export function renderDirectory(startups, customEmptyText = null) {
     const directoryList = document.getElementById('directory-list');
     if (!directoryList) return;
     
+    const prevScrollTop = directoryList.scrollTop;
     const fragment = document.createDocumentFragment();
 
     if (!Array.isArray(startups) || startups.length === 0) {
@@ -109,6 +110,26 @@ export function renderDirectory(startups, customEmptyText = null) {
         }
 
         const headCount = Math.max(0, parseInt(startup.head_count, 10) || 0);
+
+        const roleBadges = [];
+        if (Array.isArray(startup.job_titles) && startup.job_titles.length > 0) {
+            const displayRoles = startup.job_titles.slice(0, 3);
+            displayRoles.forEach(roleTitle => {
+                roleBadges.push(createElement('span', {
+                    className: 'verified-pill',
+                    style: 'background: #f5f3ff; color: #5b21b6; border: 1px solid #ddd6fe; font-size: 10px; font-weight: 600; padding: 2px 6px;',
+                    textContent: roleTitle
+                }));
+            });
+            if (startup.job_titles.length > 3) {
+                roleBadges.push(createElement('span', {
+                    className: 'verified-pill',
+                    style: 'background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-size: 10px; font-weight: 600; padding: 2px 6px;',
+                    textContent: `+${startup.job_titles.length - 3} more`
+                }));
+            }
+        }
+
         const card = createElement('div', {
             className: 'directory-item' + (isSelected ? ' active' : ''),
             id: `directory-item-${startup.id}`
@@ -117,6 +138,7 @@ export function renderDirectory(startups, customEmptyText = null) {
             createElement('div', { className: 'card-body' }, [
                 cardTitle,
                 createElement('div', { className: 'card-tags' }, badgeTags),
+                roleBadges.length > 0 ? createElement('div', { className: 'flex flex-wrap gap-1 mb-2.5 mt-1.5' }, roleBadges) : null,
                 createElement('div', { className: 'card-meta' }, [
                     createElement('span', { textContent: `👥 ${headCount}` }),
                     createElement('span', { textContent: '•' }),
@@ -145,6 +167,9 @@ export function renderDirectory(startups, customEmptyText = null) {
     }
 
     directoryList.replaceChildren(fragment);
+    if (prevScrollTop > 0) {
+        directoryList.scrollTop = prevScrollTop;
+    }
 }
 
 export function getJobSourceButtonStyle(source) {
@@ -429,7 +454,15 @@ export function selectAndOpenStartup(id) {
         state.activeGeocodeController = null;
     }
     state.currentSelectedId = id;
-    const cacheKey = String(id);
+    
+    const queryParams = new URLSearchParams();
+    if (state.currentFilters.role) queryParams.set('role', state.currentFilters.role);
+    if (state.currentFilters.salary_min) queryParams.set('salary_min', state.currentFilters.salary_min);
+    if (state.currentFilters.exp_level) queryParams.set('exp_level', state.currentFilters.exp_level);
+    if (state.currentFilters.work_type) queryParams.set('work_type', state.currentFilters.work_type);
+    
+    const queryString = queryParams.toString();
+    const cacheKey = queryString ? `${id}_${queryString}` : String(id);
 
     for (const [pendingId, controller] of state.inFlightRequests.entries()) {
         if (String(pendingId) !== cacheKey) {
@@ -439,14 +472,14 @@ export function selectAndOpenStartup(id) {
     }
 
     // 1. Check ProfileCache (0 network calls)
-    if (state.profileCache.has(id) || state.profileCache.has(cacheKey)) {
-        const cached = state.profileCache.get(id) || state.profileCache.get(cacheKey);
+    if (state.profileCache.has(cacheKey)) {
+        const cached = state.profileCache.get(cacheKey);
         _processOpenStartup(cached);
         return Promise.resolve(cached);
     }
 
     // 2. Check Request Coalescing (inFlightPromises / inFlightRequests)
-    if (state.inFlightPromises.has(id) || state.inFlightPromises.has(cacheKey) || state.inFlightRequests.has(id)) {
+    if (state.inFlightPromises.has(id) || state.inFlightPromises.has(cacheKey) || state.inFlightRequests.has(id) || state.inFlightRequests.has(cacheKey)) {
         const existingPromise = state.inFlightPromises.get(id) || state.inFlightPromises.get(cacheKey);
         if (existingPromise) {
             existingPromise.then(fullStartup => {
@@ -464,7 +497,8 @@ export function selectAndOpenStartup(id) {
     state.inFlightRequests.set(id, controller);
     state.inFlightRequests.set(cacheKey, controller);
 
-    const promise = safeFetch(`/api/company/${id}`, { signal: controller.signal })
+    const url = `/api/company/${id}${queryString ? '?' + queryString : ''}`;
+    const promise = safeFetch(url, { signal: controller.signal })
         .then(fullStartup => {
             if (controller.signal.aborted) return fullStartup;
             if (fullStartup && !fullStartup.error) {
@@ -472,7 +506,6 @@ export function selectAndOpenStartup(id) {
                     const firstKey = state.profileCache.keys().next().value;
                     state.profileCache.delete(firstKey);
                 }
-                state.profileCache.set(id, fullStartup);
                 state.profileCache.set(cacheKey, fullStartup);
                 if (state.currentSelectedId === id) {
                     _processOpenStartup(fullStartup);

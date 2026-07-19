@@ -126,7 +126,7 @@ class TestFrontendJSModularity(unittest.TestCase):
     """Verifies frontend JavaScript exports modular functions onto window.WorldTechApp."""
     
     def test_js_exports_modular_namespace(self):
-        js_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend', 'static', 'js', 'app.js'))
+        js_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'public', 'static', 'js', 'app.js'))
         with open(js_path, 'r', encoding='utf-8') as f:
             content = f.read()
         self.assertIn("window.WorldTechApp =", content, "app.js must export window.WorldTechApp for testing.")
@@ -182,7 +182,7 @@ class TestFlexibleStartupIDLookupAndFallback(unittest.TestCase):
         self.assertEqual(res_str.status_code, 200, "Should resolve string/int ID flexibly")
 
     def test_frontend_select_and_open_startup_fallback(self):
-        js_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "static", "js", "modules", "ui_manager.js"))
+        js_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "public", "static", "js", "modules", "ui_manager.js"))
         with open(js_path, "r", encoding="utf-8") as f:
             content = f.read()
         self.assertIn("const fallbackStartup = state.startupsData.find(s => String(s.id) === String(id));", content)

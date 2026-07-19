@@ -35,8 +35,8 @@ def get_session_store():
 
 app = Flask(
     __name__, 
-    static_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend', 'static'),
-    template_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend', 'templates')
+    static_folder=os.path.join(os.path.dirname(__file__), '..', 'public', 'static'),
+    template_folder=os.path.join(os.path.dirname(__file__), '..', 'public')
 )
 # Enable ProxyFix to correctly interpret client IP addresses when deployed behind cloud reverse proxies (e.g. Nginx, WSGI)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)

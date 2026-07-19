@@ -6,7 +6,6 @@ session KV verification, and static asset delivery via the ASSETS binding.
 
 import json
 import sys
-from http.cookies import SimpleCookie
 
 
 from urllib.parse import urlparse, parse_qs, urlunparse
@@ -15,124 +14,9 @@ from backend.services.startup_service import get_data_version
 from backend.unified_router import UnifiedRequest, UnifiedRouter
 
 
-try:
-    from js import Response, Request, Headers
-except ImportError:
-    class Headers:
-        def __init__(self, headers=None):
-            self._headers = []
-            if headers:
-                if isinstance(headers, dict):
-                    for k, v in headers.items():
-                        self._headers.append((k.lower(), str(v)))
-                elif isinstance(headers, list):
-                    for k, v in headers:
-                        self._headers.append((k.lower(), str(v)))
-        def set(self, name, value):
-            name_lower = name.lower()
-            self._headers = [(k, v) for k, v in self._headers if k != name_lower]
-            self._headers.append((name_lower, str(value)))
-        def append(self, name, value):
-            self._headers.append((name.lower(), str(value)))
-        def get(self, name):
-            name_lower = name.lower()
-            for k, v in self._headers:
-                if k == name_lower:
-                    return v
-            return None
-        def entries(self):
-            return self._headers
-        @classmethod
-        def new(cls, *args, **kwargs):
-            return cls(*args, **kwargs)
+from backend.utils.compatibility import JSHeaders as Headers, JSResponse as Response, JSRequest as Request
 
 
-    class Response:
-        def __init__(self, body=None, init=None, **kwargs):
-            self.body = body
-            self.status = 200
-            headers_raw = None
-            
-            if isinstance(init, dict):
-                self.status = init.get("status", 200)
-                headers_raw = init.get("headers")
-            elif init is not None:
-                self.status = getattr(init, "status", 200)
-                headers_raw = getattr(init, "headers", None)
-                
-            if "status" in kwargs:
-                self.status = kwargs["status"]
-            if "headers" in kwargs:
-                headers_raw = kwargs["headers"]
-                
-            if isinstance(headers_raw, Headers):
-                self.headers = headers_raw
-            else:
-                self.headers = Headers(headers_raw)
-        @classmethod
-        def new(cls, *args, **kwargs):
-            return cls(*args, **kwargs)
-
-
-    class Request:
-        def __init__(self, url, init=None, **kwargs):
-            self.url = url
-            self.body = None
-            self.method = "GET"
-            headers_raw = None
-            
-            if isinstance(init, dict):
-                self.method = init.get("method", "GET")
-                headers_raw = init.get("headers")
-                self.body = init.get("body")
-            elif init is not None:
-                self.method = getattr(init, "method", "GET")
-                headers_raw = getattr(init, "headers", None)
-                self.body = getattr(init, "body", None)
-            
-            if "method" in kwargs:
-                self.method = kwargs["method"]
-            if "headers" in kwargs:
-                headers_raw = kwargs["headers"]
-            if "body" in kwargs:
-                self.body = kwargs["body"]
-                
-            if isinstance(headers_raw, Headers):
-                self.headers = headers_raw
-            else:
-                self.headers = Headers(headers_raw)
-        @classmethod
-        def new(cls, *args, **kwargs):
-            return cls(*args, **kwargs)
-
-
-class DictMultiDict:
-    def __init__(self, d):
-        self._d = d or {}
-    def keys(self):
-        return self._d.keys()
-    def getlist(self, key):
-        return self._d.get(key, [])
-    def get(self, key, default=None, type=None):
-        vals = self._d.get(key)
-        if not vals:
-            return default
-        val = vals[0]
-        if type is not None:
-            try:
-                return type(val)
-            except Exception:
-                return default
-        return val
-    def __contains__(self, key):
-        return key in self._d
-
-def get_cookie(request, cookie_name):
-    cookie_str = request.headers.get("Cookie") or ""
-    cookie = SimpleCookie()
-    cookie.load(cookie_str)
-    morsel = cookie.get(cookie_name)
-    return morsel.value if morsel else None
 
 class WorkerEntrypoint:
     def __init__(self, env):
@@ -147,12 +31,8 @@ class WorkerEntrypoint:
         except Exception as e:
             if 'unittest' in sys.modules:
                 raise e
-            try:
-                from js import Response as JSResponse
-            except ImportError:
-                JSResponse = Response
             init = {"status": 500}
-            return JSResponse.new(f"Internal Server Error: {str(e)}", init)
+            return Response.new(f"Internal Server Error: {str(e)}", init)
 
     async def _fetch_unsafe(self, request):
         parsed_url = urlparse(request.url)
@@ -243,14 +123,7 @@ class WorkerEntrypoint:
         # Execute UnifiedRouter
         unified_res = await self.router.handle_request(unified_req)
 
-        # Convert UnifiedResponse to Cloudflare Response
-        try:
-            from js import Headers as JSHeaders, Response as JSResponse
-        except ImportError:
-            JSHeaders = Headers
-            JSResponse = Response
-
-        js_headers = JSHeaders.new()
+        js_headers = Headers.new()
         for k, v in unified_res.headers.items():
             if k.lower() == 'set-cookie':
                 pass
@@ -289,10 +162,10 @@ class WorkerEntrypoint:
             "status": unified_res.status,
             "headers": js_headers
         }
-        return JSResponse.new(res_body, init)
+        return Response.new(res_body, init)
 
 
-    def _inject_headers(self, response, path, rate_limit_info=None):
+    def _inject_headers(self, response, path):
         headers_dict = {}
         if hasattr(response, "headers"):
             if hasattr(response.headers, "entries"):
@@ -308,10 +181,6 @@ class WorkerEntrypoint:
 
         headers_dict = UnifiedRouter.inject_security_headers(headers_dict, path)
 
-        if rate_limit_info:
-            headers_dict['x-ratelimit-limit'] = str(rate_limit_info.get('limit', 120))
-            headers_dict['x-ratelimit-remaining'] = str(rate_limit_info.get('remaining', 120))
-
         if path.startswith('/api/company') or path.startswith('/api/companies'):
             headers_dict['x-data-version'] = get_data_version()
             expose_headers = headers_dict.get('access-control-expose-headers', '')
@@ -324,13 +193,7 @@ class WorkerEntrypoint:
         if response.status >= 400:
             headers_dict['cache-control'] = 'no-store'
 
-        try:
-            from js import Headers as JSHeaders, Response as JSResponse
-            new_headers = JSHeaders.new()
-        except ImportError:
-            JSHeaders = Headers
-            JSResponse = Response
-            new_headers = JSHeaders.new()
+        new_headers = Headers.new()
 
         for k, v in headers_dict.items():
             if k == 'set-cookie':
@@ -355,4 +218,4 @@ class WorkerEntrypoint:
             "status": response.status,
             "headers": new_headers
         }
-        return JSResponse.new(body, init)
+        return Response.new(body, init)
