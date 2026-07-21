@@ -101,8 +101,8 @@ class TestModularStartupService(unittest.TestCase):
         ]
 
     def test_filter_and_sort_startups_by_bounds(self):
-        # Query bounds around 12.90 to 13.00 lat should include ID 1 and remote ID 3, excluding ID 2 (13.05)
-        res = filter_and_sort_startups(self.sample_startups, 12.90, 13.00, 77.50, 77.65, limit=10)
+        # Query bounds around 12.00 to 13.00 lat (span >= 1.0) should include ID 1 and remote ID 3, excluding ID 2 (13.05)
+        res = filter_and_sort_startups(self.sample_startups, 12.00, 13.00, 77.50, 77.65, limit=10)
         ids = [s["id"] for s in res]
         self.assertIn(1, ids)
         self.assertIn(3, ids)

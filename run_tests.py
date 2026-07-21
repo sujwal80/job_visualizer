@@ -48,7 +48,8 @@ def main():
         ("21. E2E Search, Filtering, and Map boundaries Suite", os.path.join(tests_dir, "test_e2e_search_filtering.py")),
         ("22. HTML/JS Syntax & Event Handler Integrity", os.path.join(tests_dir, "test_html_js_parser.py")),
         ("23. Mobile and Web Responsiveness E2E", os.path.join(tests_dir, "test_mobile_responsiveness.py")),
-        ("24. Viewport Mode Transition on Manual Pan", os.path.join(tests_dir, "test_viewport_mode_transition.py"))
+        ("24. Viewport Mode Transition on Manual Pan", os.path.join(tests_dir, "test_viewport_mode_transition.py")),
+        ("25. E2E User Journeys Regression Suite", os.path.join(tests_dir, "test_e2e_user_journeys.py"))
     ]
     
     print("\n⚡ WORLDTECH MAP // FULL-STACK MASTER TEST RUNNER ⚡")

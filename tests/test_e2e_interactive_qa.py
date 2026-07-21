@@ -294,13 +294,13 @@ class TestE2EInteractiveQA(unittest.TestCase):
 
     def test_d2_job_openings_render_apply_links(self):
         """Verify that opening a startup with job openings renders apply links inside the drawer."""
-        # Stripe has jobs
-        self.page.goto(f"{self.BASE_URL}/jobs?city=San%20Francisco%2C%20CA")
+        # Microsoft has jobs in Bengaluru
+        self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
         self.page.wait_for_load_state("domcontentloaded")
         self.page.wait_for_timeout(1000)
 
-        # Click Stripe directory item
-        self.page.locator("#directory-list .directory-item:has-text('Stripe')").first.click()
+        # Click Microsoft directory item
+        self.page.locator("#directory-list .directory-item:has-text('Microsoft')").first.click()
 
         # Verify job card is rendered in details drawer and wait for it
         job_card = self.page.locator("#details-drawer .job-card").first

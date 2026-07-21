@@ -206,7 +206,7 @@ class TestProductionAuditE2E(unittest.TestCase):
                 "city": "San Francisco / Remote",
                 "has_pin": False
             }]
-            resp = self.client.get('/api/companies?min_lat=18.9&max_lat=19.3&min_lng=72.7&max_lng=73.0')
+            resp = self.client.get('/api/companies?min_lat=18.0&max_lat=19.5&min_lng=72.0&max_lng=73.5')
             self.assertEqual(resp.status_code, 200)
             data = json.loads(resp.data)
             ids = [s["id"] for s in data]

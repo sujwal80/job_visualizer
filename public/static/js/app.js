@@ -26,7 +26,8 @@ import {
     handleHashRouting,
     updateSearchCity,
     executeUnifiedSearch,
-    KNOWN_HUB_COORDINATES
+    KNOWN_HUB_COORDINATES,
+    normalizeLocationQuery
 } from './modules/router.js';
 
 
@@ -222,6 +223,9 @@ function fetchAndRender() {
 
     if (cityParam) {
         updateSearchCity(cityParam, { skipPushState: true });
+    } else if (activeQuery) {
+        state.searchedCity = '';
+        fetchFilteredStartups();
     } else {
         state.searchedCity = '';
         const titleEl = document.getElementById('activeMapTitle');
@@ -231,7 +235,18 @@ function fetchAndRender() {
         if (navInput) {
             navInput.placeholder = "Search city/location ...";
         }
-        fetchFilteredStartups();
+        
+        // Render empty sidebar state (no companies, welcome text)
+        clearAllMarkers();
+        const directoryList = document.getElementById('directory-list');
+        if (directoryList) {
+            directoryList.innerHTML = `
+                <div class="p-6 text-center text-gray-500 font-medium">
+                    Search for a city or location to find companies and jobs.
+                </div>
+            `;
+        }
+        updateDashboardStats([]);
     }
 }
 
@@ -688,6 +703,12 @@ fetch('/static/data/hub_boundaries.json')
     .then(res => res.json())
     .then(data => {
         state.hubBoundaries = data;
+        if (state.searchedCity) {
+            const normKey = normalizeLocationQuery(state.searchedCity);
+            if (state.hubBoundaries[normKey]) {
+                drawSearchBoundary(state.hubBoundaries[normKey]);
+            }
+        }
     })
     .catch(err => console.error("Error loading hub boundaries:", err));
 

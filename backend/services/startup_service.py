@@ -106,9 +106,11 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
         lat = _safe_float(s.get("lat"))
         lng = _safe_float(s.get("lng"))
         if min_lat is not None and max_lat is not None and min_lng is not None and max_lng is not None:
-            # Preserve unpinned remote startups regardless of map bounding box
+            # Preserve unpinned remote startups only at wide zoom levels (lat_span >= 1.0)
+            lat_span = abs(max_lat - min_lat)
             if s.get("has_pin") is False:
-                pass
+                if lat_span < 1.0:
+                    continue
             else:
                 eff_lat = lat if lat is not None else DEFAULT_MAP_CENTER_LAT
                 eff_lng = lng if lng is not None else DEFAULT_MAP_CENTER_LNG
