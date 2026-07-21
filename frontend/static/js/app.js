@@ -26,7 +26,7 @@ import {
     executeUnifiedSearch,
     KNOWN_HUB_COORDINATES
 } from './modules/router.js';
-import { initResumeBuilder } from './modules/resume_builder.js';
+
 
 // DOM Elements
 const directoryList = document.getElementById('directory-list');
@@ -217,7 +217,7 @@ function fetchAndRender() {
         
         const navInput = document.getElementById('unified-search-input');
         if (navInput) {
-            navInput.placeholder = "Search city/location or job title...";
+            navInput.placeholder = "Search city/location ...";
         }
         fetchFilteredStartups();
     }
@@ -649,6 +649,6 @@ window.WorldTechApp = {
 
 checkAuthStatus();
 handleHashRouting();
-initResumeBuilder();
+
 fetchAndRender();
 

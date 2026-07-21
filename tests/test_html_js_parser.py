@@ -81,16 +81,16 @@ class TestHTMLJSSyntaxIntegrity(unittest.TestCase):
 
             self.assertGreater(len(script_matches), 0, f"No inline script tags found in {path}")
             
-            # Verify that for every open inline script tag, there is a matching </script> tag before any HTML modal markup
-            modal_pos = content.find('id="resume-builder-modal"')
-            if modal_pos != -1:
+            # Verify that for every open inline script tag, there is a matching </script> tag before the end of the body
+            body_end_pos = content.find('</body>')
+            if body_end_pos != -1:
                 for s_match in script_matches:
-                    if s_match.start() < modal_pos:
-                        # Find closing tag after this script start but before modal
-                        matching_close = [c for c in closing_matches if s_match.start() < c.start() < modal_pos]
+                    if s_match.start() < body_end_pos:
+                        # Find closing tag after this script start but before </body>
+                        matching_close = [c for c in closing_matches if s_match.start() < c.start() < body_end_pos]
                         self.assertGreater(
                             len(matching_close), 0,
-                            f"Unclosed <script> tag detected before HTML modal markup at position {s_match.start()} in {path}"
+                            f"Unclosed <script> tag detected before the end of body at position {s_match.start()} in {path}"
                         )
 
     def test_02_javascript_syntax_validity(self):

@@ -122,7 +122,7 @@ export function executeUnifiedSearch(query, options = {}) {
         const navInput = document.getElementById('unified-search-input');
         if (navInput) {
             navInput.value = '';
-            navInput.placeholder = "Search city/location or job title...";
+            navInput.placeholder = "Search city/location ...";
         }
         if (window.WorldTechApp && typeof window.WorldTechApp.fetchFilteredStartups === 'function') {
             window.WorldTechApp.fetchFilteredStartups();

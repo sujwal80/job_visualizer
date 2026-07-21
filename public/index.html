@@ -157,7 +157,7 @@
     <div id="app-container" class="absolute inset-0 z-30 flex flex-col h-full w-full bg-white">
         <!-- Top Navbar -->
         <nav class="top-navbar">
-            <div class="navbar-left flex items-center gap-3">
+            <div class="navbar-left">
                 <button onclick="handleNavbarBack()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs py-2 px-3 rounded-xl transition-all shrink-0">
                     <i class="fa-solid fa-arrow-left mr-1"></i> Back
                 </button>
@@ -174,17 +174,14 @@
             </div>
 
             <div class="navbar-center">
-            </div>
-
-            <div class="navbar-right flex items-center gap-2">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input id="unified-search-input" type="text" placeholder="Search city/location or job title..." onkeydown="if(event.key === 'Enter') handleUnifiedSearch()">
+                    <input id="unified-search-input" type="text" placeholder="Search city/location ..."
+                        onkeydown="if(event.key === 'Enter') handleUnifiedSearch()">
                 </div>
-                <button id="open-resume-builder-btn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 font-extrabold text-xs py-2 px-3 rounded-xl border border-blue-200 transition-all flex items-center gap-1.5 shrink-0">
-                    <i class="fa-solid fa-file-invoice"></i>
-                    <span class="hidden md:inline">Build Resume</span>
-                </button>
+            </div>
+            
+            <div class="navbar-right">
             </div>
         </nav>
 
@@ -372,105 +369,6 @@
         }
     </script>
 
-    <!-- Interactive Resume Builder Modal -->
-    <div id="resume-builder-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm items-center justify-center p-3 sm:p-6 overflow-y-auto">
-        <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-            <!-- Modal Header -->
-            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-sm shadow-md">
-                        <i class="fa-solid fa-file-invoice"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-base font-extrabold text-slate-900 leading-none">Interactive Resume Builder</h2>
-                        <span class="text-xs text-slate-500 font-medium">Create & customize tailored ATS resume templates</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button id="autofill-job-btn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs py-2 px-3 rounded-xl border border-blue-200 transition-all flex items-center gap-1">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        <span>Autofill from Selected Job</span>
-                    </button>
-                    <button id="print-resume-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition-all flex items-center gap-1 shadow-sm">
-                        <i class="fa-solid fa-print"></i>
-                        <span>Print / Save PDF</span>
-                    </button>
-                    <button id="copy-resume-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2 px-3 rounded-xl transition-all">
-                        <i class="fa-solid fa-copy"></i>
-                    </button>
-                    <button id="close-resume-modal-btn" class="text-slate-400 hover:text-slate-700 text-xl font-bold w-8 h-8 rounded-xl flex items-center justify-center hover:bg-slate-200 transition-all">
-                        &times;
-                    </button>
-                </div>
-            </div>
 
-            <!-- Modal Content Grid: Form Inputs vs Live Preview -->
-            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 flex-1 overflow-hidden">
-                <!-- Form Inputs Section -->
-                <div class="p-6 overflow-y-auto space-y-4 bg-slate-50/50">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Template Style</span>
-                        <div class="flex items-center gap-1 bg-slate-200/80 p-1 rounded-xl">
-                            <button id="tmpl-btn-modern" class="px-2.5 py-1 text-xs font-extrabold rounded-lg bg-white text-blue-600 shadow-xs">Modern</button>
-                            <button id="tmpl-btn-minimal" class="px-2.5 py-1 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900">Minimal</button>
-                            <button id="tmpl-btn-classic" class="px-2.5 py-1 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900">Classic</button>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-200 pb-1">Personal Info</h3>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input id="res-fullname" type="text" placeholder="Full Name" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none">
-                            <input id="res-title" type="text" placeholder="Professional Title" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none">
-                        </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <input id="res-email" type="email" placeholder="Email" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none">
-                            <input id="res-phone" type="text" placeholder="Phone" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none">
-                            <input id="res-location" type="text" placeholder="City, Country" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none">
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-200 pb-1">Professional Summary</h3>
-                        <textarea id="res-summary" rows="3" placeholder="Executive summary tailored to your target position..." class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none"></textarea>
-                    </div>
-
-                    <div class="space-y-3">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-200 pb-1">Target Experience</h3>
-                        <div class="space-y-2">
-                            <div class="grid grid-cols-2 gap-2">
-                                <input id="res-exp-company" type="text" placeholder="Company Name" class="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none">
-                                <input id="res-exp-role" type="text" placeholder="Role / Position" class="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none">
-                            </div>
-                            <input id="res-exp-period" type="text" placeholder="Period (e.g. 2022 - Present)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none">
-                            <textarea id="res-exp-details" rows="2" placeholder="Key responsibilities and achievements..." class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="pt-2 border-t border-slate-200">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Education & Skills</h3>
-                        <div class="grid grid-cols-3 gap-2 mb-2">
-                            <input id="res-edu-school" type="text" placeholder="University / Institute" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none">
-                            <input id="res-edu-degree" type="text" placeholder="Degree" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none">
-                            <input id="res-edu-year" type="text" placeholder="Year" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Skills (comma separated)</label>
-                            <input id="res-skills" type="text" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Live Preview Section -->
-                <div class="p-6 overflow-y-auto bg-slate-200/50 flex flex-col">
-                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
-                        <span>Live Document Preview</span>
-                        <span class="text-blue-600">✨ Real-time rendering</span>
-                    </div>
-                    <div id="resume-live-preview" class="flex-1"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
