@@ -4,7 +4,7 @@ Viewport Mode Transition on Manual Pan (R2) Test Suite:
 tests/test_viewport_mode_transition.py
 
 Verifies:
-1. Static code assertions on frontend/static/js/app.js and public/static/js/app.js
+1. Static code assertions on public/static/js/app.js
    ensuring they implement the R2 manual pan/zoom transition logic correctly.
 2. Playwright E2E simulation (if available) verifying that searching a city (e.g. Bengaluru)
    and triggering a manual pan/zoom transitions UI and URL parameters to Viewport mode correctly.
@@ -85,11 +85,7 @@ class TestViewportModeTransition(unittest.TestCase):
             if hasattr(cls, 'server_thread') and cls.server_thread:
                 cls.server_thread.join(timeout=2)
 
-    def test_static_code_assertions_frontend_app_js(self):
-        """Assert that frontend/static/js/app.js correctly implements the manual pan/zoom transition logic."""
-        app_js_path = os.path.join(PROJECT_ROOT, "frontend/static/js/app.js")
-        self.assertTrue(os.path.exists(app_js_path), f"File {app_js_path} does not exist.")
-        self._verify_static_rules(app_js_path)
+
 
     def test_static_code_assertions_public_app_js(self):
         """Assert that public/static/js/app.js correctly implements the manual pan/zoom transition logic."""

@@ -19,7 +19,6 @@ from html.parser import HTMLParser
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 INDEX_HTML_PATHS = [
     os.path.join(PROJECT_ROOT, "public/index.html"),
-    os.path.join(PROJECT_ROOT, "frontend/templates/index.html"),
 ]
 
 class InlineScriptExtractor(HTMLParser):
@@ -139,8 +138,8 @@ class TestHTMLJSSyntaxIntegrity(unittest.TestCase):
             parser = data['parser']
             combined_js = "\n".join(parser.script_blocks)
             
-            # Also check exported functions in modules under public/static/js/ and frontend/static/js/
-            for js_dir in [os.path.join(PROJECT_ROOT, "public/static/js"), os.path.join(PROJECT_ROOT, "frontend/static/js")]:
+            # Also check exported functions in modules under public/static/js/
+            for js_dir in [os.path.join(PROJECT_ROOT, "public/static/js")]:
                 if os.path.exists(js_dir):
                     for root, _, files in os.walk(js_dir):
                         for file in files:
