@@ -222,5 +222,40 @@ class TestMobileResponsiveness(unittest.TestCase):
         
         self.assertEqual(self.js_errors, [])
 
+    def test_one_finger_map_panning(self):
+        """Verify one-finger drag on mobile pans the map and touch-action is none."""
+        self.page.set_viewport_size({"width": 375, "height": 812})
+        self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
+        self.page.wait_for_load_state("domcontentloaded")
+        self.page.wait_for_timeout(1000)
+
+        # 1. Verify computed touch-action is 'none'
+        canvas = self.page.locator(".maplibregl-canvas")
+        touch_action = canvas.evaluate("el => window.getComputedStyle(el).touchAction")
+        self.assertEqual(touch_action, "none", "Canvas touch-action must be 'none' to allow one-finger pan")
+
+        # 2. Verify panning works
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && window.WorldTechApp.map"
+        )
+        initial_center = self.page.evaluate("window.WorldTechApp.map.getCenter()")
+        
+        map_el = self.page.locator("#map")
+        box = map_el.bounding_box()
+        start_x = box['x'] + box['width'] / 2
+        start_y = box['y'] + box['height'] / 2
+        
+        # Drag
+        self.page.mouse.move(start_x, start_y)
+        self.page.mouse.down()
+        self.page.mouse.move(start_x - 100, start_y - 100, steps=10)
+        self.page.mouse.up()
+        
+        self.page.wait_for_timeout(1000)
+        final_center = self.page.evaluate("window.WorldTechApp.map.getCenter()")
+        
+        self.assertNotEqual(initial_center, final_center, "Map center should change after one-finger drag")
+        self.assertEqual(self.js_errors, [])
+
 if __name__ == "__main__":
     unittest.main()

@@ -28,8 +28,10 @@ export const map = new maplibregl.Map({
     minZoom: 1.5,
     maxZoom: 18,
     dragRotate: false,
-    touchZoomRotate: false
+    touchZoomRotate: true
 });
+
+map.touchZoomRotate.disableRotation();
 
 map.on('load', () => {
     if (map && typeof map.resize === 'function') {
