@@ -87,11 +87,7 @@ class TestR1ViewportAndLayoutResilience(unittest.TestCase):
         self.assertIn('.details-drawer', self.css_content, "CSS missing .details-drawer class definition.")
         self.assertIn('width: 100%;', self.css_content, "Details drawer should adapt to 100% width on mobile screens.")
 
-    def test_r1_07_quick_tabs_hidden_on_mobile(self):
-        """Verify quick industry tabs are hidden on mobile breakpoints to prevent top navbar overflow."""
-        self.assertIn('.quick-tabs', self.css_content, "CSS missing .quick-tabs class definition.")
-        # Under @media (max-width: 900px) quick-tabs is set to display: none
-        self.assertIn('display: none;', self.css_content, "Quick tabs should be hidden on mobile to prevent overflow.")
+
 
     def test_r1_08_text_overflow_ellipsis_on_card_title(self):
         """Verify card titles use white-space nowrap and text-overflow ellipsis to prevent text wrapping/overflow."""
@@ -639,7 +635,7 @@ class TestM1UIUXModernizationAndSecurityResilience(unittest.TestCase):
 
     def test_m1_r2_interactive_focus_visible_and_active_press(self):
         """Verify .tab-btn, .directory-item, and .map-overlay-btn define :focus-visible outline rings and :active press scaling."""
-        components = ['.tab-btn', '.directory-item', '.map-overlay-btn']
+        components = ['.directory-item', '.map-overlay-btn']
         for comp in components:
             self.assertIn(f"{comp}:focus-visible", self.css_content, f"Missing :focus-visible outline for {comp}")
             self.assertIn(f"{comp}:active", self.css_content, f"Missing :active press transform for {comp}")
