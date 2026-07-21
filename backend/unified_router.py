@@ -142,10 +142,13 @@ class UnifiedRouter:
     async def handle_request(self, req: UnifiedRequest) -> UnifiedResponse:
         # Check rate limit
         client_ip = req.client_ip
-        if req.testing and client_ip == "127.0.0.1":
+        if req.testing and client_ip in ("127.0.0.1", "::1", "localhost"):
             allowed, retry_after, remaining, limit_val = True, 0, 9999, 9999
         else:
             allowed, retry_after, remaining, limit_val = _check_rate_limit(client_ip)
+            if not allowed:
+                # Log diagnostic info to stderr or stdout for E2E troubleshooting
+                print(f"[DEBUG RateLimit Blocked] client_ip={client_ip!r} req.testing={req.testing!r} path={req.path!r}", flush=True)
 
         rate_limit_info = {'limit': limit_val, 'remaining': remaining}
 

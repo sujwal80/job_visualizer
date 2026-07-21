@@ -8,7 +8,9 @@ import {
     updateMarkersDiff,
     updateMarkersVisualState,
     industryColors,
-    defaultColor
+    defaultColor,
+    drawSearchBoundary,
+    clearSearchBoundary
 } from './modules/map_manager.js';
 import {
     updateDashboardStats,
@@ -78,11 +80,21 @@ function fetchFilteredStartups(preventScroll = false) {
     const qParam = urlParams.get('q') || urlParams.get('role');
     const cityParam = urlParams.get('city');
 
-    if (cityParam) {
-        state.searchedCity = cityParam.toLowerCase();
-        queryParams.set('city', cityParam);
-    } else if (state.searchedCity) {
-        queryParams.set('city', state.searchedCity);
+    if (state.boundsOverride && Array.isArray(state.boundsOverride) && state.boundsOverride.length === 4) {
+        queryParams.set('min_lat', state.boundsOverride[0]);
+        queryParams.set('max_lat', state.boundsOverride[1]);
+        queryParams.set('min_lng', state.boundsOverride[2]);
+        queryParams.set('max_lng', state.boundsOverride[3]);
+        if (cityParam) {
+            state.searchedCity = cityParam.toLowerCase();
+        }
+    } else {
+        if (cityParam) {
+            state.searchedCity = cityParam.toLowerCase();
+            queryParams.set('city', cityParam);
+        } else if (state.searchedCity) {
+            queryParams.set('city', state.searchedCity);
+        }
     }
 
     if (qParam) {
@@ -104,7 +116,7 @@ function fetchFilteredStartups(preventScroll = false) {
     }
 
     try {
-        if (!state.searchedCity && map && map.getContainer() && map.getContainer().clientWidth > 0) {
+        if (!state.boundsOverride && !state.searchedCity && map && map.getContainer() && map.getContainer().clientWidth > 0) {
             const bounds = map.getBounds();
             if (bounds && !isNaN(bounds.getSouth()) && !isNaN(bounds.getNorth()) && !isNaN(bounds.getWest()) && !isNaN(bounds.getEast())) {
                 let minLat = Math.max(-90, Math.min(90, bounds.getSouth()));
@@ -247,6 +259,28 @@ map.on('moveend', (e) => {
         } catch (err) {
             return;
         }
+
+        // Transition to viewport mode on manual pan/zoom
+        state.searchedCity = '';
+        state.boundsOverride = null;
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('city')) {
+            urlParams.delete('city');
+            const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash || ''}`;
+            window.history.replaceState({ path: newUrl }, '', newUrl);
+            state.lastQueryString = window.location.search;
+        }
+
+        const titleEl = document.getElementById('activeMapTitle');
+        if (titleEl) {
+            titleEl.textContent = 'All locations';
+        }
+        const navInput = document.getElementById('unified-search-input');
+        if (navInput) {
+            navInput.placeholder = "Search city/location ...";
+            navInput.value = '';
+        }
+
         fetchFilteredStartups(true);
     }, 300);
 });
@@ -457,6 +491,7 @@ if (backDrawerBtn) {
 
 function resetMapView() {
     lockProgrammaticMove(2500);
+    clearSearchBoundary();
     map.flyTo({
         center: state.defaultLocation,
         zoom: state.defaultZoom,
@@ -606,6 +641,8 @@ window.resetMapView = resetMapView;
 window.executeUnifiedSearch = executeUnifiedSearch;
 
 window.WorldTechApp = {
+    clearSearchBoundary,
+    drawSearchBoundary,
     createElement,
     showToast,
     safeFetch,
@@ -646,6 +683,13 @@ window.WorldTechApp = {
     executeUnifiedSearch,
     state
 };
+
+fetch('/static/data/hub_boundaries.json')
+    .then(res => res.json())
+    .then(data => {
+        state.hubBoundaries = data;
+    })
+    .catch(err => console.error("Error loading hub boundaries:", err));
 
 checkAuthStatus();
 handleHashRouting();

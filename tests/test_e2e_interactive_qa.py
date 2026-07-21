@@ -58,7 +58,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
             from backend.app import app
             from werkzeug.serving import make_server
             app.testing = True
-            cls.server = make_server("127.0.0.1", 5001, app)
+            cls.server = make_server("127.0.0.1", 5001, app, threaded=True)
             cls.server_thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
             cls.server_thread.start()
 
@@ -574,7 +574,14 @@ class TestE2EInteractiveQA(unittest.TestCase):
     def test_g5_map_zoom_pan_viewport_preservation(self):
         """Verify that zooming or panning the map programmatically preserves the new zoom/center and does not reset."""
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
-        self.page.wait_for_timeout(2000)
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && "
+            "window.WorldTechApp.state && "
+            "window.WorldTechApp.map && "
+            "window.WorldTechApp.state.startupsData && "
+            "window.WorldTechApp.state.startupsData.length > 0",
+            timeout=15000
+        )
 
         # Set a new zoom level
         self.page.evaluate("() => WorldTechApp.map.setZoom(14)")

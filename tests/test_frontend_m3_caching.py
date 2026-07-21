@@ -98,8 +98,11 @@ class TestMilestone3FrontendCachingAndCoalescing(unittest.TestCase):
         """Verify geocoding lookup checks GeocodeCache in router.js."""
         self.assertIn("state.geocodeCache.get(lowerCity)", self.router_js,
                       "Geocoder lookup must check state.geocodeCache first.")
-        self.assertIn("state.geocodeCache.set(lowerCity, [lon, lat])", self.router_js,
-                      "Successful geocoder lookups must be stored in state.geocodeCache.")
+        self.assertTrue(
+            "state.geocodeCache.set(lowerCity, [lon, lat])" in self.router_js or
+            "state.geocodeCache.set(lowerCity, cachedVal)" in self.router_js,
+            "Successful geocoder lookups must be stored in state.geocodeCache."
+        )
 
 
 if __name__ == "__main__":

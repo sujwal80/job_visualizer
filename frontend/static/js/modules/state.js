@@ -132,6 +132,8 @@ export class LRUCacheWithTTL {
 
 export const state = {
     searchedCity: '',
+    boundsOverride: null,
+    hubBoundaries: {},
     startupsData: [],
     currentSelectedId: null,
     defaultLocation: [78.9629, 22.5937],

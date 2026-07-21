@@ -44,49 +44,6 @@ map.on('style.load', () => {
     if (map.getLayer('water')) map.setPaintProperty('water', 'fill-color', '#89bceb');
     if (map.getLayer('waterway')) map.setPaintProperty('waterway', 'line-color', '#7aafe0');
     if (map.getLayer('water_shadow')) map.setPaintProperty('water_shadow', 'fill-color', '#98c6f0');
-
-    // Fetch detailed India GeoJSON (MultiPolygon) to construct the world mask
-    fetch('/static/data/india_high_res.geojson')
-        .then(res => res.json())
-        .then(indiaGeojson => {
-            const worldCoords = [
-                [-180, -90],
-                [180, -90],
-                [180, 90],
-                [-180, 90],
-                [-180, -90]
-            ];
-            
-            const maskCoords = [worldCoords];
-            
-            // Loop through all polygons of India and add their exterior rings as holes in the mask
-            const geom = indiaGeojson.features[0].geometry;
-            if (geom.type === 'MultiPolygon') {
-                geom.coordinates.forEach(polygon => {
-                    maskCoords.push(polygon[0]); // Exterior ring of this polygon segment
-                });
-            } else if (geom.type === 'Polygon') {
-                maskCoords.push(geom.coordinates[0]);
-            }
-            
-            // Add India GeoJSON boundary outline
-            map.addSource('india-boundary', {
-                type: 'geojson',
-                data: indiaGeojson
-            });
-
-            map.addLayer({
-                id: 'india-outline-on-mask',
-                type: 'line',
-                source: 'india-boundary',
-                paint: {
-                    'line-color': '#2563eb', // Blue outline
-                    'line-width': 1.8,
-                    'line-opacity': 0.8
-                }
-            });
-        })
-        .catch(err => console.error("Error loading India GeoJSON:", err));
 });
 
 // Add navigation controls
@@ -255,6 +212,41 @@ export function updateMarkersVisualState() {
                 tempEl.style.zIndex = '';
             }
         }
+    }
+}
+
+export function drawSearchBoundary(geojson) {
+    if (!map || !geojson) return;
+    const source = map.getSource('search-boundary');
+    if (source) {
+        source.setData(geojson);
+    } else {
+        map.addSource('search-boundary', {
+            type: 'geojson',
+            data: geojson
+        });
+    }
+    if (!map.getLayer('search-boundary-outline')) {
+        map.addLayer({
+            id: 'search-boundary-outline',
+            type: 'line',
+            source: 'search-boundary',
+            paint: {
+                'line-color': '#2563eb',
+                'line-width': 2.5,
+                'line-opacity': 0.8
+            }
+        });
+    }
+}
+
+export function clearSearchBoundary() {
+    if (!map) return;
+    if (map.getLayer('search-boundary-outline')) {
+        map.removeLayer('search-boundary-outline');
+    }
+    if (map.getSource('search-boundary')) {
+        map.removeSource('search-boundary');
     }
 }
 
