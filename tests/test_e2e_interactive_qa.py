@@ -197,7 +197,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
         self.assertIn("/jobs", self.page.url)
 
         # Verify Back button returns to landing state
-        self.page.click("button[onclick='resetToLandingState()']")
+        self.page.click("button[onclick='handleNavbarBack()']")
         self.page.wait_for_timeout(500)
         
         parsed_path = urllib.parse.urlparse(self.page.url).path

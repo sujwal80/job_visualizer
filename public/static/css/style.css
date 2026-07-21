@@ -147,6 +147,47 @@ textarea {
     padding: 0 20px;
 }
 
+.quick-tabs {
+    display: flex;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+}
+
+.tab-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+}
+
+.tab-btn:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+.tab-btn:active {
+    transform: scale(0.95);
+    transition-duration: 90ms;
+}
+
+.tab-btn.active {
+    background: #ffffff;
+    color: var(--accent-blue);
+    box-shadow: var(--shadow-sm);
+}
+
 .navbar-right {
     display: flex;
     align-items: center;
@@ -622,6 +663,10 @@ textarea {
     color: #0f172a;
 }
 
+.back-drawer-btn {
+    display: none;
+}
+
 .drawer-content {
     padding: 24px;
     overflow-y: auto;
@@ -631,6 +676,7 @@ textarea {
     display: flex;
     flex-direction: column;
     gap: 22px;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Unified Top Company Profile Card in Drawer */
@@ -1148,6 +1194,10 @@ textarea {
         padding: 0 16px;
     }
 
+    .quick-tabs {
+        display: none;
+    }
+
     .sidebar {
         position: absolute;
         top: 0;
@@ -1191,6 +1241,34 @@ textarea {
         z-index: 55;
     }
 
+    .drawer-header-bar {
+        padding: 12px 16px;
+        justify-content: flex-start;
+        gap: 12px;
+    }
+
+    .close-drawer-btn {
+        display: none;
+    }
+
+    .back-drawer-btn {
+        display: block;
+        background: transparent;
+        border: none;
+        font-size: 18px;
+        color: #64748b;
+        cursor: pointer;
+        transition: color 0.2s;
+        margin-right: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .back-drawer-btn:hover {
+        color: #0f172a;
+    }
+
     #app-container:has(.details-drawer.active) .mobile-toggle {
         display: none !important;
     }
@@ -1200,6 +1278,10 @@ textarea {
     .top-navbar {
         padding: 0 14px;
         gap: 8px;
+    }
+
+    .quick-tabs {
+        display: none;
     }
 
     .sidebar {
@@ -1318,6 +1400,10 @@ textarea {
 }
 
 @media (max-width: 360px) {
+    .brand-text-label {
+        display: none;
+    }
+
     .top-navbar {
         padding: 0 6px;
         gap: 4px;

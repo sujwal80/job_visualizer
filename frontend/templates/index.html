@@ -158,14 +158,14 @@
         <!-- Top Navbar -->
         <nav class="top-navbar">
             <div class="navbar-left flex items-center gap-3">
-                <button onclick="resetToLandingState()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs py-2 px-3 rounded-xl transition-all shrink-0">
+                <button onclick="handleNavbarBack()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs py-2 px-3 rounded-xl transition-all shrink-0">
                     <i class="fa-solid fa-arrow-left mr-1"></i> Back
                 </button>
                 <div class="brand-logo cursor-pointer" onclick="resetToLandingState()">
                     <div class="w-9 h-9 rounded-xl bg-[#1a73e8] flex items-center justify-center shadow-lg shadow-blue-500/20">
                         <i class="fa-solid fa-map-location-dot text-white text-sm"></i>
                     </div>
-                    <span class="font-extrabold text-lg tracking-tight text-slate-900">Job<span class="text-[#1a73e8]">Map</span></span>
+                    <span class="brand-text-label font-extrabold text-lg tracking-tight text-slate-900">Job<span class="text-[#1a73e8]">Map</span></span>
                 </div>
                 <span class="live-badge">
                     <span class="pulse-dot"></span>
@@ -193,7 +193,7 @@
         <!-- Main Content Area: Directory & Map -->
         <div class="content-wrapper flex-1 flex overflow-hidden relative">
             <!-- Left Sidebar / Directory List -->
-            <aside class="sidebar">
+            <aside id="sidebar" class="sidebar">
                 <!-- Directory Header Stats -->
                 <div class="p-4 border-b border-slate-200/80 bg-slate-50/80 backdrop-blur-sm">
                     <div class="grid grid-cols-3 gap-2 text-center">
@@ -217,13 +217,7 @@
                     <!-- Local Company Search -->
                     <div class="relative flex items-center bg-white rounded-xl border border-slate-200/80 p-2 shadow-inner focus-within:border-blue-400">
                         <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm mr-2 pl-1"></i>
-                        <input id="sidebar-search-input" type="text" placeholder="Search company name..." class="w-full bg-transparent text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none">
-                    </div>
-
-                    <!-- Role Search -->
-                    <div class="relative flex items-center bg-white rounded-xl border border-slate-200/80 p-2 shadow-inner focus-within:border-blue-400">
-                        <i class="fa-solid fa-briefcase text-slate-400 text-sm mr-2 pl-1"></i>
-                        <input id="filter-role-input" type="text" placeholder="Filter by job role..." class="w-full bg-transparent text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none">
+                        <input id="sidebar-search-input" type="text" placeholder="Search company, role, or skill..." class="w-full bg-transparent text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none">
                     </div>
 
                     <!-- Dropdown Filters Row 1: Work Type & Exp Level -->
@@ -276,6 +270,7 @@
             <!-- Details Drawer -->
             <div id="details-drawer" class="details-drawer">
                 <div class="drawer-header-bar">
+                    <button id="back-drawer-btn" class="back-drawer-btn"><i class="fa-solid fa-arrow-left"></i></button>
                     <span class="drawer-top-label">Role & Company Details</span>
                     <button id="close-drawer-btn" class="close-drawer-btn">&times;</button>
                 </div>
@@ -284,7 +279,7 @@
         </div>
     </div>
 
-    <button id="mobile-toggle-btn" class="mobile-toggle" aria-label="Toggle directory list" style="display:none;"></button>
+    <button id="mobile-toggle-btn" class="mobile-toggle" aria-label="Toggle directory list"></button>
 
     <!-- Load complete interactive application logic -->
     <script type="module" src="/static/js/app.js"></script>
@@ -357,6 +352,23 @@
 
         function resetToLandingState() {
             window.location.href = '/';
+        }
+
+        function handleNavbarBack() {
+            const detailsDrawer = document.getElementById('details-drawer');
+            const sidebar = document.getElementById('sidebar');
+            const mobileToggleBtn = document.getElementById('mobile-toggle-btn');
+            
+            if (detailsDrawer && detailsDrawer.classList.contains('active')) {
+                window.location.hash = '';
+            } else if (window.innerWidth <= 900 && sidebar && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                if (mobileToggleBtn) {
+                    mobileToggleBtn.textContent = 'Show Directory';
+                }
+            } else {
+                resetToLandingState();
+            }
         }
     </script>
 

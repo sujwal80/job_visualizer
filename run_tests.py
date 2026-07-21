@@ -46,7 +46,8 @@ def main():
         ("19. Cloudflare KV Session Store Integration", os.path.join(tests_dir, "test_oauth_kv.py")),
         ("20. Cloudflare Workers Endpoint Integration", os.path.join(tests_dir, "test_worker_endpoints.py")),
         ("21. E2E Search, Filtering, and Map boundaries Suite", os.path.join(tests_dir, "test_e2e_search_filtering.py")),
-        ("22. HTML/JS Syntax & Event Handler Integrity", os.path.join(tests_dir, "test_html_js_parser.py"))
+        ("22. HTML/JS Syntax & Event Handler Integrity", os.path.join(tests_dir, "test_html_js_parser.py")),
+        ("23. Mobile and Web Responsiveness E2E", os.path.join(tests_dir, "test_mobile_responsiveness.py"))
     ]
     
     print("\n⚡ WORLDTECH MAP // FULL-STACK MASTER TEST RUNNER ⚡")

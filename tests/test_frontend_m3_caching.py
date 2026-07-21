@@ -21,6 +21,7 @@ class TestMilestone3FrontendCachingAndCoalescing(unittest.TestCase):
         cls.state_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "modules", "state.js")
         cls.api_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "modules", "api.js")
         cls.ui_manager_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "modules", "ui_manager.js")
+        cls.router_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "modules", "router.js")
         cls.app_js_path = os.path.join(PROJECT_ROOT, "public", "static", "js", "app.js")
 
         with open(cls.state_js_path, "r", encoding="utf-8") as f:
@@ -29,6 +30,8 @@ class TestMilestone3FrontendCachingAndCoalescing(unittest.TestCase):
             cls.api_js = f.read()
         with open(cls.ui_manager_js_path, "r", encoding="utf-8") as f:
             cls.ui_manager_js = f.read()
+        with open(cls.router_js_path, "r", encoding="utf-8") as f:
+            cls.router_js = f.read()
         with open(cls.app_js_path, "r", encoding="utf-8") as f:
             cls.app_js = f.read()
 
@@ -92,10 +95,10 @@ class TestMilestone3FrontendCachingAndCoalescing(unittest.TestCase):
                       "fetchFilteredStartups must cache empty results [] with a 60,000ms (60s) TTL instead of standard 120s TTL.")
 
     def test_07_geocode_cache_integration(self):
-        """Verify geocoding lookup checks GeocodeCache in app.js."""
-        self.assertIn("state.geocodeCache.get(state.searchedCity)", self.app_js,
+        """Verify geocoding lookup checks GeocodeCache in router.js."""
+        self.assertIn("state.geocodeCache.get(lowerCity)", self.router_js,
                       "Geocoder lookup must check state.geocodeCache first.")
-        self.assertIn("state.geocodeCache.set(state.searchedCity, [lon, lat])", self.app_js,
+        self.assertIn("state.geocodeCache.set(lowerCity, [lon, lat])", self.router_js,
                       "Successful geocoder lookups must be stored in state.geocodeCache.")
 
 

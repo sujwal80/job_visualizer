@@ -33,98 +33,20 @@ const directoryList = document.getElementById('directory-list');
 const detailsDrawer = document.getElementById('details-drawer');
 const drawerContent = document.getElementById('drawer-content');
 const closeDrawerBtn = document.getElementById('close-drawer-btn');
+const backDrawerBtn = document.getElementById('back-drawer-btn');
 const searchInput = document.getElementById('unified-search-input');
 
 const mobileToggleBtn = document.getElementById('mobile-toggle-btn');
 const sidebar = document.getElementById('sidebar');
 const resetMapBtn = document.getElementById('reset-map-btn');
 
-const filterRoleInput = document.getElementById('filter-role-input');
 const filterWorkType = document.getElementById('filter-work-type');
 const filterExpLevel = document.getElementById('filter-exp-level');
 const filterSalaryMin = document.getElementById('filter-salary-min');
 const clearFiltersBtn = document.getElementById('clear-filters-btn');
 const sidebarSearchInput = document.getElementById('sidebar-search-input');
 
-// Initialize geocode/hub routing on load
-const urlParams = new URLSearchParams(window.location.search);
-state.searchedCity = (urlParams.get('city') || '').toLowerCase();
-state.lastQueryString = window.location.search;
-
-let isHub = false;
-if (state.searchedCity.includes('bengaluru') || state.searchedCity.includes('bangalore') || state.searchedCity.includes('india') || state.searchedCity === 'in' || state.searchedCity === 'blr') {
-    state.defaultLocation = [77.5946, 12.9716];
-    state.defaultZoom = 11;
-    isHub = true;
-}
-
 showDirectoryLoading();
-
-if (isHub || !state.searchedCity) {
-    map.once('load', () => {
-        lockProgrammaticMove(2500);
-        map.flyTo({
-            center: state.defaultLocation,
-            zoom: state.defaultZoom,
-            speed: 3.0,
-            essential: true
-        });
-    });
-} else {
-    const cachedCoords = state.geocodeCache.get(state.searchedCity);
-    if (cachedCoords && Array.isArray(cachedCoords) && cachedCoords.length === 2) {
-        state.defaultLocation = cachedCoords;
-        state.defaultZoom = 11;
-        lockProgrammaticMove(2500);
-        map.flyTo({
-            center: state.defaultLocation,
-            zoom: state.defaultZoom,
-            speed: 3.0,
-            essential: true
-        });
-    } else {
-        const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(state.searchedCity)}&countrycodes=in&format=json&limit=1`;
-        console.log('[DEBUG app.js geocode] fetching geocode for ' + state.searchedCity);
-        fetch(geoUrl, {
-            headers: {
-                'Accept': 'application/json',
-                'User-Agent': 'WorldTechMap-JobVisualizer/1.0 (sujwal80@gmail.com)'
-            }
-        })
-        .then(res => {
-            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-            return res.json();
-        })
-        .then(data => {
-            if (Array.isArray(data) && data.length > 0) {
-                const lat = parseFloat(data[0].lat);
-                const lon = parseFloat(data[0].lon);
-                if (!isNaN(lat) && !isNaN(lon)) {
-                    state.defaultLocation = [lon, lat];
-                    state.defaultZoom = 11;
-                    state.geocodeCache.set(state.searchedCity, [lon, lat]);
-                    lockProgrammaticMove(2500);
-                    map.flyTo({
-                        center: state.defaultLocation,
-                        zoom: state.defaultZoom,
-                        speed: 3.0,
-                        essential: true
-                    });
-                }
-            }
-        })
-        .catch(err => {
-            console.warn('[Geocoder] Failed to geocode custom city query:', err);
-            lockProgrammaticMove(2500);
-            map.flyTo({
-                center: state.defaultLocation,
-                zoom: state.defaultZoom,
-                speed: 3.0,
-                essential: true
-            });
-        });
-    }
-}
 
 function _processFilteredStartupsResult(startups, preventScroll = false) {
     if (!Array.isArray(startups)) return;
@@ -153,7 +75,7 @@ function _processFilteredStartupsResult(startups, preventScroll = false) {
 function fetchFilteredStartups(preventScroll = false) {
     const queryParams = new URLSearchParams();
     const urlParams = new URLSearchParams(window.location.search);
-    const qParam = urlParams.get('q');
+    const qParam = urlParams.get('q') || urlParams.get('role');
     const cityParam = urlParams.get('city');
 
     if (cityParam) {
@@ -167,9 +89,7 @@ function fetchFilteredStartups(preventScroll = false) {
         queryParams.set('search', qParam);
     }
 
-    if (state.currentFilters.role) {
-        queryParams.set('role', state.currentFilters.role);
-    }
+
     if (state.currentFilters.salary_min) {
         queryParams.set('salary_min', state.currentFilters.salary_min);
     }
@@ -258,8 +178,9 @@ function fetchFilteredStartups(preventScroll = false) {
                         createElement('div', { className: 'about-text', textContent: 'Failed to load company data.' })
                     );
                 }
+                throw err;
             }
-            throw err;
+            return new Promise(() => {});
         })
         .finally(() => {
             state.inFlightPromises.delete(url);
@@ -285,63 +206,10 @@ function fetchAndRender() {
         // Set search input value
         const navInput = document.getElementById('unified-search-input');
         if (navInput) navInput.value = activeQuery;
-        if (filterRoleInput) filterRoleInput.value = activeQuery;
     }
 
     if (cityParam) {
-        state.searchedCity = cityParam.toLowerCase();
-        const titleEl = document.getElementById('activeMapTitle');
-        if (titleEl) titleEl.textContent = cityParam;
-        
-        const navInput = document.getElementById('unified-search-input');
-        if (navInput) {
-            navInput.value = activeQuery || '';
-            navInput.placeholder = `Search jobs in ${cityParam}...`;
-        }
-
-        const lowerCity = cityParam.toLowerCase();
-        if (KNOWN_HUB_COORDINATES[lowerCity]) {
-            state.defaultLocation = KNOWN_HUB_COORDINATES[lowerCity];
-            state.defaultZoom = 11;
-            lockProgrammaticMove(2500);
-            map.flyTo({
-                center: state.defaultLocation,
-                zoom: state.defaultZoom,
-                speed: 3.0,
-                essential: true
-            });
-            fetchFilteredStartups();
-        } else {
-            const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityParam)}&format=json&limit=1`;
-            fetch(geoUrl, {
-                headers: {
-                    'Accept': 'application/json',
-                    'User-Agent': 'WorldTechMap-JobVisualizer/1.0 (sujwal80@gmail.com)'
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data) && data.length > 0) {
-                    const lat = parseFloat(data[0].lat);
-                    const lon = parseFloat(data[0].lon);
-                    if (!isNaN(lat) && !isNaN(lon)) {
-                        state.defaultLocation = [lon, lat];
-                        state.defaultZoom = 11;
-                        lockProgrammaticMove(2500);
-                        map.flyTo({
-                            center: state.defaultLocation,
-                            zoom: state.defaultZoom,
-                            speed: 3.0,
-                            essential: true
-                        });
-                    }
-                }
-                fetchFilteredStartups();
-            })
-            .catch(() => {
-                fetchFilteredStartups();
-            });
-        }
+        updateSearchCity(cityParam, { skipPushState: true });
     } else {
         state.searchedCity = '';
         const titleEl = document.getElementById('activeMapTitle');
@@ -526,7 +394,6 @@ function handleDebouncedInput() {
 }
 
 function handleFiltersChange() {
-    state.currentFilters.role = filterRoleInput ? filterRoleInput.value.trim() : '';
     state.currentFilters.work_type = filterWorkType ? filterWorkType.value : '';
     state.currentFilters.exp_level = filterExpLevel ? filterExpLevel.value : '';
     state.currentFilters.salary_min = filterSalaryMin ? filterSalaryMin.value : '';
@@ -550,19 +417,16 @@ window.addEventListener('hashchange', handleHashRouting);
 if (searchInput) searchInput.addEventListener('input', handleDebouncedInput);
 if (sidebarSearchInput) sidebarSearchInput.addEventListener('input', handleDebouncedInput);
 
-if (filterRoleInput) filterRoleInput.addEventListener('input', handleDebouncedFiltersChange);
 if (filterWorkType) filterWorkType.addEventListener('change', handleFiltersChange);
 if (filterExpLevel) filterExpLevel.addEventListener('change', handleFiltersChange);
 if (filterSalaryMin) filterSalaryMin.addEventListener('change', handleFiltersChange);
 
 if (clearFiltersBtn) {
     clearFiltersBtn.addEventListener('click', () => {
-        if (filterRoleInput) filterRoleInput.value = '';
         if (filterWorkType) filterWorkType.value = '';
         if (filterExpLevel) filterExpLevel.value = '';
         if (filterSalaryMin) filterSalaryMin.value = '';
         
-        state.currentFilters.role = '';
         state.currentFilters.work_type = '';
         state.currentFilters.exp_level = '';
         state.currentFilters.salary_min = '';
@@ -580,6 +444,13 @@ map.on('click', () => {
 if (closeDrawerBtn) {
     closeDrawerBtn.addEventListener('click', () => {
         console.log('[DEBUG closeDrawerBtn click] clearing hash');
+        window.location.hash = '';
+    });
+}
+
+if (backDrawerBtn) {
+    backDrawerBtn.addEventListener('click', () => {
+        console.log('[DEBUG backDrawerBtn click] clearing hash');
         window.location.hash = '';
     });
 }

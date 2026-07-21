@@ -308,17 +308,47 @@ export function executeUnifiedSearch(query, options = {}) {
 
 export function updateSearchCity(cityTitle, options = {}) {
     const skipPushState = !!options.skipPushState;
-    const lowerCity = (cityTitle || '').trim().toLowerCase();
+    let lowerCity = (cityTitle || '').trim().toLowerCase();
+
+    // Map synonyms/countries to their corresponding canonical hub titles
+    const usaTerms = ["san", "francisco", "sf", "ca", "usa", "us", "united states", "america", "california"];
+    const ukTerms = ["london", "uk", "england", "united kingdom", "gb", "great britain"];
+    const indiaTerms = ["india", "in", "bengaluru", "bangalore", "karnataka", "blr"];
+
+    let canonicalCity = cityTitle;
+    let newLocation = [77.5946, 12.9716];
+    let newZoom = 11;
+    let isNewHub = false;
+
+    if (usaTerms.some(term => lowerCity.includes(term))) {
+        canonicalCity = 'San Francisco, CA';
+        lowerCity = 'san francisco, ca';
+        newLocation = [-122.4194, 37.7749];
+        newZoom = 12;
+        isNewHub = true;
+    } else if (ukTerms.some(term => lowerCity.includes(term))) {
+        canonicalCity = 'London, UK';
+        lowerCity = 'london, uk';
+        newLocation = [-0.1276, 51.5072];
+        newZoom = 12;
+        isNewHub = true;
+    } else if (indiaTerms.some(term => lowerCity.includes(term))) {
+        canonicalCity = 'Bengaluru, KA';
+        lowerCity = 'bengaluru, ka';
+        newLocation = [77.5946, 12.9716];
+        newZoom = 11;
+        isNewHub = true;
+    }
 
     // Update active title and navbar input value
     const titleEl = document.getElementById('activeMapTitle');
-    if (titleEl) titleEl.textContent = cityTitle;
+    if (titleEl) titleEl.textContent = canonicalCity;
     const navInput = document.getElementById('navbar-city-input') || document.getElementById('unified-search-input');
-    if (navInput) navInput.value = cityTitle;
+    if (navInput) navInput.value = canonicalCity;
 
     // Update URL query parameters without reloading
     const currentHash = window.location.hash || '';
-    const newUrl = `${window.location.pathname}?city=${encodeURIComponent(cityTitle)}${currentHash}`;
+    const newUrl = `${window.location.pathname}?city=${encodeURIComponent(canonicalCity)}${currentHash}`;
     if (!skipPushState) {
         window.history.pushState({ path: newUrl }, '', newUrl);
     } else {
@@ -326,28 +356,6 @@ export function updateSearchCity(cityTitle, options = {}) {
     }
     state.lastQueryString = window.location.search;
     state.searchedCity = lowerCity;
-
-    // Resolve location coordinates (either hub or geocode)
-    let newLocation = [77.5946, 12.9716];
-    let newZoom = 11;
-    let isNewHub = false;
-
-    const usaTerms = ["san", "francisco", "sf", "ca", "usa", "us", "united states", "america", "california"];
-    const ukTerms = ["london", "uk", "england", "united kingdom", "gb", "great britain"];
-
-    if (usaTerms.some(term => lowerCity.includes(term))) {
-        newLocation = [-122.4194, 37.7749];
-        newZoom = 12;
-        isNewHub = true;
-    } else if (ukTerms.some(term => lowerCity.includes(term))) {
-        newLocation = [-0.1276, 51.5072];
-        newZoom = 12;
-        isNewHub = true;
-    } else if (lowerCity.includes('bengaluru') || lowerCity.includes('bangalore') || lowerCity.includes('india') || lowerCity === 'in' || lowerCity === 'blr') {
-        newLocation = [77.5946, 12.9716];
-        newZoom = 11;
-        isNewHub = true;
-    }
 
     const handleFlyTo = (coords, zoomVal) => {
         state.defaultLocation = coords;
@@ -377,32 +385,39 @@ export function updateSearchCity(cityTitle, options = {}) {
     if (isNewHub) {
         handleFlyTo(newLocation, newZoom);
     } else {
-        const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityTitle)}&format=json&limit=1`;
-        fetch(geoUrl, {
-            headers: {
-                'Accept': 'application/json',
-                'User-Agent': 'WorldTechMap-JobVisualizer/1.0 (sujwal80@gmail.com)'
-            }
-        })
-        .then(res => {
-            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-            return res.json();
-        })
-        .then(data => {
-            if (Array.isArray(data) && data.length > 0) {
-                const lat = parseFloat(data[0].lat);
-                const lon = parseFloat(data[0].lon);
-                if (!isNaN(lat) && !isNaN(lon)) {
-                    handleFlyTo([lon, lat], 11);
-                    return;
+        const cachedCoords = state.geocodeCache.get(lowerCity);
+        if (cachedCoords && Array.isArray(cachedCoords) && cachedCoords.length === 2) {
+            handleFlyTo(cachedCoords, 11);
+        } else {
+            const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityTitle)}&format=json&limit=1`;
+            fetch(geoUrl, {
+                headers: {
+                    'Accept': 'application/json',
+                    'User-Agent': 'WorldTechMap-JobVisualizer/1.0 (sujwal80@gmail.com)'
                 }
-            }
-            handleFlyTo(newLocation, newZoom);
-        })
-        .catch(err => {
-            console.warn('[Geocoder] Failed to geocode custom city query:', err);
-            handleFlyTo(newLocation, newZoom);
-        });
+            })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lon = parseFloat(data[0].lon);
+                    if (!isNaN(lat) && !isNaN(lon)) {
+                        state.geocodeCache.set(lowerCity, [lon, lat]);
+                        handleFlyTo([lon, lat], 11);
+                        return;
+                    }
+                }
+                handleFlyTo(newLocation, newZoom);
+            })
+            .catch(err => {
+                console.warn('[Geocoder] Failed to geocode custom city query:', err);
+                handleFlyTo(newLocation, newZoom);
+            });
+        }
     }
 }
+
 
