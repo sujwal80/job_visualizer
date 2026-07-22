@@ -641,6 +641,7 @@ textarea {
     transform: translateX(0);
     opacity: 1;
     pointer-events: auto;
+    z-index: 55;
 }
 
 .drawer-header-bar {

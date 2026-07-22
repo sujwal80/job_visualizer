@@ -41,7 +41,7 @@ class TestViewportModeTransition(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Manage backend server lifecycle for Playwright E2E tests."""
+        """Manage backend server lifecycle and start Playwright headless Chromium for tests."""
         cls.server_thread = None
         cls.server = None
         cls.server_ready = False
@@ -74,16 +74,198 @@ class TestViewportModeTransition(unittest.TestCase):
 
             if not cls.server_ready:
                 print("Warning: Backend Flask server could not be started for Playwright E2E tests.")
+
+            cls.playwright = sync_playwright().start()
+            cls.browser = cls.playwright.chromium.launch(headless=True)
         else:
             print("Playwright is not available. Skipping E2E browser tests.")
 
     @classmethod
     def tearDownClass(cls):
-        """Shutdown the Flask server if started by this suite."""
+        """Shutdown the Flask server and browser if started by this suite."""
+        if hasattr(cls, 'browser') and cls.browser:
+            cls.browser.close()
+        if hasattr(cls, 'playwright') and cls.playwright:
+            cls.playwright.stop()
         if hasattr(cls, 'server') and cls.server:
             cls.server.shutdown()
             if hasattr(cls, 'server_thread') and cls.server_thread:
                 cls.server_thread.join(timeout=2)
+
+    def setUp(self):
+        """Create a fresh browser context and page, and register offline CDN mocks for each test."""
+        if not PLAYWRIGHT_AVAILABLE or not self.server_ready:
+            return
+        self.context = self.browser.new_context()
+        self.page = self.context.new_page()
+
+        # Setup route mocks for external CDNs to allow offline execution and speed up loading
+        self.page.route(re.compile(r"https://cdn\.tailwindcss\.com.*"), lambda route: route.fulfill(
+            status=200,
+            content_type="text/javascript",
+            body="window.tailwind = { config: {} };"
+        ))
+        self.page.route(re.compile(r"https://unpkg\.com/maplibre-gl@.*/dist/maplibre-gl\.js"), lambda route: route.fulfill(
+            status=200,
+            content_type="text/javascript",
+            body="""
+            window.maplibregl = {
+                Map: function() {
+                    this._listeners = {};
+                    this._layers = {};
+                    this._sources = {};
+                    this.on = function(event, cb) {
+                        this._listeners[event] = this._listeners[event] || [];
+                        this._listeners[event].push(cb);
+                        if (event === 'load' || event === 'style.load') {
+                            setTimeout(cb, 10);
+                        }
+                        return this;
+                    };
+                    this.fire = function(event, data) {
+                        const list = this._listeners[event] || [];
+                        for (const cb of list) {
+                            cb(data);
+                        }
+                        return this;
+                    };
+                    this.zoom = 11;
+                    this.center = { lng: 77.5946, lat: 12.9716 };
+                    this.addControl = function() { return this; };
+                    this.getContainer = function() {
+                        return { clientWidth: 1024, clientHeight: 768 };
+                    };
+                    this.getBounds = function() {
+                        const span = 0.05 * Math.pow(2, 11 - this.zoom);
+                        return {
+                            getSouth: () => this.center.lat - span,
+                            getNorth: () => this.center.lat + span,
+                            getWest: () => this.center.lng - span,
+                            getEast: () => this.center.lng + span,
+                            _ne: { lat: this.center.lat + span, lng: this.center.lng + span },
+                            _sw: { lat: this.center.lat - span, lng: this.center.lng - span }
+                        };
+                    };
+                    this.flyTo = function(options) { return this; };
+                    this.jumpTo = function(options) { if (options && options.center) this.center = options.center; return this; };
+                    this.resize = function() { return this; };
+                    this.getZoom = function() { return this.zoom; };
+                    this.setZoom = function(z) { this.zoom = z; return this; };
+                    this.panBy = function(offset, options) {
+                        this.center.lng += 0.01;
+                        this.center.lat += 0.01;
+                        return this;
+                    };
+                    this.fitBounds = function(bounds, options) {
+                        if (bounds && bounds.length === 2) {
+                            const sw = bounds[0];
+                            const ne = bounds[1];
+                            this.center = { lng: (sw[0] + ne[0]) / 2, lat: (sw[1] + ne[1]) / 2 };
+                        }
+                        return this;
+                    };
+                    this.getSource = function(id) { return this._sources[id] || null; };
+                    this.addSource = function(id, data) { this._sources[id] = { setData: (d) => { this._sources[id].data = d; } }; return this; };
+                    this.getLayer = function(id) { return this._layers[id] || null; };
+                    this.addLayer = function(layerObj) { this._layers[layerObj.id] = layerObj; return this; };
+                    this.removeLayer = function(id) { delete this._layers[id]; return this; };
+                    this.removeSource = function(id) { delete this._sources[id]; return this; };
+                    this.setPaintProperty = function() { return this; };
+                    this.getCenter = function() { return this.center; };
+                    this.touchZoomRotate = { disableRotation: function() {} };
+                },
+                NavigationControl: function() {},
+                Marker: function() {
+                    const el = document.createElement('div');
+                    el.className = 'logo-marker-container';
+                    const fallbackEl = document.createElement('div');
+                    fallbackEl.className = 'logo-marker-fallback';
+                    fallbackEl.style.backgroundColor = 'rgb(234, 88, 12)';
+                    el.appendChild(fallbackEl);
+                    this.setLngLat = function() { return this; };
+                    this.addTo = function() { return this; };
+                    this.remove = function() { return this; };
+                    this.getElement = function() { return el; };
+                }
+            };
+            """
+        ))
+        self.page.route(re.compile(r"https://cdnjs\.cloudflare\.com/ajax/libs/font-awesome/.*"), lambda route: route.fulfill(status=200, content_type="text/css", body=""))
+        self.page.route(re.compile(r"https://unpkg\.com/maplibre-gl@.*/dist/maplibre-gl\.css"), lambda route: route.fulfill(status=200, content_type="text/css", body=""))
+        self.page.route(re.compile(r"https://fonts\.googleapis\.com/.*"), lambda route: route.fulfill(status=200, content_type="text/css", body=""))
+        self.page.route(re.compile(r"https://fonts\.gstatic\.com/.*"), lambda route: route.fulfill(status=200, content_type="text/css", body=""))
+        self.page.route(re.compile(r"https://.*\.basemaps\.cartocdn\.com/.*"), lambda route: route.fulfill(status=200, content_type="application/json", body="{}"))
+        self.page.route(re.compile(r"https://tiles\.basemaps\.cartocdn\.com/.*"), lambda route: route.fulfill(status=200, content_type="application/json", body="{}"))
+
+        # Setup route mock for Nominatim geocoding
+        def handle_nominatim(route):
+            url = route.request.url
+            parsed = urllib.parse.urlparse(url)
+            query = urllib.parse.parse_qs(parsed.query).get('q', [''])[0]
+            
+            mocks = {
+                "bengaluru": {
+                    "lat": "12.9716", "lon": "77.5946",
+                    "boundingbox": ["12.8716", "13.0716", "77.4946", "77.6946"]
+                },
+                "mumbai": {
+                    "lat": "19.0760", "lon": "72.8777",
+                    "boundingbox": ["18.9760", "19.1760", "72.7777", "72.9777"]
+                },
+                "delhi": {
+                    "lat": "28.6139", "lon": "77.2090",
+                    "boundingbox": ["28.5139", "28.7139", "77.1090", "77.3090"]
+                },
+                "london": {
+                    "lat": "51.5074", "lon": "-0.1278",
+                    "boundingbox": ["51.4074", "51.6074", "-0.2278", "-0.0278"]
+                },
+                "usa": {
+                    "lat": "37.7749", "lon": "-122.4194",
+                    "boundingbox": ["37.6749", "37.8749", "-122.5194", "-122.3194"]
+                },
+                "indiranagar": {
+                    "lat": "12.9732913", "lon": "77.6404672",
+                    "boundingbox": ["12.9532913", "12.9932913", "77.6204672", "77.6604672"]
+                }
+            }
+            
+            matched_key = None
+            for key in mocks:
+                if key in query.lower():
+                    matched_key = key
+                    break
+            
+            if matched_key:
+                m = mocks[matched_key]
+                body = [{
+                    "importance": 0.5,
+                    "type": "city",
+                    "class": "place",
+                    "lat": m["lat"],
+                    "lon": m["lon"],
+                    "boundingbox": m["boundingbox"],
+                    "geojson": {
+                        "type": "Polygon",
+                        "coordinates": [[[float(m["boundingbox"][2]), float(m["boundingbox"][0])],
+                                         [float(m["boundingbox"][3]), float(m["boundingbox"][0])],
+                                         [float(m["boundingbox"][3]), float(m["boundingbox"][1])],
+                                         [float(m["boundingbox"][2]), float(m["boundingbox"][1])],
+                                         [float(m["boundingbox"][2]), float(m["boundingbox"][0])]]]
+                    }
+                }]
+                route.fulfill(status=200, content_type="application/json", body=json.dumps(body))
+            else:
+                route.fulfill(status=200, content_type="application/json", body="[]")
+
+        self.page.route(re.compile(r"https://nominatim\.openstreetmap\.org/search.*"), handle_nominatim)
+
+    def tearDown(self):
+        """Close browser page and context after test."""
+        if hasattr(self, 'page') and self.page:
+            self.page.close()
+        if hasattr(self, 'context') and self.context:
+            self.context.close()
 
 
 
@@ -171,102 +353,90 @@ class TestViewportModeTransition(unittest.TestCase):
         if not PLAYWRIGHT_AVAILABLE or not self.server_ready:
             self.skipTest("Playwright or local Flask test server is not available.")
 
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            context = browser.new_context()
-            page = context.new_page()
+        # 1. Load Homepage
+        self.page.goto(f"{self.BASE_URL}/")
+        self.page.wait_for_load_state("domcontentloaded")
 
-            try:
-                page.on("console", lambda msg: print(f"Browser Console: {msg.text}"))
-                # 1. Load Homepage
-                page.goto(f"{self.BASE_URL}/")
-                page.wait_for_load_state("domcontentloaded")
+        # 2. Click preset search button (e.g. Bengaluru)
+        self.page.click("button[onclick=\"handlePresetSearch('bengaluru')\"]")
+        
+        # Wait for redirect to /jobs
+        self.page.wait_for_url("**/jobs?city=Bengaluru%2C%20KA")
+        self.page.wait_for_load_state("domcontentloaded")
 
-                # 2. Click preset search button (e.g. Bengaluru)
-                page.click("button[onclick=\"handlePresetSearch('bengaluru')\"]")
-                
-                # Wait for redirect to /jobs
-                page.wait_for_url("**/jobs?city=Bengaluru%2C%20KA")
-                page.wait_for_load_state("domcontentloaded")
+        # 3. Wait for WorldTechApp, state, and map to be initialized robustly
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && "
+            "window.WorldTechApp.state && "
+            "window.WorldTechApp.map && "
+            "window.WorldTechApp.state.startupsData && "
+            "window.WorldTechApp.state.startupsData.length > 0 && "
+            "!window.WorldTechApp.state.isProgrammaticMove",
+            timeout=15000
+        )
 
-                # 3. Wait for WorldTechApp, state, and map to be initialized robustly
-                page.wait_for_function(
-                    "() => typeof window.WorldTechApp !== 'undefined' && "
-                    "window.WorldTechApp.state && "
-                    "window.WorldTechApp.map && "
-                    "window.WorldTechApp.state.startupsData && "
-                    "window.WorldTechApp.state.startupsData.length > 0 && "
-                    "!window.WorldTechApp.state.isProgrammaticMove",
-                    timeout=15000
-                )
+        # Confirm initial state is in City search mode
+        self.assertEqual(
+            self.page.evaluate("() => window.WorldTechApp.state.searchedCity").lower(),
+            "bengaluru, ka"
+        )
+        self.assertEqual(
+            self.page.locator("#activeMapTitle").text_content().strip().lower(),
+            "bengaluru, ka"
+        )
 
-                # Confirm initial state is in City search mode
-                self.assertEqual(
-                    page.evaluate("() => window.WorldTechApp.state.searchedCity").lower(),
-                    "bengaluru, ka"
-                )
-                self.assertEqual(
-                    page.locator("#activeMapTitle").text_content().strip().lower(),
-                    "bengaluru, ka"
-                )
+        # Confirm search input retains query value after search (R4)
+        initial_input_val = self.page.locator("#unified-search-input").input_value()
+        self.assertIn("Bengaluru", initial_input_val, f"Search input should retain query value 'Bengaluru'. Got: {initial_input_val}")
 
-                # Confirm search input retains query value after search (R4)
-                initial_input_val = page.locator("#unified-search-input").input_value()
-                self.assertIn("Bengaluru", initial_input_val, f"Search input should retain query value 'Bengaluru'. Got: {initial_input_val}")
+        # Confirm boundary layer exists before pan (R3)
+        self.page.wait_for_function("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')", timeout=5000)
+        has_layer_before = self.page.evaluate("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')")
+        self.assertTrue(has_layer_before, "Search boundary outline layer should be visible before pan")
 
-                # Confirm boundary layer exists before pan (R3)
-                page.wait_for_function("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')", timeout=5000)
-                has_layer_before = page.evaluate("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')")
-                self.assertTrue(has_layer_before, "Search boundary outline layer should be visible before pan")
+        # Set search input value and placeholder to mock custom filter state
+        self.page.evaluate("""() => {
+            const navInput = document.getElementById('unified-search-input');
+            if (navInput) {
+                navInput.value = 'React';
+                navInput.placeholder = 'Search React...';
+            }
+        }""")
 
-                # Set search input value and placeholder to mock custom filter state
-                page.evaluate("""() => {
-                    const navInput = document.getElementById('unified-search-input');
-                    if (navInput) {
-                        navInput.value = 'React';
-                        navInput.placeholder = 'Search React...';
-                    }
-                }""")
+        # 4. Trigger manual map move. We simulate this programmatically by firing
+        # the 'moveend' event with an originalEvent property set (simulating user pan).
+        # This bypasses the programmatic move check.
+        self.page.evaluate("window.WorldTechApp.map.fire('moveend', { originalEvent: {} })")
 
-                # 4. Trigger manual map move. We simulate this programmatically by firing
-                # the 'moveend' event with an originalEvent property set (simulating user pan).
-                # This bypasses the programmatic move check.
-                page.evaluate("window.WorldTechApp.map.fire('moveend', { originalEvent: {} })")
+        # Wait robustly for the transition to Viewport mode (url query param city deleted)
+        self.page.wait_for_function("() => !window.location.search.includes('city=')", timeout=5000)
 
-                # Wait robustly for the transition to Viewport mode (url query param city deleted)
-                page.wait_for_function("() => !window.location.search.includes('city=')", timeout=5000)
+        # 5. Verify the transition to Viewport mode
+        # URL must not contain city param anymore
+        current_url = self.page.url
+        self.assertNotIn("city=", current_url, f"City query param should be deleted from URL. Current URL: {current_url}")
 
-                # 5. Verify the transition to Viewport mode
-                # URL must not contain city param anymore
-                current_url = page.url
-                self.assertNotIn("city=", current_url, f"City query param should be deleted from URL. Current URL: {current_url}")
+        # state.searchedCity must be empty
+        searched_city = self.page.evaluate("() => window.WorldTechApp.state.searchedCity")
+        self.assertEqual(searched_city, "", "state.searchedCity should be cleared")
 
-                # state.searchedCity must be empty
-                searched_city = page.evaluate("() => window.WorldTechApp.state.searchedCity")
-                self.assertEqual(searched_city, "", "state.searchedCity should be cleared")
+        # state.boundsOverride must be null
+        bounds_override = self.page.evaluate("() => window.WorldTechApp.state.boundsOverride")
+        self.assertIsNone(bounds_override, "state.boundsOverride should be null")
 
-                # state.boundsOverride must be null
-                bounds_override = page.evaluate("() => window.WorldTechApp.state.boundsOverride")
-                self.assertIsNone(bounds_override, "state.boundsOverride should be null")
+        # activeMapTitle must be reset to "All locations"
+        title_text = self.page.locator("#activeMapTitle").text_content().strip()
+        self.assertEqual(title_text, "All locations", "Active map title should be reset to 'All locations'")
 
-                # activeMapTitle must be reset to "All locations"
-                title_text = page.locator("#activeMapTitle").text_content().strip()
-                self.assertEqual(title_text, "All locations", "Active map title should be reset to 'All locations'")
+        # Confirm boundary layer remains visible after pan (R3)
+        has_layer_after = self.page.evaluate("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')")
+        self.assertTrue(has_layer_after, "Search boundary outline layer should remain visible after pan")
 
-                # Confirm boundary layer remains visible after pan (R3)
-                has_layer_after = page.evaluate("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')")
-                self.assertTrue(has_layer_after, "Search boundary outline layer should remain visible after pan")
-
-                # unified-search-input must be cleared and placeholder reset
-                input_val = page.locator("#unified-search-input").input_value()
-                input_placeholder = page.locator("#unified-search-input").get_attribute("placeholder")
-                self.assertEqual(input_val, "", "Search input value should be cleared")
-                self.assertEqual(input_placeholder, "Search city/location ...", "Search input placeholder should be reset")
-
-            finally:
-                page.close()
-                context.close()
-                browser.close()
+        # unified-search-input must be cleared and placeholder reset
+        input_val = self.page.locator("#unified-search-input").input_value()
+        input_placeholder = self.page.locator("#unified-search-input").get_attribute("placeholder")
+        self.assertEqual(input_val, "", "Search input value should be cleared")
+        self.assertEqual(input_placeholder, "Search city/location ...", "Search input placeholder should be reset")
 
     def test_local_zoom_unpinned_exclusion(self):
         """Backend Unit Test: Verify filter_and_sort_startups unpinned exclusion based on lat_span."""
@@ -314,297 +484,195 @@ class TestViewportModeTransition(unittest.TestCase):
         if not PLAYWRIGHT_AVAILABLE or not self.server_ready:
             self.skipTest("Playwright or local Flask test server is not available.")
 
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            context = browser.new_context()
-            page = context.new_page()
+        api_calls = []
+        def handle_request(request):
+            if "/api/companies" in request.url:
+                api_calls.append(request.url)
 
-            api_calls = []
-            def handle_request(request):
-                if "/api/companies" in request.url:
-                    api_calls.append(request.url)
+        self.page.on("request", handle_request)
 
-            page.on("request", handle_request)
+        self.page.goto(f"{self.BASE_URL}/jobs")
+        self.page.wait_for_load_state("domcontentloaded")
 
-            try:
-                page.goto(f"{self.BASE_URL}/jobs")
-                page.wait_for_load_state("domcontentloaded")
+        # Wait for WorldTechApp to be defined
+        self.page.wait_for_function("() => typeof window.WorldTechApp !== 'undefined'")
 
-                # Wait for WorldTechApp to be defined
-                page.wait_for_function("() => typeof window.WorldTechApp !== 'undefined'")
+        # Verify sidebar empty text
+        sidebar_text = self.page.locator("#directory-list").text_content()
+        self.assertIn(
+            "Search for a city or location to find companies and jobs.",
+            sidebar_text
+        )
 
-                # Verify sidebar empty text
-                sidebar_text = page.locator("#directory-list").text_content()
-                self.assertIn(
-                    "Search for a city or location to find companies and jobs.",
-                    sidebar_text
-                )
+        # Verify no markers are displayed
+        markers_count = self.page.evaluate("() => window.WorldTechApp.state.markersMap.size")
+        self.assertEqual(markers_count, 0)
 
-                # Verify no markers are displayed
-                markers_count = page.evaluate("() => window.WorldTechApp.state.markersMap.size")
-                self.assertEqual(markers_count, 0)
-
-                # Verify no API requests to /api/companies
-                self.assertEqual(len(api_calls), 0)
-
-            finally:
-                page.close()
-                context.close()
-                browser.close()
+        # Verify no API requests to /api/companies
+        self.assertEqual(len(api_calls), 0)
 
     def test_playwright_viewport_pan_sidebar_update(self):
         """E2E Test: Search Bengaluru, pan map manually, verify sidebar directory updates to bounds."""
         if not PLAYWRIGHT_AVAILABLE or not self.server_ready:
             self.skipTest("Playwright or local Flask test server is not available.")
 
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            context = browser.new_context()
-            page = context.new_page()
+        self.page.goto(f"{self.BASE_URL}/")
+        self.page.wait_for_load_state("domcontentloaded")
+        self.page.click("button[onclick=\"handlePresetSearch('bengaluru')\"]")
+        self.page.wait_for_url("**/jobs?city=Bengaluru%2C%20KA")
 
-            try:
-                page.goto(f"{self.BASE_URL}/")
-                page.wait_for_load_state("domcontentloaded")
-                page.click("button[onclick=\"handlePresetSearch('bengaluru')\"]")
-                page.wait_for_url("**/jobs?city=Bengaluru%2C%20KA")
+        # Wait robustly for WorldTechApp and startups to load and programmatic move lock to release
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && "
+            "window.WorldTechApp.state && "
+            "window.WorldTechApp.state.startupsData && "
+            "window.WorldTechApp.state.startupsData.length > 0 && "
+            "!window.WorldTechApp.state.isProgrammaticMove",
+            timeout=15000
+        )
 
-                # Wait robustly for WorldTechApp and startups to load and programmatic move lock to release
-                page.wait_for_function(
-                    "() => typeof window.WorldTechApp !== 'undefined' && "
-                    "window.WorldTechApp.state && "
-                    "window.WorldTechApp.state.startupsData && "
-                    "window.WorldTechApp.state.startupsData.length > 0 && "
-                    "!window.WorldTechApp.state.isProgrammaticMove",
-                    timeout=15000
-                )
+        self.page.wait_for_selector(".directory-item")
+        initial_companies = self.page.eval_on_selector_all(".directory-item .card-title", "elements => elements.map(el => el.textContent.trim())")
+        self.assertTrue(len(initial_companies) > 0, "Should load initial companies in Bengaluru")
 
-                page.wait_for_selector(".directory-item")
-                initial_companies = page.eval_on_selector_all(".directory-item .card-title", "elements => elements.map(el => el.textContent.trim())")
-                self.assertTrue(len(initial_companies) > 0, "Should load initial companies in Bengaluru")
+        # Simulate manual map pan programmatically
+        self.page.evaluate("""() => {
+            const center = window.WorldTechApp.map.getCenter();
+            window.WorldTechApp.map.center = { lng: center.lng + 0.1, lat: center.lat + 0.1 };
+            window.WorldTechApp.map.fire('moveend', { originalEvent: {} });
+        }""")
 
-                # Perform manual map drag/pan
-                map_locator = page.locator("#map")
-                box = map_locator.bounding_box()
-                self.assertIsNotNone(box, "Map element bounding box should not be None")
+        # Wait for the transition to Viewport mode
+        self.page.wait_for_function("() => !window.location.search.includes('city=')", timeout=5000)
 
-                start_x = box["x"] + box["width"] / 2
-                start_y = box["y"] + box["height"] / 2
-                page.mouse.move(start_x, start_y)
-                page.mouse.down()
-                page.mouse.move(start_x - 300, start_y, steps=10)
-                page.mouse.up()
+        # Wait a small bit for rendering to finish
+        self.page.wait_for_timeout(1000)
 
-                # Wait for the transition to Viewport mode
-                page.wait_for_function("() => !window.location.search.includes('city=')", timeout=5000)
-
-                # Wait a small bit for rendering to finish
-                page.wait_for_timeout(1000)
-
-                panned_companies = page.eval_on_selector_all(".directory-item .card-title", "elements => elements.map(el => el.textContent.trim())")
-                self.assertNotEqual(initial_companies, panned_companies, "Company list should have changed after manual panning")
-
-            finally:
-                page.close()
-                context.close()
-                browser.close()
+        panned_companies = self.page.eval_on_selector_all(".directory-item .card-title", "elements => elements.map(el => el.textContent.trim())")
+        self.assertNotEqual(initial_companies, panned_companies, "Company list should have changed after manual panning")
 
     def test_playwright_indiranagar_clean_search(self):
         """E2E Test: Search Indiranagar and verify only Indiranagar physical startups are returned (unpinned/remote excluded)."""
         if not PLAYWRIGHT_AVAILABLE or not self.server_ready:
             self.skipTest("Playwright or local Flask test server is not available.")
 
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            context = browser.new_context()
-            page = context.new_page()
+        # Load /jobs directly where the navbar search is always visible
+        self.page.goto(f"{self.BASE_URL}/jobs")
+        self.page.wait_for_load_state("domcontentloaded")
 
-            # Mock Nominatim geocoding for Indiranagar to ensure test is hermetic and doesn't hit external APIs
-            page.route(
-                "https://nominatim.openstreetmap.org/search?q=Indiranagar&format=json&limit=1&polygon_geojson=1",
-                lambda route: route.fulfill(
-                    status=200,
-                    content_type="application/json",
-                    body=json.dumps([{
-                        "importance": 0.5,
-                        "type": "suburb",
-                        "class": "place",
-                        "lat": "12.9732913",
-                        "lon": "77.6404672",
-                        "boundingbox": ["12.9532913", "12.9932913", "77.6204672", "77.6604672"],
-                        "geojson": {
-                            "type": "Polygon",
-                            "coordinates": [[[77.6204672, 12.9532913], [77.6604672, 12.9532913], [77.6604672, 12.9932913], [77.6204672, 12.9932913], [77.6204672, 12.9532913]]]
-                        }
-                    }])
-                )
-            )
+        # Wait for WorldTechApp to load
+        self.page.wait_for_function("() => typeof window.WorldTechApp !== 'undefined'")
 
-            try:
-                # Load /jobs directly where the navbar search is always visible
-                page.goto(f"{self.BASE_URL}/jobs")
-                page.wait_for_load_state("domcontentloaded")
+        self.page.fill("#unified-search-input", "Indiranagar")
+        self.page.press("#unified-search-input", "Enter")
 
-                # Wait for WorldTechApp to load
-                page.wait_for_function("() => typeof window.WorldTechApp !== 'undefined'")
+        self.page.wait_for_url("**/jobs?city=Indiranagar*")
 
-                page.fill("#unified-search-input", "Indiranagar")
-                page.press("#unified-search-input", "Enter")
+        # Wait for geocoding / search bounds request to complete and state to update
+        self.page.wait_for_function(
+            "() => window.WorldTechApp.state && "
+            "window.WorldTechApp.state.startupsData && "
+            "window.WorldTechApp.state.startupsData.length > 0"
+        )
 
-                page.wait_for_url("**/jobs?city=Indiranagar*")
+        self.page.wait_for_selector(".directory-item")
+        company_names = self.page.eval_on_selector_all(".directory-item .card-title", "elements => elements.map(el => el.textContent.trim())")
 
-                # Wait for geocoding / search bounds request to complete and state to update
-                page.wait_for_function(
-                    "() => window.WorldTechApp.state && "
-                    "window.WorldTechApp.state.startupsData && "
-                    "window.WorldTechApp.state.startupsData.length > 0"
-                )
+        # "Indira Pay" and "Zenith SaaS" must be present (physically located in Indiranagar)
+        self.assertIn("Indira Pay", company_names)
+        self.assertIn("Zenith SaaS", company_names)
 
-                page.wait_for_selector(".directory-item")
-                company_names = page.eval_on_selector_all(".directory-item .card-title", "elements => elements.map(el => el.textContent.trim())")
-
-                # "Indira Pay" and "Zenith SaaS" must be present (physically located in Indiranagar)
-                self.assertIn("Indira Pay", company_names)
-                self.assertIn("Zenith SaaS", company_names)
-
-                # "BairesDev" (remote startup) must be excluded
-                self.assertNotIn("BairesDev", company_names)
-
-            finally:
-                page.close()
-                context.close()
-                browser.close()
+        # "BairesDev" (remote startup) must be excluded
+        self.assertNotIn("BairesDev", company_names)
 
     def test_playwright_non_hub_search_and_pan(self):
         """E2E Test: Search non-hub city (Delhi), fly there, pan, and verify transition to Viewport mode."""
         if not PLAYWRIGHT_AVAILABLE or not self.server_ready:
             self.skipTest("Playwright or local Flask test server is not available.")
 
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            context = browser.new_context()
-            page = context.new_page()
+        self.page.goto(f"{self.BASE_URL}/jobs")
+        self.page.wait_for_load_state("domcontentloaded")
 
-            # Mock Delhi geocoding response
-            page.route(
-                "https://nominatim.openstreetmap.org/search?q=Delhi&format=json&limit=1&polygon_geojson=1",
-                lambda route: route.fulfill(
-                    status=200,
-                    content_type="application/json",
-                    body=json.dumps([{
-                        "importance": 0.5,
-                        "type": "city",
-                        "class": "place",
-                        "lat": "28.6139",
-                        "lon": "77.2090",
-                        "boundingbox": ["28.4", "28.8", "77.0", "77.4"],
-                        "geojson": {
-                            "type": "Polygon",
-                            "coordinates": [[[77.0, 28.4], [77.4, 28.4], [77.4, 28.8], [77.0, 28.8], [77.0, 28.4]]]
-                        }
-                    }])
-                )
-            )
+        # Wait for WorldTechApp to load
+        self.page.wait_for_function("() => typeof window.WorldTechApp !== 'undefined'")
 
-            try:
-                page.goto(f"{self.BASE_URL}/jobs")
-                page.wait_for_load_state("domcontentloaded")
+        # Type Delhi in unified search and enter
+        self.page.fill("#unified-search-input", "Delhi")
+        self.page.press("#unified-search-input", "Enter")
 
-                # Wait for WorldTechApp to load
-                page.wait_for_function("() => typeof window.WorldTechApp !== 'undefined'")
+        self.page.wait_for_url("**/jobs?city=Delhi*")
+        self.page.wait_for_load_state("domcontentloaded")
 
-                # Type Delhi in unified search and enter
-                page.fill("#unified-search-input", "Delhi")
-                page.press("#unified-search-input", "Enter")
+        # Wait robustly for map to fly to Delhi and programmatic move to clear
+        self.page.wait_for_function(
+            "() => window.WorldTechApp.state && "
+            "window.WorldTechApp.state.searchedCity === 'delhi' && "
+            "!window.WorldTechApp.state.isProgrammaticMove",
+            timeout=15000
+        )
 
-                page.wait_for_url("**/jobs?city=Delhi*")
-                page.wait_for_load_state("domcontentloaded")
+        # Confirm title displays Delhi
+        self.assertEqual(
+            self.page.locator("#activeMapTitle").text_content().strip(),
+            "Delhi"
+        )
 
-                # Wait robustly for map to fly to Delhi and programmatic move to clear
-                page.wait_for_function(
-                    "() => window.WorldTechApp.state && "
-                    "window.WorldTechApp.state.searchedCity === 'delhi' && "
-                    "!window.WorldTechApp.state.isProgrammaticMove",
-                    timeout=15000
-                )
+        # Confirm boundary layer exists before pan
+        has_layer_before = self.page.evaluate("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')")
+        self.assertTrue(has_layer_before, "Search boundary outline layer should be visible before pan")
 
-                # Confirm title displays Delhi
-                self.assertEqual(
-                    page.locator("#activeMapTitle").text_content().strip(),
-                    "Delhi"
-                )
+        # Trigger manual map move (simulated via fire moveend with originalEvent)
+        self.page.evaluate("window.WorldTechApp.map.fire('moveend', { originalEvent: {} })")
 
-                # Confirm boundary layer exists before pan
-                has_layer_before = page.evaluate("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')")
-                self.assertTrue(has_layer_before, "Search boundary outline layer should be visible before pan")
+        # Wait for transition to Viewport mode
+        self.page.wait_for_function("() => !window.location.search.includes('city=')", timeout=5000)
 
-                # Trigger manual map move (simulated via fire moveend with originalEvent)
-                page.evaluate("window.WorldTechApp.map.fire('moveend', { originalEvent: {} })")
+        # Verify transition to Viewport mode
+        current_url = self.page.url
+        self.assertNotIn("city=", current_url, "City query param should be deleted from URL")
 
-                # Wait for transition to Viewport mode
-                page.wait_for_function("() => !window.location.search.includes('city=')", timeout=5000)
+        searched_city = self.page.evaluate("() => window.WorldTechApp.state.searchedCity")
+        self.assertEqual(searched_city, "", "state.searchedCity should be cleared")
 
-                # Verify transition to Viewport mode
-                current_url = page.url
-                self.assertNotIn("city=", current_url, "City query param should be deleted from URL")
+        title_text = self.page.locator("#activeMapTitle").text_content().strip()
+        self.assertEqual(title_text, "All locations", "Active map title should be reset to 'All locations'")
 
-                searched_city = page.evaluate("() => window.WorldTechApp.state.searchedCity")
-                self.assertEqual(searched_city, "", "state.searchedCity should be cleared")
+        # Confirm boundary layer remains visible after pan (R3)
+        has_layer_after = self.page.evaluate("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')")
+        self.assertTrue(has_layer_after, "Search boundary outline layer should remain visible after pan")
 
-                title_text = page.locator("#activeMapTitle").text_content().strip()
-                self.assertEqual(title_text, "All locations", "Active map title should be reset to 'All locations'")
-
-                # Confirm boundary layer remains visible after pan (R3)
-                has_layer_after = page.evaluate("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')")
-                self.assertTrue(has_layer_after, "Search boundary outline layer should remain visible after pan")
-
-                input_val = page.locator("#unified-search-input").input_value()
-                self.assertEqual(input_val, "", "Search input value should be cleared")
-
-            finally:
-                page.close()
-                context.close()
-                browser.close()
+        input_val = self.page.locator("#unified-search-input").input_value()
+        self.assertEqual(input_val, "", "Search input value should be cleared")
 
     def test_playwright_whitespace_search_handling(self):
         """E2E Test: Verify that whitespace-only search does not trigger geocoding or state changes."""
         if not PLAYWRIGHT_AVAILABLE or not self.server_ready:
             self.skipTest("Playwright or local Flask test server is not available.")
 
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            context = browser.new_context()
-            page = context.new_page()
+        # Record if a fetch to Nominatim is initiated
+        nominatim_called = []
+        def handle_route(route):
+            nominatim_called.append(route.request.url)
+            route.fulfill(status=200, body="[]")
 
-            # Record if a fetch to Nominatim is initiated
-            nominatim_called = []
-            def handle_route(route):
-                nominatim_called.append(route.request.url)
-                route.fulfill(status=200, body="[]")
+        self.page.route("https://nominatim.openstreetmap.org/**", handle_route)
 
-            page.route("https://nominatim.openstreetmap.org/**", handle_route)
+        self.page.goto(f"{self.BASE_URL}/jobs")
+        self.page.wait_for_load_state("domcontentloaded")
+        self.page.wait_for_function("() => typeof window.WorldTechApp !== 'undefined'")
 
-            try:
-                page.goto(f"{self.BASE_URL}/jobs")
-                page.wait_for_load_state("domcontentloaded")
-                page.wait_for_function("() => typeof window.WorldTechApp !== 'undefined'")
+        # Fill search input with spaces and press enter
+        self.page.fill("#unified-search-input", "   ")
+        self.page.press("#unified-search-input", "Enter")
 
-                # Fill search input with spaces and press enter
-                page.fill("#unified-search-input", "   ")
-                page.press("#unified-search-input", "Enter")
+        self.page.wait_for_timeout(1000)
 
-                page.wait_for_timeout(1000)
+        # Verify Nominatim was NOT called
+        self.assertEqual(len(nominatim_called), 0, f"Nominatim should not be called for whitespace queries. Calls: {nominatim_called}")
 
-                # Verify Nominatim was NOT called
-                self.assertEqual(len(nominatim_called), 0, f"Nominatim should not be called for whitespace queries. Calls: {nominatim_called}")
-
-                # Verify input is still spaces or empty, and no transition or change in search modes occurred
-                searched_city = page.evaluate("() => window.WorldTechApp.state.searchedCity")
-                self.assertEqual(searched_city, "", "Searched city should remain empty")
-
-            finally:
-                page.close()
-                context.close()
-                browser.close()
+        # Verify input is still spaces or empty, and no transition or change in search modes occurred
+        searched_city = self.page.evaluate("() => window.WorldTechApp.state.searchedCity")
+        self.assertEqual(searched_city, "", "Searched city should remain empty")
 
 
 if __name__ == '__main__':

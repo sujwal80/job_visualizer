@@ -1,6 +1,58 @@
 import os
 import sys
 from unittest.mock import patch, MagicMock
+import socket
+
+# Mock socket.gethostbyname globally to bypass real DNS resolution in CODE_ONLY mode
+def mock_gethostbyname(host):
+    if host in ["localhost", "127.0.0.1"]:
+        return "127.0.0.1"
+    return "93.184.216.34" # safe IP (example.com)
+
+socket_patcher = patch("socket.gethostbyname", side_effect=mock_gethostbyname)
+socket_patcher.start()
+
+# Global requests mock router to prevent any real HTTP/HTTPS traffic
+import requests
+def mock_requests_get(url, *args, **kwargs):
+    resp = MagicMock()
+    resp.url = url
+    if "google.com" in url:
+        resp.status_code = 200
+        resp.text = "<html><body><button>Apply Now</button></body></html>"
+    elif "404" in url:
+        resp.status_code = 404
+    elif "429" in url:
+        resp.status_code = 429
+    elif "yc" in url or "ycombinator" in url:
+        resp.status_code = 200
+        resp.text = "<html><body><a href='/apply'>Apply</a></body></html>"
+    elif "wellfound" in url or "indeed" in url or "glassdoor" in url or "naukri" in url or "cutshort" in url or "hirist" in url:
+        resp.status_code = 200
+        resp.text = "<html><body><a href='/apply'>Apply</a></body></html>"
+    else:
+        resp.status_code = 200
+        resp.text = "<html><body><button>Apply Now</button></body></html>"
+    return resp
+
+def mock_requests_head(url, *args, **kwargs):
+    resp = MagicMock()
+    resp.url = url
+    if "404" in url:
+        resp.status_code = 404
+    elif "429" in url:
+        resp.status_code = 429
+    else:
+        resp.status_code = 200
+    return resp
+
+requests_get_patcher = patch("requests.get", side_effect=mock_requests_get)
+requests_get_patcher.start()
+
+requests_head_patcher = patch("requests.head", side_effect=mock_requests_head)
+requests_head_patcher.start()
+
+
 
 # Add workspace root to sys.path
 workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))

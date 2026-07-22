@@ -36,6 +36,7 @@ const directoryList = document.getElementById('directory-list');
 const detailsDrawer = document.getElementById('details-drawer');
 const drawerContent = document.getElementById('drawer-content');
 const closeDrawerBtn = document.getElementById('close-drawer-btn');
+console.log('[DEBUG app init] closeDrawerBtn=', closeDrawerBtn);
 const backDrawerBtn = document.getElementById('back-drawer-btn');
 const searchInput = document.getElementById('unified-search-input');
 
@@ -73,6 +74,135 @@ function _processFilteredStartupsResult(startups, preventScroll = false) {
         }
     }
     handleHashRouting();
+}
+
+/**
+ * Helper to check if a single longitude point falls within a range (with wrap-around support).
+ */
+function isPointLongitudeContained(lng, minLng, maxLng) {
+    if (minLng <= maxLng) {
+        return lng >= minLng && lng <= maxLng;
+    }
+    return lng >= minLng || lng <= maxLng;
+}
+
+/**
+ * Helper to check if a longitude interval is contained inside another (with wrap-around support).
+ */
+function isIntervalLongitudeContained(newMin, newMax, cachedMin, cachedMax) {
+    if (cachedMin <= cachedMax) {
+        if (newMin <= newMax) {
+            return newMin >= cachedMin && newMax <= cachedMax;
+        }
+        return false;
+    }
+    if (newMin <= newMax) {
+        return newMin >= cachedMin || newMax <= cachedMax;
+    }
+    return newMin >= cachedMin && newMax <= cachedMax;
+}
+
+/**
+ * Searches the queryCache for a super-set viewport matching all other criteria.
+ */
+function findCachedViewportMatch(newParams) {
+    const newMinLat = parseFloat(newParams.get('min_lat'));
+    const newMaxLat = parseFloat(newParams.get('max_lat'));
+    const newMinLng = parseFloat(newParams.get('min_lng'));
+    const newMaxLng = parseFloat(newParams.get('max_lng'));
+    const limit = parseInt(newParams.get('limit') || '500', 10);
+
+    const hasNewBounds = !isNaN(newMinLat) && !isNaN(newMaxLat) && !isNaN(newMinLng) && !isNaN(newMaxLng);
+    const now = Date.now();
+
+    // Iterate over active cache entries
+    for (const [cachedUrl, item] of state.queryCache.cache.entries()) {
+        // Clean up expired items during search
+        if (now >= item.expiry) {
+            state.queryCache.delete(cachedUrl);
+            continue;
+        }
+
+        const cachedStartups = item.value;
+        const cachedUrlObj = new URL(cachedUrl, window.location.origin);
+        const cachedParams = cachedUrlObj.searchParams;
+
+        // 1. Compare non-coordinate parameters
+        let paramsMatch = true;
+        const keysToCompare = ['search', 'salary_min', 'exp_level', 'work_type', 'has_jobs', 'city'];
+        for (const key of keysToCompare) {
+            if (newParams.get(key) !== cachedParams.get(key)) {
+                paramsMatch = false;
+                break;
+            }
+        }
+        if (!paramsMatch) continue;
+
+        // 2. Compare coordinates
+        const cachedMinLat = parseFloat(cachedParams.get('min_lat'));
+        const cachedMaxLat = parseFloat(cachedParams.get('max_lat'));
+        const cachedMinLng = parseFloat(cachedParams.get('min_lng'));
+        const cachedMaxLng = parseFloat(cachedParams.get('max_lng'));
+
+        const hasCachedBounds = !isNaN(cachedMinLat) && !isNaN(cachedMaxLat) && !isNaN(cachedMinLng) && !isNaN(cachedMaxLng);
+
+        if (hasNewBounds && hasCachedBounds) {
+            // Verify if cached response was capped by server limit
+            if (cachedStartups.length >= limit) {
+                continue;
+            }
+
+            // Check latitude containment
+            const latContained = (newMinLat >= cachedMinLat) && (newMaxLat <= cachedMaxLat);
+            
+            // Check longitude containment
+            const lngContained = isIntervalLongitudeContained(newMinLng, newMaxLng, cachedMinLng, cachedMaxLng);
+
+            if (latContained && lngContained) {
+                // Return cache hit (also accesses key in LRUCache to refresh TTL/order)
+                return state.queryCache.get(cachedUrl);
+            }
+        } else if (!hasNewBounds && !hasCachedBounds) {
+            // Both are city or general searches with identical non-coordinate filters
+            return state.queryCache.get(cachedUrl);
+        }
+    }
+    return null;
+}
+
+/**
+ * Filter startups client-side to only keep those inside the new viewport.
+ */
+function filterStartupsByViewport(startups, queryParams) {
+    const minLat = parseFloat(queryParams.get('min_lat'));
+    const maxLat = parseFloat(queryParams.get('max_lat'));
+    const minLng = parseFloat(queryParams.get('min_lng'));
+    const maxLng = parseFloat(queryParams.get('max_lng'));
+
+    const hasBounds = !isNaN(minLat) && !isNaN(maxLat) && !isNaN(minLng) && !isNaN(maxLng);
+    if (!hasBounds) {
+        return startups;
+    }
+
+    const latSpan = Math.abs(maxLat - minLat);
+    const keepRemote = latSpan >= 1.0;
+
+    return startups.filter(s => {
+        if (s.has_pin === false) {
+            return keepRemote;
+        }
+        
+        const lat = parseFloat(s.lat);
+        const lng = parseFloat(s.lng);
+        if (isNaN(lat) || isNaN(lng)) {
+            return false;
+        }
+
+        const latContained = lat >= minLat && lat <= maxLat;
+        const lngContained = isPointLongitudeContained(lng, minLng, maxLng);
+
+        return latContained && lngContained;
+    });
 }
 
 function fetchFilteredStartups(preventScroll = false) {
@@ -155,6 +285,14 @@ function fetchFilteredStartups(preventScroll = false) {
         const cachedStartups = state.queryCache.get(url);
         _processFilteredStartupsResult(cachedStartups, preventScroll);
         return Promise.resolve(cachedStartups);
+    }
+
+    // 1b. Check Viewport Containment Cache Match (0 network calls)
+    const containmentMatch = findCachedViewportMatch(queryParams);
+    if (containmentMatch) {
+        const filteredCachedStartups = filterStartupsByViewport(containmentMatch, queryParams);
+        _processFilteredStartupsResult(filteredCachedStartups, preventScroll);
+        return Promise.resolve(filteredCachedStartups);
     }
 
     // 2. Check Request Coalescing (inFlightPromises)
