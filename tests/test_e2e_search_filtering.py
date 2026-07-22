@@ -393,6 +393,26 @@ class TestE2ESearchFiltering(unittest.TestCase):
         file_size_kb = os.path.getsize(geojson_path) / 1024.0
         self.assertTrue(120.0 <= file_size_kb <= 300.0, f"GeoJSON size is {file_size_kb:.2f}KB, expected between 120KB and 300KB")
 
+    def test_tier2_hub_boundaries_valid_geometry(self):
+        """Verify that all hub boundaries in hub_boundaries.json are valid Polygons or MultiPolygons."""
+        hub_boundaries_path = os.path.join(PROJECT_ROOT, "public/static/data/hub_boundaries.json")
+        self.assertTrue(os.path.exists(hub_boundaries_path), f"File {hub_boundaries_path} not found")
+
+        with open(hub_boundaries_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        for hub_name, hub_data in data.items():
+            self.assertEqual(hub_data.get("type"), "Feature", f"Hub {hub_name} must be a GeoJSON Feature")
+            geom = hub_data.get("geometry")
+            self.assertIsNotNone(geom, f"Hub {hub_name} must have a geometry")
+            geom_type = geom.get("type")
+            self.assertIn(geom_type, ["Polygon", "MultiPolygon"], 
+                          f"Hub {hub_name} has invalid geometry type: {geom_type}. Must be Polygon or MultiPolygon")
+            
+            coords = geom.get("coordinates")
+            self.assertIsInstance(coords, list, f"Hub {hub_name} coordinates must be a list")
+            self.assertGreater(len(coords), 0, f"Hub {hub_name} coordinates must not be empty")
+
     # =========================================================================
     # Tier 3 - Cross-Feature Combinations & Selectors
     # =========================================================================

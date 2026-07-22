@@ -16,7 +16,7 @@ except ImportError:
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 class TestMobileResponsiveness(unittest.TestCase):
-    BASE_URL = "http://127.0.0.1:5001"
+    BASE_URL = "http://127.0.0.1:5012"
 
     @classmethod
     def setUpClass(cls):
@@ -37,7 +37,7 @@ class TestMobileResponsiveness(unittest.TestCase):
             from backend.app import app
             from werkzeug.serving import make_server
             app.testing = True
-            cls.server = make_server("127.0.0.1", 5001, app)
+            cls.server = make_server("127.0.0.1", 5012, app)
             cls.server_thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
             cls.server_thread.start()
 

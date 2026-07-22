@@ -79,7 +79,7 @@ export const KNOWN_HUB_COORDINATES = {
     'singapore': [103.8198, 1.3521],
     'mumbai': [72.8777, 19.0760],
     'pune': [73.8567, 18.5204],
-    'delhi': [77.1025, 28.7041],
+    'delhi': [77.2090, 28.6139],
     'hyderabad': [78.4867, 17.3850],
     'chennai': [80.2707, 13.0827],
     'gurugram': [77.0266, 28.4595],
