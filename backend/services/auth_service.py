@@ -12,10 +12,6 @@ from backend.utils import jwt_helper as jwt
 from urllib.parse import urlencode
 from backend import config
 
-# Default secure key and mock OAuth credentials
-SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "worldtech_map_default_jwt_secret_key_2026_super_secure")
-GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "1234567890-worldtechmapmockclientid.apps.googleusercontent.com")
-GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "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")
 
 # In-memory storage for stateless verification & revocation tracking
 _csrf_state_store = {}  # state_token -> timestamp
@@ -116,7 +112,7 @@ def get_google_auth_url(state, redirect_uri=None):
         str: The fully formatted `https://accounts.google.com/o/oauth2/v2/auth` URL.
     """
     params = {
-        "client_id": GOOGLE_CLIENT_ID,
+        "client_id": config.GOOGLE_CLIENT_ID,
         "redirect_uri": redirect_uri or config.GOOGLE_REDIRECT_URI,
         "response_type": "code",
         "scope": "openid email profile",
@@ -177,7 +173,7 @@ def issue_jwt_token(user_data, expires_in=3600, custom_secret=None):
     Returns:
         str: The encoded JWT string signed with HS256 algorithm.
     """
-    secret = custom_secret or SECRET_KEY
+    secret = custom_secret or config.JWT_SECRET_KEY
     now = int(time.time())
     jti = secrets.token_hex(16)
     payload = {
@@ -208,7 +204,7 @@ async def verify_jwt_token(token, custom_secret=None, session_store=None):
     """
     if not token or not isinstance(token, str):
         return None
-    secret = custom_secret or SECRET_KEY
+    secret = custom_secret or config.JWT_SECRET_KEY
     try:
         payload = jwt.decode(token, secret, algorithms=["HS256"])
         jti = payload.get("jti")
@@ -243,7 +239,7 @@ async def revoke_jwt_token(token, custom_secret=None, session_store=None):
     """
     if not token or not isinstance(token, str):
         return False
-    secret = custom_secret or SECRET_KEY
+    secret = custom_secret or config.JWT_SECRET_KEY
     try:
         # Decode without verifying expiration so we can still revoke an already expired token
         payload = jwt.decode(token, secret, algorithms=["HS256"], options={"verify_exp": False})

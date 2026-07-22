@@ -128,3 +128,203 @@ except ImportError:
 def is_testing_environment():
     """Check if the code is currently running inside unit tests."""
     return 'unittest' in sys.modules
+
+
+# ==========================================
+# 4. SQLite Key-Value Store Implementation
+# ==========================================
+import sqlite3
+import os
+import time
+import asyncio
+
+class SQLiteKVStore:
+    """SQLite-backed Key-Value Store supporting async put, get, and delete operations."""
+    def __init__(self, db_path="tmp/local_kv.db"):
+        self.db_path = db_path
+        # Ensure target folder exists
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        # Initialize table structures
+        self._init_db()
+
+    def _init_db(self):
+        conn = sqlite3.connect(self.db_path)
+        try:
+            with conn:
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS kv_store (
+                        key TEXT PRIMARY KEY,
+                        value TEXT,
+                        expires_at REAL
+                    )
+                """)
+        finally:
+            conn.close()
+
+    def _get_sync(self, key):
+        conn = sqlite3.connect(self.db_path)
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT value, expires_at FROM kv_store WHERE key = ?", (key,))
+            row = cursor.fetchone()
+            if row:
+                val, expires_at = row
+                if expires_at is not None and time.time() > expires_at:
+                    cursor.execute("DELETE FROM kv_store WHERE key = ?", (key,))
+                    conn.commit()
+                    return None
+                return val
+            return None
+        finally:
+            conn.close()
+
+    def _put_sync(self, key, value, expires_at=None):
+        conn = sqlite3.connect(self.db_path)
+        try:
+            with conn:
+                conn.execute(
+                    "INSERT OR REPLACE INTO kv_store (key, value, expires_at) VALUES (?, ?, ?)",
+                    (key, str(value), expires_at)
+                )
+        finally:
+            conn.close()
+
+    def _delete_sync(self, key):
+        conn = sqlite3.connect(self.db_path)
+        try:
+            with conn:
+                conn.execute("DELETE FROM kv_store WHERE key = ?", (key,))
+        finally:
+            conn.close()
+
+    async def get(self, key):
+        return await asyncio.to_thread(self._get_sync, key)
+
+    async def put(self, key, value, expirationTtl=None):
+        expires_at = time.time() + expirationTtl if expirationTtl is not None else None
+        await asyncio.to_thread(self._put_sync, key, value, expires_at)
+
+    async def delete(self, key):
+        await asyncio.to_thread(self._delete_sync, key)
+
+
+class SQLiteD1PreparedStatement:
+    def __init__(self, db, query, params=None):
+        self.db = db
+        self.query = query
+        self.params = params or []
+
+    def bind(self, *args):
+        if len(args) == 1 and isinstance(args[0], (list, tuple, dict)):
+            params = args[0]
+        else:
+            params = args
+        return SQLiteD1PreparedStatement(self.db, self.query, params)
+
+    async def run(self):
+        def _execute():
+            conn = sqlite3.connect(self.db.db_path)
+            conn.row_factory = sqlite3.Row
+            try:
+                with conn:
+                    cursor = conn.execute(self.query, self.params)
+                    rows = cursor.fetchall()
+                    results = [dict(row) for row in rows]
+                    return {
+                        "success": True,
+                        "results": results,
+                        "meta": {
+                            "changes": conn.total_changes,
+                            "duration": 0,
+                            "last_row_id": cursor.lastrowid
+                        }
+                    }
+            except Exception as e:
+                import traceback, sys
+                print(f"[SQLite Error] {e}", file=sys.stderr)
+                traceback.print_exc()
+                return {
+                    "success": False,
+                    "error": str(e),
+                    "results": []
+                }
+            finally:
+                conn.close()
+        return await asyncio.to_thread(_execute)
+
+    async def all(self):
+        res = await self.run()
+        class D1Result:
+            def __init__(self, results, success=True):
+                self.results = results
+                self.success = success
+            def __getitem__(self, key):
+                if key == "results":
+                    return self.results
+                raise KeyError(key)
+            def get(self, key, default=None):
+                if key == "results":
+                    return self.results
+                return default
+        return D1Result(res.get("results", []), success=res.get("success", False))
+
+    async def first(self, col_name=None):
+        res = await self.run()
+        results = res.get("results", [])
+        if not results:
+            return None
+        row = results[0]
+        if col_name is not None:
+            return row.get(col_name)
+        return row
+
+
+class SQLiteD1Database:
+    def __init__(self, db_path="tmp/local_d1.db"):
+        self.db_path = db_path
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        self._init_db()
+
+    def _init_db(self):
+        conn = sqlite3.connect(self.db_path)
+        try:
+            with conn:
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS user_profiles (
+                        id TEXT PRIMARY KEY,
+                        email TEXT,
+                        name TEXT,
+                        picture TEXT,
+                        bio TEXT,
+                        skills TEXT,
+                        preferred_location TEXT,
+                        job_preferences TEXT
+                    )
+                """)
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS bookmarks (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id TEXT,
+                        company_id TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+        finally:
+            conn.close()
+
+    def prepare(self, query):
+        return SQLiteD1PreparedStatement(self, query)
+
+    async def exec(self, query):
+        def _execute():
+            conn = sqlite3.connect(self.db_path)
+            try:
+                with conn:
+                    conn.executescript(query)
+                return {"success": True}
+            except Exception as e:
+                return {"success": False, "error": str(e)}
+            finally:
+                conn.close()
+        return await asyncio.to_thread(_execute)
+

@@ -10,3 +10,8 @@ binding = "ASSETS"
 [[kv_namespaces]]
 binding = "SESSION_STORE"
 id = "ae27dac64a534dc485511d6911cae2fd"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "startup-visualizer-db"
+database_id = "mock-d1-db-id"

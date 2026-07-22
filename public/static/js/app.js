@@ -728,16 +728,187 @@ window.addEventListener('resize', () => {
     }
 });
 
-// Setup auth logout click handler
-const navLogoutBtn = document.getElementById('nav-logout-btn');
-if (navLogoutBtn) {
-    navLogoutBtn.addEventListener('click', () => {
+// Dropdown menu toggle delegation
+document.addEventListener('click', (e) => {
+    const toggleBtn = e.target.closest('.user-dropdown-toggle');
+    if (toggleBtn) {
+        const dropdown = toggleBtn.nextElementSibling;
+        if (dropdown) {
+            dropdown.classList.toggle('hidden');
+        }
+        document.querySelectorAll('.user-dropdown').forEach(d => {
+            if (d !== dropdown) d.classList.add('hidden');
+        });
+        return;
+    }
+
+    if (!e.target.closest('.auth-user')) {
+        document.querySelectorAll('.user-dropdown').forEach(d => d.classList.add('hidden'));
+    }
+});
+
+// View profile handler
+document.addEventListener('click', (e) => {
+    const viewProfileBtn = e.target.closest('.view-profile-btn');
+    if (viewProfileBtn) {
+        const dropdown = viewProfileBtn.closest('.user-dropdown');
+        if (dropdown) dropdown.classList.add('hidden');
+
+        safeFetch('/api/user/profile')
+            .then(profile => {
+                const avatarEl = document.getElementById('profile-modal-avatar');
+                const emailEl = document.getElementById('profile-modal-email');
+                const nameEl = document.getElementById('profile-name');
+                const bioEl = document.getElementById('profile-bio');
+                const skillsEl = document.getElementById('profile-skills');
+                const locEl = document.getElementById('profile-location');
+                
+                if (avatarEl) avatarEl.src = profile.picture || 'https://lh3.googleusercontent.com/a/default-user';
+                if (emailEl) emailEl.textContent = profile.email || '';
+                if (nameEl) nameEl.value = profile.name || '';
+                if (bioEl) bioEl.value = profile.bio || '';
+                if (skillsEl) skillsEl.value = Array.isArray(profile.skills) ? profile.skills.join(', ') : '';
+                if (locEl) locEl.value = profile.preferred_location || '';
+                
+                const prefs = profile.job_preferences || {};
+                const workTypeEl = document.getElementById('profile-pref-work-type');
+                const expLevelEl = document.getElementById('profile-pref-exp-level');
+                const minSalEl = document.getElementById('profile-pref-min-salary');
+                
+                if (workTypeEl) workTypeEl.value = prefs.work_type || '';
+                if (expLevelEl) expLevelEl.value = prefs.experience_level || '';
+                if (minSalEl) minSalEl.value = prefs.min_salary || '';
+
+                const modal = document.getElementById('profile-modal');
+                if (modal) modal.classList.remove('hidden');
+            })
+            .catch(err => {
+                console.error('[Profile Fetch Error]', err);
+                showToast('Failed to load profile data.', 'error');
+            });
+    }
+});
+
+const closeProfileModal = () => {
+    const modal = document.getElementById('profile-modal');
+    if (modal) modal.classList.add('hidden');
+};
+
+const closeProfileBtn = document.getElementById('close-profile-modal-btn');
+if (closeProfileBtn) closeProfileBtn.addEventListener('click', closeProfileModal);
+
+const cancelProfileBtn = document.getElementById('cancel-profile-btn');
+if (cancelProfileBtn) cancelProfileBtn.addEventListener('click', closeProfileModal);
+
+// Profile form save handler
+const profileForm = document.getElementById('profile-form');
+if (profileForm) {
+    profileForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const name = document.getElementById('profile-name').value.trim();
+        const bio = document.getElementById('profile-bio').value.trim();
+        const skillsRaw = document.getElementById('profile-skills').value;
+        const preferred_location = document.getElementById('profile-location').value.trim();
+        
+        const work_type = document.getElementById('profile-pref-work-type').value;
+        const experience_level = document.getElementById('profile-pref-exp-level').value;
+        const minSalaryRaw = document.getElementById('profile-pref-min-salary').value.trim();
+        const min_salary = minSalaryRaw ? parseFloat(minSalaryRaw) : null;
+
+        const skills = skillsRaw
+            ? skillsRaw.split(',').map(s => s.trim()).filter(Boolean)
+            : [];
+
+        const payload = {
+            name,
+            bio,
+            skills,
+            preferred_location,
+            job_preferences: {
+                work_type,
+                experience_level,
+                min_salary
+            }
+        };
+
+        safeFetch('/api/user/profile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(updatedProfile => {
+            showToast('Profile updated successfully!', 'success');
+            closeProfileModal();
+            document.querySelectorAll('.user-name').forEach(el => {
+                el.textContent = updatedProfile.name || 'User';
+            });
+            if (state.user) {
+                state.user.name = updatedProfile.name;
+            }
+            applyAutoFilters(updatedProfile);
+        })
+        .catch(err => {
+            console.error('[Profile Update Error]', err);
+            showToast('Failed to update profile.', 'error');
+        });
+    });
+}
+
+// Global logout delegation
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.logout-btn')) {
         safeFetch('/api/auth/logout', { method: 'POST' })
             .then(() => {
                 window.location.reload();
             })
             .catch(() => window.location.reload());
-    });
+    }
+});
+
+function applyAutoFilters(profile) {
+    const isJobsRoute = window.location.pathname.startsWith('/jobs') || window.location.pathname.startsWith('/map') || (new URLSearchParams(window.location.search)).has('city');
+    if (!isJobsRoute) return;
+
+    const prefs = profile.job_preferences || {};
+    let filterChanged = false;
+
+    if (prefs.work_type && filterWorkType) {
+        if (filterWorkType.value !== prefs.work_type) {
+            filterWorkType.value = prefs.work_type;
+            state.currentFilters.work_type = prefs.work_type;
+            filterChanged = true;
+        }
+    }
+    if (prefs.experience_level && filterExpLevel) {
+        if (filterExpLevel.value !== prefs.experience_level) {
+            filterExpLevel.value = prefs.experience_level;
+            state.currentFilters.exp_level = prefs.experience_level;
+            filterChanged = true;
+        }
+    }
+    if (prefs.min_salary && filterSalaryMin) {
+        const minSalStr = String(prefs.min_salary);
+        const options = Array.from(filterSalaryMin.options).map(o => o.value);
+        if (options.includes(minSalStr)) {
+            if (filterSalaryMin.value !== minSalStr) {
+                filterSalaryMin.value = minSalStr;
+                state.currentFilters.salary_min = minSalStr;
+                filterChanged = true;
+            }
+        }
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const cityParam = urlParams.get('city');
+
+    if (!cityParam && profile.preferred_location) {
+        executeUnifiedSearch(profile.preferred_location);
+    } else if (filterChanged) {
+        fetchFilteredStartups();
+    }
 }
 
 // Initial checks
@@ -850,8 +1021,18 @@ fetch('/static/data/hub_boundaries.json')
     })
     .catch(err => console.error("Error loading hub boundaries:", err));
 
-checkAuthStatus();
-handleHashRouting();
-
-fetchAndRender();
+checkAuthStatus()
+    .then(data => {
+        if (data && data.authenticated) {
+            return safeFetch('/api/user/profile')
+                .then(profile => {
+                    applyAutoFilters(profile);
+                });
+        }
+    })
+    .catch(err => console.warn('[Auth/Profile Init Error]', err))
+    .finally(() => {
+        handleHashRouting();
+        fetchAndRender();
+    });
 

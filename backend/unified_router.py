@@ -7,6 +7,16 @@ Compatible with Flask and Cloudflare Workers environments.
 
 import json
 from http.cookies import SimpleCookie
+from urllib.parse import urlparse
+
+def get_request_origin(url):
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme and parsed.netloc:
+            return f"{parsed.scheme}://{parsed.netloc}"
+    except Exception:
+        pass
+    return "http://127.0.0.1:5001"
 
 from backend.utils.validators import _validate_query_params, _strip_redundant, _safe_float
 from backend.utils.rate_limiter import _check_rate_limit
@@ -15,6 +25,11 @@ from backend.services.auth_service import (
     exchange_code_for_user, issue_jwt_token, verify_jwt_token, revoke_jwt_token
 )
 
+def is_safe_redirect(url):
+    if not url:
+        return False
+    # Must start with / and not start with // or /\ to prevent protocol-relative redirects
+    return url.startswith('/') and not url.startswith('//') and not url.startswith('/\\')
 
 class CaseInsensitiveDict:
     """A case-insensitive dictionary lookup wrapper for headers."""
@@ -142,13 +157,50 @@ class UnifiedRouter:
     async def handle_request(self, req: UnifiedRequest) -> UnifiedResponse:
         # Check rate limit
         client_ip = req.client_ip
-        if req.testing and client_ip in ("127.0.0.1", "::1", "localhost"):
-            allowed, retry_after, remaining, limit_val = True, 0, 9999, 9999
+
+        # 1. Parse session token early
+        token = req.get_cookie('session_token') or req.get_cookie('auth_token') or req.get_cookie('jwt_token')
+        if not token:
+            auth_header = req.headers.get('Authorization') or ""
+            if auth_header.startswith('Bearer '):
+                token = auth_header.split(' ', 1)[1]
+
+        # 2. Verify token early
+        user = None
+        if token:
+            session_store = None
+            if req.env:
+                session_store = req.env.get("SESSION_STORE") if isinstance(req.env, dict) else getattr(req.env, "SESSION_STORE", None)
+            if not session_store:
+                from backend import config
+                session_store = getattr(config, 'SESSION_STORE', None)
+            user = await verify_jwt_token(token, session_store=session_store)
+
+        # Resolve DB
+        db = None
+        if req.env:
+            db = req.env.get("DB") if isinstance(req.env, dict) else getattr(req.env, "DB", None)
+        if not db:
+            from backend import config
+            db = getattr(config, 'DB', None)
+
+        # 3. Determine rate limit key and value
+        from backend import config
+        if user:
+            user_id = user.get("sub") or str(user.get("id", ""))
+            rate_key = f"auth:{user_id}"
+            limit_val = config.RATE_LIMIT_AUTH
         else:
-            allowed, retry_after, remaining, limit_val = _check_rate_limit(client_ip)
+            rate_key = f"anon:{client_ip}"
+            limit_val = config.RATE_LIMIT_ANON
+
+        # 4. Check rate limit
+        if req.testing and client_ip in ("127.0.0.1", "::1", "localhost"):
+            allowed, retry_after, remaining, limit_val = True, 0, 9999, limit_val
+        else:
+            allowed, retry_after, remaining, limit_val = _check_rate_limit(rate_key, limit=limit_val)
             if not allowed:
-                # Log diagnostic info to stderr or stdout for E2E troubleshooting
-                print(f"[DEBUG RateLimit Blocked] client_ip={client_ip!r} req.testing={req.testing!r} path={req.path!r}", flush=True)
+                print(f"[DEBUG RateLimit Blocked] rate_key={rate_key!r} req.testing={req.testing!r} path={req.path!r}", flush=True)
 
         rate_limit_info = {'limit': limit_val, 'remaining': remaining}
 
@@ -184,20 +236,10 @@ class UnifiedRouter:
                     is_protected = True
 
             # If protected, perform authentication checks
-            user = None
             if is_protected:
-                token = req.get_cookie('session_token') or req.get_cookie('auth_token') or req.get_cookie('jwt_token')
-                if not token:
-                    auth_header = req.headers.get('Authorization') or ""
-                    if auth_header.startswith('Bearer '):
-                        token = auth_header.split(' ', 1)[1]
-
                 if not token:
                     res = UnifiedResponse({"error": "Unauthenticated. Missing JWT session token."}, status=401)
                     return self._inject_headers(res, req, rate_limit_info)
-
-                session_store = req.env.get("SESSION_STORE") if isinstance(req.env, dict) else getattr(req.env, "SESSION_STORE", None)
-                user = await verify_jwt_token(token, session_store=session_store)
                 if not user:
                     res = UnifiedResponse({"error": "Unauthenticated. Invalid, expired, or revoked JWT session token."}, status=401)
                     return self._inject_headers(res, req, rate_limit_info)
@@ -298,18 +340,30 @@ class UnifiedRouter:
 
             # 3. GET /api/auth/google
             elif parts == ['api', 'auth', 'google'] and req.method == 'GET':
-                session_store = req.env.get("SESSION_STORE") if isinstance(req.env, dict) else getattr(req.env, "SESSION_STORE", None)
-                state = await generate_oauth_state(session_store=session_store)
-                redirect_uri = req.query_params.get('redirect_uri')
-                auth_url = get_google_auth_url(state, redirect_uri=redirect_uri)
+                session_store = None
+                if req.env:
+                    session_store = req.env.get("SESSION_STORE") if isinstance(req.env, dict) else getattr(req.env, "SESSION_STORE", None)
+                if not session_store:
+                    from backend import config
+                    session_store = getattr(config, 'SESSION_STORE', None)
+                state_token = await generate_oauth_state(session_store=session_store)
+                next_path = req.query_params.get('next') or '/'
+                # Validate redirect to prevent Open Redirect vulnerabilities
+                if not is_safe_redirect(next_path):
+                    next_path = '/'
+                combined_state = f"{state_token}:{next_path}"
+                request_origin = get_request_origin(req.url)
+                redirect_uri = req.query_params.get('redirect_uri') or f"{request_origin}/api/auth/callback"
+                auth_url = get_google_auth_url(combined_state, redirect_uri=redirect_uri)
 
                 headers = {'Location': auth_url}
                 if req.query_params.get('redirect', '').lower() in ('true', '1', 'yes'):
                     res = UnifiedResponse("", status=302, headers=headers)
                 else:
-                    res = UnifiedResponse({"auth_url": auth_url, "state": state}, status=200, headers=headers)
+                    res = UnifiedResponse({"auth_url": auth_url, "state": combined_state}, status=200, headers=headers)
 
-                res.set_cookie('oauth_state', state, max_age=600, httponly=True, secure=True, samesite='Strict')
+                is_prod = (config.ENVIRONMENT == 'production')
+                res.set_cookie('oauth_state', state_token, max_age=600, httponly=True, secure=is_prod, samesite='Lax')
                 return self._inject_headers(res, req, rate_limit_info)
 
             # 4. GET/POST /api/auth/callback and /api/auth/google/callback
@@ -329,16 +383,36 @@ class UnifiedRouter:
                         except Exception:
                             pass
 
-                state = req.query_params.get('state') or body_data.get('state')
+                combined_state = req.query_params.get('state') or body_data.get('state') or ""
                 code = req.query_params.get('code') or body_data.get('code')
 
-                session_store = req.env.get("SESSION_STORE") if isinstance(req.env, dict) else getattr(req.env, "SESSION_STORE", None)
-                valid_in_store = await validate_oauth_state(state, session_store=session_store)
-                cookie_state = req.get_cookie('oauth_state')
-                valid_in_cookie = (state is not None and cookie_state is not None and cookie_state == state)
+                if ':' in combined_state:
+                    state_token, next_path = combined_state.split(':', 1)
+                else:
+                    state_token = combined_state
+                    next_path = '/'
 
-                if not (valid_in_store or valid_in_cookie):
-                    res = UnifiedResponse({"error": "CSRF state validation failed. Invalid or expired state parameter."}, status=400)
+                # Validate redirect to prevent Open Redirect vulnerabilities
+                if not is_safe_redirect(next_path):
+                    next_path = '/'
+
+                session_store = None
+                if req.env:
+                    session_store = req.env.get("SESSION_STORE") if isinstance(req.env, dict) else getattr(req.env, "SESSION_STORE", None)
+                if not session_store:
+                    from backend import config
+                    session_store = getattr(config, 'SESSION_STORE', None)
+
+                cookie_state = req.get_cookie('oauth_state')
+                # Enforce strict cookie state matching to prevent OAuth CSRF (session fixation)
+                if not cookie_state or cookie_state != state_token:
+                    res = UnifiedResponse({"error": "CSRF state validation failed. Cookie state mismatch or missing."}, status=400)
+                    return self._inject_headers(res, req, rate_limit_info)
+
+                # Consume the state from store/in-memory
+                valid_in_store = await validate_oauth_state(state_token, session_store=session_store)
+                if not valid_in_store:
+                    res = UnifiedResponse({"error": "CSRF state validation failed. State token expired or already used."}, status=400)
                     return self._inject_headers(res, req, rate_limit_info)
 
                 if not code:
@@ -348,24 +422,19 @@ class UnifiedRouter:
                 user_data = exchange_code_for_user(code)
                 token = issue_jwt_token(user_data)
 
-                payload = {
-                    "message": "Authentication successful.",
-                    "authenticated": True,
-                    "user": {
-                        "id": user_data.get("sub") or str(user_data.get("id", "")),
-                        "email": user_data.get("email", ""),
-                        "name": user_data.get("name", ""),
-                        "picture": user_data.get("picture", "")
-                    },
-                    "token": token
-                }
-                res = UnifiedResponse(payload, status=200)
-                res.set_cookie('session_token', token, max_age=3600, httponly=True, secure=True, samesite='Strict')
-                res.set_cookie('oauth_state', '', expires='Thu, 01 Jan 1970 00:00:00 GMT', httponly=True, secure=True, samesite='Strict')
+                res = UnifiedResponse("", status=302, headers={'Location': next_path})
+                is_prod = (config.ENVIRONMENT == 'production')
+                res.set_cookie('session_token', token, max_age=3600, httponly=True, secure=is_prod, samesite='Strict')
+                res.set_cookie('oauth_state', '', expires='Thu, 01 Jan 1970 00:00:00 GMT', httponly=True, secure=is_prod, samesite='Lax')
                 return self._inject_headers(res, req, rate_limit_info)
 
             # 5. GET/POST /api/auth/demo_login
             elif parts == ['api', 'auth', 'demo_login'] and req.method in ('GET', 'POST'):
+                from backend import config
+                if config.ENVIRONMENT == 'production':
+                    res = UnifiedResponse({"error": "Demo login backdoor is disabled in production."}, status=403)
+                    return self._inject_headers(res, req, rate_limit_info)
+
                 demo_user = {
                     "sub": "usr_google_1001",
                     "email": "ujwal@worldtech.map",
@@ -402,7 +471,12 @@ class UnifiedRouter:
                     res = UnifiedResponse({"authenticated": False, "user": None, "message": "No session cookie present."}, status=200)
                     return self._inject_headers(res, req, rate_limit_info)
 
-                session_store = req.env.get("SESSION_STORE") if isinstance(req.env, dict) else getattr(req.env, "SESSION_STORE", None)
+                session_store = None
+                if req.env:
+                    session_store = req.env.get("SESSION_STORE") if isinstance(req.env, dict) else getattr(req.env, "SESSION_STORE", None)
+                if not session_store:
+                    from backend import config
+                    session_store = getattr(config, 'SESSION_STORE', None)
                 user = await verify_jwt_token(token, session_store=session_store)
                 if not user:
                     res = UnifiedResponse({"authenticated": False, "user": None, "message": "Invalid, expired, or revoked session cookie."}, status=200)
@@ -430,30 +504,281 @@ class UnifiedRouter:
                         token = auth_header.split(' ', 1)[1]
 
                 if token:
-                    session_store = req.env.get("SESSION_STORE") if isinstance(req.env, dict) else getattr(req.env, "SESSION_STORE", None)
+                    session_store = None
+                    if req.env:
+                        session_store = req.env.get("SESSION_STORE") if isinstance(req.env, dict) else getattr(req.env, "SESSION_STORE", None)
+                    if not session_store:
+                        from backend import config
+                        session_store = getattr(config, 'SESSION_STORE', None)
                     await revoke_jwt_token(token, session_store=session_store)
 
                 res = UnifiedResponse({"message": "Successfully logged out.", "authenticated": False}, status=200)
-                res.set_cookie('session_token', '', expires='Thu, 01 Jan 1970 00:00:00 GMT', httponly=True, secure=True, samesite='Strict')
-                res.set_cookie('auth_token', '', expires='Thu, 01 Jan 1970 00:00:00 GMT', httponly=True, secure=True, samesite='Strict')
-                res.set_cookie('jwt_token', '', expires='Thu, 01 Jan 1970 00:00:00 GMT', httponly=True, secure=True, samesite='Strict')
+                is_prod = (config.ENVIRONMENT == 'production')
+                res.set_cookie('session_token', '', expires='Thu, 01 Jan 1970 00:00:00 GMT', httponly=True, secure=is_prod, samesite='Strict')
+                res.set_cookie('auth_token', '', expires='Thu, 01 Jan 1970 00:00:00 GMT', httponly=True, secure=is_prod, samesite='Strict')
+                res.set_cookie('jwt_token', '', expires='Thu, 01 Jan 1970 00:00:00 GMT', httponly=True, secure=is_prod, samesite='Strict')
                 return self._inject_headers(res, req, rate_limit_info)
 
-            # 8. GET /api/user/profile or /api/protected/profile
-            elif parts in (['api', 'user', 'profile'], ['api', 'protected', 'profile']) and req.method == 'GET':
-                res = UnifiedResponse({"authenticated": True, "user": user}, status=200)
-                return self._inject_headers(res, req, rate_limit_info)
+            # 8. GET/POST /api/user/profile or /api/protected/profile
+            elif parts in (['api', 'user', 'profile'], ['api', 'protected', 'profile']) and req.method in ('GET', 'POST'):
+                user_id = user.get("sub") or str(user.get("id", ""))
+                if not db:
+                    res = UnifiedResponse({"error": "D1 Database not configured"}, status=500)
+                    return self._inject_headers(res, req, rate_limit_info)
+
+                if req.method == 'GET':
+                    row = await db.prepare(
+                        "SELECT id, email, name, picture, bio, skills, preferred_location, job_preferences FROM user_profiles WHERE id = ?"
+                    ).bind(user_id).first()
+
+                    if row:
+                        try:
+                            skills = json.loads(row.get("skills") or "[]")
+                        except Exception:
+                            skills = []
+                        try:
+                            job_preferences = json.loads(row.get("job_preferences") or "{}")
+                        except Exception:
+                            job_preferences = {}
+
+                        profile = {
+                            "id": row.get("id"),
+                            "email": row.get("email") or "",
+                            "name": row.get("name") or "",
+                            "picture": row.get("picture") or "",
+                            "bio": row.get("bio") or "",
+                            "skills": skills,
+                            "preferred_location": row.get("preferred_location") or "",
+                            "job_preferences": job_preferences
+                        }
+                    else:
+                        profile = {
+                            "id": user_id,
+                            "email": user.get("email", ""),
+                            "name": user.get("name", ""),
+                            "picture": user.get("picture", ""),
+                            "bio": "",
+                            "skills": [],
+                            "preferred_location": "",
+                            "job_preferences": {}
+                        }
+                        await db.prepare(
+                            "INSERT INTO user_profiles (id, email, name, picture, bio, skills, preferred_location, job_preferences) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                        ).bind(
+                            user_id,
+                            user.get("email", ""),
+                            user.get("name", ""),
+                            user.get("picture", ""),
+                            "",
+                            json.dumps([]),
+                            "",
+                            json.dumps({})
+                        ).run()
+
+                    res = UnifiedResponse(profile, status=200)
+                    return self._inject_headers(res, req, rate_limit_info)
+
+                elif req.method == 'POST':
+                    body_data = {}
+                    if isinstance(req.body, dict):
+                        body_data = req.body
+                    elif isinstance(req.body, str) and req.body:
+                        try:
+                            body_data = json.loads(req.body)
+                        except Exception:
+                            pass
+                    elif isinstance(req.body, bytes) and req.body:
+                        try:
+                            body_data = json.loads(req.body.decode("utf-8"))
+                        except Exception:
+                            pass
+
+                    # Fetch existing profile if present
+                    row = await db.prepare(
+                        "SELECT id, email, name, picture, bio, skills, preferred_location, job_preferences FROM user_profiles WHERE id = ?"
+                    ).bind(user_id).first()
+
+                    existing_profile = {}
+                    if row:
+                        try:
+                            skills = json.loads(row.get("skills") or "[]")
+                        except Exception:
+                            skills = []
+                        try:
+                            job_preferences = json.loads(row.get("job_preferences") or "{}")
+                        except Exception:
+                            job_preferences = {}
+
+                        existing_profile = {
+                            "id": row.get("id"),
+                            "email": row.get("email") or "",
+                            "name": row.get("name") or "",
+                            "picture": row.get("picture") or "",
+                            "bio": row.get("bio") or "",
+                            "skills": skills,
+                            "preferred_location": row.get("preferred_location") or "",
+                            "job_preferences": job_preferences
+                        }
+
+                    # Merge & enforce constraints
+                    email = existing_profile.get("email") or user.get("email", "")
+                    picture = existing_profile.get("picture") or user.get("picture", "")
+
+                    name = body_data.get("name") if "name" in body_data else existing_profile.get("name", user.get("name", ""))
+                    bio = body_data.get("bio") if "bio" in body_data else existing_profile.get("bio", "")
+                    skills = body_data.get("skills") if "skills" in body_data else existing_profile.get("skills", [])
+                    preferred_location = body_data.get("preferred_location") if "preferred_location" in body_data else existing_profile.get("preferred_location", "")
+                    job_preferences = body_data.get("job_preferences") if "job_preferences" in body_data else existing_profile.get("job_preferences", {})
+
+                    skills_str = json.dumps(skills)
+                    job_preferences_str = json.dumps(job_preferences)
+
+                    if row:
+                        await db.prepare(
+                            "UPDATE user_profiles SET email = ?, name = ?, picture = ?, bio = ?, skills = ?, preferred_location = ?, job_preferences = ? WHERE id = ?"
+                        ).bind(
+                            email, name, picture, bio, skills_str, preferred_location, job_preferences_str, user_id
+                        ).run()
+                    else:
+                        await db.prepare(
+                            "INSERT INTO user_profiles (id, email, name, picture, bio, skills, preferred_location, job_preferences) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                        ).bind(
+                            user_id, email, name, picture, bio, skills_str, preferred_location, job_preferences_str
+                        ).run()
+
+                    updated_profile = {
+                        "id": user_id,
+                        "email": email,
+                        "name": name,
+                        "picture": picture,
+                        "bio": bio,
+                        "skills": skills,
+                        "preferred_location": preferred_location,
+                        "job_preferences": job_preferences
+                    }
+
+                    res = UnifiedResponse(updated_profile, status=200)
+                    return self._inject_headers(res, req, rate_limit_info)
 
             # 9. GET/POST/DELETE /api/user/bookmarks or /api/protected/bookmarks
             elif parts in (['api', 'user', 'bookmarks'], ['api', 'protected', 'bookmarks']) and req.method in ('GET', 'POST', 'DELETE'):
-                payload = {
-                    "authenticated": True,
-                    "user_id": user.get("sub"),
-                    "bookmarks": [],
-                    "message": "Protected bookmarks endpoint accessed successfully."
-                }
-                res = UnifiedResponse(payload, status=200)
-                return self._inject_headers(res, req, rate_limit_info)
+                user_id = user.get("sub") or str(user.get("id", ""))
+                if not db:
+                    res = UnifiedResponse({"error": "D1 Database not configured"}, status=500)
+                    return self._inject_headers(res, req, rate_limit_info)
+
+                if req.method == 'GET':
+                    result = await db.prepare(
+                        "SELECT id, company_id, created_at FROM bookmarks WHERE user_id = ?"
+                    ).bind(user_id).all()
+                    
+                    rows = result.get("results", []) if result else []
+                    
+                    startups = await load_all_startups()
+                    startup_names = {}
+                    for s in startups:
+                        if "id" in s and "name" in s:
+                            startup_names[str(s["id"]).strip()] = s["name"]
+                    
+                    bookmarks_list = []
+                    for row in rows:
+                        company_id = row.get("company_id")
+                        saved_at = row.get("created_at")
+                        
+                        company_name = "Unknown"
+                        comp_id_str = str(company_id).strip() if company_id is not None else ""
+                        if comp_id_str in startup_names:
+                            company_name = startup_names[comp_id_str]
+                        else:
+                            for s in startups:
+                                if _ids_match(s.get("id"), company_id):
+                                    company_name = s.get("name", "Unknown")
+                                    break
+                        
+                        bookmarks_list.append({
+                            "id": row.get("id"),
+                            "company_id": company_id,
+                            "name": company_name,
+                            "saved_at": saved_at
+                        })
+                    
+                    res = UnifiedResponse(bookmarks_list, status=200)
+                    return self._inject_headers(res, req, rate_limit_info)
+
+                elif req.method == 'POST':
+                    body_data = {}
+                    if isinstance(req.body, dict):
+                        body_data = req.body
+                    elif isinstance(req.body, str) and req.body:
+                        try:
+                            body_data = json.loads(req.body)
+                        except Exception:
+                            pass
+                    elif isinstance(req.body, bytes) and req.body:
+                        try:
+                            body_data = json.loads(req.body.decode("utf-8"))
+                        except Exception:
+                            pass
+                    
+                    company_id = body_data.get("company_id")
+                    if not company_id:
+                        res = UnifiedResponse({"error": "Missing company_id"}, status=400)
+                        return self._inject_headers(res, req, rate_limit_info)
+                    
+                    res_run = await db.prepare(
+                        "INSERT INTO bookmarks (user_id, company_id) VALUES (?, ?)"
+                    ).bind(user_id, str(company_id)).run()
+                    
+                    bookmark_id = None
+                    if res_run and isinstance(res_run, dict):
+                        bookmark_id = res_run.get("meta", {}).get("last_row_id")
+                    
+                    res = UnifiedResponse({
+                        "success": True,
+                        "bookmark": {
+                            "id": bookmark_id,
+                            "company_id": company_id,
+                            "user_id": user_id
+                        }
+                    }, status=201)
+                    return self._inject_headers(res, req, rate_limit_info)
+
+                elif req.method == 'DELETE':
+                    company_id = req.query_params.get("company_id")
+                    bookmark_id = req.query_params.get("bookmark_id") or req.query_params.get("id")
+
+                    if not company_id and not bookmark_id:
+                        body_data = {}
+                        if isinstance(req.body, dict):
+                            body_data = req.body
+                        elif isinstance(req.body, str) and req.body:
+                            try:
+                                body_data = json.loads(req.body)
+                            except Exception:
+                                pass
+                        elif isinstance(req.body, bytes) and req.body:
+                            try:
+                                body_data = json.loads(req.body.decode("utf-8"))
+                            except Exception:
+                                pass
+                        company_id = body_data.get("company_id")
+                        bookmark_id = body_data.get("bookmark_id") or body_data.get("id")
+
+                    if not company_id and not bookmark_id:
+                        res = UnifiedResponse({"error": "Missing company_id or bookmark_id"}, status=400)
+                        return self._inject_headers(res, req, rate_limit_info)
+
+                    if bookmark_id:
+                        await db.prepare(
+                            "DELETE FROM bookmarks WHERE id = ? AND user_id = ?"
+                        ).bind(bookmark_id, user_id).run()
+                    else:
+                        await db.prepare(
+                            "DELETE FROM bookmarks WHERE company_id = ? AND user_id = ?"
+                        ).bind(str(company_id), user_id).run()
+                    
+                    res = UnifiedResponse({"success": True, "message": "Bookmark removed"}, status=200)
+                    return self._inject_headers(res, req, rate_limit_info)
 
             # 10. GET /api/company/export, /api/companies/export, or /api/protected/export
             elif parts in (['api', 'company', 'export'], ['api', 'companies', 'export'], ['api', 'protected', 'export']) and req.method == 'GET':

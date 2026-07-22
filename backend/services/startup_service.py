@@ -9,7 +9,7 @@ import json
 from backend.utils.validators import _safe_float, _check_has_pin, _sanitize_string, _sanitize_url, _strip_redundant
 from backend.utils.compatibility import safe_flock, LOCK_SH, LOCK_UN, JSRequest as Request
 
-from backend.config import DEFAULT_MAP_CENTER_LAT, DEFAULT_MAP_CENTER_LNG, DEFAULT_TARGET_CITY, REGION_SYNONYM_MAP
+from backend import config
 
 DATA_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'startups.json'))
 
@@ -112,8 +112,8 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
                 if lat_span < 1.0:
                     continue
             else:
-                eff_lat = lat if lat is not None else DEFAULT_MAP_CENTER_LAT
-                eff_lng = lng if lng is not None else DEFAULT_MAP_CENTER_LNG
+                eff_lat = lat if lat is not None else config.DEFAULT_MAP_CENTER_LAT
+                eff_lng = lng if lng is not None else config.DEFAULT_MAP_CENTER_LNG
                 if eff_lat < min_lat or eff_lat > max_lat or eff_lng < min_lng or eff_lng > max_lng:
                     continue
         if city_query:
@@ -123,7 +123,7 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
             
             # Dynamically match country-level and regional city queries to their respective hubs in dataset
             is_match = False
-            for _region_key, _syn_set in REGION_SYNONYM_MAP.items():
+            for _region_key, _syn_set in config.REGION_SYNONYM_MAP.items():
                 if city_query_clean in _syn_set:
                     if any(syn in city_val for syn in _syn_set):
                         is_match = True
@@ -278,8 +278,8 @@ def format_startup_summary(s):
     return {
         "id": s.get("id"),
         "name": _sanitize_string(s.get("name")),
-        "lat": lat_val if lat_val is not None else DEFAULT_MAP_CENTER_LAT,
-        "lng": lng_val if lng_val is not None else DEFAULT_MAP_CENTER_LNG,
+        "lat": lat_val if lat_val is not None else config.DEFAULT_MAP_CENTER_LAT,
+        "lng": lng_val if lng_val is not None else config.DEFAULT_MAP_CENTER_LNG,
         "city": _sanitize_string(s.get("city")),
         "experience": experiences,
         "salary": salaries,
@@ -338,7 +338,7 @@ def format_startup_details(s):
                 "salary": _sanitize_string(j.get("salary")),
                 "job_type": _sanitize_string(j.get("job_type")),
                 "skills": [_sanitize_string(sk) for sk in (j.get("skills") or []) if isinstance(sk, str)],
-                "location": _sanitize_string(j.get("location") or s_copy.get("city") or DEFAULT_TARGET_CITY),
+                "location": _sanitize_string(j.get("location") or s_copy.get("city") or config.DEFAULT_TARGET_CITY),
                 "posted_date": _sanitize_string(j.get("posted_date", "Active")),
                 "source": _sanitize_string(j.get("source", "Direct"))
             })
@@ -396,8 +396,8 @@ def format_lightweight_summary(s):
     return {
         "id": s.get("id"),
         "name": _sanitize_string(s.get("name")),
-        "lat": lat_val if lat_val is not None else DEFAULT_MAP_CENTER_LAT,
-        "lng": lng_val if lng_val is not None else DEFAULT_MAP_CENTER_LNG,
+        "lat": lat_val if lat_val is not None else config.DEFAULT_MAP_CENTER_LAT,
+        "lng": lng_val if lng_val is not None else config.DEFAULT_MAP_CENTER_LNG,
         "city": _sanitize_string(s.get("city")),
         "logo_url": logo_url,
         "industry": _sanitize_string(s.get("industry")),

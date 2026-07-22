@@ -51,7 +51,10 @@ def main():
         ("24. Viewport Mode Transition on Manual Pan", os.path.join(tests_dir, "test_viewport_mode_transition.py")),
         ("25. E2E User Journeys Regression Suite", os.path.join(tests_dir, "test_e2e_user_journeys.py")),
         ("26. Client-Side Caching Milestone 2 Viewport Caching & Filtering", os.path.join(tests_dir, "test_viewport_caching_m2.py")),
-        ("27. Client-Side Caching Milestone 2 Viewport Caching E2E", os.path.join(tests_dir, "test_viewport_caching_e2e.py"))
+        ("27. Client-Side Caching Milestone 2 Viewport Caching E2E", os.path.join(tests_dir, "test_viewport_caching_e2e.py")),
+        ("28. User Profile Management Unit & Persistence Verification", os.path.join(tests_dir, "test_user_profile.py")),
+        ("29. User-Specific Rate Limiting Verification", os.path.join(tests_dir, "test_user_rate_limiting.py")),
+        ("30. E2E User Profile Auto-Filtering Flow", os.path.join(tests_dir, "test_e2e_profile_filtering.py"))
     ]
     
     print("\n⚡ WORLDTECH MAP // FULL-STACK MASTER TEST RUNNER ⚡")

@@ -123,18 +123,27 @@ class TestOAuthKVIntegration(unittest.TestCase):
         data_init = json.loads(resp_init.data)
         state = data_init["state"]
         
+        # Split state to get state_token
+        state_token = state.split(':', 1)[0] if ':' in state else state
+        
         # Confirm state is in KV
-        stored_val = self.run_async(self.mock_kv.get(f"csrf:{state}"))
+        stored_val = self.run_async(self.mock_kv.get(f"csrf:{state_token}"))
         self.assertEqual(stored_val, "1")
         
         # 2. Callback with valid state (should consume from KV and issue JWT)
         resp_callback = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
-        self.assertEqual(resp_callback.status_code, 200)
-        data_callback = json.loads(resp_callback.data)
-        token = data_callback["token"]
+        self.assertEqual(resp_callback.status_code, 302)
+        
+        # Parse token from Set-Cookie header
+        cookies = resp_callback.headers.getlist("Set-Cookie")
+        token = None
+        for cookie in cookies:
+            if cookie.startswith("session_token="):
+                token = cookie.split(";")[0].split("=", 1)[1]
+        self.assertIsNotNone(token, "session_token not found in Set-Cookie headers!")
         
         # Confirm state is consumed (deleted from KV)
-        stored_val_after = self.run_async(self.mock_kv.get(f"csrf:{state}"))
+        stored_val_after = self.run_async(self.mock_kv.get(f"csrf:{state_token}"))
         self.assertIsNone(stored_val_after)
         
         # 3. Status check with token (should be authenticated)
@@ -156,11 +165,11 @@ class TestOAuthKVIntegration(unittest.TestCase):
         revoked_jti = self.run_async(self.mock_kv.get(f"revoked:{jti}"))
         revoked_sig = self.run_async(self.mock_kv.get(f"revoked:{sig}"))
         self.assertTrue(revoked_jti == "1" or revoked_sig == "1")
-
+ 
         # 5. Status check now (should be unauthenticated)
         resp_status_after = self.client.get('/api/auth/status')
         self.assertFalse(json.loads(resp_status_after.data)["authenticated"])
-
+ 
     def test_flask_endpoints_with_kv_environ_override(self):
         """Verify Flask app retrieves KV from request environment override if present."""
         # Unset global config.SESSION_STORE to force retrieving from environment
@@ -172,8 +181,11 @@ class TestOAuthKVIntegration(unittest.TestCase):
         data_init = json.loads(resp_init.data)
         state = data_init["state"]
         
+        # Split state to get state_token
+        state_token = state.split(':', 1)[0] if ':' in state else state
+        
         # Confirm state is in KV
-        stored_val = self.run_async(self.mock_kv.get(f"csrf:{state}"))
+        stored_val = self.run_async(self.mock_kv.get(f"csrf:{state_token}"))
         self.assertEqual(stored_val, "1")
 
 if __name__ == '__main__':

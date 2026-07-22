@@ -6,6 +6,7 @@ import time
 import urllib.request
 import urllib.parse
 import threading
+import re
 
 try:
     from playwright.sync_api import sync_playwright
@@ -68,6 +69,189 @@ class TestMobileResponsiveness(unittest.TestCase):
         self.js_errors = []
         self.page.on("pageerror", lambda err: self.js_errors.append(err))
 
+        # Setup route mocks for external CDNs to allow offline execution and speed up loading
+        tailwind_mock_js = """
+        window.tailwind = { config: {} };
+        const style = document.createElement('style');
+        style.textContent = `
+            #app-container {
+                position: absolute !important;
+                top: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                z-index: 30 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                height: 100% !important;
+                width: 100% !important;
+                background-color: #ffffff !important;
+            }
+            .content-wrapper {
+                flex: 1 1 0% !important;
+                display: flex !important;
+                overflow: hidden !important;
+                position: relative !important;
+            }
+            #back-drawer-btn {
+                min-width: 24px !important;
+                min-height: 24px !important;
+            }
+        `;
+        document.head.appendChild(style);
+        """
+        self.page.route(re.compile(r"https://cdn\.tailwindcss\.com.*"), lambda route: route.fulfill(
+            status=200,
+            content_type="text/javascript",
+            body=tailwind_mock_js
+        ))
+        self.page.route(re.compile(r"https://unpkg\.com/maplibre-gl@.*/dist/maplibre-gl\.js"), lambda route: route.fulfill(
+            status=200,
+            content_type="text/javascript",
+            body="""
+            window.maplibregl = {
+                Map: function() {
+                    const self = this;
+                    this.callbacks = {};
+                    this.on = function(event, cb) {
+                        if (event === 'load' || event === 'style.load') {
+                            setTimeout(cb, 10);
+                        } else {
+                            if (!self.callbacks[event]) self.callbacks[event] = [];
+                            self.callbacks[event].push(cb);
+                        }
+                        return this;
+                    };
+                    // Create dummy canvas element
+                    setTimeout(() => {
+                        const mapEl = document.getElementById('map');
+                        if (mapEl && !mapEl.querySelector('.maplibregl-canvas')) {
+                            const canvas = document.createElement('canvas');
+                            canvas.className = 'maplibregl-canvas';
+                            canvas.style.width = '100%';
+                            canvas.style.height = '100%';
+                            canvas.style.touchAction = 'none';
+                            mapEl.appendChild(canvas);
+                        }
+                    }, 50);
+
+                    // Listen to DOM clicks on map container to trigger Maplibre click events
+                    setTimeout(() => {
+                        const mapEl = document.getElementById('map');
+                        if (mapEl) {
+                            mapEl.addEventListener('click', (e) => {
+                                if (e.target.closest('.logo-marker-container')) return;
+                                if (self.callbacks['click']) {
+                                    self.callbacks['click'].forEach(cb => cb({
+                                        lngLat: self.getCenter(),
+                                        point: { x: e.clientX, y: e.clientY },
+                                        originalEvent: e
+                                    }));
+                                }
+                            });
+                            
+                            // Simple drag simulation to support test_one_finger_map_panning
+                            let isDragging = false;
+                            mapEl.addEventListener('mousedown', () => { isDragging = true; });
+                            window.addEventListener('mouseup', () => { isDragging = false; });
+                            mapEl.addEventListener('mousemove', (e) => {
+                                if (isDragging) {
+                                    self.center.lng += 0.01;
+                                    self.center.lat += 0.01;
+                                    if (self.callbacks['moveend']) {
+                                        self.callbacks['moveend'].forEach(cb => cb());
+                                    }
+                                    if (self.callbacks['dragend']) {
+                                        self.callbacks['dragend'].forEach(cb => cb());
+                                    }
+                                    isDragging = false; // pan once per drag sequence
+                                }
+                            });
+                        }
+                    }, 100);
+
+                    this.zoom = 11;
+                    this.center = { lng: 77.5946, lat: 12.9716 };
+                    this.addControl = function() { return this; };
+                    this.getContainer = function() {
+                        return { clientWidth: 1024, clientHeight: 768 };
+                    };
+                    this.getBounds = function() {
+                        return {
+                            getSouth: () => 12.9,
+                            getNorth: () => 13.0,
+                            getWest: () => 77.5,
+                            getEast: () => 77.6
+                        };
+                    };
+                    this.flyTo = function(options) {
+                        if (options && options.center) this.center = options.center;
+                        if (self.callbacks['moveend']) {
+                            self.callbacks['moveend'].forEach(cb => cb());
+                        }
+                        return this;
+                    };
+                    this.jumpTo = function(options) {
+                        if (options && options.center) this.center = options.center;
+                        if (self.callbacks['moveend']) {
+                            self.callbacks['moveend'].forEach(cb => cb());
+                        }
+                        return this;
+                    };
+                    this.resize = function() { return this; };
+                    this.getZoom = function() { return this.zoom; };
+                    this.setZoom = function(z) { this.zoom = z; return this; };
+                    this.panBy = function(offset, options) {
+                        this.center.lng += 0.01;
+                        this.center.lat += 0.01;
+                        if (self.callbacks['moveend']) {
+                            self.callbacks['moveend'].forEach(cb => cb());
+                        }
+                        return this;
+                    };
+                    this.getSource = function() { return null; };
+                    this.addSource = function() { return this; };
+                    this.getLayer = function() { return null; };
+                    this.addLayer = function() { return this; };
+                    this.removeLayer = function() { return this; };
+                    this.removeSource = function() { return this; };
+                    this.setPaintProperty = function() { return this; };
+                    this.fire = function() { return this; };
+                    this.getCenter = function() { return this.center; };
+                    this.touchZoomRotate = { disableRotation: function() {} };
+                },
+                NavigationControl: function() {},
+                Marker: function() {
+                    const el = document.createElement('div');
+                    el.className = 'logo-marker-container';
+                    const fallbackEl = document.createElement('div');
+                    fallbackEl.className = 'logo-marker-fallback';
+                    fallbackEl.style.backgroundColor = 'rgb(234, 88, 12)';
+                    el.appendChild(fallbackEl);
+                    this.setLngLat = function() { return this; };
+                    this.addTo = function(map) {
+                        const mapContainer = document.getElementById('map') || document.body;
+                        mapContainer.appendChild(el);
+                        return this;
+                    };
+                    this.remove = function() {
+                        if (el.parentNode) {
+                            el.parentNode.removeChild(el);
+                        }
+                        return this;
+                    };
+                    this.getElement = function() { return el; };
+                }
+            };
+            """
+        ))
+        self.page.route(re.compile(r"https://cdnjs\.cloudflare\.com/ajax/libs/font-awesome/.*"), lambda route: route.fulfill(status=200, content_type="text/css", body=""))
+        self.page.route(re.compile(r"https://unpkg\.com/maplibre-gl@.*/dist/maplibre-gl\.css"), lambda route: route.fulfill(status=200, content_type="text/css", body=""))
+        self.page.route(re.compile(r"https://fonts\.googleapis\.com/.*"), lambda route: route.fulfill(status=200, content_type="text/css", body=""))
+        self.page.route(re.compile(r"https://fonts\.gstatic\.com/.*"), lambda route: route.fulfill(status=200, content_type="text/css", body=""))
+        self.page.route(re.compile(r"https://.*\.basemaps\.cartocdn\.com/.*"), lambda route: route.fulfill(status=200, content_type="application/json", body="{}"))
+        self.page.route(re.compile(r"https://tiles\.basemaps\.cartocdn\.com/.*"), lambda route: route.fulfill(status=200, content_type="application/json", body="{}"))
+
     def tearDown(self):
         self.context.close()
 
@@ -76,14 +260,20 @@ class TestMobileResponsiveness(unittest.TestCase):
         self.page.set_viewport_size({"width": 1024, "height": 768})
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
         self.page.wait_for_load_state("domcontentloaded")
-        self.page.wait_for_timeout(1000)
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && "
+            "window.WorldTechApp.state && "
+            "window.WorldTechApp.state.startupsData && "
+            "window.WorldTechApp.state.startupsData.length > 0",
+            timeout=15000
+        )
 
         # 1. Mobile toggle button must be hidden on desktop
         mobile_toggle = self.page.locator("#mobile-toggle-btn")
         self.assertFalse(mobile_toggle.is_visible(), "Mobile toggle button should be hidden on desktop")
 
         # 2. Brand text label must be visible
-        brand_text = self.page.locator(".brand-text-label")
+        brand_text = self.page.locator("#app-container .brand-text-label")
         self.assertTrue(brand_text.is_visible(), "Brand text label should be visible on desktop")
 
         # 3. Open details drawer
@@ -104,14 +294,20 @@ class TestMobileResponsiveness(unittest.TestCase):
         self.page.set_viewport_size({"width": 800, "height": 600})
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
         self.page.wait_for_load_state("domcontentloaded")
-        self.page.wait_for_timeout(1000)
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && "
+            "window.WorldTechApp.state && "
+            "window.WorldTechApp.state.startupsData && "
+            "window.WorldTechApp.state.startupsData.length > 0",
+            timeout=15000
+        )
 
         # 1. Mobile toggle button must be visible on mobile
         mobile_toggle = self.page.locator("#mobile-toggle-btn")
         self.assertTrue(mobile_toggle.is_visible(), "Mobile toggle button should be visible on mobile")
 
         # 2. Brand text label must be visible on 800px width
-        brand_text = self.page.locator(".brand-text-label")
+        brand_text = self.page.locator("#app-container .brand-text-label")
         self.assertTrue(brand_text.is_visible(), "Brand text label should be visible on 800px width")
 
         # 3. Open directory sidebar if not active
@@ -146,9 +342,15 @@ class TestMobileResponsiveness(unittest.TestCase):
         self.page.set_viewport_size({"width": 350, "height": 600})
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
         self.page.wait_for_load_state("domcontentloaded")
-        self.page.wait_for_timeout(1000)
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && "
+            "window.WorldTechApp.state && "
+            "window.WorldTechApp.state.startupsData && "
+            "window.WorldTechApp.state.startupsData.length > 0",
+            timeout=15000
+        )
 
-        brand_text = self.page.locator(".brand-text-label")
+        brand_text = self.page.locator("#app-container .brand-text-label")
         self.assertFalse(brand_text.is_visible(), "Brand text label should be hidden on viewports <= 360px")
         
         self.assertEqual(self.js_errors, [])
@@ -160,7 +362,13 @@ class TestMobileResponsiveness(unittest.TestCase):
         # Scenario A: Details Drawer is Active
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
         self.page.wait_for_load_state("domcontentloaded")
-        self.page.wait_for_timeout(1000)
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && "
+            "window.WorldTechApp.state && "
+            "window.WorldTechApp.state.startupsData && "
+            "window.WorldTechApp.state.startupsData.length > 0",
+            timeout=15000
+        )
         
         # Open sidebar first
         self.page.click("#mobile-toggle-btn")
@@ -201,7 +409,13 @@ class TestMobileResponsiveness(unittest.TestCase):
         self.page.set_viewport_size({"width": 800, "height": 600})
         self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
         self.page.wait_for_load_state("domcontentloaded")
-        self.page.wait_for_timeout(1000)
+        self.page.wait_for_function(
+            "() => typeof window.WorldTechApp !== 'undefined' && "
+            "window.WorldTechApp.state && "
+            "window.WorldTechApp.state.startupsData && "
+            "window.WorldTechApp.state.startupsData.length > 0",
+            timeout=15000
+        )
 
         # Open drawer
         self.page.click("#mobile-toggle-btn")

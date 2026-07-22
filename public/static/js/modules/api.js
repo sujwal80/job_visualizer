@@ -48,21 +48,25 @@ export function checkAuthStatus() {
     return fetch('/api/auth/status')
         .then(r => r.json())
         .then(data => {
-            const profileLink = document.getElementById('navbar-profile-link');
-            const loginLink = document.getElementById('navbar-login-link');
-            const authUserAvatar = document.getElementById('auth-user-avatar');
-            const authUserName = document.getElementById('auth-user-name');
-            const authUserEmail = document.getElementById('auth-user-email');
+            const anonBlocks = document.querySelectorAll('.auth-anon');
+            const userBlocks = document.querySelectorAll('.auth-user');
+            const userAvatars = document.querySelectorAll('.user-avatar');
+            const userNames = document.querySelectorAll('.user-name');
             
             if (data.authenticated && data.user) {
-                if (profileLink) profileLink.classList.remove('hidden');
-                if (loginLink) loginLink.classList.add('hidden');
-                if (authUserAvatar) authUserAvatar.src = data.user.picture || 'https://lh3.googleusercontent.com/a/default-user';
-                if (authUserName) authUserName.textContent = data.user.name || 'Developer Account';
-                if (authUserEmail) authUserEmail.textContent = data.user.email || '';
+                anonBlocks.forEach(el => el.classList.add('hidden'));
+                userBlocks.forEach(el => el.classList.remove('hidden'));
+                userAvatars.forEach(el => {
+                    el.src = data.user.picture || 'https://lh3.googleusercontent.com/a/default-user';
+                });
+                userNames.forEach(el => {
+                    el.textContent = data.user.name || 'Developer Account';
+                });
+                state.user = data.user;
             } else {
-                if (profileLink) profileLink.classList.add('hidden');
-                if (loginLink) loginLink.classList.remove('hidden');
+                anonBlocks.forEach(el => el.classList.remove('hidden'));
+                userBlocks.forEach(el => el.classList.add('hidden'));
+                state.user = null;
             }
             return data;
         })

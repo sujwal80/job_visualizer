@@ -202,7 +202,7 @@ class TestUnifiedRouter(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(res.cookies), 1)
         cookie = res.cookies[0]
         self.assertEqual(cookie["name"], "oauth_state")
-        self.assertEqual(cookie["value"], res.body["state"])
+        self.assertTrue(res.body["state"].startswith(cookie["value"]))
 
     async def test_auth_callback_flow(self):
         # 1. Generate auth URL to record state in mock session/store
@@ -217,20 +217,18 @@ class TestUnifiedRouter(unittest.IsolatedAsyncioTestCase):
         state = res_init.body["state"]
 
         # 2. Trigger callback with recorded state and mock code
+        state_token = state.split(':', 1)[0] if ':' in state else state
         req_cb = UnifiedRequest(
             method="GET",
             path="/api/auth/callback",
             url=f"http://localhost/api/auth/callback?state={state}&code=mock_code_user1",
             query_params={"state": [state], "code": ["mock_code_user1"]},
-            cookies={"oauth_state": state},
+            cookies={"oauth_state": state_token},
             testing=True,
             client_ip="127.0.0.1"
         )
         res_cb = await self.router.handle_request(req_cb)
-        self.assertEqual(res_cb.status, 200)
-        self.assertTrue(res_cb.body["authenticated"])
-        self.assertEqual(res_cb.body["user"]["email"], "ujwal@worldtech.map")
-        self.assertIn("token", res_cb.body)
+        self.assertEqual(res_cb.status, 302)
 
         # Check session cookie set, and oauth state expired
         cookie_names = [c["name"] for c in res_cb.cookies]
@@ -329,8 +327,7 @@ class TestUnifiedRouter(unittest.IsolatedAsyncioTestCase):
         )
         res_auth = await self.router.handle_request(req_auth)
         self.assertEqual(res_auth.status, 200)
-        self.assertTrue(res_auth.body["authenticated"])
-        self.assertEqual(res_auth.body["user"]["sub"], "user123")
+        self.assertEqual(res_auth.body["id"], "user123")
 
     async def test_invalid_paths_return_404(self):
         req = UnifiedRequest(

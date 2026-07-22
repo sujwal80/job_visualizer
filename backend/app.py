@@ -92,7 +92,7 @@ def index():
 @app.route('/api/<path:path>', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
 def api_gateway(path=""):
     body = None
-    if request.method == 'POST':
+    if request.method in ('POST', 'DELETE'):
         body = request.get_json(silent=True) or request.form.to_dict() or request.get_data()
 
     env = {

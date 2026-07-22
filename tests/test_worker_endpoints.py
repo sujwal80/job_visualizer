@@ -125,6 +125,8 @@ class MockEnv:
         self.DEFAULT_TARGET_CITY = "Bengaluru"
         self.DEFAULT_MAP_CENTER_LAT = "12.9716"
         self.DEFAULT_MAP_CENTER_LNG = "77.5946"
+        self.RATE_LIMIT_ANON = "120"
+        self.RATE_LIMIT_AUTH = "200"
 
 class TestWorkerEndpoints(unittest.TestCase):
     def setUp(self):
@@ -250,7 +252,8 @@ class TestWorkerEndpoints(unittest.TestCase):
         
         # Verify state is stored in KV
         state = data["state"]
-        stored_state = self.run_async(self.env.SESSION_STORE.get(f"csrf:{state}"))
+        state_token = state.split(':', 1)[0] if ':' in state else state
+        stored_state = self.run_async(self.env.SESSION_STORE.get(f"csrf:{state_token}"))
         self.assertEqual(stored_state, "1")
 
     def test_auth_google_redirect(self):
@@ -269,24 +272,27 @@ class TestWorkerEndpoints(unittest.TestCase):
     def test_auth_callback_success(self):
         """Verify OAuth callback state validation and JWT cookie emission."""
         # 1. Setup CSRF state
-        state = "test_csrf_state"
-        self.run_async(self.env.SESSION_STORE.put(f"csrf:{state}", "1", expirationTtl=300))
+        state_token = "test_csrf_state"
+        combined_state = f"{state_token}:/jobs"
+        self.run_async(self.env.SESSION_STORE.put(f"csrf:{state_token}", "1", expirationTtl=300))
         
-        # 2. Call callback
-        req = Request(f"http://localhost/api/auth/callback?code=mock_code_user1&state={state}", method="GET")
+        # 2. Call callback with matching cookie state
+        headers = Headers.new()
+        headers.set("Cookie", f"oauth_state={state_token}")
+        req = Request(
+            f"http://localhost/api/auth/callback?code=mock_code_user1&state={combined_state}",
+            {"headers": headers, "method": "GET"}
+        )
         resp = self.run_async(self.worker.fetch(req))
-        self.assertEqual(resp.status, 200)
-        
-        data = json.loads(resp.body)
-        self.assertTrue(data["authenticated"])
-        self.assertEqual(data["user"]["email"], "ujwal@worldtech.map")
+        self.assertEqual(resp.status, 302)
+        self.assertEqual(resp.headers.get("location"), "/jobs")
         
         # Verify session_token cookie set
         cookies = [v for k, v in resp.headers.entries() if k == "set-cookie"]
         self.assertTrue(any("session_token=" in c for c in cookies))
         
         # Verify state consumed
-        stored_state = self.run_async(self.env.SESSION_STORE.get(f"csrf:{state}"))
+        stored_state = self.run_async(self.env.SESSION_STORE.get(f"csrf:{state_token}"))
         self.assertIsNone(stored_state)
 
     def test_auth_demo_login(self):
@@ -363,8 +369,7 @@ class TestWorkerEndpoints(unittest.TestCase):
         self.assertEqual(resp.status, 200)
         
         data = json.loads(resp.body)
-        self.assertTrue(data["authenticated"])
-        self.assertEqual(data["user"]["email"], "profile@test.io")
+        self.assertEqual(data["email"], "profile@test.io")
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

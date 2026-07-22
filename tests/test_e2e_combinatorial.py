@@ -352,20 +352,26 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
         60 GET requests to /api/companies/1. Verifies the token bucket rate limiter shares quota by client IP
         across endpoints, so the 121st request from that IP to either endpoint returns HTTP 429 Too Many Requests.
         """
-        test_ip = '10.150.0.1'
-        for _ in range(60):
-            resp = self.client.get('/api/companies', environ_base={'REMOTE_ADDR': test_ip})
-            self.assertEqual(resp.status_code, 200)
+        from backend import config
+        old_anon_limit = config.RATE_LIMIT_ANON
+        config.RATE_LIMIT_ANON = 120
+        try:
+            test_ip = '10.150.0.1'
+            for _ in range(60):
+                resp = self.client.get('/api/companies', environ_base={'REMOTE_ADDR': test_ip})
+                self.assertEqual(resp.status_code, 200)
 
-        for _ in range(60):
-            resp = self.client.get('/api/companies/1', environ_base={'REMOTE_ADDR': test_ip})
-            # May be 200 or 404, but should not be 429 yet
-            self.assertNotEqual(resp.status_code, 429)
+            for _ in range(60):
+                resp = self.client.get('/api/companies/1', environ_base={'REMOTE_ADDR': test_ip})
+                # May be 200 or 404, but should not be 429 yet
+                self.assertNotEqual(resp.status_code, 429)
 
-        # The 121st request across combined endpoints must trigger 429
-        resp_121 = self.client.get('/api/companies', environ_base={'REMOTE_ADDR': test_ip})
-        self.assertEqual(resp_121.status_code, 429, "Expected HTTP 429 on 121st combined request across endpoints.")
-        print(" [PASS] Combo 14: Rate limiter enforces shared 120 req/min quota per client IP across multiple endpoints.")
+            # The 121st request across combined endpoints must trigger 429
+            resp_121 = self.client.get('/api/companies', environ_base={'REMOTE_ADDR': test_ip})
+            self.assertEqual(resp_121.status_code, 429, "Expected HTTP 429 on 121st combined request across endpoints.")
+            print(" [PASS] Combo 14: Rate limiter enforces shared 120 req/min quota per client IP across multiple endpoints.")
+        finally:
+            config.RATE_LIMIT_ANON = old_anon_limit
 
     def test_combo_15_cors_and_csp_headers_on_options_and_400_errors(self):
         """

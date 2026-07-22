@@ -624,8 +624,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
 
         # Verify protected endpoint /api/user/profile
         profile_data = self.page.evaluate("() => fetch('/api/user/profile').then(r => r.json())")
-        self.assertTrue(profile_data.get("authenticated"))
-        self.assertEqual(profile_data["user"]["email"], "ujwal@worldtech.map")
+        self.assertEqual(profile_data.get("email"), "ujwal@worldtech.map")
         self.assertEqual(self.js_errors, [])
 
     def test_e2_logout_flow_and_session_revocation(self):

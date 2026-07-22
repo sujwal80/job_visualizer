@@ -144,14 +144,14 @@ class BoundedRateLimitDict(MutableMapping):
 _rate_limits = BoundedRateLimitDict(max_size=10000)
 
 
-def _check_rate_limit(ip, limit=120, window=60):
+def _check_rate_limit(key, limit=120, window=60):
     """
-    Evaluate if an incoming request from a specific client IP is permitted by the rate limiter.
+    Evaluate if an incoming request is permitted by the rate limiter.
 
     Implements a sliding-window token bucket algorithm in thread-safe shared memory.
 
     Args:
-        ip (str): The remote client IP address requesting access.
+        key (str): The rate limit tracking key (e.g. client IP or authenticated user key).
         limit (int): Maximum allowable requests within the sliding window.
         window (int): The sliding window time span in seconds (default 60s).
 
@@ -170,18 +170,18 @@ def _check_rate_limit(ip, limit=120, window=60):
             _rate_limits.purge_expired(window=window)
             _rate_limits._last_cleanup = now
 
-        reqs = _rate_limits.get(ip, [])
+        reqs = _rate_limits.get(key, [])
         # Filter timestamps to retain only those within the active sliding time window
         valid_reqs = [t for t in reqs if now - t < window]
         count = len(valid_reqs)
         if limit <= 0 or count >= limit:
-            if not valid_reqs and ip in _rate_limits:
-                del _rate_limits[ip]
+            if not valid_reqs and key in _rate_limits:
+                del _rate_limits[key]
             elif valid_reqs:
-                _rate_limits[ip] = valid_reqs
+                _rate_limits[key] = valid_reqs
             oldest = valid_reqs[0] if valid_reqs else now
             retry_after = max(1, int(math.ceil((oldest + window) - now)))
             return False, retry_after, 0, max(0, limit)
         valid_reqs.append(now)
-        _rate_limits[ip] = valid_reqs
+        _rate_limits[key] = valid_reqs
         return True, 0, limit - len(valid_reqs), limit

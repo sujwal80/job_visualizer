@@ -7,7 +7,7 @@ query parameter inspection, floating-point validation, and payload pruning.
 import re
 import math
 
-from backend.config import FALLBACK_COORDINATES, PIN_DELTA_THRESHOLD, GENERIC_HUB_LABELS
+from backend import config
 
 # Essential fields that must never be stripped from startup payload objects during serialization.
 REQUIRED_FIELDS = {
@@ -80,12 +80,12 @@ def _check_has_pin(s):
     if lat is None or lng is None:
         return False
     # Check if coordinates match default generic city centers within delta threshold
-    for f_lat, f_lng in FALLBACK_COORDINATES:
-        if abs(lat - f_lat) < PIN_DELTA_THRESHOLD and abs(lng - f_lng) < PIN_DELTA_THRESHOLD:
+    for f_lat, f_lng in config.FALLBACK_COORDINATES:
+        if abs(lat - f_lat) < config.PIN_DELTA_THRESHOLD and abs(lng - f_lng) < config.PIN_DELTA_THRESHOLD:
             return False
     addr = str(s.get("address") or s.get("street_address") or s.get("bangalore_address") or s.get("city") or "").strip().lower()
     # Treat general city names without a specific street address as unpinned
-    if addr in GENERIC_HUB_LABELS:
+    if addr in config.GENERIC_HUB_LABELS:
         return False
     return True
 

@@ -58,14 +58,20 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         self.assertTrue(location.startswith("https://accounts.google.com/o/oauth2/v2/auth?"))
 
     def test_03_login_initiation_sets_oauth_state_cookie(self):
-        """Verify login initiation sets oauth_state cookie with HttpOnly, Secure, SameSite=Strict attributes."""
-        resp = self.client.get('/api/auth/google')
-        self.assertEqual(resp.status_code, 200)
-        set_cookie = resp.headers.get("Set-Cookie", "")
-        self.assertIn("oauth_state=", set_cookie)
-        self.assertIn("HttpOnly", set_cookie, "oauth_state cookie missing HttpOnly attribute!")
-        self.assertIn("Secure", set_cookie, "oauth_state cookie missing Secure attribute!")
-        self.assertIn("SameSite=Strict", set_cookie, "oauth_state cookie missing SameSite=Strict attribute!")
+        """Verify login initiation sets oauth_state cookie with HttpOnly, Secure, SameSite=Lax attributes."""
+        from backend import config
+        original_env = config.ENVIRONMENT
+        config.ENVIRONMENT = "production"
+        try:
+            resp = self.client.get('/api/auth/google')
+            self.assertEqual(resp.status_code, 200)
+            set_cookie = resp.headers.get("Set-Cookie", "")
+            self.assertIn("oauth_state=", set_cookie)
+            self.assertIn("HttpOnly", set_cookie, "oauth_state cookie missing HttpOnly attribute!")
+            self.assertIn("Secure", set_cookie, "oauth_state cookie missing Secure attribute!")
+            self.assertIn("SameSite=Lax", set_cookie, "oauth_state cookie missing SameSite=Lax attribute!")
+        finally:
+            config.ENVIRONMENT = original_env
 
     def test_04_callback_missing_state_returns_400(self):
         """Verify callback without CSRF state parameter is rejected with HTTP 400."""
@@ -92,34 +98,45 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         self.assertIn("error", data)
 
     def test_07_callback_valid_state_and_code_success(self):
-        """Verify callback with valid state and authorization code succeeds and issues session token."""
+        """Verify callback with valid state and authorization code succeeds, redirects to next path, and issues session token."""
+        # 1. Test with default next parameter (redirects to /)
         init_resp = self.client.get('/api/auth/google')
         state = json.loads(init_resp.data)["state"]
-        
         resp = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
-        self.assertEqual(resp.status_code, 200, f"Expected HTTP 200 on valid callback, got {resp.status_code}")
-        data = json.loads(resp.data)
-        self.assertTrue(data.get("authenticated"))
-        self.assertEqual(data["user"]["email"], "ujwal@worldtech.map")
-        self.assertIn("token", data)
+        self.assertEqual(resp.status_code, 302, f"Expected HTTP 302 redirect on valid callback, got {resp.status_code}")
+        self.assertEqual(resp.headers.get("Location"), "/")
         self.assertIn("session_token=", resp.headers.get("Set-Cookie", ""))
+
+        # 2. Test with custom next parameter (redirects to /jobs)
+        init_resp2 = self.client.get('/api/auth/google?next=/jobs')
+        state2 = json.loads(init_resp2.data)["state"]
+        resp2 = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state2}')
+        self.assertEqual(resp2.status_code, 302, f"Expected HTTP 302 redirect on valid callback, got {resp2.status_code}")
+        self.assertEqual(resp2.headers.get("Location"), "/jobs")
+        self.assertIn("session_token=", resp2.headers.get("Set-Cookie", ""))
 
     def test_08_jwt_cookie_security_attributes(self):
         """Verify session_token JWT cookie strictly enforces HttpOnly, Secure, and SameSite=Strict."""
-        init_resp = self.client.get('/api/auth/google')
-        state = json.loads(init_resp.data)["state"]
-        
-        resp = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
-        self.assertEqual(resp.status_code, 200)
-        
-        cookies = resp.headers.getlist("Set-Cookie")
-        session_cookie = [c for c in cookies if c.startswith("session_token=")]
-        self.assertTrue(len(session_cookie) > 0, "session_token cookie not found in Set-Cookie headers!")
-        
-        sc_val = session_cookie[0]
-        self.assertIn("HttpOnly", sc_val, "session_token MUST have HttpOnly attribute to prevent XSS theft!")
-        self.assertIn("Secure", sc_val, "session_token MUST have Secure attribute to enforce HTTPS!")
-        self.assertIn("SameSite=Strict", sc_val, "session_token MUST have SameSite=Strict attribute to prevent CSRF!")
+        from backend import config
+        original_env = config.ENVIRONMENT
+        config.ENVIRONMENT = "production"
+        try:
+            init_resp = self.client.get('/api/auth/google')
+            state = json.loads(init_resp.data)["state"]
+            
+            resp = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
+            self.assertEqual(resp.status_code, 302)
+            
+            cookies = resp.headers.getlist("Set-Cookie")
+            session_cookie = [c for c in cookies if c.startswith("session_token=")]
+            self.assertTrue(len(session_cookie) > 0, "session_token cookie not found in Set-Cookie headers!")
+            
+            sc_val = session_cookie[0]
+            self.assertIn("HttpOnly", sc_val, "session_token MUST have HttpOnly attribute to prevent XSS theft!")
+            self.assertIn("Secure", sc_val, "session_token MUST have Secure attribute to enforce HTTPS!")
+            self.assertIn("SameSite=Strict", sc_val, "session_token MUST have SameSite=Strict attribute to prevent CSRF!")
+        finally:
+            config.ENVIRONMENT = original_env
 
     def test_09_jwt_token_creation_and_signature_verification(self):
         """Verify direct JWT token creation and signature verification via auth_service."""
@@ -162,7 +179,8 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         """Verify /api/auth/status returns authenticated=true and user profile when valid session cookie is present."""
         init_resp = self.client.get('/api/auth/google')
         state = json.loads(init_resp.data)["state"]
-        self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
+        cb_resp = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
+        self.assertEqual(cb_resp.status_code, 302)
         
         resp = self.client.get('/api/auth/status')
         self.assertEqual(resp.status_code, 200)
@@ -176,7 +194,8 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         """Verify /api/auth/logout clears session cookies and subsequent status check returns unauthenticated."""
         init_resp = self.client.get('/api/auth/google')
         state = json.loads(init_resp.data)["state"]
-        self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
+        cb_resp = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
+        self.assertEqual(cb_resp.status_code, 302)
         
         # Verify authenticated first
         self.assertTrue(json.loads(self.client.get('/api/auth/status').data)["authenticated"])
@@ -200,7 +219,15 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         init_resp = self.client.get('/api/auth/google')
         state = json.loads(init_resp.data)["state"]
         callback_resp = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
-        token = json.loads(callback_resp.data)["token"]
+        self.assertEqual(callback_resp.status_code, 302)
+        
+        # Parse token from Set-Cookie header
+        cookies = callback_resp.headers.getlist("Set-Cookie")
+        token = None
+        for cookie in cookies:
+            if cookie.startswith("session_token="):
+                token = cookie.split(";")[0].split("=", 1)[1]
+        self.assertIsNotNone(token, "session_token not found in Set-Cookie headers!")
         
         # Confirm token works on protected endpoint
         self.assertEqual(self.client.get('/api/user/profile').status_code, 200)
@@ -229,7 +256,8 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         """Verify protected API endpoints return HTTP 200 OK when authenticated with valid session cookie."""
         init_resp = self.client.get('/api/auth/google')
         state = json.loads(init_resp.data)["state"]
-        self.client.get(f'/api/auth/callback?code=mock_code_admin&state={state}')
+        cb_resp = self.client.get(f'/api/auth/callback?code=mock_code_admin&state={state}')
+        self.assertEqual(cb_resp.status_code, 302)
         
         protected_endpoints = ['/api/user/profile', '/api/user/bookmarks', '/api/company/export']
         for ep in protected_endpoints:
@@ -237,14 +265,27 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
                 resp = self.client.get(ep)
                 self.assertEqual(resp.status_code, 200, f"Expected 200 OK on authenticated call to {ep}, got {resp.status_code}")
                 data = json.loads(resp.data)
-                self.assertTrue(data.get("authenticated"))
+                if ep == '/api/user/profile':
+                    self.assertIn("email", data)
+                elif ep == '/api/user/bookmarks':
+                    self.assertIsInstance(data, list)
+                else:
+                    self.assertTrue(data.get("authenticated"))
 
     def test_17_malformed_and_tampered_jwt_tokens_rejected(self):
         """Verify tampered, malformed, and wrong-secret JWT tokens are rejected cleanly with HTTP 401."""
         init_resp = self.client.get('/api/auth/google')
         state = json.loads(init_resp.data)["state"]
-        cb_data = json.loads(self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}').data)
-        valid_token = cb_data["token"]
+        cb_resp = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
+        self.assertEqual(cb_resp.status_code, 302)
+        
+        # Parse token from Set-Cookie header
+        cookies = cb_resp.headers.getlist("Set-Cookie")
+        valid_token = None
+        for cookie in cookies:
+            if cookie.startswith("session_token="):
+                valid_token = cookie.split(";")[0].split("=", 1)[1]
+        self.assertIsNotNone(valid_token, "session_token not found in Set-Cookie headers!")
         
         # 1. Tampered signature (change first character of signature segment)
         parts = valid_token.split('.')
@@ -276,8 +317,16 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         """Verify Authorization: Bearer <token> HTTP header works as an alternative to cookies."""
         init_resp = self.client.get('/api/auth/google')
         state = json.loads(init_resp.data)["state"]
-        cb_data = json.loads(self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}').data)
-        token = cb_data["token"]
+        cb_resp = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
+        self.assertEqual(cb_resp.status_code, 302)
+        
+        # Parse token from Set-Cookie header
+        cookies = cb_resp.headers.getlist("Set-Cookie")
+        token = None
+        for cookie in cookies:
+            if cookie.startswith("session_token="):
+                token = cookie.split(";")[0].split("=", 1)[1]
+        self.assertIsNotNone(token, "session_token not found in Set-Cookie headers!")
         
         # Clear cookies to ensure header is being used
         self.client.delete_cookie('session_token')
@@ -285,7 +334,7 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         headers = {"Authorization": f"Bearer {token}"}
         resp_profile = self.client.get('/api/user/profile', headers=headers)
         self.assertEqual(resp_profile.status_code, 200)
-        self.assertEqual(json.loads(resp_profile.data)["user"]["email"], "ujwal@worldtech.map")
+        self.assertEqual(json.loads(resp_profile.data)["email"], "ujwal@worldtech.map")
         
         resp_status = self.client.get('/api/auth/status', headers=headers)
         self.assertEqual(resp_status.status_code, 200)
@@ -298,7 +347,7 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         
         # First callback consumption succeeds
         resp1 = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
-        self.assertEqual(resp1.status_code, 200)
+        self.assertEqual(resp1.status_code, 302)
         
         # Clear cookies on test client so it doesn't fall back to cookie matching
         self.client.delete_cookie('oauth_state')
@@ -307,6 +356,58 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
         # Second callback attempt with SAME state must fail with 400
         resp2 = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={state}')
         self.assertEqual(resp2.status_code, 400, "CSRF state token must be consumed on first use to prevent replay!")
+
+    def test_20_open_redirect_protection_in_auth_google(self):
+        """Verify that /api/auth/google rejects unsafe redirect URL and defaults to /."""
+        # Unsafe redirect targeting external domain
+        resp = self.client.get('/api/auth/google?next=http://attacker.com')
+        self.assertEqual(resp.status_code, 200) # Returns JSON with auth_url
+        data = json.loads(resp.data)
+        self.assertIn("auth_url", data)
+        # Verify the state parameter is constructed with / instead of http://attacker.com
+        state = data["state"]
+        self.assertTrue(state.endswith(":/"), f"Expected state to end with relative fallback :/ but got {state}")
+
+    def test_21_open_redirect_protection_in_callback(self):
+        """Verify that /api/auth/callback sanitizes next target and prevents Open Redirects."""
+        # Setup valid state with malicious target
+        state_token = "legit_token"
+        
+        from backend import config
+        from backend.services.auth_service import _csrf_state_store
+        import asyncio
+        
+        session_store = getattr(config, 'SESSION_STORE', None)
+        if session_store:
+            asyncio.run(session_store.put(f"csrf:{state_token}", "1", expirationTtl=600))
+        else:
+            _csrf_state_store[state_token] = time.time() + 600
+        
+        # Inject cookie state into client
+        self.client.set_cookie('oauth_state', state_token)
+        
+        # Call callback with state parameter pointing to malicious external site
+        combined_state = f"{state_token}:http://attacker.com"
+        resp = self.client.get(f'/api/auth/callback?code=mock_code_user1&state={combined_state}')
+        self.assertEqual(resp.status_code, 302)
+        # Location header MUST fallback to relative '/' to prevent Open Redirect
+        self.assertEqual(resp.headers.get("Location"), "/")
+
+    def test_22_demo_login_disabled_in_production(self):
+        """Verify /api/auth/demo_login is disabled when ENVIRONMENT is production."""
+        # Set environment to production
+        from backend import config
+        original_env = config.ENVIRONMENT
+        config.ENVIRONMENT = "production"
+        
+        try:
+            resp = self.client.post('/api/auth/demo_login')
+            self.assertEqual(resp.status_code, 403, "Demo login backdoor must be disabled in production!")
+            
+            resp2 = self.client.get('/api/auth/demo_login')
+            self.assertEqual(resp2.status_code, 403)
+        finally:
+            config.ENVIRONMENT = original_env
 
 if __name__ == '__main__':
     print("\n======================================================================")
