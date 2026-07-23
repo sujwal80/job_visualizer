@@ -149,9 +149,13 @@ export function updateMarkersDiff(startups) {
         }
     }
 
+    // Reset coordinate registry on every update to prevent coordinate drift
+    for (const key in coordinatesRegistry) {
+        delete coordinatesRegistry[key];
+    }
+
     startups.forEach(startup => {
         if (startup.has_pin === false) return;
-        if (state.markersMap.has(startup.id) || state.markersMap.has(String(startup.id))) return;
 
         if (startup.orig_lat === undefined) {
             startup.orig_lat = startup.lat;
@@ -175,16 +179,22 @@ export function updateMarkersDiff(startups) {
         startup.lat = lat;
         startup.lng = lng;
 
-        const markerEl = createLogoContent(startup);
-        const marker = new maplibregl.Marker({
-            element: markerEl,
-            anchor: 'center'
-        })
-            .setLngLat([lng, lat])
-            .addTo(map);
+        const existingMarker = state.markersMap.get(startup.id) || state.markersMap.get(String(startup.id));
+        if (existingMarker) {
+            // Update position in case overlap group changed
+            existingMarker.setLngLat([lng, lat]);
+        } else {
+            const markerEl = createLogoContent(startup);
+            const marker = new maplibregl.Marker({
+                element: markerEl,
+                anchor: 'center'
+            })
+                .setLngLat([lng, lat])
+                .addTo(map);
 
-        markerEl.title = String(startup.name || '');
-        state.markersMap.set(startup.id, marker);
+            markerEl.title = String(startup.name || '');
+            state.markersMap.set(startup.id, marker);
+        }
     });
 }
 

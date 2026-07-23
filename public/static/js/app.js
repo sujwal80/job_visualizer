@@ -55,8 +55,8 @@ showDirectoryLoading();
 function _processFilteredStartupsResult(startups, preventScroll = false) {
     if (!Array.isArray(startups)) return;
     state.startupsData = startups;
-    applyFiltering();
     updateMarkersDiff(state.startupsData);
+    applyFiltering();
     updateMarkersVisualState();
 
     if (state.currentSelectedId !== null && detailsDrawer.classList.contains('active')) {
@@ -205,6 +205,33 @@ function filterStartupsByViewport(startups, queryParams) {
     });
 }
 
+function quantizeCoordinates(minLat, maxLat, minLng, maxLng) {
+    let precision = 2;
+    try {
+        if (map && typeof map.getZoom === 'function') {
+            const zoom = map.getZoom();
+            precision = zoom < 10 ? 2 : (zoom < 14 ? 3 : 4);
+        }
+    } catch (e) {}
+
+    let minLatStr = minLat.toFixed(precision);
+    let maxLatStr = maxLat.toFixed(precision);
+    let minLngStr = minLng.toFixed(precision);
+    let maxLngStr = maxLng.toFixed(precision);
+
+    // Safety fallback: if min and max round to the same value, expand precision by 2 decimal places
+    if (minLatStr === maxLatStr) {
+        minLatStr = minLat.toFixed(precision + 2);
+        maxLatStr = maxLat.toFixed(precision + 2);
+    }
+    if (minLngStr === maxLngStr) {
+        minLngStr = minLng.toFixed(precision + 2);
+        maxLngStr = maxLng.toFixed(precision + 2);
+    }
+
+    return [minLatStr, maxLatStr, minLngStr, maxLngStr];
+}
+
 function fetchFilteredStartups(preventScroll = false) {
     const queryParams = new URLSearchParams();
     const urlParams = new URLSearchParams(window.location.search);
@@ -212,10 +239,16 @@ function fetchFilteredStartups(preventScroll = false) {
     const cityParam = urlParams.get('city');
 
     if (state.boundsOverride && Array.isArray(state.boundsOverride) && state.boundsOverride.length === 4) {
-        queryParams.set('min_lat', state.boundsOverride[0]);
-        queryParams.set('max_lat', state.boundsOverride[1]);
-        queryParams.set('min_lng', state.boundsOverride[2]);
-        queryParams.set('max_lng', state.boundsOverride[3]);
+        const [minLatStr, maxLatStr, minLngStr, maxLngStr] = quantizeCoordinates(
+            Number(state.boundsOverride[0]),
+            Number(state.boundsOverride[1]),
+            Number(state.boundsOverride[2]),
+            Number(state.boundsOverride[3])
+        );
+        queryParams.set('min_lat', minLatStr);
+        queryParams.set('max_lat', maxLatStr);
+        queryParams.set('min_lng', minLngStr);
+        queryParams.set('max_lng', maxLngStr);
         if (cityParam) {
             state.searchedCity = cityParam.toLowerCase();
         }
@@ -268,10 +301,11 @@ function fetchFilteredStartups(preventScroll = false) {
                     maxLng = wrapLng(maxLng);
                 }
 
-                queryParams.set('min_lat', minLat);
-                queryParams.set('max_lat', maxLat);
-                queryParams.set('min_lng', minLng);
-                queryParams.set('max_lng', maxLng);
+                const [minLatStr, maxLatStr, minLngStr, maxLngStr] = quantizeCoordinates(minLat, maxLat, minLng, maxLng);
+                queryParams.set('min_lat', minLatStr);
+                queryParams.set('max_lat', maxLatStr);
+                queryParams.set('min_lng', minLngStr);
+                queryParams.set('max_lng', maxLngStr);
             }
         }
     } catch (e) {}
