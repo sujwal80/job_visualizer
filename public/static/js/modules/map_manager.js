@@ -23,9 +23,9 @@ const coordinatesRegistry = {};
 export const map = new maplibregl.Map({
     container: 'map',
     style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-    center: [78.9629, 20.5937],
+    center: [78.9629, 22.5937],
     zoom: 4.5,
-    minZoom: 1.5,
+    minZoom: 3.8,
     maxZoom: 18,
     dragRotate: false,
     touchZoomRotate: true
@@ -39,11 +39,55 @@ map.on('load', () => {
     }
 });
 
-// Configure blue water body styles on CartoDB style load
+// Configure blue water body styles and India mask layer on CartoDB style load
 map.on('style.load', () => {
     if (map.getLayer('water')) map.setPaintProperty('water', 'fill-color', '#89bceb');
     if (map.getLayer('waterway')) map.setPaintProperty('waterway', 'line-color', '#7aafe0');
     if (map.getLayer('water_shadow')) map.setPaintProperty('water_shadow', 'fill-color', '#98c6f0');
+
+    // 1. Fetch pre-computed lightweight world mask (except India)
+    fetch('/static/data/india_mask.geojson')
+        .then(res => res.json())
+        .then(maskGeojson => {
+            map.addSource('world-mask', {
+                type: 'geojson',
+                data: maskGeojson
+            });
+
+            // Add Mask Layer to color everything outside India as water
+            map.addLayer({
+                id: 'world-mask-layer',
+                type: 'fill',
+                source: 'world-mask',
+                paint: {
+                    'fill-color': '#89bceb', // Matches water color
+                    'fill-opacity': 1.0     // Fully opaque mask
+                }
+            });
+        })
+        .catch(err => console.error("Error loading India mask GeoJSON:", err));
+
+    // 2. Fetch high-resolution India borders for outline overlay
+    fetch('/static/data/india_high_res.geojson')
+        .then(res => res.json())
+        .then(indiaGeojson => {
+            map.addSource('india-boundary', {
+                type: 'geojson',
+                data: indiaGeojson
+            });
+
+            map.addLayer({
+                id: 'india-outline-on-mask',
+                type: 'line',
+                source: 'india-boundary',
+                paint: {
+                    'line-color': '#2563eb', // Blue outline
+                    'line-width': 1.8,
+                    'line-opacity': 0.8
+                }
+            });
+        })
+        .catch(err => console.error("Error loading India high-res GeoJSON:", err));
 });
 
 // Add navigation controls

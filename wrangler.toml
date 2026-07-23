@@ -13,5 +13,5 @@ id = "ae27dac64a534dc485511d6911cae2fd"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "startup-visualizer-db"
-database_id = "mock-d1-db-id"
+database_name = "jobs-visualizer-db"
+database_id = "3f8b6152-4315-4ce1-a449-b2014c740bf5"

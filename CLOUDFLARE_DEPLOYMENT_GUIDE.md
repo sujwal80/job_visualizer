@@ -71,7 +71,33 @@ id = "a1b2c3d4e5f678901234567890abcdef"
 
 ---
 
-## 🧪 Step 4: Verification & Dry-Run (Local)
+## 🗄️ Step 4: Create and Initialize Cloudflare D1 Database
+
+Run the following command to create the production D1 database:
+
+```bash
+npx wrangler d1 create startup-visualizer-db
+```
+
+**Output example:**
+```toml
+[[d1_databases]]
+binding = "DB"
+database_name = "startup-visualizer-db"
+database_id = "x1y2z3-a1b2-c3d4-e5f6-g7h8i9j0k1l2"
+```
+
+1. Open [`wrangler.toml`](file:///Users/singhujwal/starup_visualizer/wrangler.toml) and replace the `mock-d1-db-id` under `[[d1_databases]]` with the generated `database_id` from the output.
+
+2. Initialize the database schema using the provided [`schema.sql`](file:///Users/singhujwal/starup_visualizer/schema.sql) file:
+
+```bash
+npx wrangler d1 execute startup-visualizer-db --file=schema.sql --remote
+```
+
+---
+
+## 🧪 Step 5: Verification & Dry-Run (Local)
 
 Before deploying live, verify compilation and test suite status:
 
@@ -89,7 +115,7 @@ python run_tests.py
 
 ---
 
-## 🚀 Step 5: Live Deployment
+## 🚀 Step 6: Live Deployment
 
 Execute the deployment command:
 
@@ -105,7 +131,8 @@ Published startup-visualizer (2.45 sec)
 
 ---
 
-## 🔍 Step 6: Post-Deployment Verification
+## 🔍 Step 7: Post-Deployment Verification
+
 
 Verify your live endpoints:
 
