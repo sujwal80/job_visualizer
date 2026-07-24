@@ -7,15 +7,20 @@ default viewport centers, regional synonyms, and hub thresholds.
 import os
 import json
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+    HAS_DOTENV = True
+except ImportError:
+    HAS_DOTENV = False
 
 # Load .env file using python-dotenv in local development
-root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-env_path = os.path.join(root_dir, '.env')
-if os.path.exists(env_path):
-    load_dotenv(dotenv_path=env_path)
-else:
-    load_dotenv()
+if HAS_DOTENV:
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    env_path = os.path.join(root_dir, '.env')
+    if os.path.exists(env_path):
+        load_dotenv(dotenv_path=env_path)
+    else:
+        load_dotenv()
 
 def get_config_value(key, env=None, default=None):
     """
@@ -149,7 +154,12 @@ def setup_config(env):
 # Initialize with default environment variables on module load
 setup_config(None)
 
-from backend.utils.compatibility import SQLiteKVStore, SQLiteD1Database
-SESSION_STORE = SQLiteKVStore()
-DB = SQLiteD1Database("tmp/local_d1.db")
+from backend.utils.compatibility import SQLiteKVStore, SQLiteD1Database, IS_WORKER
+
+if not IS_WORKER:
+    SESSION_STORE = SQLiteKVStore()
+    DB = SQLiteD1Database("tmp/local_d1.db")
+else:
+    SESSION_STORE = None
+    DB = None
 
