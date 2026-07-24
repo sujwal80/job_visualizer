@@ -14,7 +14,7 @@ from backend.services.startup_service import get_data_version
 from backend.unified_router import UnifiedRequest, UnifiedRouter
 
 
-from backend.utils.compatibility import JSHeaders as Headers, JSResponse as Response, JSRequest as Request
+from backend.utils.compatibility import JSHeaders as Headers, JSResponse as Response, JSRequest as Request, create_response
 
 
 
@@ -31,8 +31,8 @@ class WorkerEntrypoint:
         except Exception as e:
             if 'unittest' in sys.modules:
                 raise e
-            init = {"status": 500}
-            return Response.new(f"Internal Server Error: {str(e)}", init)
+            headers = Headers.new()
+            return create_response(f"Internal Server Error: {str(e)}", 500, headers)
 
     async def _fetch_unsafe(self, request):
         parsed_url = urlparse(request.url)
@@ -46,11 +46,7 @@ class WorkerEntrypoint:
             headers.set('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
             headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Accept-Encoding')
             headers.set('Access-Control-Max-Age', '86400')
-            init = {
-                "status": 204,
-                "headers": headers
-            }
-            return Response.new("", init)
+            return create_response("", 204, headers)
 
         # Forward non-API requests (static frontend templates and assets) to ASSETS
         if not path.startswith('/api/'):
@@ -158,11 +154,7 @@ class WorkerEntrypoint:
         else:
             res_body = str(res_body)
 
-        init = {
-            "status": unified_res.status,
-            "headers": js_headers
-        }
-        return Response.new(res_body, init)
+        return create_response(res_body, unified_res.status, js_headers)
 
 
     def _inject_headers(self, response, path):
@@ -214,8 +206,4 @@ class WorkerEntrypoint:
                     new_headers.append('Set-Cookie', v)
 
         body = getattr(response, "body", "")
-        init = {
-            "status": response.status,
-            "headers": new_headers
-        }
-        return Response.new(body, init)
+        return create_response(body, response.status, new_headers)

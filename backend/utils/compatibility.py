@@ -39,7 +39,17 @@ def safe_flock(file_obj, operation):
 # ==========================================
 try:
     from js import Response as JSResponse, Request as JSRequest, Headers as JSHeaders
+    import pyodide
+    import js as js_module
     IS_WORKER = True
+
+    def create_response(body, status, headers):
+        init_dict = {
+            "status": status,
+            "headers": headers
+        }
+        js_init = pyodide.ffi.to_js(init_dict, dict_converter=js_module.Object.fromEntries)
+        return JSResponse.new(body, js_init)
 except ImportError:
     IS_WORKER = False
 
@@ -121,6 +131,13 @@ except ImportError:
         @classmethod
         def new(cls, *args, **kwargs):
             return cls(*args, **kwargs)
+
+    def create_response(body, status, headers):
+        init = {
+            "status": status,
+            "headers": headers
+        }
+        return JSResponse.new(body, init)
 
 # ==========================================
 # 3. Environment & Testing Helpers
