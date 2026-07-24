@@ -1,0 +1,7 @@
+requirements.txt
+venv/
+.env
+*.pyc
+__pycache__/
+tmp/
+.git/
