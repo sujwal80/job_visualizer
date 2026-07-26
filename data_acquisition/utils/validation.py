@@ -11,6 +11,39 @@ import xml.etree.ElementTree as ET
 
 logger = logging.getLogger(__name__)
 
+BLACKLISTED_DOMAINS = {
+    "goo.gle", "bit.ly", "linktr.ee", "tinyurl.com", "t.co", "buff.ly", "goo.gl", "ow.ly",
+    "forms.gle", "google.com", "docs.google.com", "sheets.google.com", "drive.google.com",
+    "linkedin.com", "instagram.com", "facebook.com", "twitter.com", "x.com",
+    "naukri.com", "wellfound.com", "glassdoor.com", "indeed.com", "cutshort.io",
+    "instahyre.com", "hirist.com", "hirist.tech", "ycombinator.com", "start.myjar.app",
+    "internshala.com", "myjar.app"
+}
+
+def is_blacklisted_domain(domain):
+    """
+    Checks if domain or any parent domain level matches BLACKLISTED_DOMAINS.
+    Correctly matches subdomains (e.g. careers.linkedin.com or start.myjar.app).
+    """
+    if not domain or not isinstance(domain, str):
+        return False
+    d = domain.strip().lower()
+    if d.startswith("http://") or d.startswith("https://"):
+        try:
+            parsed = urllib.parse.urlparse(d)
+            d = parsed.netloc.lower()
+        except Exception:
+            pass
+    if d.startswith("www."):
+        d = d[4:]
+    d = d.split(':')[0].strip()
+    if not d:
+        return False
+    for b in BLACKLISTED_DOMAINS:
+        if d == b or d.endswith("." + b):
+            return True
+    return False
+
 def is_safe_ip(ip_str):
     """Verify if the IP address is public and safe (not loopback, private, link-local, multicast, etc.)."""
     try:
@@ -522,42 +555,158 @@ def is_safe_svg(content_bytes):
                     
     return True
 
-def validate_logo_image(logo_url):
+def get_image_dimensions(content_bytes):
     """
-    Validate logo image URL.
-    Checks requests.head with 5s timeout and allow_redirects=True.
-    Returns False on 404/403 or non-image (content-type not starting with 'image/').
-    If it fails due to transient connection drops/timeouts (e.g., ConnectionError, Timeout),
-    log warning and return False.
+    Parses image dimensions (width, height) from raw bytes for PNG, GIF, JPEG, and SVG.
+    Returns (width, height) tuple or (None, None) if parsing fails.
+    """
+    if not content_bytes or not isinstance(content_bytes, (bytes, bytearray)):
+        return None, None
+        
+    length = len(content_bytes)
+    
+    # 1. PNG: magic \x89PNG\r\n\x1a\n
+    if length >= 24 and content_bytes.startswith(b'\x89PNG\r\n\x1a\n'):
+        width = int.from_bytes(content_bytes[16:20], 'big')
+        height = int.from_bytes(content_bytes[20:24], 'big')
+        return width, height
+
+    # 2. GIF: magic GIF87a or GIF89a
+    if length >= 10 and (content_bytes.startswith(b'GIF87a') or content_bytes.startswith(b'GIF89a')):
+        width = int.from_bytes(content_bytes[6:8], 'little')
+        height = int.from_bytes(content_bytes[8:10], 'little')
+        return width, height
+
+    # 3. JPEG: magic \xff\xd8
+    if length >= 4 and content_bytes.startswith(b'\xff\xd8'):
+        idx = 2
+        while idx < length - 8:
+            if content_bytes[idx] != 0xFF:
+                idx += 1
+                continue
+            marker = content_bytes[idx + 1]
+            if marker in (0xD8, 0xD9, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7):
+                idx += 2
+                continue
+            if idx + 4 > length:
+                break
+            seg_len = int.from_bytes(content_bytes[idx + 2:idx + 4], 'big')
+            if marker in (0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF):
+                if idx + 9 <= length:
+                    height = int.from_bytes(content_bytes[idx + 5:idx + 7], 'big')
+                    width = int.from_bytes(content_bytes[idx + 7:idx + 9], 'big')
+                    return width, height
+                break
+            idx += 2 + seg_len
+
+    # 4. SVG: string search for width/height or viewBox
+    try:
+        snippet = content_bytes[:2048].decode('utf-8', errors='ignore')
+        if '<svg' in snippet.lower():
+            w_match = re.search(r'\bwidth=["\']?(\d+)(?:px)?["\']?', snippet, re.IGNORECASE)
+            h_match = re.search(r'\bheight=["\']?(\d+)(?:px)?["\']?', snippet, re.IGNORECASE)
+            if w_match and h_match:
+                return int(w_match.group(1)), int(h_match.group(1))
+            vb_match = re.search(r'\bviewBox=["\']?\s*[\d\.\-]+\s+[\d\.\-]+\s+([\d\.]+)\s+([\d\.]+)["\']?', snippet, re.IGNORECASE)
+            if vb_match:
+                return int(float(vb_match.group(1))), int(float(vb_match.group(2)))
+    except Exception:
+        pass
+
+    return None, None
+
+
+def validate_logo_image(logo_url, content_bytes=None, headers=None):
+    """
+    Validate logo image URL, content bytes, and response headers.
+    Checks domain blacklist, image resolution (rejects 16x16 Google globe icons,
+    1x1 transparent PNG/GIF pixels), Unavatar 404/fallback responses, and unsafe content.
     """
     if not logo_url or not isinstance(logo_url, str) or not logo_url.startswith(("http://", "https://")):
         return False
 
     try:
         parsed = urllib.parse.urlparse(logo_url)
-        domain = parsed.netloc.split(':')[0]
-        
+        netloc_domain = parsed.netloc.split(':')[0].lower()
+        if netloc_domain.startswith('www.'):
+            netloc_domain = netloc_domain[4:]
+
+        # Extract target domain for favicon / unavatar services
+        target_domain = netloc_domain
+        if "google.com/s2/favicons" in logo_url:
+            qs = urllib.parse.parse_qs(parsed.query)
+            target_domain = qs.get("domain", [netloc_domain])[0]
+        elif "unavatar.io" in logo_url:
+            path_parts = parsed.path.strip('/').split('/')
+            if path_parts and path_parts[0]:
+                target_domain = path_parts[0]
+
+        # Domain blacklist check
+        if is_blacklisted_domain(target_domain):
+            return False
+
+        if is_blacklisted_domain(netloc_domain):
+            return False
+
         # SSRF Private IP protection
         try:
-            if not resolve_and_verify_host(domain):
+            if not resolve_and_verify_host(netloc_domain):
                 return False
         except Exception:
             pass
+
+        # If content_bytes is provided directly
+        if content_bytes is not None:
+            if not isinstance(content_bytes, (bytes, bytearray)) or not content_bytes:
+                return False
+
+            if headers and isinstance(headers, dict):
+                if headers.get("x-fallback", "").lower() == "true" or headers.get("x-unavatar-fallback", "").lower() == "true":
+                    return False
+                c_type = headers.get("Content-Type", "").lower()
+                if c_type and not c_type.startswith("image/") and "image/svg+xml" not in c_type:
+                    return False
+
+            try:
+                content_str_chunk = content_bytes[:4096].decode('utf-8', errors='ignore').lower()
+            except Exception:
+                content_str_chunk = ""
+
+            is_svg = "<svg" in content_str_chunk or "<?xml" in content_str_chunk
+            is_html = "<html" in content_str_chunk or "<!doctype html" in content_str_chunk
+
+            if is_html:
+                return False
+            if is_svg and not is_safe_svg(content_bytes):
+                return False
+
+            w, h = get_image_dimensions(content_bytes)
+            if w is not None and h is not None:
+                if w == 1 and h == 1:
+                    return False
+                if w == 16 and h == 16:
+                    return False
+
+            return True
 
         # Call safe_http_request for HEAD first to satisfy existing tests and check headers
         res = safe_http_request("HEAD", logo_url, timeout=5)
         if res.status_code == 404:
             return False
 
+        if res.headers.get("x-fallback", "").lower() == "true" or res.headers.get("x-unavatar-fallback", "").lower() == "true":
+            return False
+
         # If it is 403 or 405, do GET fallback
         if res.status_code in [403, 405]:
             try:
                 with safe_http_request("GET", logo_url, timeout=5, stream=True) as res_get:
-                    if res_get.status_code in [403, 404, 405]:
+                    if res_get.status_code in [403, 404, 405] or res_get.status_code >= 400:
+                        return False
+                    if res_get.headers.get("x-fallback", "").lower() == "true" or res_get.headers.get("x-unavatar-fallback", "").lower() == "true":
                         return False
                     content_type = res_get.headers.get("Content-Type", "").lower()
                     
-                    # Read first chunk
                     content_chunk = res_get.raw.read(4096)
                     if not content_chunk:
                         return False
@@ -571,20 +720,28 @@ def validate_logo_image(logo_url):
                     is_html = "text/html" in content_type or "<html" in content_str_lower or "<!doctype html" in content_str_lower
                     
                     if is_svg:
-                        # Read the remaining bytes up to 1MB limit for safe SVG parsing
                         remaining_bytes = res_get.raw.read(1024 * 1024)
                         full_content = content_chunk + remaining_bytes
                         if not is_safe_svg(full_content):
                             return False
+                        w, h = get_image_dimensions(full_content)
                     elif is_html:
                         return False
                     else:
-                        # Spoofing check for standard images
                         is_claimed_standard_image = any(img_type in content_type for img_type in ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"])
                         if is_claimed_standard_image:
                             if "<svg" in content_str_lower or "<html" in content_str_lower or "<script" in content_str_lower:
                                 return False
-                                
+                        remaining_bytes = res_get.raw.read(1024 * 1024)
+                        full_content = content_chunk + remaining_bytes
+                        w, h = get_image_dimensions(full_content)
+
+                    if w is not None and h is not None:
+                        if w == 1 and h == 1:
+                            return False
+                        if w == 16 and h == 16:
+                            return False
+
                     if not content_type.startswith("image/"):
                         if not is_svg:
                             return False
@@ -605,10 +762,11 @@ def validate_logo_image(logo_url):
         # If HEAD returned 200/success, we check the Content-Type
         content_type = res.headers.get("Content-Type", "").lower()
         
-        # Fetch the content to verify there is no script injection or spoofed SVG content
         try:
             with safe_http_request("GET", logo_url, timeout=5, stream=True) as res_get:
                 if res_get.status_code == 200:
+                    if res_get.headers.get("x-fallback", "").lower() == "true" or res_get.headers.get("x-unavatar-fallback", "").lower() == "true":
+                        return False
                     content_type = res_get.headers.get("Content-Type", "").lower()
                     content_chunk = res_get.raw.read(4096)
                     if content_chunk:
@@ -626,6 +784,7 @@ def validate_logo_image(logo_url):
                             full_content = content_chunk + remaining_bytes
                             if not is_safe_svg(full_content):
                                 return False
+                            w, h = get_image_dimensions(full_content)
                         elif is_html:
                             return False
                         else:
@@ -633,6 +792,15 @@ def validate_logo_image(logo_url):
                             if is_claimed_standard_image:
                                 if "<svg" in content_str_lower or "<html" in content_str_lower or "<script" in content_str_lower:
                                     return False
+                            remaining_bytes = res_get.raw.read(1024 * 1024)
+                            full_content = content_chunk + remaining_bytes
+                            w, h = get_image_dimensions(full_content)
+
+                        if w is not None and h is not None:
+                            if w == 1 and h == 1:
+                                return False
+                            if w == 16 and h == 16:
+                                return False
         except Exception as e:
             logger.warning(f"GET check failed for {logo_url}: {e}")
             return False

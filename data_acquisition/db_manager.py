@@ -14,17 +14,21 @@ except ImportError:
     HAS_FCNTL = False
 
 try:
-    from utils.validation import validate_website_domain, check_job_active, validate_logo_image
+    from utils.validation import validate_website_domain, check_job_active, validate_logo_image, is_blacklisted_domain, BLACKLISTED_DOMAINS
 except ImportError:
     try:
-        from data_acquisition.utils.validation import validate_website_domain, check_job_active, validate_logo_image
+        from data_acquisition.utils.validation import validate_website_domain, check_job_active, validate_logo_image, is_blacklisted_domain, BLACKLISTED_DOMAINS
     except ImportError:
-        pass
-
-BLACKLISTED_DOMAINS = {
-    "bit.ly", "linktr.ee", "tinyurl.com", "t.co", "buff.ly", "goo.gl", "ow.ly",
-    "forms.gle", "google.com", "docs.google.com", "sheets.google.com", "drive.google.com"
-}
+        BLACKLISTED_DOMAINS = {
+            "bit.ly", "linktr.ee", "tinyurl.com", "t.co", "buff.ly", "goo.gl", "ow.ly",
+            "forms.gle", "google.com", "docs.google.com", "sheets.google.com", "drive.google.com",
+            "linkedin.com", "instagram.com", "facebook.com", "twitter.com", "x.com",
+            "naukri.com", "wellfound.com", "glassdoor.com", "indeed.com", "cutshort.io",
+            "instahyre.com", "hirist.com", "hirist.tech", "ycombinator.com", "start.myjar.app",
+            "internshala.com", "myjar.app"
+        }
+        def is_blacklisted_domain(d):
+            return any(d == b or d.endswith("." + b) for b in BLACKLISTED_DOMAINS) if d else False
 
 try:
     from geo_config import DEFAULT_TARGET_CITY, DEFAULT_GEO_LOCALITIES, GENERIC_HUB_LABELS, is_fallback_coordinate, match_target_city
@@ -176,6 +180,8 @@ class DBManager:
             self.load_db()
             for j in valid_jobs:
                 comp_name = j.get("company_name", "N/A")
+                if self.is_aggregator_name(comp_name):
+                    continue
                 startup = self.find_startup(comp_name, "")
                 if not startup:
                     startup = {
@@ -194,32 +200,59 @@ class DBManager:
             self.save_db()
         return merged_count
             
+    def is_aggregator_name(self, name):
+        if not name:
+            return False
+        norm = self._normalize_text(name)
+        base_norm = self._normalize_base_text(name)
+        agg_set = {
+            "linkedin", "naukri", "glassdoor", "indeed", "wellfound",
+            "cutshort", "instahyre", "hirist", "ycombinator"
+        }
+        return norm in agg_set or base_norm in agg_set
+
     def find_startup(self, name, logo_domain, target_city=None):
         """
         Find an existing startup by domain first, then by name match.
         """
-        normalized_name = self._normalize_text(str(name or ""))
+        if self.is_aggregator_name(name):
+            return None
+
+        normalized_name = self._normalize_text(name)
         
-        # 1. Match by domain (excluding shorteners and search engines)
-        if logo_domain and logo_domain not in BLACKLISTED_DOMAINS:
+        # 1. Match by domain (excluding shorteners, search engines, and aggregators)
+        if logo_domain and not is_blacklisted_domain(logo_domain):
             for s in self.startups:
                 if target_city:
                     s_city = str(s.get("city") or "")
                     if s_city and s_city.lower() != "n/a" and not match_target_city(s_city, target_city):
                         continue
                 s_domain = s.get("logo_domain")
-                if s_domain and s_domain == logo_domain and s_domain not in BLACKLISTED_DOMAINS:
+                if s_domain and s_domain == logo_domain and not is_blacklisted_domain(s_domain):
                     return s
                     
-        # 2. Match by normalized name
-        for s in self.startups:
-            if target_city:
-                s_city = str(s.get("city") or "")
-                if s_city and s_city.lower() != "n/a" and not match_target_city(s_city, target_city):
-                    continue
-            if self._normalize_text(str(s.get("name") or "")) == normalized_name:
-                return s
-                
+        # 2. Match by exact normalized name
+        if normalized_name:
+            for s in self.startups:
+                if target_city:
+                    s_city = str(s.get("city") or "")
+                    if s_city and s_city.lower() != "n/a" and not match_target_city(s_city, target_city):
+                        continue
+                if self._normalize_text(s.get("name")) == normalized_name:
+                    return s
+
+        # 3. Match by base normalized name (ignoring descriptive business words like Technologies)
+        base_name = self._normalize_base_text(name)
+        if base_name:
+            for s in self.startups:
+                if target_city:
+                    s_city = str(s.get("city") or "")
+                    if s_city and s_city.lower() != "n/a" and not match_target_city(s_city, target_city):
+                        continue
+                s_base = self._normalize_base_text(s.get("name"))
+                if s_base and s_base == base_name:
+                    return s
+
         return None
 
     def _sanitize_string(self, text):
@@ -273,6 +306,9 @@ class DBManager:
         jobs = self._sanitize_value_recursive(jobs)
 
         name = self._sanitize_string(company_details.get("name", "N/A"))
+        if self.is_aggregator_name(name):
+            print(f"[Ingestion Gate] Rejecting merge for aggregator name '{name}'.")
+            return None
         company_details["name"] = name
         if company_details.get("description"):
             company_details["description"] = self._sanitize_string(company_details["description"])
@@ -661,6 +697,9 @@ class DBManager:
                     url = str(job.get("url") or job.get("job_url") or "").strip()
                     if not url or url == "N/A" or not url.startswith(("http://", "https://")):
                         return None
+                    if self._is_job_slug_mismatched(job, startup.get("name")):
+                        print(f"[DB Manager] Rejecting job slug mismatch: '{url}' for startup '{startup.get('name')}'")
+                        return None
                     active, _ = check_job_active(url)
                     return job if active else None
                 
@@ -779,12 +818,142 @@ class DBManager:
         domain = p.netloc.lower()
         if domain.startswith('www.'):
             domain = domain[4:]
-        if domain in BLACKLISTED_DOMAINS:
+        if is_blacklisted_domain(domain):
             return clean_url, ""
         return clean_url, domain
 
     def _normalize_text(self, text):
-        return re.sub(r'[^a-zA-Z0-9]', '', str(text or "")).lower().strip()
+        if not text:
+            return ""
+        s = str(text).strip()
+        # 1. Remove YC / incubator tags (e.g. "(YC W21)", "(YC S20)", "(YC ...)", "YC W21")
+        s = re.sub(r'\(\s*yc\b[^\)]*\)', '', s, flags=re.IGNORECASE)
+        s = re.sub(r'\byc\s+[a-z0-9]+\b', '', s, flags=re.IGNORECASE)
+        s = re.sub(r'\byc\b', '', s, flags=re.IGNORECASE)
+
+        # 2. Strip corporate legal suffixes
+        suffix_patterns = [
+            r'\bprivate\s+limited\b',
+            r'\bpvt\.?\s*ltd\.?\b',
+            r'\bpte\.?\s*ltd\.?\b',
+            r'\bcorporation\b',
+            r'\bcompany\b',
+            r'\bl\.?l\.?c\.?\b',
+            r'\binc\.?\b',
+            r'\bltd\.?\b',
+            r'\bcorp\.?\b',
+            r'\bco\.?\b'
+        ]
+        for pat in suffix_patterns:
+            s = re.sub(pat, '', s, flags=re.IGNORECASE)
+
+        norm = re.sub(r'[^a-zA-Z0-9]', '', s).lower().strip()
+        if not norm:
+            norm = re.sub(r'[^a-zA-Z0-9]', '', str(text or "")).lower().strip()
+        return norm
+
+    def _normalize_base_text(self, text):
+        norm = self._normalize_text(text)
+        if not norm:
+            return ""
+        desc_words = [
+            r'\btechnologies\b', r'\btechnology\b', r'\btech\b',
+            r'\bsolutions\b', r'\bsolution\b',
+            r'\bservices\b', r'\bservice\b',
+            r'\blabs\b', r'\blab\b',
+            r'\bsoftware\b',
+            r'\bsystems\b', r'\bsystem\b'
+        ]
+        s = str(text or "").strip()
+        s = re.sub(r'\(\s*yc\b[^\)]*\)', '', s, flags=re.IGNORECASE)
+        s = re.sub(r'\byc\s+[a-z0-9]+\b', '', s, flags=re.IGNORECASE)
+        s = re.sub(r'\byc\b', '', s, flags=re.IGNORECASE)
+        suffix_patterns = [
+            r'\bprivate\s+limited\b', r'\bpvt\.?\s*ltd\.?\b', r'\bpte\.?\s*ltd\.?\b',
+            r'\bcorporation\b', r'\bcompany\b', r'\bl\.?l\.?c\.?\b', r'\binc\.?\b',
+            r'\bltd\.?\b', r'\bcorp\.?\b', r'\bco\.?\b'
+        ]
+        for pat in suffix_patterns:
+            s = re.sub(pat, '', s, flags=re.IGNORECASE)
+        for pat in desc_words:
+            s = re.sub(pat, '', s, flags=re.IGNORECASE)
+
+        base_norm = re.sub(r'[^a-zA-Z0-9]', '', s).lower().strip()
+        if not base_norm:
+            return norm
+        return base_norm
+
+    def _is_job_slug_mismatched(self, job, startup_name):
+        if not isinstance(job, dict) or not startup_name:
+            return False
+        
+        target_norm = self._normalize_base_text(startup_name)
+        if not target_norm:
+            return False
+
+        # 1. Check explicit company_name in job metadata
+        job_comp = job.get("company_name") or job.get("company")
+        if job_comp and isinstance(job_comp, str):
+            job_comp_norm = self._normalize_base_text(job_comp)
+            if job_comp_norm and not self.is_aggregator_name(job_comp):
+                if job_comp_norm != target_norm and target_norm not in job_comp_norm and job_comp_norm not in target_norm:
+                    return True
+
+        # 2. Inspect URL slug
+        url = str(job.get("url") or job.get("job_url") or "").strip()
+        if not url:
+            return False
+
+        url_lower = urllib.parse.unquote(url).lower()
+        slug_companies = set()
+
+        # Pattern: -at-<company>
+        at_matches = re.findall(r'-at-([a-z0-9]+(?:-[a-z0-9]+)*)', url_lower)
+        for m in at_matches:
+            parts = [p for p in m.split('-') if p not in {
+                "bangalore", "bengaluru", "india", "remote", "hybrid", "jobs",
+                "job", "karnataka", "delhi", "mumbai", "fulltime", "parttime"
+            } and not p.isdigit()]
+            if parts:
+                slug_companies.add(parts[0])
+                if len(parts) > 1:
+                    slug_companies.add("".join(parts))
+
+        # Pattern: <company>-jobs
+        job_matches = re.findall(r'([a-z0-9\-]+)-jobs', url_lower)
+        for m in job_matches:
+            clean_m = m.split('/')[-1]
+            parts = [p for p in clean_m.split('-') if p not in {
+                "view", "all", "search", "india", "bangalore", "bengaluru"
+            } and not p.isdigit()]
+            if parts:
+                slug_companies.add(parts[0])
+                if len(parts) > 1:
+                    slug_companies.add("".join(parts))
+
+        # Pattern: /company/<company>/
+        comp_matches = re.findall(r'/company/([a-z0-9\-]+)', url_lower)
+        for m in comp_matches:
+            parts = [p for p in m.split('-') if p and not p.isdigit()]
+            if parts:
+                slug_companies.add(parts[0])
+                if len(parts) > 1:
+                    slug_companies.add("".join(parts))
+
+        # Filter out aggregator names and short words
+        valid_slug_comps = set()
+        for sc in slug_companies:
+            if not self.is_aggregator_name(sc) and len(sc) >= 3:
+                valid_slug_comps.add(sc)
+
+        if not valid_slug_comps:
+            return False
+
+        for sc in valid_slug_comps:
+            if sc == target_norm or sc in target_norm or target_norm in sc:
+                return False
+
+        return True
 
     def _generate_new_id(self):
         if not self.startups:

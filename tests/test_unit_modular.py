@@ -347,6 +347,7 @@ class TestValidationUtils(unittest.TestCase):
         # Since it is a cloudflare response on 403, requests.get shouldn't be called for parking page check
         mock_get.assert_not_called()
 
+    @patch.dict(os.environ, {"MOCK_SCRAPER_FALLBACK": "false"})
     @patch('socket.gethostbyname')
     @patch('requests.get')
     def test_check_job_active_cloudflare(self, mock_get, mock_gethostbyname):
@@ -384,6 +385,7 @@ class TestValidationUtils(unittest.TestCase):
         html_no_match = "<html><head><title>My Real Startup</title></head><body>Short</body></html>"
         self.assertFalse(is_parking_page(html_no_match))
 
+    @patch.dict(os.environ, {"MOCK_SCRAPER_FALLBACK": "false"})
     @patch('socket.gethostbyname')
     @patch('requests.get')
     def test_check_job_active_parking_page(self, mock_get, mock_gethostbyname):

@@ -2,15 +2,9 @@ import urllib.parse
 import re
 from bs4 import BeautifulSoup
 try:
-    from data_acquisition.utils.validation import safe_http_request, validate_logo_image
+    from data_acquisition.utils.validation import safe_http_request, validate_logo_image, is_blacklisted_domain, BLACKLISTED_DOMAINS
 except ImportError:
-    from utils.validation import safe_http_request, validate_logo_image
-
-BLACKLISTED_DOMAINS = {
-    "bit.ly", "linktr.ee", "tinyurl.com", "t.co", "buff.ly", "goo.gl", "ow.ly",
-    "forms.gle", "google.com", "docs.google.com", "sheets.google.com", "drive.google.com",
-    "linkedin.com", "instagram.com", "facebook.com", "twitter.com", "x.com"
-}
+    from utils.validation import safe_http_request, validate_logo_image, is_blacklisted_domain, BLACKLISTED_DOMAINS
 
 class LogoEnricher:
     """
@@ -42,31 +36,26 @@ class LogoEnricher:
         
         # 1. Check and enrich logo_domain if missing/blacklisted
         current_domain = str(company_record.get("logo_domain") or "").strip()
-        has_valid_domain = current_domain and current_domain.lower() not in BLACKLISTED_DOMAINS
+        has_valid_domain = bool(current_domain) and not is_blacklisted_domain(current_domain)
         
+        if current_domain and not has_valid_domain:
+            company_record["logo_domain"] = ""
+            current_domain = ""
+            modified = True
+
         if not has_valid_domain:
             if website:
                 extracted = self._extract_domain(website)
-                if extracted and extracted not in BLACKLISTED_DOMAINS:
+                if extracted and not is_blacklisted_domain(extracted):
                     comp_name = str(company_record.get("name") or "N/A")
                     print(f"[Logo Enricher] Tagged logo domain '{extracted}' from website for '{comp_name}'")
                     company_record["logo_domain"] = extracted
                     modified = True
                     has_valid_domain = True
                     current_domain = extracted
-                    
-            if not has_valid_domain:
-                # Fallback: Deduce candidate domain from company name
-                name = str(company_record.get("name") or "").strip()
-                if name and name != "N/A":
-                    clean_name = re.sub(r'[^a-zA-Z0-9]', '', name).lower()
-                    if clean_name:
-                        candidate = f"{clean_name}.com"
-                        print(f"[Logo Enricher] Tagged fallback logo domain '{candidate}' for '{name}'")
-                        company_record["logo_domain"] = candidate
-                        modified = True
-                        has_valid_domain = True
-                        current_domain = candidate
+            if not has_valid_domain and company_record.get("logo_domain") != "":
+                company_record["logo_domain"] = ""
+                modified = True
                         
         # 2. Check and enrich logo_svg_url if missing, empty, or invalid (does not start with http or fails validation)
         current_svg = str(company_record.get("logo_svg_url") or "").strip()
@@ -80,25 +69,28 @@ class LogoEnricher:
             
             # Priority A: SVG Scraping
             if website:
-                svg_url = self._scrape_svg_logo(website)
-                if svg_url and validate_logo_image(svg_url):
-                    logo_url = svg_url
+                extracted_web = self._extract_domain(website)
+                if extracted_web and not is_blacklisted_domain(extracted_web):
+                    svg_url = self._scrape_svg_logo(website)
+                    if svg_url and validate_logo_image(svg_url):
+                        logo_url = svg_url
             
             # Priority B: Unavatar API check (200 status code)
-            if not logo_url and current_domain:
+            if not logo_url and current_domain and not is_blacklisted_domain(current_domain):
                 unavatar_url = self._check_unavatar(current_domain)
                 if unavatar_url and validate_logo_image(unavatar_url):
                     logo_url = unavatar_url
             
             # Priority C: Google Favicon API check (200 status code)
-            if not logo_url and current_domain:
+            if not logo_url and current_domain and not is_blacklisted_domain(current_domain):
                 google_url = self._check_google_favicon(current_domain)
                 if google_url and validate_logo_image(google_url):
                     logo_url = google_url
             
-            company_record["logo_svg_url"] = logo_url
-            print(f"[Logo Enricher] Resolved logo URL '{logo_url}' for '{company_record.get('name')}'")
-            modified = True
+            if company_record.get("logo_svg_url") != logo_url:
+                company_record["logo_svg_url"] = logo_url
+                print(f"[Logo Enricher] Resolved logo URL '{logo_url}' for '{company_record.get('name')}'")
+                modified = True
             
         return modified
 
@@ -211,6 +203,9 @@ class LogoEnricher:
             domain = parsed.netloc.lower()
             if domain.startswith('www.'):
                 domain = domain[4:]
-            return domain.split(':')[0]
+            domain = domain.split(':')[0]
+            if is_blacklisted_domain(domain):
+                return ""
+            return domain
         except Exception:
             return ""

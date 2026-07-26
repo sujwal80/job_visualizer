@@ -200,7 +200,14 @@ def test_scraper_429_backoff_handling():
 
 def test_db_manager_null_record_handling():
     print("\n=== TESTING DB MANAGER NULL RECORD HANDLING ===")
-    db = DBManager("/tmp/test_null_records_db.json")
+    db_path = "/tmp/test_null_records_db.json"
+    for p in [db_path, db_path + ".lock", db_path + ".tmp"]:
+        if os.path.exists(p):
+            try:
+                os.remove(p)
+            except OSError:
+                pass
+    db = DBManager(db_path)
     db.startups = []
     company_details = {"name": None, "website": None, "logo_domain": None, "description": None}
     with patch.object(db, "geocode_address", return_value=(None, None)):
