@@ -1,5 +1,6 @@
 import sys
 import os
+import re
 import socket
 import urllib.parse
 from unittest.mock import patch
@@ -41,7 +42,9 @@ class MockResponse:
             self.headers = {"Server": "gunicorn", "Content-Type": "image/png"}
         else:
             self.headers = {"Server": "gunicorn", "Content-Type": "text/html; charset=utf-8"}
+        import io
         self.content = text.encode("utf-8")
+        self.raw = io.BytesIO(self.content)
 
 def mock_requests_head(url, *args, **kwargs):
     parsed = urllib.parse.urlparse(url)
@@ -91,12 +94,26 @@ def run_cleanup_pass(db):
     # -------------------------------------------------------------------------
     for s in db.startups:
         web = str(s.get("website") or "").strip()
+        # Canonicalize corporate press/about/careers/news subdomains
         if web and web != "N/A":
             p = urllib.parse.urlparse(web if web.startswith(("http://", "https://")) else f"https://{web}")
             netloc_dom = p.netloc.lower()
             if netloc_dom.startswith("www."):
                 netloc_dom = netloc_dom[4:]
             netloc_dom = netloc_dom.split(":")[0]
+
+            # Canonicalize special corporate subdomains
+            if netloc_dom == "aboutamazon.com":
+                s["website"] = "https://www.amazon.com"
+                s["logo_domain"] = "amazon.com"
+            elif netloc_dom == "news.microsoft.com":
+                s["website"] = "https://www.microsoft.com"
+                s["logo_domain"] = "microsoft.com"
+            elif netloc_dom.startswith(("about.", "news.", "careers.", "corp.", "corporate.", "press.")):
+                # Strip subdomain prefix to reach primary corporate root domain
+                root_dom = re.sub(r'^(about|news|careers|corp|corporate|press)\.', '', netloc_dom)
+                s["website"] = f"https://www.{root_dom}"
+                s["logo_domain"] = root_dom
 
             if is_blacklisted_domain(web) or is_blacklisted_domain(netloc_dom):
                 s["website"] = ""
@@ -169,11 +186,16 @@ def run_cleanup_pass(db):
         
         # Clean canonical name if needed
         clean_canon_name = canonical.get("name", "")
-        # Remove YC tags from canonical name
-        import re
+        # Remove YC tags and legal suffixes from canonical display name
         clean_canon_name = re.sub(r'\(\s*yc\b[^\)]*\)', '', clean_canon_name, flags=re.IGNORECASE).strip()
-        clean_canon_name = re.sub(r'\bpvt\.?\s*ltd\.?\b', '', clean_canon_name, flags=re.IGNORECASE).strip()
         clean_canon_name = re.sub(r'\bprivate\s+limited\b', '', clean_canon_name, flags=re.IGNORECASE).strip()
+        clean_canon_name = re.sub(r'\bpvt\.?\s*ltd\.?\b', '', clean_canon_name, flags=re.IGNORECASE).strip()
+        clean_canon_name = re.sub(r'\bpte\.?\s*ltd\.?\b', '', clean_canon_name, flags=re.IGNORECASE).strip()
+        clean_canon_name = re.sub(r'\bltd\.?\b', '', clean_canon_name, flags=re.IGNORECASE).strip()
+        clean_canon_name = re.sub(r'\binc\.?\b', '', clean_canon_name, flags=re.IGNORECASE).strip()
+        clean_canon_name = re.sub(r'\bl\.?l\.?c\.?\b', '', clean_canon_name, flags=re.IGNORECASE).strip()
+        clean_canon_name = re.sub(r'\bcorp\.?\b', '', clean_canon_name, flags=re.IGNORECASE).strip()
+        clean_canon_name = re.sub(r'[\.,\-\s]+$', '', clean_canon_name).strip()
         if clean_canon_name:
             canonical["name"] = clean_canon_name
 
@@ -220,9 +242,30 @@ def run_cleanup_pass(db):
                         existing_job_keys.add(j_key)
                         canonical_jobs.append(j)
 
-        canonical_startups.append(canonical)
+    # Step C: Clean company display names (strip legal suffixes & YC tags) and re-index IDs
+    cleaned_startups = []
+    for idx, s in enumerate(canonical_startups, start=1):
+        s["id"] = idx
+        name = str(s.get("name") or "").strip()
+        clean_name = re.sub(r'\(\s*yc\b[^\)]*\)', '', name, flags=re.IGNORECASE).strip()
+        clean_name = re.sub(r'\bprivate\s+limited\b', '', clean_name, flags=re.IGNORECASE).strip()
+        clean_name = re.sub(r'\bpvt\.?\s*ltd\.?\b', '', clean_name, flags=re.IGNORECASE).strip()
+        clean_name = re.sub(r'\bpte\.?\s*ltd\.?\b', '', clean_name, flags=re.IGNORECASE).strip()
+        clean_name = re.sub(r'\bltd\.?\b', '', clean_name, flags=re.IGNORECASE).strip()
+        clean_name = re.sub(r'\binc\.?\b', '', clean_name, flags=re.IGNORECASE).strip()
+        clean_name = re.sub(r'\bl\.?l\.?c\.?\b', '', clean_name, flags=re.IGNORECASE).strip()
+        clean_name = re.sub(r'\bcorp\.?\b', '', clean_name, flags=re.IGNORECASE).strip()
+        clean_name = re.sub(r'[\.,\-\s]+$', '', clean_name).strip()
+        if clean_name:
+            s["name"] = clean_name
+            # Re-update company name on internal job objects
+            for j in s.get("job_openings", []):
+                if isinstance(j, dict):
+                    j["company_name"] = clean_name
+                    j["company"] = clean_name
+        cleaned_startups.append(s)
 
-    db.startups = canonical_startups
+    db.startups = cleaned_startups
 
     # -------------------------------------------------------------------------
     # Stage 3: Logo Validation & Cleaning
@@ -248,39 +291,53 @@ def run_cleanup_pass(db):
             stats["cleared_logos"] += 1
 
     # -------------------------------------------------------------------------
-    # Stage 4: Job Opening Slug Validation & Mismatch Pruning
-    # Audit all job openings under each startup. Re-check job URL slugs
-    # (_is_job_slug_mismatched) to prune mismatched jobs or jobs registered under
-    # aggregator company names.
+    # Stage 4: Job Opening Validation, Mismatch Pruning & City Alignment
     # -------------------------------------------------------------------------
+    expired_phrases = [
+        "no longer accepting applications", "job is closed",
+        "position has been filled", "job expired",
+        "posting is no longer available", "this job is no longer active",
+        "job not found"
+    ]
+
     for s in db.startups:
         startup_name = s.get("name", "")
         jobs = s.get("job_openings", [])
-        if not jobs or not isinstance(jobs, list):
+        if not isinstance(jobs, list):
             continue
 
         valid_jobs = []
         for j in jobs:
             if not isinstance(j, dict):
+                continue
+            
+            # Prune by expired phrases in description/title
+            desc = (j.get("description") or "").lower()
+            title = (j.get("title") or "").lower()
+            if any(phrase in desc or phrase in title for phrase in expired_phrases):
                 stats["pruned_jobs"] += 1
                 continue
 
             comp_name = j.get("company_name") or j.get("company") or startup_name
-            if db.is_aggregator_name(comp_name):
-                print(f"[Stage 4] Pruning job with aggregator company name '{comp_name}': '{j.get('title')}'")
-                stats["pruned_jobs"] += 1
-                continue
-
-            if db._is_job_slug_mismatched(j, startup_name):
-                print(f"[Stage 4] Pruning mismatched job '{j.get('title')}' (URL: {j.get('url') or j.get('job_url')}) under startup '{startup_name}'")
+            if db.is_aggregator_name(comp_name) or db._is_job_slug_mismatched(j, startup_name):
                 stats["pruned_jobs"] += 1
                 continue
 
             j["company_name"] = startup_name
             j["company"] = startup_name
             valid_jobs.append(j)
-
         s["job_openings"] = valid_jobs
+
+    # Align city tags for remote offices
+    for s in db.startups:
+        if s.get("is_remote_office") is True:
+            lat, lng = s.get("lat"), s.get("lng")
+            if lat and lng:
+                for c_name, (c_lat, c_lng) in getattr(db, "MULTI_CITY_CENTERS", {}).items():
+                    if abs(lat - c_lat) < 0.8 and abs(lng - c_lng) < 0.8:
+                        if "remote" not in s.get("city", "").lower():
+                            s["city"] = f"{c_name.capitalize()} (Remote Office)"
+                        break
 
     return stats
 

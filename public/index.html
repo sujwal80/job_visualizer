@@ -175,14 +175,12 @@
                 </div>
 
                 <div class="mt-4 flex items-center justify-center gap-1.5 text-xs flex-wrap">
-                    <span class="text-slate-400 font-bold text-[10px] uppercase tracking-wider mr-1">Global Tech Hubs:</span>
+                    <span class="text-slate-400 font-bold text-[10px] uppercase tracking-wider mr-1">Indian Tech Hubs:</span>
                     <button onclick="handlePresetSearch('bengaluru')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2 py-0.5 rounded-md font-bold transition-all">Bengaluru</button>
                     <span class="text-slate-300">•</span>
-                    <button onclick="handlePresetSearch('san francisco')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2 py-0.5 rounded-md font-bold transition-all">San Francisco</button>
+                    <button onclick="handlePresetSearch('pune')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2 py-0.5 rounded-md font-bold transition-all">Pune</button>
                     <span class="text-slate-300">•</span>
-                    <button onclick="handlePresetSearch('london')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2 py-0.5 rounded-md font-bold transition-all">London</button>
-                    <span class="text-slate-300">•</span>
-                    <button onclick="handlePresetSearch('singapore')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2 py-0.5 rounded-md font-bold transition-all">Singapore</button>
+                    <button onclick="handlePresetSearch('delhi')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2 py-0.5 rounded-md font-bold transition-all">Delhi</button>
                     <span class="text-slate-300">•</span>
                     <button onclick="handlePresetSearch('mumbai')" class="text-slate-600 hover:text-[#1a73e8] hover:bg-slate-100 px-2 py-0.5 rounded-md font-bold transition-all">Mumbai</button>
                 </div>
@@ -362,11 +360,10 @@
 
         function handlePresetSearch(cityKey) {
             let cityTitle = 'Bengaluru';
-            if (cityKey === 'san francisco') cityTitle = 'San Francisco';
-            else if (cityKey === 'london') cityTitle = 'London';
-            else if (cityKey === 'singapore') cityTitle = 'Singapore';
-            else if (cityKey === 'mumbai') cityTitle = 'Mumbai';
+            if (cityKey === 'mumbai') cityTitle = 'Mumbai';
             else if (cityKey === 'bengaluru') cityTitle = 'Bengaluru';
+            else if (cityKey === 'pune') cityTitle = 'Pune';
+            else if (cityKey === 'delhi') cityTitle = 'Delhi';
             else if (cityKey) {
                 cityTitle = cityKey.charAt(0).toUpperCase() + cityKey.slice(1);
             }

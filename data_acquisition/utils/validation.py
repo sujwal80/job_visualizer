@@ -700,52 +700,52 @@ def validate_logo_image(logo_url, content_bytes=None, headers=None):
         # If it is 403 or 405, do GET fallback
         if res.status_code in [403, 405]:
             try:
-                with safe_http_request("GET", logo_url, timeout=5, stream=True) as res_get:
-                    if res_get.status_code in [403, 404, 405] or res_get.status_code >= 400:
+                res_get = safe_http_request("GET", logo_url, timeout=5, stream=True)
+                if res_get.status_code in [403, 404, 405] or res_get.status_code >= 400:
+                    return False
+                if res_get.headers.get("x-fallback", "").lower() == "true" or res_get.headers.get("x-unavatar-fallback", "").lower() == "true":
+                    return False
+                content_type = res_get.headers.get("Content-Type", "").lower()
+                
+                content_chunk = res_get.raw.read(4096)
+                if not content_chunk:
+                    return False
+                try:
+                    content_str_chunk = content_chunk.decode('utf-8', errors='ignore')
+                except Exception:
+                    content_str_chunk = ""
+                content_str_lower = content_str_chunk.lower()
+                
+                is_svg = "image/svg+xml" in content_type or "<svg" in content_str_lower or "<?xml" in content_str_lower
+                is_html = "text/html" in content_type or "<html" in content_str_lower or "<!doctype html" in content_str_lower
+                
+                if is_svg:
+                    remaining_bytes = res_get.raw.read(1024 * 1024)
+                    full_content = content_chunk + remaining_bytes
+                    if not is_safe_svg(full_content):
                         return False
-                    if res_get.headers.get("x-fallback", "").lower() == "true" or res_get.headers.get("x-unavatar-fallback", "").lower() == "true":
-                        return False
-                    content_type = res_get.headers.get("Content-Type", "").lower()
-                    
-                    content_chunk = res_get.raw.read(4096)
-                    if not content_chunk:
-                        return False
-                    try:
-                        content_str_chunk = content_chunk.decode('utf-8', errors='ignore')
-                    except Exception:
-                        content_str_chunk = ""
-                    content_str_lower = content_str_chunk.lower()
-                    
-                    is_svg = "image/svg+xml" in content_type or "<svg" in content_str_lower or "<?xml" in content_str_lower
-                    is_html = "text/html" in content_type or "<html" in content_str_lower or "<!doctype html" in content_str_lower
-                    
-                    if is_svg:
-                        remaining_bytes = res_get.raw.read(1024 * 1024)
-                        full_content = content_chunk + remaining_bytes
-                        if not is_safe_svg(full_content):
+                    w, h = get_image_dimensions(full_content)
+                elif is_html:
+                    return False
+                else:
+                    is_claimed_standard_image = any(img_type in content_type for img_type in ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"])
+                    if is_claimed_standard_image:
+                        if "<svg" in content_str_lower or "<html" in content_str_lower or "<script" in content_str_lower:
                             return False
-                        w, h = get_image_dimensions(full_content)
-                    elif is_html:
-                        return False
-                    else:
-                        is_claimed_standard_image = any(img_type in content_type for img_type in ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"])
-                        if is_claimed_standard_image:
-                            if "<svg" in content_str_lower or "<html" in content_str_lower or "<script" in content_str_lower:
-                                return False
-                        remaining_bytes = res_get.raw.read(1024 * 1024)
-                        full_content = content_chunk + remaining_bytes
-                        w, h = get_image_dimensions(full_content)
+                    remaining_bytes = res_get.raw.read(1024 * 1024)
+                    full_content = content_chunk + remaining_bytes
+                    w, h = get_image_dimensions(full_content)
 
-                    if w is not None and h is not None:
-                        if w == 1 and h == 1:
-                            return False
-                        if w == 16 and h == 16:
-                            return False
+                if w is not None and h is not None:
+                    if w == 1 and h == 1:
+                        return False
+                    if w == 16 and h == 16:
+                        return False
 
-                    if not content_type.startswith("image/"):
-                        if not is_svg:
-                            return False
-                    return True
+                if not content_type.startswith("image/"):
+                    if not is_svg:
+                        return False
+                return True
             except requests.exceptions.SSLError as ssl_err:
                 logger.warning(f"SSL error validating logo via GET fallback {logo_url}: {ssl_err}")
                 return False
@@ -763,8 +763,8 @@ def validate_logo_image(logo_url, content_bytes=None, headers=None):
         content_type = res.headers.get("Content-Type", "").lower()
         
         try:
-            with safe_http_request("GET", logo_url, timeout=5, stream=True) as res_get:
-                if res_get.status_code == 200:
+            res_get = safe_http_request("GET", logo_url, timeout=5, stream=True)
+            if res_get.status_code == 200:
                     if res_get.headers.get("x-fallback", "").lower() == "true" or res_get.headers.get("x-unavatar-fallback", "").lower() == "true":
                         return False
                     content_type = res_get.headers.get("Content-Type", "").lower()

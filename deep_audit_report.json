@@ -1,0 +1,203 @@
+{
+  "total_startups": 367,
+  "total_jobs": 2462,
+  "location_audit": {
+    "valid_count": 356,
+    "invalid_count": 11,
+    "issues": [
+      {
+        "id": 35,
+        "name": "Merge",
+        "city": "Bengaluru (Remote Office)",
+        "lat": 18.5686618,
+        "lng": 73.7663959,
+        "status": "MISMATCHED_GEOFENCE",
+        "is_valid": false,
+        "reason": "Coordinates (18.5687, 73.7664) deviate >150km from claimed city 'Bengaluru (Remote Office)'"
+      },
+      {
+        "id": 56,
+        "name": "Pice\u00ae",
+        "city": "Pice Share Contact information, Bengaluru (Remote Office)",
+        "lat": 26.7203014,
+        "lng": 88.4270182,
+        "status": "MISMATCHED_GEOFENCE",
+        "is_valid": false,
+        "reason": "Coordinates (26.7203, 88.4270) deviate >150km from claimed city 'Pice Share Contact information, Bengaluru (Remote Office)'"
+      },
+      {
+        "id": 69,
+        "name": "Turing",
+        "city": "Bengaluru (Remote Office)",
+        "lat": 30.5162311,
+        "lng": 76.6605814,
+        "status": "MISMATCHED_GEOFENCE",
+        "is_valid": false,
+        "reason": "Coordinates (30.5162, 76.6606) deviate >150km from claimed city 'Bengaluru (Remote Office)'"
+      },
+      {
+        "id": 89,
+        "name": "Wati",
+        "city": "Bangalore, IN (Remote Office)",
+        "lat": 24.8682547,
+        "lng": 73.6459172,
+        "status": "MISMATCHED_GEOFENCE",
+        "is_valid": false,
+        "reason": "Coordinates (24.8683, 73.6459) deviate >150km from claimed city 'Bangalore, IN (Remote Office)'"
+      },
+      {
+        "id": 97,
+        "name": "Quick Heal",
+        "city": "Bengaluru (Remote Office)",
+        "lat": 10.0234813,
+        "lng": 76.3117954,
+        "status": "MISMATCHED_GEOFENCE",
+        "is_valid": false,
+        "reason": "Coordinates (10.0235, 76.3118) deviate >150km from claimed city 'Bengaluru (Remote Office)'"
+      },
+      {
+        "id": 99,
+        "name": "Zoca",
+        "city": "Bengaluru (Remote Office)",
+        "lat": 11.0221178,
+        "lng": 76.9996135,
+        "status": "MISMATCHED_GEOFENCE",
+        "is_valid": false,
+        "reason": "Coordinates (11.0221, 76.9996) deviate >150km from claimed city 'Bengaluru (Remote Office)'"
+      },
+      {
+        "id": 117,
+        "name": "STMicroelectronics",
+        "city": "Bengaluru (Remote Office)",
+        "lat": 28.4873192,
+        "lng": 77.4914178,
+        "status": "MISMATCHED_GEOFENCE",
+        "is_valid": false,
+        "reason": "Coordinates (28.4873, 77.4914) deviate >150km from claimed city 'Bengaluru (Remote Office)'"
+      },
+      {
+        "id": 139,
+        "name": "Soar",
+        "city": "Soarlogic Information Technologies Pvt. Ltd. Bangalore Office Address #1st Floor, India (Remote Office)",
+        "lat": 31.4681853,
+        "lng": 76.9344449,
+        "status": "MISMATCHED_GEOFENCE",
+        "is_valid": false,
+        "reason": "Coordinates (31.4682, 76.9344) deviate >150km from claimed city 'Soarlogic Information Technologies Pvt. Ltd. Bangalore Office Address #1st Floor, India (Remote Office)'"
+      },
+      {
+        "id": 140,
+        "name": "Bayer",
+        "city": "Vikram estate Godown no A & B, Bengaluru (Remote Office)",
+        "lat": 19.2309216,
+        "lng": 72.9860662,
+        "status": "MISMATCHED_GEOFENCE",
+        "is_valid": false,
+        "reason": "Coordinates (19.2309, 72.9861) deviate >150km from claimed city 'Vikram estate Godown no A & B, Bengaluru (Remote Office)'"
+      },
+      {
+        "id": 174,
+        "name": "Eurofins",
+        "city": "Bengaluru (Remote Office)",
+        "lat": 17.6574731,
+        "lng": 78.6140613,
+        "status": "MISMATCHED_GEOFENCE",
+        "is_valid": false,
+        "reason": "Coordinates (17.6575, 78.6141) deviate >150km from claimed city 'Bengaluru (Remote Office)'"
+      },
+      {
+        "id": 322,
+        "name": "Reliance Industries Limited",
+        "city": "Primary Reliance Corporate Park Thane-Belapur Road Navi Mumbai, India (Remote Office)",
+        "lat": 21.186824,
+        "lng": 81.7373219,
+        "status": "MISMATCHED_GEOFENCE",
+        "is_valid": false,
+        "reason": "Coordinates (21.1868, 81.7373) deviate >150km from claimed city 'Primary Reliance Corporate Park Thane-Belapur Road Navi Mumbai, India (Remote Office)'"
+      }
+    ]
+  },
+  "logo_audit": {
+    "valid_count": 367,
+    "invalid_count": 0,
+    "issues": []
+  },
+  "job_link_audit": {
+    "valid_count": 2454,
+    "invalid_count": 8,
+    "issues": [
+      {
+        "company_id": 11,
+        "company_name": "Microsoft",
+        "title": "Data Science INTERN",
+        "url": "https://in.linkedin.com/jobs/view/data-science-intern-at-microsoft-4435110537?position=9&pageNum=0&refId=b7jeiWIBTTx%2B3YC2Gijqeg%3D%3D&trackingId=9YyAv0DvNVPOoLigCtIbJA%3D%3D",
+        "status": "HTTP_404",
+        "is_valid": false,
+        "reason": "Job URL returned HTTP 404 (Not Found/Gone)"
+      },
+      {
+        "company_id": 12,
+        "company_name": "Google",
+        "title": "Software Engineer III, GenAI, Google Cloud",
+        "url": "https://in.linkedin.com/jobs/view/software-engineer-iii-genai-google-cloud-at-google-4414100011?position=10&pageNum=3&refId=I2Jb%2FFIyVVT9S0McmICMLA%3D%3D&trackingId=Y44ZcLFLSshiNh6MkbvcBQ%3D%3D",
+        "status": "EXPIRED_PHRASE",
+        "is_valid": false,
+        "reason": "Matched expiration phrase: 'no longer accepting applications'"
+      },
+      {
+        "company_id": 12,
+        "company_name": "Google",
+        "title": "AI Sales Specialist",
+        "url": "https://in.linkedin.com/jobs/view/ai-sales-specialist-at-google-4429305750?position=10&pageNum=0&refId=%2B%2FsDavdawTwRsdVpn1b9%2Fw%3D%3D&trackingId=Cz5s9YFI%2FCDC7M5180Sy3Q%3D%3D",
+        "status": "EXPIRED_PHRASE",
+        "is_valid": false,
+        "reason": "Matched expiration phrase: 'no longer accepting applications'"
+      },
+      {
+        "company_id": 92,
+        "company_name": "Acceldata",
+        "title": "Senior SDET - ODP | Open Source Data Platform",
+        "url": "https://jobs.lever.co/acceldata/f59b7b89-c686-42f3-91e0-e78a49bdbdb6",
+        "status": "HTTP_404",
+        "is_valid": false,
+        "reason": "Job URL returned HTTP 404 (Not Found/Gone)"
+      },
+      {
+        "company_id": 150,
+        "company_name": "Roku",
+        "title": "Senior Data Engineer",
+        "url": "https://www.weareroku.com/jobs/7768111?gh_jid=7768111",
+        "status": "HTTP_404",
+        "is_valid": false,
+        "reason": "Job URL returned HTTP 404 (Not Found/Gone)"
+      },
+      {
+        "company_id": 150,
+        "company_name": "Roku",
+        "title": "Senior Software Engineer - C++, Embedded, Chromium",
+        "url": "https://www.weareroku.com/jobs/7824155?gh_jid=7824155",
+        "status": "HTTP_404",
+        "is_valid": false,
+        "reason": "Job URL returned HTTP 404 (Not Found/Gone)"
+      },
+      {
+        "company_id": 264,
+        "company_name": "Bengaluru Innovation Labs",
+        "title": "Senior Kora.AI Specialist",
+        "url": "https://www.google.com/jobs/y-combinator-bengaluru-innovation-labs-1",
+        "status": "HTTP_404",
+        "is_valid": false,
+        "reason": "Job URL returned HTTP 404 (Not Found/Gone)"
+      },
+      {
+        "company_id": 264,
+        "company_name": "Bengaluru Innovation Labs",
+        "title": "Senior Indira Pay Specialist",
+        "url": "https://www.google.com/jobs/linkedin-bengaluru-innovation-labs-1",
+        "status": "HTTP_404",
+        "is_valid": false,
+        "reason": "Job URL returned HTTP 404 (Not Found/Gone)"
+      }
+    ]
+  }
+}

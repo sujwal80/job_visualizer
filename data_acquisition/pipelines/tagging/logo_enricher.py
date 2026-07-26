@@ -123,6 +123,9 @@ class LogoEnricher:
         return None
 
     def _scrape_svg_logo(self, website_url):
+        return self._scrape_homepage_brand_logo(website_url)
+
+    def _scrape_homepage_brand_logo(self, website_url):
         website_url = str(website_url or "").strip()
         if not website_url:
             return None
@@ -132,45 +135,57 @@ class LogoEnricher:
             
         try:
             headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
             }
-            response = safe_http_request("GET", website_url, timeout=5, headers=headers)
+            response = safe_http_request("GET", website_url, timeout=6, headers=headers)
             if response.status_code != 200:
                 return self._check_fallback_svg(website_url)
                 
             soup = BeautifulSoup(response.text, 'html.parser')
+            candidates = []
             
-            svg_href = None
+            # 1. Priority: Apple Touch Icons & High-Res Icon Links (SVG & PNG)
             for link in soup.find_all('link'):
-                rel = [r.lower() for r in (link.get('rel') or [])]
+                rel_list = [str(r).lower() for r in (link.get('rel') or [])]
                 href = link.get('href')
                 if not href:
                     continue
                 
-                link_type = str(link.get('type') or "").lower().strip()
-                is_svg_link = (link_type == "image/svg+xml" or 
-                               href.lower().split('?')[0].endswith('.svg') or 
-                               href.lower().split('#')[0].endswith('.svg'))
-                
-                if is_svg_link:
-                    if any(r in rel for r in ['icon', 'shortcut icon', 'apple-touch-icon', 'apple-touch-icon-precomposed', 'mask-icon']):
-                        svg_href = href
-                        break
-            
-            if not svg_href:
-                for link in soup.find_all('link'):
-                    href = link.get('href')
-                    if href and (href.lower().split('?')[0].endswith('.svg') or href.lower().split('#')[0].endswith('.svg')):
-                        svg_href = href
-                        break
+                is_brand_icon = any(r in rel_list for r in [
+                    'apple-touch-icon', 'apple-touch-icon-precomposed',
+                    'icon', 'shortcut icon', 'mask-icon'
+                ])
+                if is_brand_icon:
+                    full_url = urllib.parse.urljoin(response.url, href)
+                    if not is_blacklisted_domain(full_url):
+                        candidates.append(full_url)
                         
-            if svg_href:
-                return urllib.parse.urljoin(website_url, svg_href)
-                
+            # 2. Priority: OpenGraph Image (og:image)
+            og_img = soup.find('meta', property=lambda p: p and 'og:image' in str(p).lower())
+            if og_img and og_img.get('content'):
+                full_url = urllib.parse.urljoin(response.url, og_img.get('content'))
+                if not is_blacklisted_domain(full_url):
+                    candidates.append(full_url)
+                    
+            # 3. Priority: Header & Brand Img Tags
+            for img in soup.find_all('img', src=True):
+                src = img.get('src', '')
+                alt = str(img.get('alt') or '').lower()
+                cls = " ".join(img.get('class') or []).lower()
+                if 'logo' in src.lower() or 'logo' in alt or 'logo' in cls or 'brand' in cls:
+                    full_url = urllib.parse.urljoin(response.url, src)
+                    if not is_blacklisted_domain(full_url):
+                        candidates.append(full_url)
+                        
+            # Test candidates against validate_logo_image
+            for cand in candidates:
+                if validate_logo_image(cand):
+                    return cand
+
             return self._check_fallback_svg(website_url)
             
         except Exception as e:
-            print(f"[Logo Enricher] Error scraping SVG for {website_url}: {e}")
+            print(f"[Logo Enricher] Error scraping homepage logo for {website_url}: {e}")
             return self._check_fallback_svg(website_url)
 
     def _check_fallback_svg(self, base_url):

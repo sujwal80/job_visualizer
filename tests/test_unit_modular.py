@@ -431,12 +431,17 @@ class TestValidationUtils(unittest.TestCase):
         mock_head.assert_called_once()
         mock_get.assert_called_once()
 
+    @patch('requests.get')
     @patch('requests.head')
-    def test_validate_logo_image_failure_non_image(self, mock_head):
+    def test_validate_logo_image_failure_non_image(self, mock_head, mock_get):
         mock_res = MagicMock()
         mock_res.status_code = 200
         mock_res.headers = {"Content-Type": "text/html"}
         mock_head.return_value = mock_res
+        
+        mock_get_res = MagicMock(status_code=200)
+        mock_get_res.headers = {"Content-Type": "text/html"}
+        mock_get.return_value = mock_get_res
 
         from data_acquisition.utils.validation import validate_logo_image
         self.assertFalse(validate_logo_image("https://startup.com/logo.png"))

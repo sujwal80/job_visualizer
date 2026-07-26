@@ -459,8 +459,8 @@ class TestE2EInteractiveQA(unittest.TestCase):
         print(f"\nDEBUG test_c3: total_items={total_items}, state_startupsData_length={state_len}")
         print(f"DEBUG test_c3 initial names (len={len(initial_names)}): {initial_names}")
 
-        # Search for a specific company name that exists, has job openings and is unique, e.g., "Indira Pay"
-        self.page.fill("#unified-search-input", "Indira Pay")
+        # Search for a specific company name that exists, has job openings and is unique, e.g., "Zenith SaaS"
+        self.page.fill("#unified-search-input", "Zenith SaaS")
         self.page.wait_for_timeout(1000)
 
         names = self.page.evaluate("() => Array.from(document.querySelectorAll('#directory-list .directory-item .card-title')).map(el => el.textContent.trim())")

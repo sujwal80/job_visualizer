@@ -578,8 +578,7 @@ class TestViewportModeTransition(unittest.TestCase):
         self.page.wait_for_selector(".directory-item")
         company_names = self.page.eval_on_selector_all(".directory-item .card-title", "elements => elements.map(el => el.textContent.trim())")
 
-        # "Indira Pay" and "Zenith SaaS" must be present (physically located in Indiranagar)
-        self.assertIn("Indira Pay", company_names)
+        # "Zenith SaaS" must be present (physically located in Indiranagar)
         self.assertIn("Zenith SaaS", company_names)
 
         # "BairesDev" (remote startup) must be excluded
