@@ -21,6 +21,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from backend.utils.validators import _sanitize_string, _safe_float, _check_has_pin, _sanitize_url, _validate_query_params, _strip_redundant, REQUIRED_FIELDS
 from backend.utils.rate_limiter import _check_rate_limit, _rate_limits
 from backend.services.startup_service import filter_and_sort_startups, format_startup_summary, format_startup_details
+from backend.utils.compatibility import fetch_json
 
 
 class TestModularValidators(unittest.TestCase):
@@ -594,6 +595,44 @@ class TestModularStartupServiceUnified(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, [{"id": 5, "name": "Local Fallback Obj Startup"}])
         mock_load_local.assert_called_once()
         mock_load_assets.assert_not_called()
+
+
+class TestModularCompatibility(unittest.IsolatedAsyncioTestCase):
+    """Unit tests for compatibility layer functions, specifically fetch_json."""
+    
+    @patch('urllib.request.urlopen')
+    async def test_fetch_json_non_worker_success(self, mock_urlopen):
+        # Mock urlopen context manager return
+        mock_response = MagicMock()
+        mock_response.read.return_value = b'{"success": true, "data": "hello"}'
+        mock_response.__enter__.return_value = mock_response
+        mock_urlopen.return_value = mock_response
+
+        # Execute fetch_json (which runs in non-worker mode since IS_WORKER = False under standard Python environment)
+        result = await fetch_json("http://example.com/api/test", method="GET", headers={"Authorization": "Bearer token123"})
+        
+        self.assertEqual(result, {"success": True, "data": "hello"})
+        mock_urlopen.assert_called_once()
+        
+        # Verify the request arguments
+        called_req = mock_urlopen.call_args[0][0]
+        self.assertEqual(called_req.full_url, "http://example.com/api/test")
+        self.assertEqual(called_req.method, "GET")
+        self.assertEqual(called_req.get_header("Authorization"), "Bearer token123")
+
+    @patch('urllib.request.urlopen')
+    async def test_fetch_json_non_worker_with_body(self, mock_urlopen):
+        mock_response = MagicMock()
+        mock_response.read.return_value = b'{"status": "ok"}'
+        mock_response.__enter__.return_value = mock_response
+        mock_urlopen.return_value = mock_response
+
+        result = await fetch_json("http://example.com/api/test", method="POST", body={"key": "value"})
+        self.assertEqual(result, {"status": "ok"})
+        
+        mock_urlopen.assert_called_once()
+        args, kwargs = mock_urlopen.call_args
+        self.assertEqual(kwargs.get('data'), b'{"key": "value"}')
 
 
 if __name__ == '__main__':

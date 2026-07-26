@@ -419,7 +419,13 @@ class UnifiedRouter:
                     res = UnifiedResponse({"error": "Missing authorization code."}, status=400)
                     return self._inject_headers(res, req, rate_limit_info)
 
-                user_data = exchange_code_for_user(code)
+                request_origin = get_request_origin(req.url)
+                redirect_uri = req.query_params.get('redirect_uri') or f"{request_origin}/api/auth/callback"
+                try:
+                    user_data = await exchange_code_for_user(code, redirect_uri=redirect_uri)
+                except ValueError as e:
+                    res = UnifiedResponse({"error": str(e)}, status=400)
+                    return self._inject_headers(res, req, rate_limit_info)
                 token = issue_jwt_token(user_data)
 
                 res = UnifiedResponse("", status=302, headers={'Location': next_path})

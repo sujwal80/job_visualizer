@@ -9,6 +9,7 @@ and HTTP 401 unauthenticated gating on protected API endpoints.
 """
 
 import unittest
+import unittest.mock
 import sys
 import os
 import json
@@ -408,6 +409,71 @@ class TestOAuthAndSessionSecurity(unittest.TestCase):
             self.assertEqual(resp2.status_code, 403)
         finally:
             config.ENVIRONMENT = original_env
+
+    @unittest.mock.patch('backend.services.auth_service.fetch_json', new_callable=unittest.mock.AsyncMock)
+    def test_23_real_google_oauth_exchange_success(self, mock_fetch):
+        """Verify successful exchange of Google OAuth authorization code for user profile."""
+        from backend import config
+        mock_fetch.side_effect = [
+            {"access_token": "fake_access_token_123"},
+            {
+                "sub": "google_999",
+                "email": "test_user@gmail.com",
+                "name": "Test Google User",
+                "picture": "https://picture.url"
+            }
+        ]
+        
+        user = asyncio.run(auth_service.exchange_code_for_user("real_code_google_999"))
+        
+        self.assertEqual(user["sub"], "google_999")
+        self.assertEqual(user["email"], "test_user@gmail.com")
+        self.assertEqual(user["name"], "Test Google User")
+        self.assertEqual(user["picture"], "https://picture.url")
+        
+        self.assertEqual(mock_fetch.call_count, 2)
+        
+        # Verify first call (token request)
+        first_call_args, first_call_kwargs = mock_fetch.call_args_list[0]
+        self.assertEqual(first_call_args[0], "https://oauth2.googleapis.com/token")
+        self.assertEqual(first_call_kwargs.get("method"), "POST")
+        self.assertEqual(first_call_kwargs.get("headers"), {"Content-Type": "application/x-www-form-urlencoded"})
+        
+        # Parse body form parameters
+        body_params = parse_qs(first_call_kwargs.get("body"))
+        self.assertEqual(body_params.get("code"), ["real_code_google_999"])
+        self.assertEqual(body_params.get("client_id"), [config.GOOGLE_CLIENT_ID])
+        self.assertEqual(body_params.get("client_secret"), [config.GOOGLE_CLIENT_SECRET])
+        self.assertEqual(body_params.get("grant_type"), ["authorization_code"])
+        
+        # Verify second call (userinfo request)
+        second_call_args, second_call_kwargs = mock_fetch.call_args_list[1]
+        self.assertEqual(second_call_args[0], "https://www.googleapis.com/oauth2/v3/userinfo")
+        self.assertEqual(second_call_kwargs.get("method"), "GET")
+        self.assertEqual(second_call_kwargs.get("headers"), {"Authorization": "Bearer fake_access_token_123"})
+
+    @unittest.mock.patch('backend.services.auth_service.fetch_json', new_callable=unittest.mock.AsyncMock)
+    def test_24_real_google_oauth_exchange_token_failure(self, mock_fetch):
+        """Verify handling of OAuth token exchange failure."""
+        mock_fetch.return_value = {"error": "invalid_grant", "error_description": "Bad code"}
+        
+        with self.assertRaises(ValueError) as ctx:
+            asyncio.run(auth_service.exchange_code_for_user("real_code_google_999"))
+            
+        self.assertEqual(str(ctx.exception), "Failed to exchange authorization code: Bad code")
+
+    @unittest.mock.patch('backend.services.auth_service.fetch_json', new_callable=unittest.mock.AsyncMock)
+    def test_25_real_google_oauth_exchange_userinfo_failure(self, mock_fetch):
+        """Verify handling of OAuth user profile retrieval failure."""
+        mock_fetch.side_effect = [
+            {"access_token": "fake_access_token_123"},
+            {"error": "invalid_token", "error_description": "Token expired"}
+        ]
+        
+        with self.assertRaises(ValueError) as ctx:
+            asyncio.run(auth_service.exchange_code_for_user("real_code_google_999"))
+            
+        self.assertEqual(str(ctx.exception), "Failed to retrieve user profile: Token expired")
 
 if __name__ == '__main__':
     print("\n======================================================================")

@@ -11,6 +11,7 @@ import secrets
 from backend.utils import jwt_helper as jwt
 from urllib.parse import urlencode
 from backend import config
+from backend.utils.compatibility import fetch_json
 
 
 # In-memory storage for stateless verification & revocation tracking
@@ -122,7 +123,7 @@ def get_google_auth_url(state, redirect_uri=None):
     }
     return "https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(params)
 
-def exchange_code_for_user(code):
+async def exchange_code_for_user(code, redirect_uri=None):
     """
     Exchange an OAuth authorization code for a Google user profile dictionary.
 
@@ -131,6 +132,7 @@ def exchange_code_for_user(code):
 
     Args:
         code (str): The authorization code received from the OAuth callback.
+        redirect_uri (str, optional): The redirect URI used in the initial request.
 
     Returns:
         dict: User profile data containing 'sub' (ID), 'email', 'name', and 'picture'.
@@ -143,7 +145,7 @@ def exchange_code_for_user(code):
     
     if code in MOCK_USERS:
         return MOCK_USERS[code]
-    elif code.startswith("mock_") or code.startswith("test_") or code.startswith("4/0"):
+    elif code.startswith("mock_") or code.startswith("test_"):
         # Generic fallback for any simulated code in test environments
         return {
             "sub": f"usr_sim_{secrets.token_hex(4)}",
@@ -152,13 +154,43 @@ def exchange_code_for_user(code):
             "picture": "https://lh3.googleusercontent.com/a/default"
         }
     else:
-        # In a real environment with network access, we would execute requests.post('https://oauth2.googleapis.com/token'...)
-        # Since we operate in sandbox environments without external network access, return a safe simulated user
+        # Real Google OAuth 2.0 flow
+        token_url = "https://oauth2.googleapis.com/token"
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+        params = {
+            "code": code,
+            "client_id": config.GOOGLE_CLIENT_ID,
+            "client_secret": config.GOOGLE_CLIENT_SECRET,
+            "redirect_uri": redirect_uri or config.GOOGLE_REDIRECT_URI,
+            "grant_type": "authorization_code"
+        }
+        body = urlencode(params)
+        
+        token_response = await fetch_json(token_url, method="POST", headers=headers, body=body)
+        if not token_response or "error" in token_response:
+            err_desc = token_response.get("error_description") or token_response.get("error") if token_response else "Unknown error"
+            raise ValueError(f"Failed to exchange authorization code: {err_desc}")
+            
+        access_token = token_response.get("access_token")
+        if not access_token:
+            raise ValueError("Failed to retrieve access token from Google response.")
+            
+        userinfo_url = "https://www.googleapis.com/oauth2/v3/userinfo"
+        userinfo_headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
+        user_info = await fetch_json(userinfo_url, method="GET", headers=userinfo_headers)
+        if not user_info or "error" in user_info:
+            err_desc = user_info.get("error_description") or user_info.get("error") if user_info else "Unknown error"
+            raise ValueError(f"Failed to retrieve user profile: {err_desc}")
+            
         return {
-            "sub": f"usr_{secrets.token_hex(6)}",
-            "email": "auth_user@worldtech.map",
-            "name": "Authenticated User",
-            "picture": "https://lh3.googleusercontent.com/a/default"
+            "sub": user_info.get("sub"),
+            "email": user_info.get("email"),
+            "name": user_info.get("name"),
+            "picture": user_info.get("picture")
         }
 
 def issue_jwt_token(user_data, expires_in=3600, custom_secret=None):

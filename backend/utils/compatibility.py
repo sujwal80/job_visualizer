@@ -140,6 +140,52 @@ except ImportError:
         return JSResponse.new(body, init)
 
 # ==========================================
+# 2.5 Cross-Platform Async HTTP Client
+# ==========================================
+import json
+
+async def fetch_json(url, method="GET", headers=None, body=None):
+    """
+    Cross-platform asynchronous HTTP client helper to fetch JSON resources.
+    
+    If IS_WORKER is True, it uses native js.fetch.
+    If IS_WORKER is False, it uses urllib.request in a thread.
+    """
+    if body is not None and not isinstance(body, (str, bytes)):
+        body = json.dumps(body)
+
+    if IS_WORKER:
+        import js as js_module
+        import pyodide
+        
+        js_headers = pyodide.ffi.to_js(headers or {}, dict_converter=js_module.Object.fromEntries)
+        init_dict = {
+            "method": method,
+            "headers": js_headers,
+        }
+        if body is not None:
+            init_dict["body"] = body
+        js_init = pyodide.ffi.to_js(init_dict, dict_converter=js_module.Object.fromEntries)
+        
+        response = await js_module.fetch(url, js_init)
+        text = await response.text()
+        return json.loads(text)
+    else:
+        import urllib.request
+        
+        def _fetch_sync():
+            req = urllib.request.Request(url, method=method)
+            if headers:
+                for k, v in headers.items():
+                    req.add_header(k, v)
+            data = body.encode('utf-8') if isinstance(body, str) else body
+            with urllib.request.urlopen(req, data=data) as response:
+                resp_bytes = response.read()
+                return json.loads(resp_bytes.decode('utf-8'))
+                
+        return await asyncio.to_thread(_fetch_sync)
+
+# ==========================================
 # 3. Environment & Testing Helpers
 # ==========================================
 def is_testing_environment():
