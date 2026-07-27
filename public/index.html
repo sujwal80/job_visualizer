@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JobMap - Find Local Jobs in Your Neighborhood</title>
+    <title>Map My Job - Find Local Jobs in Your Neighborhood</title>
     <script>
         (function() {
             const path = window.location.pathname.toLowerCase();
@@ -115,15 +115,11 @@
                 <div class="w-9 h-9 rounded-xl bg-[#1a73e8] flex items-center justify-center shadow-lg shadow-blue-500/20">
                     <i class="fa-solid fa-map-location-dot text-white text-sm"></i>
                 </div>
-                <span class="brand-text-label font-extrabold text-lg tracking-tight text-slate-900">Job<span class="text-[#1a73e8]">Map</span></span>
+                <span class="brand-text-label font-extrabold text-lg tracking-tight text-slate-900">Map My <span class="text-[#1a73e8]">Job</span></span>
             </div>
             <div class="navbar-right">
                 <!-- Anonymous State -->
-                <div class="auth-anon hidden">
-                    <a href="/api/auth/google?redirect=true" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-95">
-                        Login / Signup
-                    </a>
-                </div>
+                <div class="auth-anon hidden"></div>
                 <!-- Authenticated State -->
                 <div class="auth-user hidden relative">
                     <button class="flex items-center gap-2 focus:outline-none user-dropdown-toggle">
@@ -193,14 +189,11 @@
         <!-- Top Navbar -->
         <nav class="top-navbar">
             <div class="navbar-left">
-                <button onclick="handleNavbarBack()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs py-2 px-3 rounded-xl transition-all shrink-0">
-                    <i class="fa-solid fa-arrow-left mr-1"></i> Back
-                </button>
                 <div class="brand-logo cursor-pointer" onclick="resetToLandingState()">
                     <div class="w-9 h-9 rounded-xl bg-[#1a73e8] flex items-center justify-center shadow-lg shadow-blue-500/20">
                         <i class="fa-solid fa-map-location-dot text-white text-sm"></i>
                     </div>
-                    <span class="brand-text-label font-extrabold text-lg tracking-tight text-slate-900">Job<span class="text-[#1a73e8]">Map</span></span>
+                    <span class="brand-text-label font-extrabold text-lg tracking-tight text-slate-900">Map My <span class="text-[#1a73e8]">Job</span></span>
                 </div>
                 <span class="live-badge">
                     <span class="pulse-dot"></span>
@@ -218,11 +211,7 @@
             
             <div class="navbar-right">
                 <!-- Anonymous State -->
-                <div class="auth-anon hidden">
-                    <a href="/api/auth/google?redirect=true" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-95">
-                        Login / Signup
-                    </a>
-                </div>
+                <div class="auth-anon hidden"></div>
                 <!-- Authenticated State -->
                 <div class="auth-user hidden relative">
                     <button class="flex items-center gap-2 focus:outline-none user-dropdown-toggle">
@@ -252,7 +241,7 @@
             <aside id="sidebar" class="sidebar">
                 <!-- Directory Header Stats -->
                 <div class="p-4 border-b border-slate-200/80 bg-slate-50/80 backdrop-blur-sm">
-                    <div class="grid grid-cols-3 gap-2 text-center">
+                    <div class="grid grid-cols-2 gap-2 text-center">
                         <div class="stat-card">
                             <span id="stat-companies" class="stat-val">0</span>
                             <span class="stat-lbl">Companies</span>
@@ -260,10 +249,6 @@
                         <div class="stat-card">
                             <span id="stat-jobs" class="stat-val">0</span>
                             <span class="stat-lbl">Open Roles</span>
-                        </div>
-                        <div class="stat-card">
-                            <span id="stat-headcount" class="stat-val">0</span>
-                            <span class="stat-lbl">Headcount</span>
                         </div>
                     </div>
                 </div>
@@ -407,23 +392,6 @@
 
         function resetToLandingState() {
             window.location.href = '/';
-        }
-
-        function handleNavbarBack() {
-            const detailsDrawer = document.getElementById('details-drawer');
-            const sidebar = document.getElementById('sidebar');
-            const mobileToggleBtn = document.getElementById('mobile-toggle-btn');
-            
-            if (detailsDrawer && detailsDrawer.classList.contains('active')) {
-                window.location.hash = '';
-            } else if (window.innerWidth <= 900 && sidebar && sidebar.classList.contains('active')) {
-                sidebar.classList.remove('active');
-                if (mobileToggleBtn) {
-                    mobileToggleBtn.textContent = 'Show Directory';
-                }
-            } else {
-                resetToLandingState();
-            }
         }
     </script>
 

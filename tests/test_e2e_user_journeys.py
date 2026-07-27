@@ -194,7 +194,7 @@ class TestE2EUserJourneys(unittest.TestCase):
         self.page.wait_for_load_state("domcontentloaded")
 
         # Verify landing page title & visual structure
-        self.assertIn("JobMap", self.page.title())
+        self.assertIn("Map My Job", self.page.title())
         self.assertTrue(self.page.locator("#landingInterface").is_visible())
         self._take_screenshot("journey_1_landing_page")
 
@@ -210,8 +210,8 @@ class TestE2EUserJourneys(unittest.TestCase):
         self.assertEqual(self.page.locator("#activeMapTitle").text_content().strip(), "Bengaluru, KA")
         self._take_screenshot("journey_1_jobs_bengaluru")
 
-        # 3. Go back using the navbar Back button
-        self.page.click("button[onclick='handleNavbarBack()']")
+        # 3. Go back using the logo
+        self.page.click(".top-navbar .brand-logo")
         self.page.wait_for_timeout(500)
         parsed_path = urllib.parse.urlparse(self.page.url).path
         self.assertEqual(parsed_path, "/")
@@ -268,13 +268,13 @@ class TestE2EUserJourneys(unittest.TestCase):
         initial_count = self.page.locator("#directory-list .directory-item").count()
 
         # 1. Type specific company/job query into unified search
-        self.page.fill("#unified-search-input", "Indira Pay")
+        self.page.fill("#unified-search-input", "Zenith SaaS")
         self.page.wait_for_timeout(1000)
 
         # Verify directory list is filtered down
         filtered_count = self.page.locator("#directory-list .directory-item").count()
         self.assertEqual(filtered_count, 1)
-        self.assertEqual(self.page.locator("#directory-list .directory-item .card-title").text_content().strip(), "Indira Pay")
+        self.assertEqual(self.page.locator("#directory-list .directory-item .card-title").text_content().strip(), "Zenith SaaS")
         self._take_screenshot("journey_3_filtered_keyword")
 
         # 2. Clear search input and verify restoration

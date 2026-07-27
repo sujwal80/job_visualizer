@@ -91,6 +91,7 @@ def index():
 @app.route('/api/', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
 @app.route('/api/<path:path>', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
 def api_gateway(path=""):
+    print(f"API GATEWAY: {request.method} {request.path} from {request.remote_addr} at {time.time()}", flush=True)
     body = None
     if request.method in ('POST', 'DELETE'):
         body = request.get_json(silent=True) or request.form.to_dict() or request.get_data()
@@ -134,6 +135,7 @@ def api_gateway(path=""):
             samesite=cookie.get('samesite')
         )
 
+    print(f"API GATEWAY RESPONSE: {flask_resp.status_code} for {request.path} at {time.time()}", flush=True)
     return flask_resp
 
 

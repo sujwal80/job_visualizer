@@ -270,28 +270,8 @@ export function updateMarkersVisualState() {
 }
 
 export function drawSearchBoundary(geojson) {
-    if (!map || !geojson) return;
-    const source = map.getSource('search-boundary');
-    if (source) {
-        source.setData(geojson);
-    } else {
-        map.addSource('search-boundary', {
-            type: 'geojson',
-            data: geojson
-        });
-    }
-    if (!map.getLayer('search-boundary-outline')) {
-        map.addLayer({
-            id: 'search-boundary-outline',
-            type: 'line',
-            source: 'search-boundary',
-            paint: {
-                'line-color': '#2563eb',
-                'line-width': 2.5,
-                'line-opacity': 0.8
-            }
-        });
-    }
+    // No-op: Remove search boundary rendering to keep map clean
+    return;
 }
 
 export function clearSearchBoundary() {

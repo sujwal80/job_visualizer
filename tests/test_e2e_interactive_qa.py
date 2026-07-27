@@ -334,7 +334,7 @@ class TestE2EInteractiveQA(unittest.TestCase):
         self.page.wait_for_load_state("domcontentloaded")
 
         title = self.page.title()
-        self.assertIn("JobMap", title, "Page title should contain JobMap")
+        self.assertIn("Map My Job", title, "Page title should contain Map My Job")
 
         # Verify landing interface elements
         landing = self.page.locator("#landingInterface")
@@ -415,12 +415,12 @@ class TestE2EInteractiveQA(unittest.TestCase):
 
         self.assertIn("/jobs", self.page.url)
 
-        # Verify Back button returns to landing state
-        self.page.click("button[onclick='handleNavbarBack()']")
+        # Verify clicking logo returns to landing state
+        self.page.click(".top-navbar .brand-logo")
         self.page.wait_for_timeout(500)
         
         parsed_path = urllib.parse.urlparse(self.page.url).path
-        self.assertEqual(parsed_path, "/", "Back button should return user to homepage root")
+        self.assertEqual(parsed_path, "/", "Clicking logo should return user to homepage root")
         self.assertEqual(self.js_errors, [])
 
     # =========================================================================
@@ -753,7 +753,10 @@ class TestE2EInteractiveQA(unittest.TestCase):
         self.page.wait_for_timeout(1500)
 
         # Scroll the directory list container down manually
-        self.page.evaluate("() => document.getElementById('directory-list').scrollTop = 300")
+        # Use 100 instead of 300 because smaller card heights (removed headcount)
+        # mean the list might not be long enough to scroll to 300 after panning
+        # and transitioning to Viewport mode (which shrinks the list to viewport bounds).
+        self.page.evaluate("() => document.getElementById('directory-list').scrollTop = 100")
         scroll_pos_before = self.page.evaluate("() => document.getElementById('directory-list').scrollTop")
 
         # Pan the map slightly to trigger a fetch

@@ -122,12 +122,12 @@ class TestE2EProfileFiltering(unittest.TestCase):
 
     def test_profile_edit_and_auto_filter_flow(self):
         """Test complete profile editing, modal save, UI update, auto-filter application, and logout."""
-        # 1. Load root path as anonymous user -> Login button should be visible
+        # 1. Load root path as anonymous user -> User profile dropdown should be hidden
         self.page.goto(f"{self.BASE_URL}/")
         self.page.wait_for_load_state("domcontentloaded")
 
-        login_buttons = self.page.locator(".auth-anon a")
-        self.assertTrue(login_buttons.first.is_visible())
+        # Verify user is anonymous initially (user profile dropdown is hidden)
+        self.assertFalse(self.page.locator("#landingInterface .auth-user").is_visible())
         
         # 2. Perform Demo Sandbox Login
         self.page.goto(f"{self.BASE_URL}/api/auth/demo_login?redirect=true")
@@ -202,9 +202,8 @@ class TestE2EProfileFiltering(unittest.TestCase):
         self.assertTrue(logout_btn.is_visible())
         logout_btn.click()
         
-        # Wait for the login button to reappear on the app header (since we reload current /jobs page)
-        self.page.wait_for_selector("#app-container .auth-anon", state="visible", timeout=5000)
-        self.assertTrue(self.page.locator("#app-container .auth-anon").is_visible())
+        # Wait for the user dropdown to disappear from the app header (since we reload current /jobs page)
+        self.page.wait_for_selector("#app-container .auth-user", state="hidden", timeout=5000)
         self.assertFalse(self.page.locator("#app-container .auth-user").is_visible())
 
         self.assertEqual(self.js_errors, [])

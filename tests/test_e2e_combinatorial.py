@@ -368,6 +368,17 @@ class TestZeroRegressionCombinatorialAudit(unittest.TestCase):
 
             # The 121st request across combined endpoints must trigger 429
             resp_121 = self.client.get('/api/companies', environ_base={'REMOTE_ADDR': test_ip})
+            if resp_121.status_code != 429:
+                print(f"\nDEBUG test_combo_14 failed!")
+                print(f"config.RATE_LIMIT_ANON = {config.RATE_LIMIT_ANON}")
+                print(f"resp_121.status_code = {resp_121.status_code}")
+                print(f"resp_121.headers = {dict(resp_121.headers)}")
+                print(f"resp_121.data = {resp_121.data.decode('utf-8')[:200]}")
+                # Print history of requests for this IP if possible
+                from backend.utils.rate_limiter import _rate_limits
+                store = _rate_limits.get(f'anon:{test_ip}', [])
+                print(f"Rate limits store length: {len(store)}")
+                print(f"Rate limits store for IP: {store}")
             self.assertEqual(resp_121.status_code, 429, "Expected HTTP 429 on 121st combined request across endpoints.")
             print(" [PASS] Combo 14: Rate limiter enforces shared 120 req/min quota per client IP across multiple endpoints.")
         finally:

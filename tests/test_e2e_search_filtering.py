@@ -479,7 +479,7 @@ class TestE2ESearchFiltering(unittest.TestCase):
                 # 1. Load Homepage
                 page.goto(f"{self.BASE_URL}/")
                 page.wait_for_load_state("domcontentloaded")
-                self.assertIn("JobMap", page.title())
+                self.assertIn("Map My Job", page.title())
                 
                 # 2. Click preset search button (e.g. Bengaluru)
                 # Wait for popular section buttons

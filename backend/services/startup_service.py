@@ -6,10 +6,13 @@ filtering and sorting against viewport queries and metadata criteria, and format
 
 import os
 import json
+import re
 from backend.utils.validators import _safe_float, _check_has_pin, _sanitize_string, _sanitize_url, _strip_redundant
 from backend.utils.compatibility import safe_flock, LOCK_SH, LOCK_UN, JSRequest as Request
 
 from backend import config
+
+COUNTRY_NAMES = {'india', 'in', 'usa', 'us', 'united states', 'america', 'uk', 'united kingdom', 'gb', 'great britain'}
 
 DATA_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'startups.json'))
 
@@ -106,18 +109,20 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
         lat = _safe_float(s.get("lat"))
         lng = _safe_float(s.get("lng"))
         if min_lat is not None and max_lat is not None and min_lng is not None and max_lng is not None:
-            # Preserve unpinned remote startups only at wide zoom levels (lat_span >= 1.0)
+            # Preserve unpinned remote startups at wide zoom levels (lat_span >= 1.0)
+            # or when zoomed in if their fallback coordinates are within the viewport
             lat_span = abs(max_lat - min_lat)
+            eff_lat = lat if lat is not None else config.DEFAULT_MAP_CENTER_LAT
+            eff_lng = lng if lng is not None else config.DEFAULT_MAP_CENTER_LNG
+            
             if s.get("has_pin") is False:
                 if lat_span < 1.0:
-                    continue
+                    if eff_lat < min_lat or eff_lat > max_lat or eff_lng < min_lng or eff_lng > max_lng:
+                        continue
             else:
-                eff_lat = lat if lat is not None else config.DEFAULT_MAP_CENTER_LAT
-                eff_lng = lng if lng is not None else config.DEFAULT_MAP_CENTER_LNG
                 if eff_lat < min_lat or eff_lat > max_lat or eff_lng < min_lng or eff_lng > max_lng:
                     continue
         if city_query:
-            import re
             city_query_clean = city_query.strip().lower()
             city_val = str(s.get("city") or s.get("location") or "").lower()
             
@@ -125,8 +130,17 @@ def filter_and_sort_startups(startups, min_lat, max_lat, min_lng, max_lng, limit
             is_match = False
             for _region_key, _syn_set in config.REGION_SYNONYM_MAP.items():
                 if city_query_clean in _syn_set:
-                    if any(syn in city_val for syn in _syn_set):
-                        is_match = True
+                    if city_query_clean in COUNTRY_NAMES:
+                        target_syns = _syn_set
+                    else:
+                        target_syns = {syn for syn in _syn_set if syn not in COUNTRY_NAMES}
+                    
+                    for syn in target_syns:
+                        pattern = r'\b' + re.escape(syn) + r'\b'
+                        if re.search(pattern, city_val):
+                            is_match = True
+                            break
+                    if is_match:
                         break
 
             if not is_match:

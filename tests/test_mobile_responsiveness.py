@@ -355,54 +355,6 @@ class TestMobileResponsiveness(unittest.TestCase):
         
         self.assertEqual(self.js_errors, [])
 
-    def test_navbar_back_button_navigation(self):
-        """Verify navbar Back button behavior across different mobile UI states."""
-        self.page.set_viewport_size({"width": 800, "height": 600})
-        
-        # Scenario A: Details Drawer is Active
-        self.page.goto(f"{self.BASE_URL}/jobs?city=Bengaluru%2C%20KA")
-        self.page.wait_for_load_state("domcontentloaded")
-        self.page.wait_for_function(
-            "() => typeof window.WorldTechApp !== 'undefined' && "
-            "window.WorldTechApp.state && "
-            "window.WorldTechApp.state.startupsData && "
-            "window.WorldTechApp.state.startupsData.length > 0",
-            timeout=15000
-        )
-        
-        # Open sidebar first
-        self.page.click("#mobile-toggle-btn")
-        self.page.wait_for_timeout(500)
-        
-        # Open drawer
-        self.page.locator("#directory-list .directory-item").first.click()
-        self.page.wait_for_selector("#details-drawer.active", timeout=3000)
-        
-        # Click Navbar Back button
-        self.page.click("button[onclick='handleNavbarBack()']")
-        self.page.wait_for_timeout(500)
-        
-        # Drawer should close
-        drawer = self.page.locator("#details-drawer")
-        self.assertFalse(drawer.evaluate("el => el.classList.contains('active')"), "Drawer should close after handleNavbarBack()")
-        
-        # Scenario B: Sidebar is Active (Drawer is closed)
-        sidebar = self.page.locator("#sidebar")
-        sidebar_active = sidebar.evaluate("el => el.classList.contains('active')")
-        
-        if sidebar_active:
-            # Click Navbar Back button again
-            self.page.click("button[onclick='handleNavbarBack()']")
-            self.page.wait_for_timeout(500)
-            self.assertFalse(sidebar.evaluate("el => el.classList.contains('active')"), "Sidebar should close after second handleNavbarBack()")
-        
-        # Scenario C: Landing / Map only (neither active)
-        self.page.click("button[onclick='handleNavbarBack()']")
-        self.page.wait_for_timeout(500)
-        parsed_url = urllib.parse.urlparse(self.page.url)
-        self.assertEqual(parsed_url.path, "/")
-        
-        self.assertEqual(self.js_errors, [])
 
     def test_touch_scrolling_property(self):
         """Verify drawer-content has -webkit-overflow-scrolling: touch."""

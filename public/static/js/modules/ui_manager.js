@@ -149,8 +149,6 @@ export function renderDirectory(startups, customEmptyText = null) {
                 createElement('div', { className: 'card-tags' }, badgeTags),
                 roleBadges.length > 0 ? createElement('div', { className: 'flex flex-wrap gap-1 mb-2.5 mt-1.5' }, roleBadges) : null,
                 createElement('div', { className: 'card-meta' }, [
-                    createElement('span', { textContent: `👥 ${headCount}` }),
-                    createElement('span', { textContent: '•' }),
                     createElement('span', { textContent: `📍 ${startup.city ? String(startup.city).split(',')[0] : 'Global'}` })
                 ])
             ])

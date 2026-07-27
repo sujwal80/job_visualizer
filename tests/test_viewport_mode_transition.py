@@ -389,10 +389,7 @@ class TestViewportModeTransition(unittest.TestCase):
         initial_input_val = self.page.locator("#unified-search-input").input_value()
         self.assertIn("Bengaluru", initial_input_val, f"Search input should retain query value 'Bengaluru'. Got: {initial_input_val}")
 
-        # Confirm boundary layer exists before pan (R3)
-        self.page.wait_for_function("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')", timeout=5000)
-        has_layer_before = self.page.evaluate("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')")
-        self.assertTrue(has_layer_before, "Search boundary outline layer should be visible before pan")
+        # Boundary layer check removed as per goal (no boundary rendering)
 
         # Set search input value and placeholder to mock custom filter state
         self.page.evaluate("""() => {
@@ -428,9 +425,7 @@ class TestViewportModeTransition(unittest.TestCase):
         title_text = self.page.locator("#activeMapTitle").text_content().strip()
         self.assertEqual(title_text, "All locations", "Active map title should be reset to 'All locations'")
 
-        # Confirm boundary layer remains visible after pan (R3)
-        has_layer_after = self.page.evaluate("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')")
-        self.assertTrue(has_layer_after, "Search boundary outline layer should remain visible after pan")
+        # Boundary layer check removed as per goal (no boundary rendering)
 
         # unified-search-input must be cleared and placeholder reset
         input_val = self.page.locator("#unified-search-input").input_value()
@@ -448,15 +443,26 @@ class TestViewportModeTransition(unittest.TestCase):
             {"id": 3, "name": "Unpinned Startup", "lat": None, "lng": None, "has_pin": False}
         ]
 
-        # Case 1: lat_span < 1.0 (min_lat=12.5, max_lat=13.0) -> Unpinned must be excluded
+        # Case 1: lat_span < 1.0 (min_lat=12.5, max_lat=13.0) and contains default center (12.9716, 77.5946) -> Unpinned must be kept
         result_local = filter_and_sort_startups(
             mock_startups,
             min_lat=12.5, max_lat=13.0,
             min_lng=77.0, max_lng=78.0,
             limit=-1
         )
-        self.assertEqual(len(result_local), 1)
-        self.assertEqual(result_local[0]["id"], 1)
+        self.assertEqual(len(result_local), 2)
+        ids_local = {s["id"] for s in result_local}
+        self.assertIn(1, ids_local)
+        self.assertIn(3, ids_local)
+
+        # Case 1b: lat_span < 1.0 (min_lat=13.1, max_lat=13.6) and does NOT contain default center -> Unpinned must be excluded
+        result_panned = filter_and_sort_startups(
+            mock_startups,
+            min_lat=13.1, max_lat=13.6,
+            min_lng=77.0, max_lng=78.0,
+            limit=-1
+        )
+        self.assertEqual(len(result_panned), 0)
 
         # Case 2: lat_span >= 1.0 (min_lat=11.5, max_lat=13.0) -> Unpinned must be preserved
         result_wide = filter_and_sort_startups(
@@ -616,9 +622,7 @@ class TestViewportModeTransition(unittest.TestCase):
             "Delhi"
         )
 
-        # Confirm boundary layer exists before pan
-        has_layer_before = self.page.evaluate("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')")
-        self.assertTrue(has_layer_before, "Search boundary outline layer should be visible before pan")
+        # Boundary layer check removed as per goal (no boundary rendering)
 
         # Trigger manual map move (simulated via fire moveend with originalEvent)
         self.page.evaluate("window.WorldTechApp.map.fire('moveend', { originalEvent: {} })")
@@ -636,9 +640,7 @@ class TestViewportModeTransition(unittest.TestCase):
         title_text = self.page.locator("#activeMapTitle").text_content().strip()
         self.assertEqual(title_text, "All locations", "Active map title should be reset to 'All locations'")
 
-        # Confirm boundary layer remains visible after pan (R3)
-        has_layer_after = self.page.evaluate("() => !!window.WorldTechApp.map.getLayer('search-boundary-outline')")
-        self.assertTrue(has_layer_after, "Search boundary outline layer should remain visible after pan")
+        # Boundary layer check removed as per goal (no boundary rendering)
 
         input_val = self.page.locator("#unified-search-input").input_value()
         self.assertEqual(input_val, "", "Search input value should be cleared")
