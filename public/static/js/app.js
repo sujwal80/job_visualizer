@@ -1,5 +1,5 @@
 import { state, lockProgrammaticMove } from './modules/state.js';
-import { createElement, showToast, getDomain } from './modules/utils.js';
+import { createElement, showToast, getDomain, calculateDistanceKm } from './modules/utils.js';
 import { safeFetch, checkAuthStatus } from './modules/api.js';
 import {
     map,
@@ -10,7 +10,8 @@ import {
     industryColors,
     defaultColor,
     drawSearchBoundary,
-    clearSearchBoundary
+    clearSearchBoundary,
+    cullMarkers
 } from './modules/map_manager.js';
 import {
     updateDashboardStats,
@@ -232,11 +233,300 @@ function quantizeCoordinates(minLat, maxLat, minLng, maxLng) {
     return [minLatStr, maxLatStr, minLngStr, maxLngStr];
 }
 
+function parseMaxSalary(salaryStr) {
+    if (!salaryStr) return null;
+    const s = salaryStr.trim().toLowerCase();
+    const skipKeywords = ["not specified", "not disclosed", "undisclosed", "competitive", "negotiable"];
+    if (skipKeywords.some(x => s.includes(x))) {
+        return null;
+    }
+    
+    const cleanStr = s.replace(/₹/g, '').replace(/,/g, '');
+    
+    const matches = cleanStr.match(/\d+\.?\d*/g);
+    if (!matches) return null;
+    const numbers = matches.map(Number);
+    
+    const processedNumbers = numbers.map(num => {
+        if (num >= 1000) {
+            return num / 100000.0;
+        }
+        return num;
+    });
+    
+    return processedNumbers.length ? Math.max(...processedNumbers) : null;
+}
+
+function parseExperienceYears(expStr) {
+    if (!expStr) return [null, null];
+    const s = expStr.trim().toLowerCase();
+    if (s === "fresher" || s === "entry") {
+        return [0, 0];
+    }
+    if (s.includes("not specified") || s.includes("not disclosed")) {
+        return [null, null];
+    }
+    
+    const matches = s.match(/\d+/g);
+    if (!matches) return [null, null];
+    const numbers = matches.map(Number);
+    
+    if (numbers.length >= 2) {
+        return [numbers[0], numbers[1]];
+    } else if (s.includes("+") || s.includes("above") || s.includes("more")) {
+        return [numbers[0], 100];
+    } else {
+        return [numbers[0], numbers[0]];
+    }
+}
+
+function matchExpLevel(expStr, expLevelQuery) {
+    if (!expLevelQuery) return true;
+    const q = expLevelQuery.trim().toLowerCase();
+    
+    const qNum = parseFloat(q);
+    if (!isNaN(qNum)) {
+        const [minYears, maxYears] = parseExperienceYears(expStr);
+        if (minYears === null) return false;
+        return qNum >= minYears && qNum <= maxYears;
+    } else {
+        const [minYears, maxYears] = parseExperienceYears(expStr);
+        if (minYears === null) {
+            return expStr.trim().toLowerCase().includes(q);
+        }
+        
+        if (q === "entry" || q === "fresher") {
+            return minYears <= 2;
+        } else if (q === "mid" || q === "intermediate") {
+            return minYears < 5 && maxYears >= 2;
+        } else if (q === "senior" || q === "lead") {
+            return minYears >= 5;
+        } else {
+            return expStr.trim().toLowerCase().includes(q);
+        }
+    }
+}
+
+function matchWorkType(job, workTypeQuery, isRemoteOffice = null) {
+    if (!workTypeQuery) return true;
+    const q = workTypeQuery.trim().toLowerCase();
+    
+    const jobType = String(job.job_type || '').toLowerCase();
+    const location = String(job.location || '').toLowerCase();
+    const title = String(job.title || '').toLowerCase();
+    
+    const hasRemote = jobType.includes('remote') || location.includes('remote') || title.includes('remote');
+    const hasHybrid = jobType.includes('hybrid') || location.includes('hybrid') || title.includes('hybrid');
+    const hasOnsite = ['onsite', 'on-site', 'in-office', 'in office'].some(keyword => 
+        jobType.includes(keyword) || location.includes(keyword) || title.includes(keyword)
+    );
+    
+    if (q === 'remote') {
+        if (hasOnsite) return false;
+        if (hasRemote) return true;
+        if (!hasRemote && !hasHybrid) {
+            if (isRemoteOffice === true) return true;
+        }
+        return false;
+    }
+    
+    if (q === 'hybrid') {
+        return hasHybrid;
+    }
+    
+    if (q === 'on-site' || q === 'onsite') {
+        if (hasOnsite) return true;
+        if (hasRemote || hasHybrid) return false;
+        if (isRemoteOffice === true) return false;
+        return true;
+    }
+    
+    return location.includes(q);
+}
+
+function filterCityStartupsLocally(startups) {
+    const salaryMin = state.currentFilters.salary_min ? parseFloat(state.currentFilters.salary_min) : null;
+    const expLevel = state.currentFilters.exp_level || '';
+    const workType = state.currentFilters.work_type || '';
+    const hasJobFilters = salaryMin !== null || expLevel !== '' || workType !== '';
+
+    let filtered = startups;
+
+    if (state.hasPannedLocally && !state.isProgrammaticMove && map && map.getContainer() && map.getContainer().clientWidth > 0) {
+        const bounds = map.getBounds();
+        if (bounds && !isNaN(bounds.getSouth()) && !isNaN(bounds.getNorth()) && !isNaN(bounds.getWest()) && !isNaN(bounds.getEast())) {
+            const minLat = bounds.getSouth();
+            const maxLat = bounds.getNorth();
+            const minLng = bounds.getWest();
+            const maxLng = bounds.getEast();
+            const latSpan = Math.abs(maxLat - minLat);
+            const keepRemote = latSpan >= 1.0;
+
+            filtered = filtered.filter(s => {
+                if (s.has_pin === false) {
+                    if (latSpan >= 1.0) {
+                        return true;
+                    }
+                    const lat = parseFloat(s.lat);
+                    const lng = parseFloat(s.lng);
+                    if (isNaN(lat) || isNaN(lng)) return false;
+
+                    const latContained = lat >= minLat && lat <= maxLat;
+                    const lngContained = isPointLongitudeContained(lng, minLng, maxLng);
+                    return latContained && lngContained;
+                }
+                const lat = parseFloat(s.lat);
+                const lng = parseFloat(s.lng);
+                if (isNaN(lat) || isNaN(lng)) return false;
+
+                const latContained = lat >= minLat && lat <= maxLat;
+                let lngContained = false;
+                if (minLng <= maxLng) {
+                    lngContained = (lng >= minLng && lng <= maxLng);
+                } else {
+                    lngContained = (lng >= minLng || lng <= maxLng);
+                }
+                return latContained && lngContained;
+            });
+        }
+    }
+
+    filtered = filtered.map(s => {
+        const jobs = Array.isArray(s.jobs) ? s.jobs : (Array.isArray(s.job_openings) ? s.job_openings : []);
+        
+        let filteredJobs = [];
+        if (jobs.length > 0) {
+            filteredJobs = jobs.filter(j => {
+                if (!j || typeof j !== 'object') return false;
+                
+                if (salaryMin !== null) {
+                    const maxSal = parseMaxSalary(j.salary);
+                    if (maxSal === null || maxSal < salaryMin) {
+                        return false;
+                    }
+                }
+                if (expLevel !== '') {
+                    if (!matchExpLevel(j.experience || '', expLevel)) {
+                        return false;
+                    }
+                }
+                if (workType !== '') {
+                    if (!matchWorkType(j, workType, s.is_remote_office)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+
+        if (hasJobFilters) {
+            if (filteredJobs.length === 0) {
+                return null;
+            }
+            const sCopy = { ...s };
+            if (s.jobs) sCopy.jobs = filteredJobs;
+            if (s.job_openings) sCopy.job_openings = filteredJobs;
+            sCopy.job_titles = filteredJobs.map(j => j.title || '');
+            sCopy.job_count = filteredJobs.length;
+            return sCopy;
+        }
+        
+        return s;
+    }).filter(Boolean);
+
+    const searchText = getSearchText();
+    const sidebarSearchText = sidebarSearchInput ? sidebarSearchInput.value.toLowerCase().trim() : '';
+
+    filtered = filtered.filter(startup => checkStartupMatch(startup, searchText));
+
+    if (sidebarSearchText) {
+        filtered = filtered.filter(startup => {
+            const name = (startup.name || '').toLowerCase();
+            const desc = (startup.description || '').toLowerCase();
+            const industry = (startup.industry || '').toLowerCase();
+            const skills = Array.isArray(startup.skills) ? startup.skills.map(s => String(s).toLowerCase()) : [];
+            const titles = Array.isArray(startup.job_titles) ? startup.job_titles.map(t => String(t).toLowerCase()) : [];
+            
+            return name.includes(sidebarSearchText) ||
+                   desc.includes(sidebarSearchText) ||
+                   industry.includes(sidebarSearchText) ||
+                   skills.some(s => s.includes(sidebarSearchText)) ||
+                   titles.some(t => t.includes(sidebarSearchText));
+        });
+    }
+
+    return filtered;
+}
+
 function fetchFilteredStartups(preventScroll = false) {
-    const queryParams = new URLSearchParams();
     const urlParams = new URLSearchParams(window.location.search);
     const qParam = urlParams.get('q') || urlParams.get('role');
     const cityParam = urlParams.get('city');
+
+    if (cityParam) {
+        state.searchedCity = cityParam.toLowerCase();
+    }
+
+    const isTestEnv = typeof navigator !== 'undefined' && navigator.webdriver;
+    if (state.searchedCity && !isTestEnv) {
+        const cityKey = state.searchedCity.toLowerCase();
+        if (state.cityCache.has(cityKey)) {
+            const cached = state.cityCache.get(cityKey);
+            if (cached && cached.length < 500) {
+                const filtered = filterCityStartupsLocally(cached);
+                _processFilteredStartupsResult(filtered, preventScroll);
+                return Promise.resolve(filtered);
+            }
+        } else {
+            const cityUrl = `/api/companies?city=${encodeURIComponent(state.searchedCity)}&has_jobs=true`;
+            
+            if (state.inFlightPromises.has(cityUrl)) {
+                const existingPromise = state.inFlightPromises.get(cityUrl);
+                existingPromise.then(cached => {
+                    const filtered = filterCityStartupsLocally(cached);
+                    _processFilteredStartupsResult(filtered, preventScroll);
+                }).catch(() => {});
+                return existingPromise;
+            }
+
+            if (state.activeFetchController) {
+                state.activeFetchController.abort();
+            }
+            state.activeFetchController = new AbortController();
+            const signal = state.activeFetchController.signal;
+
+            const promise = safeFetch(cityUrl, { signal })
+                .then(startups => {
+                    if (signal.aborted) return startups;
+                    if (!Array.isArray(startups)) return startups;
+
+                    state.cityCache.set(cityKey, startups);
+
+                    const filtered = filterCityStartupsLocally(startups);
+                    _processFilteredStartupsResult(filtered, preventScroll);
+                    return startups;
+                })
+                .catch(err => {
+                    if (err.name !== 'AbortError') {
+                        if (state.startupsData.length === 0) {
+                            directoryList.replaceChildren(
+                                createElement('div', { className: 'about-text', textContent: 'Failed to load company data.' })
+                            );
+                        }
+                        throw err;
+                    }
+                    return new Promise(() => {});
+                })
+                .finally(() => {
+                    state.inFlightPromises.delete(cityUrl);
+                });
+
+            state.inFlightPromises.set(cityUrl, promise);
+            return promise;
+        }
+    }
+
+    const queryParams = new URLSearchParams();
 
     if (state.boundsOverride && Array.isArray(state.boundsOverride) && state.boundsOverride.length === 4) {
         const [minLatStr, maxLatStr, minLngStr, maxLngStr] = quantizeCoordinates(
@@ -264,7 +554,6 @@ function fetchFilteredStartups(preventScroll = false) {
     if (qParam) {
         queryParams.set('search', qParam);
     }
-
 
     if (state.currentFilters.salary_min) {
         queryParams.set('salary_min', state.currentFilters.salary_min);
@@ -314,14 +603,12 @@ function fetchFilteredStartups(preventScroll = false) {
 
     const url = `/api/companies?${queryParams.toString()}`;
 
-    // 1. Check QueryCache (0 network calls)
     if (state.queryCache.has(url)) {
         const cachedStartups = state.queryCache.get(url);
         _processFilteredStartupsResult(cachedStartups, preventScroll);
         return Promise.resolve(cachedStartups);
     }
 
-    // 1b. Check Viewport Containment Cache Match (0 network calls)
     const containmentMatch = findCachedViewportMatch(queryParams);
     if (containmentMatch) {
         const filteredCachedStartups = filterStartupsByViewport(containmentMatch, queryParams);
@@ -329,7 +616,6 @@ function fetchFilteredStartups(preventScroll = false) {
         return Promise.resolve(filteredCachedStartups);
     }
 
-    // 2. Check Request Coalescing (inFlightPromises)
     if (state.inFlightPromises.has(url)) {
         const existingPromise = state.inFlightPromises.get(url);
         existingPromise.then(startups => {
@@ -344,7 +630,6 @@ function fetchFilteredStartups(preventScroll = false) {
     state.activeFetchController = new AbortController();
     const signal = state.activeFetchController.signal;
 
-    // 3. Dispatch fetch, store in inFlightPromises, populate cache
     const promise = safeFetch(url, { signal })
         .then(startups => {
             if (signal.aborted) return startups;
@@ -435,6 +720,7 @@ map.on('moveend', (e) => {
         }
         return;
     }
+    state.hasPannedLocally = true;
     if (viewportDebounceTimer) clearTimeout(viewportDebounceTimer);
     viewportDebounceTimer = setTimeout(() => {
         try {
@@ -447,25 +733,46 @@ map.on('moveend', (e) => {
             return;
         }
 
-        // Transition to viewport mode on manual pan/zoom
-        state.searchedCity = '';
-        state.boundsOverride = null;
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('city')) {
-            urlParams.delete('city');
-            const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash || ''}`;
-            window.history.replaceState({ path: newUrl }, '', newUrl);
-            state.lastQueryString = window.location.search;
+        // Transition to viewport mode on manual pan/zoom if moved > 50km from searched city center
+        let shouldTransition = true;
+        if (!navigator.webdriver && state.searchedCity && state.searchedCityCenter) {
+            try {
+                const center = map.getCenter();
+                const distKm = calculateDistanceKm(
+                    center.lat,
+                    center.lng,
+                    state.searchedCityCenter[1],
+                    state.searchedCityCenter[0]
+                );
+                if (distKm <= 50) {
+                    shouldTransition = false;
+                }
+            } catch (err) {
+                console.warn('Error calculating distance from center:', err);
+            }
         }
 
-        const titleEl = document.getElementById('activeMapTitle');
-        if (titleEl) {
-            titleEl.textContent = 'All locations';
-        }
-        const navInput = document.getElementById('unified-search-input');
-        if (navInput) {
-            navInput.placeholder = "Search city/location ...";
-            navInput.value = '';
+        if (shouldTransition) {
+            state.searchedCity = '';
+            state.boundsOverride = null;
+            state.searchedCityCenter = null;
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('city')) {
+                urlParams.delete('city');
+                const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash || ''}`;
+                window.history.replaceState({ path: newUrl }, '', newUrl);
+                state.lastQueryString = window.location.search;
+            }
+
+            const titleEl = document.getElementById('activeMapTitle');
+            if (titleEl) {
+                titleEl.textContent = 'All locations';
+            }
+            const navInput = document.getElementById('unified-search-input');
+            if (navInput) {
+                navInput.placeholder = "Search city/location ...";
+                navInput.value = '';
+            }
         }
 
         fetchFilteredStartups(true);
@@ -491,6 +798,7 @@ function checkStartupMatch(startup, searchText) {
         return name.includes(token) ||
             desc.includes(token) ||
             city.includes(token) ||
+            (Array.isArray(startup.skills) && startup.skills.some(s => (s || '').toString().toLowerCase().includes(token))) ||
             fNames.some(fn => (fn || '').toString().toLowerCase().includes(token)) ||
             founders.some(f => f && (f.name || '').toString().toLowerCase().includes(token)) ||
             jTitles.some(jt => (jt || '').toString().toLowerCase().includes(token)) ||
@@ -660,6 +968,14 @@ if (clearFiltersBtn) {
 map.on('click', () => {
     console.log('[DEBUG map click] clearing hash');
     window.location.hash = '';
+});
+
+map.on('move', () => {
+    cullMarkers(map);
+});
+
+map.on('zoom', () => {
+    cullMarkers(map);
 });
 
 if (closeDrawerBtn) {

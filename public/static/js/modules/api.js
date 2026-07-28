@@ -32,6 +32,9 @@ export async function safeFetch(url, options = {}) {
                     if (state.profileCache && typeof state.profileCache.clear === 'function') {
                         state.profileCache.clear();
                     }
+                    if (state.cityCache && typeof state.cityCache.clear === 'function') {
+                        state.cityCache.clear();
+                    }
                 }
                 state.currentDataVersion = dataVersion;
             }

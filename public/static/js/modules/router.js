@@ -149,6 +149,8 @@ export function executeUnifiedSearch(query, options = {}) {
         }
         state.lastQueryString = window.location.search;
         state.searchedCity = '';
+        state.searchedCityCenter = null;
+        state.hasPannedLocally = false;
         
         const titleEl = document.getElementById('activeMapTitle');
         if (titleEl) titleEl.textContent = 'All locations';
@@ -197,6 +199,7 @@ export function executeUnifiedSearch(query, options = {}) {
             clearSearchBoundary();
         }
         state.defaultLocation = KNOWN_HUB_COORDINATES[normalizedQuery];
+        state.searchedCityCenter = KNOWN_HUB_COORDINATES[normalizedQuery];
         state.defaultZoom = 11;
 
         lockProgrammaticMove(2500);
@@ -220,6 +223,7 @@ export function executeUnifiedSearch(query, options = {}) {
         }
         state.lastQueryString = window.location.search;
         state.searchedCity = normalizedQuery;
+        state.hasPannedLocally = false;
 
         const titleEl = document.getElementById('activeMapTitle');
         if (titleEl) titleEl.textContent = queryTrimmed;
@@ -251,6 +255,7 @@ export function executeUnifiedSearch(query, options = {}) {
             clearSearchBoundary();
         }
         state.defaultLocation = [lon, lat];
+        state.searchedCityCenter = [lon, lat];
         state.defaultZoom = 11;
 
         lockProgrammaticMove(2500);
@@ -274,6 +279,7 @@ export function executeUnifiedSearch(query, options = {}) {
         }
         state.lastQueryString = window.location.search;
         state.searchedCity = normalizedQuery;
+        state.hasPannedLocally = false;
 
         const titleEl = document.getElementById('activeMapTitle');
         if (titleEl) titleEl.textContent = queryTrimmed;
@@ -336,6 +342,7 @@ export function executeUnifiedSearch(query, options = {}) {
                         clearSearchBoundary();
                     }
                     state.defaultLocation = [lon, lat];
+                    state.searchedCityCenter = [lon, lat];
                     state.defaultZoom = 11;
 
                     lockProgrammaticMove(2500);
@@ -359,6 +366,7 @@ export function executeUnifiedSearch(query, options = {}) {
                     }
                     state.lastQueryString = window.location.search;
                     state.searchedCity = normalizedQuery;
+                    state.hasPannedLocally = false;
                     let cachedVal = [lon, lat];
                     if (state.boundsOverride) {
                         cachedVal = [lon, lat, ...state.boundsOverride];
@@ -473,9 +481,11 @@ export function updateSearchCity(cityTitle, options = {}) {
     }
     state.lastQueryString = window.location.search;
     state.searchedCity = lowerCity;
+    state.hasPannedLocally = false;
 
     const handleFlyTo = (coords, zoomVal) => {
         state.defaultLocation = coords;
+        state.searchedCityCenter = coords;
         state.defaultZoom = zoomVal;
 
         showDirectoryLoading();

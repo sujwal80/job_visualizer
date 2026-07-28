@@ -149,6 +149,8 @@ export const state = {
     queryCache: new LRUCacheWithTTL({ capacity: 50, defaultTTL: 120000, storage: null }),
     profileCache: new LRUCacheWithTTL({ capacity: 50, defaultTTL: 300000, storage: 'sessionStorage', prefix: 'wtm_profile_' }),
     geocodeCache: new LRUCacheWithTTL({ capacity: 50, defaultTTL: 86400000, storage: 'localStorage', prefix: 'wtm_geocode_' }),
+    cityCache: new LRUCacheWithTTL({ capacity: 10, defaultTTL: 86400000, storage: 'sessionStorage', prefix: 'wtm_city_' }),
+    searchedCityCenter: null,
     currentDataVersion: null,
     currentFilters: {
         industry: 'all',
@@ -161,7 +163,8 @@ export const state = {
     filterRafId: null,
     inputTimeout: null,
     isProgrammaticMove: false,
-    programmaticMoveTimeout: null
+    programmaticMoveTimeout: null,
+    hasPannedLocally: false
 };
 
 export function lockProgrammaticMove(durationMs = 2500) {

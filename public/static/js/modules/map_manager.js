@@ -145,6 +145,54 @@ export function clearAllMarkers() {
     }
 }
 
+export function cullMarkers(map) {
+    if (!map) return;
+    const bounds = map.getBounds();
+    if (!bounds || isNaN(bounds.getSouth()) || isNaN(bounds.getNorth()) || isNaN(bounds.getWest()) || isNaN(bounds.getEast())) {
+        return;
+    }
+
+    const south = bounds.getSouth();
+    const north = bounds.getNorth();
+    const west = bounds.getWest();
+    const east = bounds.getEast();
+
+    for (const marker of state.markersMap.values()) {
+        if (!marker || typeof marker.getLngLat !== 'function') {
+            continue;
+        }
+        const lngLat = marker.getLngLat();
+        const lng = lngLat.lng;
+        const lat = lngLat.lat;
+
+        const latContained = lat >= south && lat <= north;
+        let lngContained = false;
+        if (west <= east) {
+            lngContained = (lng >= west && lng <= east);
+        } else {
+            lngContained = (lng >= west || lng <= east);
+        }
+
+        const inBounds = latContained && lngContained;
+
+        if (marker.isAttached === undefined) {
+            marker.isAttached = true;
+        }
+
+        if (inBounds) {
+            if (!marker.isAttached) {
+                marker.addTo(map);
+                marker.isAttached = true;
+            }
+        } else {
+            if (marker.isAttached) {
+                marker.remove();
+                marker.isAttached = false;
+            }
+        }
+    }
+}
+
 export function initializeMarkers(startups) {
     startups.forEach(startup => {
         if (startup.has_pin === false) return;
@@ -177,10 +225,12 @@ export function initializeMarkers(startups) {
         })
             .setLngLat([lng, lat])
             .addTo(map);
+        marker.isAttached = true;
 
         markerEl.title = String(startup.name || '');
         state.markersMap.set(startup.id, marker);
     });
+    cullMarkers(map);
 }
 
 export function updateMarkersDiff(startups) {
@@ -189,6 +239,7 @@ export function updateMarkersDiff(startups) {
     for (const [id, marker] of state.markersMap.entries()) {
         if (!activeIds.has(String(id))) {
             marker.remove();
+            marker.isAttached = false;
             state.markersMap.delete(id);
         }
     }
@@ -235,11 +286,13 @@ export function updateMarkersDiff(startups) {
             })
                 .setLngLat([lng, lat])
                 .addTo(map);
+            marker.isAttached = true;
 
             markerEl.title = String(startup.name || '');
             state.markersMap.set(startup.id, marker);
         }
     });
+    cullMarkers(map);
 }
 
 export function updateMarkersVisualState() {
