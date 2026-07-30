@@ -32,72 +32,86 @@ class CompanyDiscoveryService:
             if max_new_companies is not None and new_added >= max_new_companies:
                 break
                 
-            print(f"\n[Discovery] Searching LinkedIn for jobs matching: '{kw}' in {target_city}...")
-            if hasattr(self.scraper, "get_jobs"):
-                jobs = self.scraper.get_jobs(kw, start=0, target_city=target_city) or []
-            else:
-                jobs = self.scraper.get_bangalore_jobs(kw, start=0, target_city=target_city) or []
-            if not jobs and os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
-                jobs = get_mock_jobs("LinkedIn", kw, target_city=target_city)
-            print(f"[Discovery] Found {len(jobs)} job listings for keyword '{kw}'.")
-
-            for job in jobs:
-                if max_new_companies is not None and new_added >= max_new_companies:
-                    break
-                if not isinstance(job, dict):
-                    continue
-                    
-                comp_name = str(job.get("company_name") or "").strip()
-                comp_slug = str(job.get("company_slug") or "").strip()
-                
-                if not comp_name or comp_name == "N/A":
-                    continue
-                    
-                existing = self.db.find_startup(comp_name, logo_domain=None, target_city=target_city)
-                if existing:
-                    continue
-                    
-                print(f"[Discovery] Discovered NEW company candidate: '{comp_name}' (slug: {comp_slug})")
-                
-                details = None
-                if comp_slug and hasattr(self.scraper, "get_company_details"):
-                    details = self.scraper.get_company_details(comp_slug, target_city=target_city)
-                    
-                if not details:
-                    job_title = str(job.get('title') or 'Open Roles')
-                    loc_val = str(job.get("location") or target_city)
-                    details = {
-                        "name": comp_name,
-                        "website": "",
-                        "industry": "Software Development",
-                        "head_count": 15,
-                        "headquarters": target_city,
-                        "description": f"Innovative startup in {target_city} hiring for {job_title}.",
-                        "bangalore_address": loc_val,
-                        "office_address": loc_val,
-                        "logo_domain": ""
-                    }
+            start_offset = 0
+            empty_pages = 0
+            while max_new_companies is None or new_added < max_new_companies:
+                print(f"\n[Discovery] Searching LinkedIn for jobs matching: '{kw}' (offset {start_offset}) in {target_city}...")
+                if hasattr(self.scraper, "get_jobs"):
+                    jobs = self.scraper.get_jobs(kw, start=start_offset, target_city=target_city) or []
                 else:
-                    if "office_address" not in details:
-                        details["office_address"] = details.get("bangalore_address") or target_city
-                    
-                if not details.get("website"):
-                    official_web, official_dom = self._resolve_official_company_website(comp_name, comp_slug)
-                    if official_web:
-                        details["website"] = official_web
-                        details["logo_domain"] = official_dom
-                        print(f"[Discovery] Resolved official website '{official_web}' for new startup '{comp_name}'")
+                    jobs = self.scraper.get_bangalore_jobs(kw, start=start_offset, target_city=target_city) or []
+                if not jobs and os.environ.get("MOCK_SCRAPER_FALLBACK", "false").lower() == "true":
+                    jobs = get_mock_jobs("LinkedIn", kw, target_city=target_city)
+                print(f"[Discovery] Found {len(jobs)} job listings for keyword '{kw}' (offset {start_offset}).")
 
-                if self.validator is not None:
-                    self.validator.validate_company_status(details)
-                merged = self.db.merge_startup(details, [job], target_city=target_city)
-                if merged is not None:
-                    self.db.save_db()
-                    new_added += 1
-                
-                delay_mult = float(os.environ.get("DELAY_MULTIPLIER", 0.0))
-                if delay_mult > 0:
-                    time.sleep(random.uniform(1.5, 3.0) * delay_mult)
+                if not jobs:
+                    empty_pages += 1
+                    if empty_pages >= 2:
+                        break
+                    start_offset += 10
+                    continue
+
+                empty_pages = 0
+
+                for job in jobs:
+                    if max_new_companies is not None and new_added >= max_new_companies:
+                        break
+                    if not isinstance(job, dict):
+                        continue
+                        
+                    comp_name = str(job.get("company_name") or "").strip()
+                    comp_slug = str(job.get("company_slug") or "").strip()
+                    
+                    if not comp_name or comp_name == "N/A":
+                        continue
+                        
+                    existing = self.db.find_startup(comp_name, logo_domain=None, target_city=target_city)
+                    if existing:
+                        continue
+                        
+                    print(f"[Discovery] Discovered NEW company candidate: '{comp_name}' (slug: {comp_slug})")
+                    
+                    details = None
+                    if comp_slug and hasattr(self.scraper, "get_company_details"):
+                        details = self.scraper.get_company_details(comp_slug, target_city=target_city)
+                        
+                    if not details:
+                        job_title = str(job.get('title') or 'Open Roles')
+                        loc_val = str(job.get("location") or target_city)
+                        details = {
+                            "name": comp_name,
+                            "website": "",
+                            "industry": "Software Development",
+                            "head_count": 15,
+                            "headquarters": target_city,
+                            "description": f"Innovative startup in {target_city} hiring for {job_title}.",
+                            "bangalore_address": loc_val,
+                            "office_address": loc_val,
+                            "logo_domain": ""
+                        }
+                    else:
+                        if "office_address" not in details:
+                            details["office_address"] = details.get("bangalore_address") or target_city
+                        
+                    if not details.get("website"):
+                        official_web, official_dom = self._resolve_official_company_website(comp_name, comp_slug)
+                        if official_web:
+                            details["website"] = official_web
+                            details["logo_domain"] = official_dom
+                            print(f"[Discovery] Resolved official website '{official_web}' for new startup '{comp_name}'")
+
+                    if self.validator is not None:
+                        self.validator.validate_company_status(details)
+                    merged = self.db.merge_startup(details, [job], target_city=target_city)
+                    if merged is not None:
+                        self.db.save_db()
+                        new_added += 1
+                    
+                    delay_mult = float(os.environ.get("DELAY_MULTIPLIER", 0.0))
+                    if delay_mult > 0:
+                        time.sleep(random.uniform(1.5, 3.0) * delay_mult)
+
+                start_offset += 10
                 
         print(f"\n[Discovery] Acquisition phase finished. Added {new_added} new startup records to database.")
 
