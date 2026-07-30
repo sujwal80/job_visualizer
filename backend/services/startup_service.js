@@ -11,7 +11,7 @@ let fs = null;
 async function getFs() {
   if (fs) return fs;
   if (typeof globalThis.WebSocketPair === 'undefined' && typeof process !== 'undefined') {
-    fs = await import('fs/promises');
+    fs = await import('node:fs/promises');
   }
   return fs;
 }
