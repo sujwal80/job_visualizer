@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import re from 'safe-regex';
 
 test.describe('E2E Interactive QA', () => {
 
