@@ -1,7 +1,6 @@
 name = "job-visualizer"
-main = "entrypoint.py"
+main = "backend/worker.js"
 compatibility_date = "2024-09-19"
-compatibility_flags = ["python_workers"]
 
 [vars]
 ENVIRONMENT = "production"
