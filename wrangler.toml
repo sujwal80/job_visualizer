@@ -1,6 +1,7 @@
 name = "job-visualizer"
 main = "backend/worker.js"
 compatibility_date = "2024-09-19"
+compatibility_flags = [ "nodejs_compat" ]
 
 [vars]
 ENVIRONMENT = "production"
