@@ -1,70 +1,5 @@
 [
   {
-    "id": 1,
-    "name": "Delhi Innovation Labs",
-    "lat": 28.6138954,
-    "lng": 77.2090057,
-    "city": "Delhi",
-    "industry": "SaaS",
-    "description": "Innovative startup in Delhi hiring for Senior Software Engineer Specialist.",
-    "website": "http://www.delhiinnovation.com",
-    "logo_domain": "delhiinnovation.com",
-    "logo_svg_url": "",
-    "funding_stage": "Seed / Active",
-    "total_raised": "Undisclosed",
-    "is_active_website": true,
-    "verified_email": "",
-    "head_count": 15,
-    "founders": [],
-    "hr_details": {
-      "contact_email": "",
-      "benefits": ""
-    },
-    "tagging_status": "completed",
-    "classification_status": "completed",
-    "last_crawled": null,
-    "job_openings": [
-      {
-        "title": "Senior Software Engineer Specialist",
-        "department": "Engineering",
-        "location": "Delhi",
-        "source": "LinkedIn",
-        "url": "https://www.google.com/jobs/linkedin-delhi-innovation-labs-1",
-        "job_url": "https://www.google.com/jobs/linkedin-delhi-innovation-labs-1",
-        "experience": "3-5 years",
-        "salary": "20-30 LPA",
-        "job_type": "Full-time",
-        "skills": [
-          "Python",
-          "Cloud",
-          "Architecture"
-        ],
-        "posted_date": "1 day ago"
-      },
-      {
-        "title": "Senior Delhi Innovation Labs Specialist",
-        "company_name": "Delhi Innovation Labs",
-        "company_slug": "delhi-innovation-labs",
-        "job_url": "https://www.google.com/jobs/y-combinator-delhi-innovation-labs-1",
-        "url": "https://www.google.com/jobs/y-combinator-delhi-innovation-labs-1",
-        "location": "Delhi",
-        "source": "Y Combinator",
-        "experience": "3-5 years",
-        "salary": "20-30 LPA",
-        "job_type": "Full-time",
-        "skills": [
-          "Python",
-          "Cloud",
-          "Architecture"
-        ],
-        "posted_date": "1 day ago"
-      }
-    ],
-    "is_remote_office": false,
-    "remote_office_distance_km": 0.0,
-    "location_tagged": true
-  },
-  {
     "id": 2,
     "name": "Four Seas Infotech",
     "lat": 28.6138954,
@@ -1593,8 +1528,8 @@
     "industry": "SaaS",
     "description": "Microsoft | 28,750,631 followers on LinkedIn. Every company has a mission. What&#39;s ours? To empower every person and every organization to achieve more.",
     "website": "https://news.microsoft.com/source",
-    "logo_domain": "news.microsoft.com",
-    "logo_svg_url": "https://news.microsoft.com/source/wp-content/uploads/2022/10/cropped-Microsoft_logo.svg_-300x300-1-128x120.png",
+    "logo_domain": "microsoft.com",
+    "logo_svg_url": "https://unavatar.io/microsoft.com",
     "funding_stage": "Seed / Active",
     "total_raised": "Undisclosed",
     "is_active_website": true,
@@ -2831,8 +2766,8 @@
     "industry": "SaaS",
     "description": "Myntra | 2,679,568 followers on LinkedIn. Discover, choose and express your style every day! | At Myntra, we build lifestyle experiences used by millions of people across India.\n\nOver the years, Myntra has grown from a fashion destination into one of India\u2019s leading lifestyle platforms with over 13,000 brands across fashion, beauty, and home decor. This growth is backed by strong business fundamentals, with Myntra sustaining its positive EBITDA for the second consecutive year in FY25.",
     "website": "https://life.myntra.com",
-    "logo_domain": "life.myntra.com",
-    "logo_svg_url": "https://life.myntra.com/wp-content/themes/myntra_life/dist/new-images/favicon.ico",
+    "logo_domain": "myntra.com",
+    "logo_svg_url": "https://unavatar.io/myntra.com",
     "funding_stage": "Seed / Active",
     "total_raised": "Undisclosed",
     "is_active_website": true,
@@ -3475,8 +3410,8 @@
     "industry": "SaaS",
     "description": "Microsoft | 28,750,644 followers on LinkedIn. Every company has a mission. What&#39;s ours? To empower every person and every organization to achieve more.",
     "website": "https://news.microsoft.com/source",
-    "logo_domain": "news.microsoft.com",
-    "logo_svg_url": "https://news.microsoft.com/source/wp-content/uploads/2022/10/cropped-Microsoft_logo.svg_-300x300-1-128x120.png",
+    "logo_domain": "microsoft.com",
+    "logo_svg_url": "https://unavatar.io/microsoft.com",
     "funding_stage": "Seed / Active",
     "total_raised": "Undisclosed",
     "is_active_website": true,
@@ -3820,7 +3755,7 @@
     "description": "Teradata | 585,269 followers on LinkedIn. Teradata empowers enterprises to turn intelligence into autonomous action, grounding AI agents in deep business context and trusted data. As AI agents multiply, Teradata is the context foundation, governance layer, and performance backbone that companies need now. The Teradata Autonomous Knowledge platform puts AI into production across cloud, on-premises, and hybrid environments.",
     "website": "https://www.teradata.com",
     "logo_domain": "teradata.com",
-    "logo_svg_url": "https://marvel-b1-cdn.bc0a.com/f00000000151999/www.teradata.com/getmedia/44bfca8e-074a-47fa-b949-d82b24646f71/why_teradata_partners-rev.png?origin=fd",
+    "logo_svg_url": "",
     "funding_stage": "Seed / Active",
     "total_raised": "Undisclosed",
     "is_active_website": true,
@@ -5764,7 +5699,7 @@
     "description": "Zensoft Services | 28,640 followers on LinkedIn. Zensoft and Qualitia, sister companies since 2011, merged in March 2026 to form a unified entity called Qualitia. | Welcome to Qualitia - The Pioneers in Simplifying Test Automation! \n\nAt Qualitia, we have redefined what it means to master test automation. We are a global leader in delivering innovative AI-powered solutions that empower enterprises to effortlessly automate testing for all types of applications.",
     "website": "https://www.qualitia.ai",
     "logo_domain": "qualitia.ai",
-    "logo_svg_url": "https://www.qualitia.ai/_next/image?url=%2Fimages%2Fiso-logo.webp&w=256&q=75",
+    "logo_svg_url": "",
     "funding_stage": "Seed / Active",
     "total_raised": "Undisclosed",
     "is_active_website": true,
@@ -7859,60 +7794,6 @@
     "industry": "SaaS"
   },
   {
-    "id": 69,
-    "name": "Mumbai Innovation Labs",
-    "city": "Mumbai",
-    "job_openings": [
-      {
-        "title": "Senior Purplle.com Specialist",
-        "company_name": "Mumbai Innovation Labs",
-        "company_slug": "mumbai-innovation-labs",
-        "job_url": "https://www.google.com/jobs/y-combinator-mumbai-innovation-labs-1",
-        "url": "https://www.google.com/jobs/y-combinator-mumbai-innovation-labs-1",
-        "location": "Mumbai",
-        "source": "Y Combinator",
-        "experience": "3-5 years",
-        "salary": "20-30 LPA",
-        "job_type": "Full-time",
-        "skills": [
-          "Python",
-          "Cloud",
-          "Architecture"
-        ],
-        "posted_date": "1 day ago"
-      },
-      {
-        "title": "Senior Bonkers.corner Specialist",
-        "company_name": "Mumbai Innovation Labs",
-        "company_slug": "mumbai-innovation-labs",
-        "job_url": "https://www.google.com/jobs/linkedin-mumbai-innovation-labs-1",
-        "url": "https://www.google.com/jobs/linkedin-mumbai-innovation-labs-1",
-        "location": "Mumbai",
-        "source": "LinkedIn",
-        "experience": "3-5 years",
-        "salary": "20-30 LPA",
-        "job_type": "Full-time",
-        "skills": [
-          "Python",
-          "Cloud",
-          "Architecture"
-        ],
-        "posted_date": "1 day ago"
-      }
-    ],
-    "tagging_status": "completed",
-    "classification_status": "completed",
-    "last_crawled": null,
-    "logo_domain": "",
-    "logo_svg_url": "",
-    "lat": 19.054999,
-    "lng": 72.8692035,
-    "is_remote_office": false,
-    "remote_office_distance_km": 2.5,
-    "location_tagged": true,
-    "industry": "SaaS"
-  },
-  {
     "id": 70,
     "name": "BDO",
     "city": "Mumbai, Maharashtra, India",
@@ -8066,42 +7947,6 @@
     "remote_office_distance_km": null,
     "location_tagged": true,
     "industry": "Artificial Intelligence"
-  },
-  {
-    "id": 75,
-    "name": "Bengaluru Innovation Labs",
-    "city": "Bengaluru",
-    "job_openings": [
-      {
-        "title": "Senior Microsoft Specialist",
-        "company_name": "Bengaluru Innovation Labs",
-        "company_slug": "bengaluru-innovation-labs",
-        "job_url": "https://www.google.com/jobs/y-combinator-bengaluru-innovation-labs-1",
-        "url": "https://www.google.com/jobs/y-combinator-bengaluru-innovation-labs-1",
-        "location": "Bengaluru",
-        "source": "Y Combinator",
-        "experience": "3-5 years",
-        "salary": "20-30 LPA",
-        "job_type": "Full-time",
-        "skills": [
-          "Python",
-          "Cloud",
-          "Architecture"
-        ],
-        "posted_date": "1 day ago"
-      }
-    ],
-    "tagging_status": "completed",
-    "classification_status": "completed",
-    "last_crawled": null,
-    "logo_domain": "",
-    "logo_svg_url": "",
-    "lat": null,
-    "lng": null,
-    "is_remote_office": false,
-    "remote_office_distance_km": null,
-    "location_tagged": true,
-    "industry": "SaaS"
   },
   {
     "id": 76,
@@ -9338,42 +9183,6 @@
     "industry": "SaaS"
   },
   {
-    "id": 111,
-    "name": "Hyderabad Innovation Labs",
-    "city": "Hyderabad",
-    "job_openings": [
-      {
-        "title": "Senior Amazon Specialist",
-        "company_name": "Hyderabad Innovation Labs",
-        "company_slug": "hyderabad-innovation-labs",
-        "job_url": "https://www.google.com/jobs/y-combinator-hyderabad-innovation-labs-1",
-        "url": "https://www.google.com/jobs/y-combinator-hyderabad-innovation-labs-1",
-        "location": "Hyderabad",
-        "source": "Y Combinator",
-        "experience": "3-5 years",
-        "salary": "20-30 LPA",
-        "job_type": "Full-time",
-        "skills": [
-          "Python",
-          "Cloud",
-          "Architecture"
-        ],
-        "posted_date": "1 day ago"
-      }
-    ],
-    "tagging_status": "completed",
-    "classification_status": "completed",
-    "last_crawled": null,
-    "logo_domain": "",
-    "logo_svg_url": "",
-    "lat": 17.360589,
-    "lng": 78.4740613,
-    "is_remote_office": false,
-    "remote_office_distance_km": 3.03,
-    "location_tagged": true,
-    "industry": "SaaS"
-  },
-  {
     "id": 112,
     "name": "Edvak",
     "city": "Hyderabad",
@@ -9933,114 +9742,6 @@
     "industry": "Artificial Intelligence"
   },
   {
-    "id": 127,
-    "name": "Pune Innovation Labs",
-    "city": "Pune",
-    "job_openings": [
-      {
-        "title": "Senior hackajob Specialist",
-        "company_name": "Pune Innovation Labs",
-        "company_slug": "pune-innovation-labs",
-        "job_url": "https://www.google.com/jobs/y-combinator-pune-innovation-labs-1",
-        "url": "https://www.google.com/jobs/y-combinator-pune-innovation-labs-1",
-        "location": "Pune",
-        "source": "Y Combinator",
-        "experience": "3-5 years",
-        "salary": "20-30 LPA",
-        "job_type": "Full-time",
-        "skills": [
-          "Python",
-          "Cloud",
-          "Architecture"
-        ],
-        "posted_date": "1 day ago"
-      }
-    ],
-    "tagging_status": "completed",
-    "classification_status": "completed",
-    "last_crawled": null,
-    "logo_domain": "",
-    "logo_svg_url": "",
-    "lat": 18.5213738,
-    "lng": 73.8545071,
-    "is_remote_office": false,
-    "remote_office_distance_km": 0.26,
-    "location_tagged": true,
-    "industry": "SaaS"
-  },
-  {
-    "id": 128,
-    "name": "Kolkata Innovation Labs",
-    "city": "Kolkata",
-    "job_openings": [
-      {
-        "title": "Senior PwC India Specialist",
-        "company_name": "Kolkata Innovation Labs",
-        "company_slug": "kolkata-innovation-labs",
-        "job_url": "https://www.google.com/jobs/y-combinator-kolkata-innovation-labs-1",
-        "url": "https://www.google.com/jobs/y-combinator-kolkata-innovation-labs-1",
-        "location": "Kolkata",
-        "source": "Y Combinator",
-        "experience": "3-5 years",
-        "salary": "20-30 LPA",
-        "job_type": "Full-time",
-        "skills": [
-          "Python",
-          "Cloud",
-          "Architecture"
-        ],
-        "posted_date": "1 day ago"
-      },
-      {
-        "title": "Senior PwC India Specialist",
-        "company_name": "Kolkata Innovation Labs",
-        "company_slug": "kolkata-innovation-labs",
-        "job_url": "https://www.google.com/jobs/instahyre-kolkata-innovation-labs-1",
-        "url": "https://www.google.com/jobs/instahyre-kolkata-innovation-labs-1",
-        "location": "Kolkata",
-        "source": "Instahyre",
-        "experience": "3-5 years",
-        "salary": "20-30 LPA",
-        "job_type": "Full-time",
-        "skills": [
-          "Python",
-          "Cloud",
-          "Architecture"
-        ],
-        "posted_date": "1 day ago"
-      },
-      {
-        "title": "Senior StraViso Specialist",
-        "company_name": "Kolkata Innovation Labs",
-        "company_slug": "kolkata-innovation-labs",
-        "job_url": "https://www.google.com/jobs/linkedin-kolkata-innovation-labs-1",
-        "url": "https://www.google.com/jobs/linkedin-kolkata-innovation-labs-1",
-        "location": "Kolkata",
-        "source": "LinkedIn",
-        "experience": "3-5 years",
-        "salary": "20-30 LPA",
-        "job_type": "Full-time",
-        "skills": [
-          "Python",
-          "Cloud",
-          "Architecture"
-        ],
-        "posted_date": "1 day ago"
-      }
-    ],
-    "tagging_status": "completed",
-    "classification_status": "completed",
-    "last_crawled": null,
-    "logo_domain": "",
-    "logo_svg_url": "",
-    "lat": 22.5726459,
-    "lng": 88.3638953,
-    "is_remote_office": false,
-    "remote_office_distance_km": 0.01,
-    "location_tagged": true,
-    "industry": "SaaS"
-  },
-  {
     "id": 129,
     "name": "BJAK",
     "city": "Greater Kolkata Area",
@@ -10205,42 +9906,6 @@
     "lng": 88.4642259,
     "is_remote_office": false,
     "remote_office_distance_km": null,
-    "location_tagged": true,
-    "industry": "SaaS"
-  },
-  {
-    "id": 134,
-    "name": "Chennai Innovation Labs",
-    "city": "Chennai",
-    "job_openings": [
-      {
-        "title": "Senior Propel Consulting Services, Inc. Specialist",
-        "company_name": "Chennai Innovation Labs",
-        "company_slug": "chennai-innovation-labs",
-        "job_url": "https://www.google.com/jobs/y-combinator-chennai-innovation-labs-1",
-        "url": "https://www.google.com/jobs/y-combinator-chennai-innovation-labs-1",
-        "location": "Chennai",
-        "source": "Y Combinator",
-        "experience": "3-5 years",
-        "salary": "20-30 LPA",
-        "job_type": "Full-time",
-        "skills": [
-          "Python",
-          "Cloud",
-          "Architecture"
-        ],
-        "posted_date": "1 day ago"
-      }
-    ],
-    "tagging_status": "completed",
-    "classification_status": "completed",
-    "last_crawled": null,
-    "logo_domain": "",
-    "logo_svg_url": "",
-    "lat": 13.0836939,
-    "lng": 80.270186,
-    "is_remote_office": false,
-    "remote_office_distance_km": 0.12,
     "location_tagged": true,
     "industry": "SaaS"
   },
@@ -14939,8 +14604,8 @@
   {
     "id": 252,
     "name": "Yokohama-ATG",
-    "lat": 41.6508201,
-    "lng": 41.6411383,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Primary Unit 1001, Mumbai",
     "industry": "Manufacturing",
     "description": "Yokohama-ATG | 99,015 followers on LinkedIn. Yokohama-ATG (Y-ATG) is a global leader in the design, development, manufacturing and marketing of commercial tires for a diverse range of applications which include agriculture, forestry, construction, industrial, earthmoving, mining, and port operations. With an extensive portfolio of well established brands such as Alliance, Galaxy and Primex, Y-ATG provides customers the highest quality tires, the lowest cost of ownership and the utmost convenience. The diverse range of offerings from Y- ATG comprises over 3500 SKUs, ensuring that customers can find the ideal tires to meet their unique requirements for both aftermarket replacements and OEM solutions.",
