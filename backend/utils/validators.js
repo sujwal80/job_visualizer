@@ -3,7 +3,9 @@ import * as config from '../config.js';
 export const REQUIRED_FIELDS = new Set([
   'id', 'name', 'lat', 'lng', 'city', 'experience', 
   'salary', 'job_type', 'skills', 'logo_url', 'url', 'description',
-  'head_count', 'funding_stage', 'verified_email', 'founder_names'
+  'head_count', 'funding_stage', 'verified_email', 'founder_names',
+  'job_openings', 'job_titles', 'jobs', 'job_count',
+  'title', 'department', 'source', 'posted_date', 'job_url'
 ]);
 
 export function sanitizeString(val) {

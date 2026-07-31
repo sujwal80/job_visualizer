@@ -816,8 +816,13 @@ function checkStartupMatch(startup, searchText) {
 
 function getSearchText() {
     const rawSearch = searchInput.value.toLowerCase().trim();
-    if (state.searchedCity && rawSearch === state.searchedCity.toLowerCase().trim()) {
-        return '';
+    if (!rawSearch) return '';
+    if (state.searchedCity) {
+        const normRaw = normalizeLocationQuery(rawSearch);
+        const normCity = normalizeLocationQuery(state.searchedCity);
+        if (normRaw === normCity || rawSearch === state.searchedCity.toLowerCase().trim()) {
+            return '';
+        }
     }
     return rawSearch;
 }
