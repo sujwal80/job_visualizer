@@ -165,6 +165,12 @@ class LinkedInScraper(ScraperBase):
                 img_el = top_card.find('img', class_='artdeco-entity-image')
                 if img_el:
                     logo_src = img_el.get('src') or img_el.get('data-delayed-url') or ""
+            if not logo_src:
+                for img in soup.find_all('img'):
+                    src = img.get('src') or img.get('data-delayed-url') or ""
+                    if "licdn.com" in src and "company-logo" in src:
+                        logo_src = src
+                        break
             
             # 4. Parse DL Metadata (Website, Industry, Size, Headquarters)
             website = ""
@@ -215,11 +221,7 @@ class LinkedInScraper(ScraperBase):
                         break
             
             if not bangalore_address and headquarters:
-                hq_match = match_target_city(headquarters, target_city)
-                if hq_match:
-                    bangalore_address = headquarters
-                else:
-                    bangalore_address = target_city
+                bangalore_address = headquarters
                 
             return {
                 "name": name,

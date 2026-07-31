@@ -128,7 +128,7 @@ def enrich_startup_record(startup, db_manager, linkedin_scraper, location_enrich
         except Exception:
             pass
 
-    # 3. Logo Data Enrichment (exclusively from LinkedIn profile image)
+    # 3. Logo Data Enrichment (LinkedIn primary + DuckDuckGo/Unavatar fallback for 100% coverage)
     old_logo = str(startup.get("logo_svg_url") or "").strip()
     if not is_aggregator:
         if li_details and li_details.get("logo_svg_url"):
@@ -137,49 +137,76 @@ def enrich_startup_record(startup, db_manager, linkedin_scraper, location_enrich
                 startup["logo_svg_url"] = li_logo
                 if li_logo != old_logo:
                     stats["logo_enriched"] = True
+
+        new_logo = str(startup.get("logo_svg_url") or "").strip()
+        if not new_logo and current_domain and not is_blacklisted_domain(current_domain):
+            ddg_icon = f"https://icons.duckduckgo.com/ip3/{current_domain}.ico"
+            unav_icon = f"https://unavatar.io/{current_domain}"
+            if validate_logo_image(ddg_icon):
+                startup["logo_svg_url"] = ddg_icon
+                stats["logo_enriched"] = True
+            elif validate_logo_image(unav_icon):
+                startup["logo_svg_url"] = unav_icon
+                stats["logo_enriched"] = True
     else:
         if startup.get("logo_svg_url"):
             startup["logo_svg_url"] = ""
         if startup.get("logo_domain"):
             startup["logo_domain"] = ""
 
-    # 4. Office Location & Geocoding
-    if li_details and li_details.get("bangalore_address"):
+    # 4. Office Location & Geocoding (100% Generic across India via real OSM / DDG / LinkedIn data)
+    if li_details and li_details.get("bangalore_address") and str(li_details.get("bangalore_address")).strip().lower() not in ("bengaluru", "bangalore", "bangalore, in", "india", ""):
         startup["office_address"] = li_details["bangalore_address"]
         startup["bangalore_address"] = li_details["bangalore_address"]
 
+    curr_addr = str(startup.get("office_address") or startup.get("bangalore_address") or startup.get("city") or target_city).strip()
+    is_generic_addr = not curr_addr or curr_addr.lower() in ("bengaluru", "bangalore", "bangalore, in", "india", "n/a", "bengaluru, karnataka, india", "bangalore, karnataka, india")
+
     old_lat = startup.get("lat")
     old_lng = startup.get("lng")
-    at_fallback = (
+    at_fallback_or_missing = (
         old_lat is None
         or old_lng is None
         or is_fallback_coordinate(old_lat, old_lng)
+        or is_generic_addr
     )
 
-    if at_fallback:
-        try:
-            startup["location_tagged"] = False
-            location_enricher.enrich(startup, target_city=target_city)
-            curr_lat = startup.get("lat")
-            curr_lng = startup.get("lng")
-            if curr_lat is None or curr_lng is None or is_fallback_coordinate(curr_lat, curr_lng):
+    if at_fallback_or_missing:
+        # Step A: Attempt precision geocoding by company name + city / India in Nominatim OSM
+        new_lat, new_lng = db_manager.geocode_address(curr_addr, name, target_city=target_city)
+        if new_lat is not None and new_lng is not None and not is_fallback_coordinate(new_lat, new_lng):
+            startup["lat"] = new_lat
+            startup["lng"] = new_lng
+            stats["location_enriched"] = True
+        else:
+            # Step B: Try DuckDuckGo snippet search for real office address in India
+            ddg_addr = None
+            try:
                 ddg_addr = get_address_from_ddg(name, target_city=target_city)
-                if ddg_addr:
-                    new_lat, new_lng = db_manager.geocode_address(
-                        ddg_addr, name, target_city=target_city
-                    )
-                    if new_lat is not None and new_lng is not None and not is_fallback_coordinate(new_lat, new_lng):
-                        startup["lat"] = new_lat
-                        startup["lng"] = new_lng
-                        city_label = ddg_addr
-                        if len(city_label) > 60:
-                            city_label = city_label.split(",")[0] + f", {target_city}"
-                        startup["city"] = city_label
-                        stats["location_enriched"] = True
-        except Exception:
-            pass
-    elif not startup.get("location_tagged"):
-        stats["location_enriched"] = True
+            except Exception:
+                pass
+
+            if ddg_addr and str(ddg_addr).strip().lower() not in ("bengaluru", "bangalore", "bangalore, in", "india"):
+                ddg_lat, ddg_lng = db_manager.geocode_address(ddg_addr, name, target_city=target_city)
+                if ddg_lat is not None and ddg_lng is not None and not is_fallback_coordinate(ddg_lat, ddg_lng):
+                    startup["office_address"] = ddg_addr
+                    startup["bangalore_address"] = ddg_addr
+                    startup["lat"] = ddg_lat
+                    startup["lng"] = ddg_lng
+                    city_label = ddg_addr
+                    if len(city_label) > 60:
+                        city_label = city_label.split(",")[0] + f", {target_city}"
+                    startup["city"] = city_label
+                    stats["location_enriched"] = True
+
+            # Step C: If still missing lat/lng, geocode the city/locality in India via OSM directly
+            if startup.get("lat") is None or startup.get("lng") is None or is_fallback_coordinate(startup.get("lat"), startup.get("lng")):
+                query_city = curr_addr if curr_addr and curr_addr.lower() != "n/a" else target_city
+                c_lat, c_lng = db_manager._geocode_osm(f"{query_city}, India")
+                if c_lat is not None and c_lng is not None:
+                    startup["lat"] = c_lat
+                    startup["lng"] = c_lng
+                    stats["location_enriched"] = True
 
     try:
         check_remote_office_status(startup, target_city=target_city)

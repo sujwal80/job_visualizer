@@ -531,11 +531,11 @@ class DBManager:
         
         # If the address is generic and we have a company name, try the company name first!
         if is_generic and company_name and company_name != "N/A":
-            query_comp = f"{company_name} {target_city}"
-            print(f"[Geocoder] Generic address '{address}' detected. Prioritizing direct Company Name Lookup: '{query_comp}'")
-            coords = self._geocode_osm(query_comp)
-            if self._is_valid_coords(coords):
-                return coords
+            for q_comp in [f"{company_name}, {target_city}", f"{company_name}, India", f"{company_name} office, {target_city}"]:
+                print(f"[Geocoder] Generic address '{address}' detected. Prioritizing direct Company Name Lookup: '{q_comp}'")
+                coords = self._geocode_osm(q_comp)
+                if self._is_valid_coords(coords):
+                    return coords
             
         api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
         if api_key:
