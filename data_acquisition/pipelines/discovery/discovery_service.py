@@ -34,7 +34,8 @@ class CompanyDiscoveryService:
                 
             start_offset = 0
             empty_pages = 0
-            while max_new_companies is None or new_added < max_new_companies:
+            no_new_pages_count = 0
+            while (max_new_companies is None or new_added < max_new_companies) and start_offset <= 100:
                 print(f"\n[Discovery] Searching LinkedIn for jobs matching: '{kw}' (offset {start_offset}) in {target_city}...")
                 if hasattr(self.scraper, "get_jobs"):
                     jobs = self.scraper.get_jobs(kw, start=start_offset, target_city=target_city) or []
@@ -52,6 +53,7 @@ class CompanyDiscoveryService:
                     continue
 
                 empty_pages = 0
+                page_added = 0
 
                 for job in jobs:
                     if max_new_companies is not None and new_added >= max_new_companies:
@@ -106,10 +108,18 @@ class CompanyDiscoveryService:
                     if merged is not None:
                         self.db.save_db()
                         new_added += 1
+                        page_added += 1
                     
                     delay_mult = float(os.environ.get("DELAY_MULTIPLIER", 0.0))
                     if delay_mult > 0:
                         time.sleep(random.uniform(1.5, 3.0) * delay_mult)
+
+                if page_added == 0:
+                    no_new_pages_count += 1
+                    if no_new_pages_count >= 2:
+                        break
+                else:
+                    no_new_pages_count = 0
 
                 start_offset += 10
                 
