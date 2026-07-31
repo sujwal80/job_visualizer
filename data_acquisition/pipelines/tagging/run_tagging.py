@@ -31,15 +31,19 @@ def main():
         db_path = os.path.join(PROJECT_ROOT, db_path)
 
     db = DBManager(db_path=db_path)
-    logo_enricher = LogoEnricher()
     location_enricher = LocationEnricher(db)
+    from data_acquisition.pipelines.crawling.job_scrapers.linkedin_scraper import LinkedInScraper
+    from data_acquisition.run_data_enricher import enrich_startup_record
+    import shutil
+
+    linkedin_scraper = LinkedInScraper(validator=None)
 
     db.load_db()
     
     # 1. Tagging/Enrichment Loop
     processed = 0
     for startup in db.startups:
-        if not args.force and startup.get("tagging_status") == "completed":
+        if not args.force and startup.get("tagging_status") == "completed" and startup.get("logo_svg_url") and startup.get("website"):
             print(f"[Tagging] Skipping {startup.get('name')} - already completed.")
             continue
 
@@ -49,33 +53,20 @@ def main():
 
         print(f"[Tagging] Processing company: '{startup.get('name')}'")
         try:
-            logo_changed = logo_enricher.enrich(startup)
-            loc_changed = location_enricher.enrich(startup, target_city=args.target_city)
-            startup["tagging_status"] = "completed"
+            enrich_startup_record(startup, db, linkedin_scraper, location_enricher, args.target_city)
             processed += 1
         except Exception as e:
             print(f"[Tagging] Error enriching '{startup.get('name')}': {e}")
             startup["tagging_status"] = "failed"
 
-    # 2. Industry Classification Loop
-    classified = 0
-    for startup in db.startups:
-        if not args.force and startup.get("classification_status") == "completed":
-            print(f"[Classification] Skipping {startup.get('name')} - already completed.")
-            continue
-
-        print(f"[Classification] Classifying company: '{startup.get('name')}'")
-        try:
-            new_ind = classify_startup(startup, force=args.force)
-            startup["industry"] = new_ind
-            startup["classification_status"] = "completed"
-            classified += 1
-        except Exception as e:
-            print(f"[Classification] Error classifying '{startup.get('name')}': {e}")
-            startup["classification_status"] = "failed"
-
     db.save_db()
-    print(f"[Tagging & Classification Completed] Tagged: {processed}, Classified: {classified}")
+    
+    # Synchronize with public/static/data/startups.json
+    public_db_path = os.path.join(PROJECT_ROOT, "public", "static", "data", "startups.json")
+    os.makedirs(os.path.dirname(public_db_path), exist_ok=True)
+    shutil.copy2(db_path, public_db_path)
+    print(f"[Tagging & Classification Completed] Tagged & Enriched: {processed} startups. Synchronized to {public_db_path}")
 
 if __name__ == "__main__":
     main()
+

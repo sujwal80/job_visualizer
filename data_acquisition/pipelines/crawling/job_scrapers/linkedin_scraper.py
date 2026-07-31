@@ -1,4 +1,5 @@
 import os
+import random
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -26,18 +27,24 @@ class LinkedInScraper(ScraperBase):
         return {"http": proxy, "https": proxy} if proxy else None
 
     def _get_with_retry(self, url, params=None, allow_redirects=True, timeout=10):
-        backoff = 1.0
-        for attempt in range(3):
+        backoff = 2.0
+        for attempt in range(5):
             try:
-                self._sleep_throttle()
+                self._sleep_throttle(min_s=1.0, max_s=2.5)
                 res = requests.get(url, headers=self.headers, params=params, proxies=self._get_proxies(), allow_redirects=allow_redirects, timeout=timeout)
-                if res.status_code == 429 or res.status_code >= 500:
-                    time.sleep(backoff)
+                # Handle rate limiting or gating (429, 403, 999, or login/signup redirection)
+                is_gated_redirect = allow_redirects and ("signup" in getattr(res, "url", "") or "login" in getattr(res, "url", ""))
+                if res.status_code in (429, 403, 999) or res.status_code >= 500 or is_gated_redirect:
+                    sleep_time = backoff * random.uniform(1.2, 1.8)
+                    print(f"[LinkedIn Scraper] Rate limit / gating detected (HTTP {res.status_code}) for {url}. Holding on for {sleep_time:.1f}s before retrying...")
+                    time.sleep(sleep_time)
                     backoff *= 2
                     continue
                 return res
-            except Exception:
-                time.sleep(backoff)
+            except Exception as e:
+                sleep_time = backoff * random.uniform(1.2, 1.8)
+                print(f"[LinkedIn Scraper] Request exception on attempt {attempt+1}: {e}. Holding on for {sleep_time:.1f}s...")
+                time.sleep(sleep_time)
                 backoff *= 2
         return None
 
