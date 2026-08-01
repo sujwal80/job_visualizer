@@ -1325,8 +1325,8 @@
   {
     "id": 11,
     "name": "Bahwan CyberTek",
-    "lat": 12.950526,
-    "lng": 80.2417568,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "Software Development",
     "description": "Bahwan CyberTek | 268,183 followers on LinkedIn. Driving Digital Transformation | Driving Digital Transformation\n\nEstablished in 1999, Bahwan CyberTek (BCT) is a global provider of digital transformation solutions in the areas of Predictive Analytics, Digital Experience and Digital Supply Chain Management, and has delivered solutions in 20 countries across North America, the Middle East, Far East, Africa and Asia. Driving innovation through outcome-based business models, proven and powerful IP solutions, BCT is a trusted partner for over 1000+ customers, including Fortune 500 companies. \n\nWith strong capabilities in Digital Technologies, BCT has over 4000 associates with technical and domain expertise, delivering solutions to the Oil &amp; Gas, Telecom, Power, Government, Banking, Retail and SCM / Logistics verticals.",
@@ -1493,8 +1493,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 286.86,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Bahwan Cybertek Pvt. Ltd., lift, CMWSSB Division 193, Ward 193",
+    "bangalore_address": "Bahwan Cybertek Pvt. Ltd., lift, CMWSSB Division 193, Ward 193"
   },
   {
     "id": 12,
@@ -1538,8 +1538,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 1.46,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Bonkers Corner, Brigade Road, Ashok Nagar, Ashokanagar",
+    "bangalore_address": "Bonkers Corner, Brigade Road, Ashok Nagar, Ashokanagar"
   },
   {
     "id": 13,
@@ -1700,8 +1700,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 5.66,
     "location_tagged": true,
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Microsoft, Embassy Golf Links Road, Embassy GolfLinks Business Park, Yamalur",
+    "bangalore_address": "Microsoft, Embassy Golf Links Road, Embassy GolfLinks Business Park, Yamalur"
   },
   {
     "id": 14,
@@ -1998,8 +1998,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 6.76,
     "location_tagged": true,
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Cisco, 1st Main Road, JP Nagar 3rd Phase, JP Nagar",
+    "bangalore_address": "Cisco, 1st Main Road, JP Nagar 3rd Phase, JP Nagar"
   },
   {
     "id": 16,
@@ -2790,8 +2790,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 6.94,
     "location_tagged": true,
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Nykaa, New BEL Road, RMV 2nd Stage 2nd Block, Geddalahalli",
+    "bangalore_address": "Nykaa, New BEL Road, RMV 2nd Stage 2nd Block, Geddalahalli"
   },
   {
     "id": 20,
@@ -3354,8 +3354,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 11.94,
     "location_tagged": true,
-    "office_address": "Hyderabad",
-    "bangalore_address": "Hyderabad"
+    "office_address": "Amazon, Phoenix Avance Sez Internal road, Pheonix Avance Business Park, Kothaguda",
+    "bangalore_address": "Amazon, Phoenix Avance Sez Internal road, Pheonix Avance Business Park, Kothaguda"
   },
   {
     "id": 23,
@@ -3399,8 +3399,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 501.08,
     "location_tagged": true,
-    "office_address": "Hyderabad",
-    "bangalore_address": "Hyderabad"
+    "office_address": "AMAZON, Jayraj Nagar, Ashtavinayak Nagar, Shimpoli",
+    "bangalore_address": "AMAZON, Jayraj Nagar, Ashtavinayak Nagar, Shimpoli"
   },
   {
     "id": 24,
@@ -3489,8 +3489,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 5.66,
     "location_tagged": true,
-    "office_address": "Hyderabad",
-    "bangalore_address": "Hyderabad"
+    "office_address": "Microsoft, Gachibowli, Greater Hyderabad Municipal Corporation West Zone, Hyderabad",
+    "bangalore_address": "Microsoft, Gachibowli, Greater Hyderabad Municipal Corporation West Zone, Hyderabad"
   },
   {
     "id": 26,
@@ -3638,8 +3638,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 11.3,
     "location_tagged": true,
-    "office_address": "Chennai",
-    "bangalore_address": "Chennai"
+    "office_address": "Chennai, India",
+    "bangalore_address": "Chennai, India"
   },
   {
     "id": 27,
@@ -3997,8 +3997,8 @@
   {
     "id": 30,
     "name": "Godrej & Boyce Mfg. Co. Ltd.",
-    "lat": 22.5717718,
-    "lng": 88.4269505,
+    "lat": 17.385,
+    "lng": 78.4867,
     "city": "Hyderabad (Remote Office)",
     "industry": "Manufacturing",
     "description": "Godrej &amp; Boyce Mfg. Co. Ltd. | 708,653 followers on LinkedIn. Godrej is one of India\u2019s most trusted brands serving over 1.1bn customers worldwide, every day.\n \nGodrej &amp; Boyce, a Godrej group company, began it&#39;s journey in 1897 with the manufacture of high quality locks and continues with its outstanding engineering capabilities across diverse categories \u2013 from consumer goods and furniture, precision manufacturing and aerospace, infrastructure development, and industrial logistics to real estate and power distribution.\n\nAt Godrej, we enable you to do work that\u2019s good for you, your customers, your community and good for the people around you - essentially, work that you can be proud of.",
@@ -4062,8 +4062,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1565.5,
     "location_tagged": true,
-    "office_address": "Hyderabad",
-    "bangalore_address": "Hyderabad"
+    "office_address": "Godrej & Boyce Mfg. Co. Ltd, GODREJ BHAVAN, Street Number 13, DN Block",
+    "bangalore_address": "Godrej & Boyce Mfg. Co. Ltd, GODREJ BHAVAN, Street Number 13, DN Block"
   },
   {
     "id": 31,
@@ -4379,8 +4379,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 735.44,
     "location_tagged": true,
-    "office_address": "Pune",
-    "bangalore_address": "Pune"
+    "office_address": "Pune/Pimpri-Chinchwad Area",
+    "bangalore_address": "Pune/Pimpri-Chinchwad Area"
   },
   {
     "id": 34,
@@ -5766,8 +5766,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 0.76,
     "location_tagged": true,
-    "office_address": "Pune",
-    "bangalore_address": "Pune"
+    "office_address": "Pune District, Maharashtra, India",
+    "bangalore_address": "Pune District, Maharashtra, India"
   },
   {
     "id": 42,
@@ -6341,8 +6341,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1560.7,
     "location_tagged": true,
-    "office_address": "Kolkata",
-    "bangalore_address": "Kolkata"
+    "office_address": "Greater Kolkata Area",
+    "bangalore_address": "Greater Kolkata Area"
   },
   {
     "id": 46,
@@ -6403,8 +6403,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 0.76,
     "location_tagged": true,
-    "office_address": "Kolkata",
-    "bangalore_address": "Kolkata"
+    "office_address": "Greater Kolkata Area",
+    "bangalore_address": "Greater Kolkata Area"
   },
   {
     "id": 47,
@@ -6448,8 +6448,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1560.7,
     "location_tagged": true,
-    "office_address": "Kolkata",
-    "bangalore_address": "Kolkata"
+    "office_address": "Greater Kolkata Area",
+    "bangalore_address": "Greater Kolkata Area"
   },
   {
     "id": 48,
@@ -6493,8 +6493,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1560.7,
     "location_tagged": true,
-    "office_address": "Kolkata",
-    "bangalore_address": "Kolkata"
+    "office_address": "Greater Kolkata Area",
+    "bangalore_address": "Greater Kolkata Area"
   },
   {
     "id": 49,
@@ -6551,8 +6551,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1560.7,
     "location_tagged": true,
-    "office_address": "Kolkata",
-    "bangalore_address": "Kolkata"
+    "office_address": "Greater Kolkata Area",
+    "bangalore_address": "Greater Kolkata Area"
   },
   {
     "id": 50,
@@ -6726,8 +6726,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1560.7,
     "location_tagged": true,
-    "office_address": "Kolkata",
-    "bangalore_address": "Kolkata"
+    "office_address": "Greater Kolkata Area",
+    "bangalore_address": "Greater Kolkata Area"
   },
   {
     "id": 51,
@@ -6823,8 +6823,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1560.7,
     "location_tagged": true,
-    "office_address": "Kolkata",
-    "bangalore_address": "Kolkata"
+    "office_address": "Greater Kolkata Area",
+    "bangalore_address": "Greater Kolkata Area"
   },
   {
     "id": 52,
@@ -6868,8 +6868,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1560.7,
     "location_tagged": true,
-    "office_address": "Kolkata",
-    "bangalore_address": "Kolkata"
+    "office_address": "Greater Kolkata Area",
+    "bangalore_address": "Greater Kolkata Area"
   },
   {
     "id": 53,
@@ -7554,8 +7554,8 @@
   {
     "id": 61,
     "name": "Oracle",
-    "lat": 17.4499488,
-    "lng": 78.3742804,
+    "lat": 13.0827,
+    "lng": 80.2707,
     "city": "Chennai",
     "industry": "IT Services and IT Consulting",
     "description": "Oracle | 11,484,604 followers on LinkedIn. Oracle is a global leader in AI, delivering the cloud infrastructure, data, and applications that organizations across the world trust to successfully achieve business outcomes at scale.\n\nOracle Cloud Infrastructure (OCI) provides fast, flexible, scalable AI infrastructure. With superior compute performance and network design, a comprehensive choice of AI services for developing and orchestrating agentic AI workflows at scale, and unrivaled data control, security, privacy, and governance, OCI is designed for AI workloads.",
@@ -7593,8 +7593,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 4.86,
     "location_tagged": true,
-    "office_address": "Chennai",
-    "bangalore_address": "Chennai"
+    "office_address": "Chennai, India",
+    "bangalore_address": "Chennai, India"
   },
   {
     "id": 62,
@@ -7683,8 +7683,8 @@
     "last_crawled": "2026-07-31T19:39:45.158860",
     "logo_domain": "paytm.com",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/D560BAQFk1pEHVpJxRQ/company-logo_200_200/B56ZxM_LMOJgAM-/0/1770818156480/paytm_logo?e=2147483647&v=beta&t=oKleZbIRp8xSK5kyx8Hc8KnMX5LZ25ID8IGVC40DpdE",
-    "lat": 21.1231613,
-    "lng": 79.1051225,
+    "lat": 28.6139,
+    "lng": 77.209,
     "is_remote_office": true,
     "remote_office_distance_km": 920.5,
     "location_tagged": true,
@@ -7701,8 +7701,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Delhi NCR",
-    "bangalore_address": "Delhi NCR"
+    "office_address": "Paytm ATM, Manewada Road, Jawahar Nagar, Nagpur City",
+    "bangalore_address": "Paytm ATM, Manewada Road, Jawahar Nagar, Nagpur City"
   },
   {
     "id": 64,
@@ -7978,8 +7978,8 @@
     "last_crawled": "2026-07-31T19:39:47.280977",
     "logo_domain": "plushforher.com",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/C560BAQGAHj7V4Kzgog/company-logo_200_200/company-logo_200_200/0/1630641431002/urban_essentials_india_pvt_ltd_logo?e=2147483647&v=beta&t=yl3hug8gsjWUTGnrnyDJ68imL22w2tyVBRx6bLvgH10",
-    "lat": 13.089913,
-    "lng": 80.2790405,
+    "lat": 19.076,
+    "lng": 72.8777,
     "is_remote_office": true,
     "remote_office_distance_km": 291.11,
     "location_tagged": true,
@@ -7996,8 +7996,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Plush Jewels, Mint Street, CMWSSB Division 57, Ward 57",
+    "bangalore_address": "Plush Jewels, Mint Street, CMWSSB Division 57, Ward 57"
   },
   {
     "id": 70,
@@ -8023,8 +8023,8 @@
     "last_crawled": "2026-07-31T19:39:52.461256",
     "logo_domain": "bdo.global",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/D4E0BAQHDaK7rSTq7lg/company-logo_200_200/company-logo_200_200/0/1718977121554/bdo_international_logo?e=2147483647&v=beta&t=HI6qarh_QBJY0_-EWoT8BcJoq1NbBjiZMu-cV8TMIus",
-    "lat": 22.441687,
-    "lng": 86.1643225,
+    "lat": 19.076,
+    "lng": 72.8777,
     "is_remote_office": true,
     "remote_office_distance_km": 1389.36,
     "location_tagged": true,
@@ -8041,8 +8041,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Bahalda Road, Tiring, Mayurbhanj, Odisha",
+    "bangalore_address": "Bahalda Road, Tiring, Mayurbhanj, Odisha"
   },
   {
     "id": 71,
@@ -8203,8 +8203,8 @@
     "last_crawled": "2026-07-31T19:39:56.210083",
     "logo_domain": "microsoft.ai",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/D560BAQHFvUw9m77CbA/company-logo_200_200/B56ZnovjGLIsAI-/0/1760546414603/microsoft_ai_logo?e=2147483647&v=beta&t=PHxFysL0SwLi29zxHz1DtmrxAoxf8aXuKC0EnXQo8Yg",
-    "lat": 17.4307694,
-    "lng": 78.3421402,
+    "lat": 12.9716,
+    "lng": 77.5946,
     "is_remote_office": false,
     "remote_office_distance_km": 502.28,
     "location_tagged": true,
@@ -8221,8 +8221,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Bengaluru, India",
+    "bangalore_address": "Bengaluru, India"
   },
   {
     "id": 76,
@@ -8284,8 +8284,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Rakuten, 2nd Main Road, Kaverappa Layout, Kaadubeesanahalli",
+    "bangalore_address": "Rakuten, 2nd Main Road, Kaverappa Layout, Kaadubeesanahalli"
   },
   {
     "id": 77,
@@ -8524,8 +8524,8 @@
     "last_crawled": "2026-07-31T19:39:53.696117",
     "logo_domain": "kutumb.app",
     "logo_svg_url": "https://static.primetrace.com/website/favicon.ico",
-    "lat": 17.47423,
-    "lng": 78.4811184,
+    "lat": 12.9716,
+    "lng": 77.5946,
     "is_remote_office": false,
     "remote_office_distance_km": 509.62,
     "location_tagged": true,
@@ -8542,8 +8542,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Kutumb, 8-5-293/2, Hasmathpet bus stop road, HAL Colony",
+    "bangalore_address": "Kutumb, 8-5-293/2, Hasmathpet bus stop road, HAL Colony"
   },
   {
     "id": 82,
@@ -8767,8 +8767,8 @@
     "last_crawled": "2026-07-31T19:40:09.045431",
     "logo_domain": "rolls-royce.com",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/D4E0BAQG026Y0w2F9ZA/company-logo_200_200/company-logo_200_200/0/1688142449677/rolls_royce_logo?e=2147483647&v=beta&t=QA8OMh5fH1e-IkKJdoTU3itOB5XonqYgy4lersPQZUM",
-    "lat": 13.0952094,
-    "lng": 80.1720728,
+    "lat": 12.9716,
+    "lng": 77.5946,
     "is_remote_office": false,
     "remote_office_distance_km": 279.56,
     "location_tagged": true,
@@ -8785,8 +8785,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Rolls Royce Service, Ambit Park Road, CMWSSB Division 86, Ward 86",
+    "bangalore_address": "Rolls Royce Service, Ambit Park Road, CMWSSB Division 86, Ward 86"
   },
   {
     "id": 87,
@@ -9010,8 +9010,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Decathlon, # 1st, Bannerghatta Road, Kalena Agrahara",
+    "bangalore_address": "Decathlon, # 1st, Bannerghatta Road, Kalena Agrahara"
   },
   {
     "id": 92,
@@ -9100,8 +9100,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Nava Vaibhava, Horamavu, Bengaluru East City Corporation, Bengaluru",
+    "bangalore_address": "Nava Vaibhava, Horamavu, Bengaluru East City Corporation, Bengaluru"
   },
   {
     "id": 94,
@@ -10057,8 +10057,8 @@
     "last_crawled": "2026-07-31T19:40:32.187267",
     "logo_domain": "pepsico.com",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/D4E0BAQH6OpZgQIX1lQ/company-logo_200_200/B4EZoqk4DAKYAI-/0/1761650901484/pepsico_logo?e=2147483647&v=beta&t=k5XDrYl40WQjHrAnkztIcab6_6jUkJCF_eUGCf5F0qM",
-    "lat": 13.1413049,
-    "lng": 77.3421848,
+    "lat": 17.385,
+    "lng": 78.4867,
     "is_remote_office": false,
     "remote_office_distance_km": 33.22,
     "location_tagged": true,
@@ -10075,8 +10075,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Hyderabad",
-    "bangalore_address": "Hyderabad"
+    "office_address": "PepsiCo, Paithan, Chhatrapati Sambhajinagar, Maharashtra",
+    "bangalore_address": "PepsiCo, Paithan, Chhatrapati Sambhajinagar, Maharashtra"
   },
   {
     "id": 114,
@@ -10165,8 +10165,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Hyderabad",
-    "bangalore_address": "Hyderabad"
+    "office_address": "Greater Hyderabad Area",
+    "bangalore_address": "Greater Hyderabad Area"
   },
   {
     "id": 116,
@@ -10403,8 +10403,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Hyderabad",
-    "bangalore_address": "Hyderabad"
+    "office_address": "Mana Karmel, Kodati, Kodathi, Bangalore East",
+    "bangalore_address": "Mana Karmel, Kodati, Kodathi, Bangalore East"
   },
   {
     "id": 121,
@@ -10539,8 +10539,8 @@
     },
     "website": "https://sidsfarm.com/",
     "is_active_website": true,
-    "office_address": "Pune",
-    "bangalore_address": "Pune"
+    "office_address": "Pune/Pimpri-Chinchwad Area",
+    "bangalore_address": "Pune/Pimpri-Chinchwad Area"
   },
   {
     "id": 124,
@@ -10623,8 +10623,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Pune",
-    "bangalore_address": "Pune"
+    "office_address": "Pune/Pimpri-Chinchwad Area",
+    "bangalore_address": "Pune/Pimpri-Chinchwad Area"
   },
   {
     "id": 125,
@@ -10754,8 +10754,8 @@
     "last_crawled": "2026-07-31T19:40:35.176017",
     "logo_domain": "bjak.my",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/D560BAQHLdbu8pvZ5Zg/company-logo_200_200/company-logo_200_200/0/1687510523771/bjak_logo?e=2147483647&v=beta&t=SbSgcRIGThC9zbHR9B9iHeuXkT1n0vYHQP3dXI7pdoA",
-    "lat": 22.3454457,
-    "lng": 88.4642259,
+    "lat": 22.5726,
+    "lng": 88.3639,
     "is_remote_office": true,
     "remote_office_distance_km": 1551.97,
     "location_tagged": true,
@@ -10772,8 +10772,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Kolkata",
-    "bangalore_address": "Kolkata"
+    "office_address": "Greater Kolkata Area",
+    "bangalore_address": "Greater Kolkata Area"
   },
   {
     "id": 130,
@@ -10799,8 +10799,8 @@
     "last_crawled": "2026-07-31T19:40:32.899803",
     "logo_domain": "gunjanappstudios.com",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/C560BAQE4S_0IOVcpPw/company-logo_200_200/company-logo_200_200/0/1651049138563?e=2147483647&v=beta&t=2qOpayaPV1LdQbmecA6hs2oKqBUyg0bxuGKICuI0SgI",
-    "lat": 22.3454457,
-    "lng": 88.4642259,
+    "lat": 22.5726,
+    "lng": 88.3639,
     "is_remote_office": true,
     "remote_office_distance_km": 1551.97,
     "location_tagged": true,
@@ -10817,8 +10817,8 @@
     },
     "website": "https://gunjanappstudios.com",
     "is_active_website": true,
-    "office_address": "Kolkata",
-    "bangalore_address": "Kolkata"
+    "office_address": "Greater Kolkata Area",
+    "bangalore_address": "Greater Kolkata Area"
   },
   {
     "id": 131,
@@ -10889,8 +10889,8 @@
     "last_crawled": "2026-07-31T19:40:43.955098",
     "logo_domain": "cuepilot.ai",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/D560BAQEL5hnbi1cjWA/company-logo_200_200/company-logo_200_200/0/1713700047933/agastya_ai_logo?e=2147483647&v=beta&t=r0Z5qrb_DolAuNa3H7Hlxr9eHVVNeKLqM0D-1pmOzZ4",
-    "lat": 22.3454457,
-    "lng": 88.4642259,
+    "lat": 22.5726,
+    "lng": 88.3639,
     "is_remote_office": true,
     "remote_office_distance_km": 1551.97,
     "location_tagged": true,
@@ -10907,8 +10907,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Kolkata",
-    "bangalore_address": "Kolkata"
+    "office_address": "Greater Kolkata Area",
+    "bangalore_address": "Greater Kolkata Area"
   },
   {
     "id": 133,
@@ -10934,8 +10934,8 @@
     "last_crawled": "2026-07-31T19:40:54.652436",
     "logo_domain": "redpapr.com",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/D4D0BAQHS4wjs99OBhg/company-logo_200_200/company-logo_200_200/0/1697778547919?e=2147483647&v=beta&t=CLglYZkA_eb3qd1TGDIyO33RmvhlmKfIdOfV_szU4o8",
-    "lat": 22.3454457,
-    "lng": 88.4642259,
+    "lat": 22.5726,
+    "lng": 88.3639,
     "is_remote_office": true,
     "remote_office_distance_km": 1551.97,
     "location_tagged": true,
@@ -10952,8 +10952,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Kolkata",
-    "bangalore_address": "Kolkata"
+    "office_address": "Greater Kolkata Area",
+    "bangalore_address": "Greater Kolkata Area"
   },
   {
     "id": 135,
@@ -11205,8 +11205,8 @@
     "last_crawled": "2026-07-31T19:40:39.398482",
     "logo_domain": "logitech.com",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/D560BAQGZy4MFSpNapg/company-logo_200_200/company-logo_200_200/0/1727322903222/logitech_logo?e=2147483647&v=beta&t=5DlveVoYRI-UjK5H1bH1pMPy5mnaOKw6suHns8lInXk",
-    "lat": 28.5396614,
-    "lng": 77.2697139,
+    "lat": 13.0827,
+    "lng": 80.2707,
     "is_remote_office": true,
     "remote_office_distance_km": 1731.42,
     "location_tagged": true,
@@ -11223,8 +11223,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Chennai",
-    "bangalore_address": "Chennai"
+    "office_address": "Accel IT Services, A-61/1, Okhla Industrial Area Phase 2, Okhla Phase - II",
+    "bangalore_address": "Accel IT Services, A-61/1, Okhla Industrial Area Phase 2, Okhla Phase - II"
   },
   {
     "id": 139,
@@ -11250,8 +11250,8 @@
     "last_crawled": "2026-07-31T19:40:41.779947",
     "logo_domain": "bankofamerica.com",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/C4D0BAQEL1rI2h3XGxg/company-logo_200_200/company-logo_200_200/0/1676325271208/bank_of_america_logo?e=2147483647&v=beta&t=eRz3HVy0RZSGMzQizEJmxKrKkHMmA_TrtP7Z02xsX4s",
-    "lat": 19.060854,
-    "lng": 72.8649585,
+    "lat": 13.0827,
+    "lng": 80.2707,
     "is_remote_office": true,
     "remote_office_distance_km": 844.79,
     "location_tagged": true,
@@ -11268,8 +11268,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Chennai",
-    "bangalore_address": "Chennai"
+    "office_address": "Bank of America, Avenue 3: Lane 3, G Block, Bandra Kurla Complex",
+    "bangalore_address": "Bank of America, Avenue 3: Lane 3, G Block, Bandra Kurla Complex"
   },
   {
     "id": 140,
@@ -11379,8 +11379,8 @@
     "last_crawled": "2026-07-31T19:40:41.690873",
     "logo_domain": "bnpp.lk",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/C4E0BAQGaPfduOoKCJA/company-logo_200_200/company-logo_200_200/0/1669711365932/bnp_paribas_logo?e=2147483647&v=beta&t=ZUdy8RMY0_08xBkiRkJRxYXEUJtVTTywzvUsrd_sniM",
-    "lat": 22.574159,
-    "lng": 88.434239,
+    "lat": 13.0827,
+    "lng": 80.2707,
     "is_remote_office": false,
     "remote_office_distance_km": 2.56,
     "location_tagged": true,
@@ -11397,8 +11397,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Chennai",
-    "bangalore_address": "Chennai"
+    "office_address": "Greater Chennai Area",
+    "bangalore_address": "Greater Chennai Area"
   },
   {
     "id": 142,
@@ -11514,8 +11514,8 @@
     "last_crawled": "2026-07-31T19:40:44.422188",
     "logo_domain": "arigs.com",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/C4D0BAQEz3zVHd3-aRg/company-logo_200_200/company-logo_200_200/0/1654593226945/automotiveroboticsindiaprivatelimited_logo?e=2147483647&v=beta&t=iwlFtKc1Zw0H_squkzXx5QqzUhR8LkUKO3xdDUJ9ai0",
-    "lat": 24.7323636,
-    "lng": 77.3147836,
+    "lat": 13.0827,
+    "lng": 80.2707,
     "is_remote_office": true,
     "remote_office_distance_km": 1308.07,
     "location_tagged": true,
@@ -11532,8 +11532,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Chennai",
-    "bangalore_address": "Chennai"
+    "office_address": "Ari, Guna Tahsil, Guna, Madhya Pradesh",
+    "bangalore_address": "Ari, Guna Tahsil, Guna, Madhya Pradesh"
   },
   {
     "id": 145,
@@ -11784,8 +11784,8 @@
     "last_crawled": "2026-07-31T19:40:54.675217",
     "logo_domain": "fuller-technologies.com",
     "logo_svg_url": "https://media.licdn.com/dms/image/v2/D560BAQGKaXFU_ixLKA/company-logo_200_200/B56ZpKUcEOJoAM-/0/1762183463600/fullertechnologies_logo?e=2147483647&v=beta&t=9-Tdl4h82h1z2JE7MTkYWED4EN3SyJcJBze6gO3qnRE",
-    "lat": 18.9285069,
-    "lng": 72.8304503,
+    "lat": 13.0827,
+    "lng": 80.2707,
     "is_remote_office": false,
     "remote_office_distance_km": 6.92,
     "location_tagged": true,
@@ -11802,8 +11802,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Chennai",
-    "bangalore_address": "Chennai"
+    "office_address": "Greater Chennai Area",
+    "bangalore_address": "Greater Chennai Area"
   },
   {
     "id": 151,
@@ -12346,8 +12346,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 844.0,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Abbott Cold Storage Private Limited, 80, Janpath, Kashmiri Market",
+    "bangalore_address": "Abbott Cold Storage Private Limited, 80, Janpath, Kashmiri Market"
   },
   {
     "id": 163,
@@ -12481,8 +12481,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 846.11,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Arrow, Periyar Street, CMWSSB Division 174, Ward 174",
+    "bangalore_address": "Arrow, Periyar Street, CMWSSB Division 174, Ward 174"
   },
   {
     "id": 166,
@@ -12798,8 +12798,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 847.03,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Pepper, 193, Central Avenue, Hiranandani Gardens",
+    "bangalore_address": "Pepper, 193, Central Avenue, Hiranandani Gardens"
   },
   {
     "id": 173,
@@ -12843,8 +12843,8 @@
     "location_tagged": true,
     "is_remote_office": false,
     "remote_office_distance_km": 4.85,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Gupshup, Doctor M H Marigowda Road, Jogi Colony, Chikka Adugodi",
+    "bangalore_address": "Gupshup, Doctor M H Marigowda Road, Jogi Colony, Chikka Adugodi"
   },
   {
     "id": 174,
@@ -13348,8 +13348,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 2.18,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Blackrock, Mahatma Gandhi Road, Craig Park Layout, Ashok Nagar",
+    "bangalore_address": "Blackrock, Mahatma Gandhi Road, Craig Park Layout, Ashok Nagar"
   },
   {
     "id": 185,
@@ -13663,8 +13663,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 11.3,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Mumbai, India",
+    "bangalore_address": "Mumbai, India"
   },
   {
     "id": 192,
@@ -13759,8 +13759,8 @@
   {
     "id": 194,
     "name": "FOLKS",
-    "lat": 22.6308064,
-    "lng": 88.378945,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "Advertising Services",
     "description": "FOLKS | 67,053 followers on LinkedIn. From the very beginning, we\u2019ve been passionate about capturing the imagination. Based in Montreal, Toronto, Bogot\u00e1, Atlanta, Los Angeles, New York, Vancouver, Saguenay and Mumbai, the artists who bring their rich and diverse experiences to our team have been making larger-than-life visual effects for film and television for the past 13 years. \nFOLKS is a Pitch Black company!",
@@ -13798,8 +13798,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1566.14,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Foodie Folks, KC Ghosh Road, Cossipore, Baranagar",
+    "bangalore_address": "Foodie Folks, KC Ghosh Road, Cossipore, Baranagar"
   },
   {
     "id": 195,
@@ -14383,8 +14383,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 1.2,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Apple Authorized Service Provider, Daya Kishan Sapru Marg, Bhudargarh Colony, Jogeshwari West",
+    "bangalore_address": "Apple Authorized Service Provider, Daya Kishan Sapru Marg, Bhudargarh Colony, Jogeshwari West"
   },
   {
     "id": 208,
@@ -14835,8 +14835,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 844.0,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Mumbai, India",
+    "bangalore_address": "Mumbai, India"
   },
   {
     "id": 218,
@@ -15227,8 +15227,8 @@
   {
     "id": 226,
     "name": "ALS",
-    "lat": 28.6449569,
-    "lng": 77.1930719,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "International Trade and Development",
     "description": "ALS | 346,925 followers on LinkedIn. A global leader in testing, ALS provides comprehensive testing solutions to clients in a wide range of industries around the world. Using state-of-the-art technologies and innovative methodologies, our dedicated international teams deliver highest-quality testing services and personalized solutions supported by local expertise. We help our clients leverage the power of data-driven insights for a safer and healthier world.",
@@ -15266,8 +15266,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1743.29,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "ALS, Sat Bhirawan Marg, 8, Karol Bagh",
+    "bangalore_address": "ALS, Sat Bhirawan Marg, 8, Karol Bagh"
   },
   {
     "id": 227,
@@ -15896,8 +15896,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 845.03,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Sia, Kannod Tahsil, Dewas, Madhya Pradesh",
+    "bangalore_address": "Sia, Kannod Tahsil, Dewas, Madhya Pradesh"
   },
   {
     "id": 241,
@@ -16127,8 +16127,8 @@
   {
     "id": 246,
     "name": "Brennan",
-    "lat": 15.2786917,
-    "lng": 73.9296652,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "Service Industry",
     "description": "Brennan | 55,404 followers on LinkedIn. Brennan believes that how technology is delivered is every bit as important as what the technology is. We focus on creating real and relevant value for customers and their end users by designing, procuring, maintaining, and delivering technology systems that fit their specific needs, and always reflect their true interests. It\u2019s a claim backed by our True Performance System, a way of working engineered to get us closer, and deliver better, for our customers and their actual experience of technology.",
@@ -16166,8 +16166,8 @@
     "location_tagged": true,
     "is_remote_office": true,
     "remote_office_distance_km": 471.13,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Dr.  Brennan Tavares, MDR37, Mungul, Colva",
+    "bangalore_address": "Dr.  Brennan Tavares, MDR37, Mungul, Colva"
   },
   {
     "id": 247,
@@ -16211,8 +16211,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 2.56,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "1 North Avenue, Bandra Kurla Complex Road, Kalanagar, Bandra East",
+    "bangalore_address": "1 North Avenue, Bandra Kurla Complex Road, Kalanagar, Bandra East"
   },
   {
     "id": 248,
@@ -16391,8 +16391,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 26.07,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Courtyard by Marriott Mumbai International Airport, Cross Road A, Chakala, MIDC",
+    "bangalore_address": "Courtyard by Marriott Mumbai International Airport, Cross Road A, Chakala, MIDC"
   },
   {
     "id": 252,
@@ -16442,8 +16442,8 @@
   {
     "id": 253,
     "name": "Microsoft",
-    "lat": 17.4307694,
-    "lng": 78.3421402,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai",
     "industry": "Software Development",
     "description": "Microsoft | 28,751,697 followers on LinkedIn. Every company has a mission. What&#39;s ours? To empower every person and every organization to achieve more.",
@@ -16481,8 +16481,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 5.66,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Mumbai, India",
+    "bangalore_address": "Mumbai, India"
   },
   {
     "id": 254,
@@ -16712,8 +16712,8 @@
   {
     "id": 259,
     "name": "Ansell",
-    "lat": 28.6476631,
-    "lng": 77.2251083,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "Manufacturing",
     "description": "Ansell | 251,935 followers on LinkedIn. Ansell is a global leader in safety solutions and an integrated manufacturer of personal protective equipment (PPE), with a vision of leading the world to a safer future.\n\nEach day, our workforce of over 15,000 people across more than 100 countries designs, manufactures, and markets our world-renowned brands, including HyFlex\u2122, AlphaTec\u2122, BioClean\u2122, GAMMEX\u2122, MICROFLEX\u2122, AnsellGUARDIAN\u2122, Kimtech\u2122, KleenGuard\u2122, and The RightCycle\u2122 Program.\n\nSynonymous with quality and performance, these brands help over 10 million workers and professionals in the healthcare and industrial sectors worldwide stay ahead of everyday workplace challenges.",
@@ -16751,8 +16751,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1743.52,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Mumbai, India",
+    "bangalore_address": "Mumbai, India"
   },
   {
     "id": 260,
@@ -17023,8 +17023,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 1.2,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Sterling, Murzban Road, Bori Bunder, Fort",
+    "bangalore_address": "Sterling, Murzban Road, Bori Bunder, Fort"
   },
   {
     "id": 266,
@@ -17385,8 +17385,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 844.0,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Baker Hughes, Chinnapanahalli Main Road, EPIP Zone, Bharath Aikya Ward",
+    "bangalore_address": "Baker Hughes, Chinnapanahalli Main Road, EPIP Zone, Bharath Aikya Ward"
   },
   {
     "id": 274,
@@ -18034,8 +18034,8 @@
   {
     "id": 288,
     "name": "Amaha",
-    "lat": 23.4847933,
-    "lng": 80.9011003,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "Mental Health Care",
     "description": "Amaha | 75,981 followers on LinkedIn. Your Mental Health Partner | Everyone deserves access to the right care, at the right time. At Amaha, we combine clinical expertise with compassion to make mental healthcare accessible, personalised, and continuous.\n\nOur care spans across therapy, psychiatry, self-care tools, community support, and now, India\u2019s first dedicated private Mental Health Hospital in Bengaluru.",
@@ -18075,8 +18075,8 @@
     "location_tagged": true,
     "is_remote_office": true,
     "remote_office_distance_km": 1219.87,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Amaha, Manpur Tahsil, Umaria, Madhya Pradesh",
+    "bangalore_address": "Amaha, Manpur Tahsil, Umaria, Madhya Pradesh"
   },
   {
     "id": 289,
@@ -18165,8 +18165,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 861.49,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "AMAZON, Jayraj Nagar, Ashtavinayak Nagar, Shimpoli",
+    "bangalore_address": "AMAZON, Jayraj Nagar, Ashtavinayak Nagar, Shimpoli"
   },
   {
     "id": 291,
@@ -18347,8 +18347,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 844.0,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Amina Complex, Prajay Ashray Apts Road, Prashanth Nagar, Uppal",
+    "bangalore_address": "Amina Complex, Prajay Ashray Apts Road, Prashanth Nagar, Uppal"
   },
   {
     "id": 295,
@@ -18482,8 +18482,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 844.87,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "LogiNext Solutions, Gate No 2, Plant No. 6, Lal Bahadur Shastri Marg",
+    "bangalore_address": "LogiNext Solutions, Gate No 2, Plant No. 6, Lal Bahadur Shastri Marg"
   },
   {
     "id": 298,
@@ -18664,8 +18664,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 12.65,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "WNS, 7th Cross Road, Green Domain Layout, EPIP Zone",
+    "bangalore_address": "WNS, 7th Cross Road, Green Domain Layout, EPIP Zone"
   },
   {
     "id": 302,
@@ -19131,8 +19131,8 @@
   {
     "id": 312,
     "name": "dentsu",
-    "lat": 9.9724302,
-    "lng": 76.3040004,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "Advertising Services",
     "description": "dentsu | 1,830,928 followers on LinkedIn. We are dentsu. We team together to help brands predict and plan for disruptive future opportunities and create new paths to growth in the sustainable economy. We know people better than anyone else and we use those insights to connect brand, content, commerce and experience, underpinned by modern creativity.",
@@ -19170,8 +19170,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 361.93,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Dentsu, Subhash Chandra Bose Road, Elamkulam, Ernakulam",
+    "bangalore_address": "Dentsu, Subhash Chandra Bose Road, Elamkulam, Ernakulam"
   },
   {
     "id": 313,
@@ -19221,8 +19221,8 @@
   {
     "id": 314,
     "name": "Version 1",
-    "lat": 30.8739813,
-    "lng": 75.843441,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "IT Services and IT Consulting",
     "description": "Version 1 | 360,977 followers on LinkedIn. Version 1 is a leader in AI and digital transformation, partnering strategically with global organisations to transform and adopt technology and drive innovation in a responsible way.\n\nWith an end-to-end offer designed to address the most difficult challenges faced by customers, and supported by the latest cutting-edge technologies, Version 1 is focused on delivering successful customer outcomes through the power of world-class teams. \n\nThis pledge is underscored by the key principles of the organisation, a triangle of balanced priorities comprising customer success, empowered people, and a strong organisation.",
@@ -19260,8 +19260,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 1998.73,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Mobile Store (Powered by ESSAR & Version), Phase 1 Road, Gurudev Nagar, Ludhiana",
+    "bangalore_address": "Mobile Store (Powered by ESSAR & Version), Phase 1 Road, Gurudev Nagar, Ludhiana"
   },
   {
     "id": 315,
@@ -19311,8 +19311,8 @@
   {
     "id": 316,
     "name": "Morningstar",
-    "lat": 26.1726876,
-    "lng": 91.7634514,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "Financial Services",
     "description": "Morningstar | 439,282 followers on LinkedIn. Morningstar, Inc. is a leading provider of independent investment insights in North America, Europe, Australia, and Asia. The Company offers an extensive line of products and services for individual investors, financial advisors, asset managers and owners, retirement plan providers and sponsors, institutional \ninvestors in the debt and private capital markets, and alliances and redistributors. Morningstar provides data and research insights on a wide range of investment offerings, including managed investment products, publicly listed companies, private capital markets, debt securities, and real-time global market data.",
@@ -19350,8 +19350,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 2084.13,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Morningstar School, Lachit Nagar Road, Gandh Basti, Ulubari",
+    "bangalore_address": "Morningstar School, Lachit Nagar Road, Gandh Basti, Ulubari"
   },
   {
     "id": 317,
@@ -19485,8 +19485,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 844.0,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Mondelez International, Chengambakkam, Varadaiahpalem, Tirupati",
+    "bangalore_address": "Mondelez International, Chengambakkam, Varadaiahpalem, Tirupati"
   },
   {
     "id": 320,
@@ -19861,8 +19861,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 847.04,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Here Technologies, Patni Road, Airoli Gaon, Digha",
+    "bangalore_address": "Here Technologies, Patni Road, Airoli Gaon, Digha"
   },
   {
     "id": 328,
@@ -19906,8 +19906,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 10.05,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Mumbai, India",
+    "bangalore_address": "Mumbai, India"
   },
   {
     "id": 329,
@@ -21733,8 +21733,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 849.87,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Procter & Gamble Plaza, Andheri East, K/E Ward, Mumbai Zone 3",
+    "bangalore_address": "Procter & Gamble Plaza, Andheri East, K/E Ward, Mumbai Zone 3"
   },
   {
     "id": 369,
@@ -21874,8 +21874,8 @@
   {
     "id": 372,
     "name": "LearningMate",
-    "lat": 17.4987995,
-    "lng": 78.3852813,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "E-Learning Providers",
     "description": "LearningMate | 319,385 followers on LinkedIn. Grow Boldly | LearningMate is a technology company offering domain expertise in teaching and learning solutions - leveraging digital, cloud, process automation, data, and strong learning design principles.\n\nFor more than twenty years, LearningMate has been working with education institutions across the globe to help them build, deploy, and streamline their digital infrastructure. Through our powerful mix of products and services, we are proud to help lead the world toward a future where education is accessible, affordable, and effective.",
@@ -22369,8 +22369,8 @@
   {
     "id": 383,
     "name": "ERM",
-    "lat": 13.8897952,
-    "lng": 75.6691171,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "Business Consulting and Services",
     "description": "ERM | 630,687 followers on LinkedIn. Shaping a sustainable future with the world\u2019s leading organizations | Sustainability\u202fis our business.\u202f \n\nAs the world\u2019s largest specialist sustainability consultancy, ERM partners with clients to operationalize sustainability at pace and scale, deploying a unique combination of strategic transformation and technical delivery capabilities. This approach helps clients to accelerate the integration of sustainability at every level of\u202ftheir business.",
@@ -22408,8 +22408,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 231.93,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "ERM. pvt.ltd., Teru Bidi, Navile Basavapura, Bhadravati taluk",
+    "bangalore_address": "ERM. pvt.ltd., Teru Bidi, Navile Basavapura, Bhadravati taluk"
   },
   {
     "id": 384,
@@ -22858,8 +22858,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 844.0,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Mumbai, India",
+    "bangalore_address": "Mumbai, India"
   },
   {
     "id": 394,
@@ -23811,8 +23811,8 @@
   {
     "id": 415,
     "name": "BASF",
-    "lat": 12.9798673,
-    "lng": 74.8246658,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "Chemical Manufacturing",
     "description": "BASF | 2,914,753 followers on LinkedIn. We create chemistry for a sustainable future | At BASF, we create chemistry for a sustainable future. Our ambition: We want to be the preferred chemical company to enable our customers\u2019 green transformation. We combine economic success with environmental protection and social responsibility.",
@@ -23850,8 +23850,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 300.14,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "BASF India Ltd, Mangaluru, Mangaluru taluk, Dakshina Kannada",
+    "bangalore_address": "BASF India Ltd, Mangaluru, Mangaluru taluk, Dakshina Kannada"
   },
   {
     "id": 416,
@@ -24257,8 +24257,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 844.0,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Mumbai, India",
+    "bangalore_address": "Mumbai, India"
   },
   {
     "id": 425,
@@ -24529,8 +24529,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 4.86,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Legal Oracle Law Firm, 115C, Dr. BR Ambedkar Road, Adarsh Nagar",
+    "bangalore_address": "Legal Oracle Law Firm, 115C, Dr. BR Ambedkar Road, Adarsh Nagar"
   },
   {
     "id": 431,
@@ -25084,8 +25084,8 @@
   {
     "id": 443,
     "name": "Mastercard",
-    "lat": 18.5499827,
-    "lng": 73.894538,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "IT Services and IT Consulting",
     "description": "Mastercard | 2,508,793 followers on LinkedIn. Mastercard powers economies and empowers people in 200+ countries and territories worldwide. Together with our customers, we\u2019re building a sustainable economy where everyone can prosper. We support a wide range of digital payments choices, making transactions secure, simple, smart and accessible.",
@@ -25448,8 +25448,8 @@
   {
     "id": 451,
     "name": "Pfizer",
-    "lat": 13.0584935,
-    "lng": 80.259229,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai (Remote Office)",
     "industry": "Pharmaceutical Manufacturing",
     "description": "Pfizer | 7,119,946 followers on LinkedIn. We\u2019re celebrating over 175 years of daring scientific innovation\u2014and we\u2019re not done yet. Let\u2019s outdo yesterday. Protect your health at PfizerForAll.com\n \nFor additional information on our guidelines, please visit  http://www.pfizer.com/community-guidelines",
@@ -25625,8 +25625,8 @@
     "is_remote_office": true,
     "remote_office_distance_km": 847.55,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Krishna Galaxy, Datta Mandir Road, Vakola, Kalina",
+    "bangalore_address": "Krishna Galaxy, Datta Mandir Road, Vakola, Kalina"
   },
   {
     "id": 455,
@@ -25676,8 +25676,8 @@
   {
     "id": 456,
     "name": "Jacobs",
-    "lat": 9.5006017,
-    "lng": 76.6378397,
+    "lat": 19.076,
+    "lng": 72.8777,
     "city": "Mumbai",
     "industry": "Business Consulting and Services",
     "description": "Jacobs | 2,093,729 followers on LinkedIn. At Jacobs, we&#39;re challenging today to reinvent tomorrow \u2013 delivering outcomes and solutions for the world&#39;s most complex challenges. With a team of approximately 45,000, we provide end-to-end services in advanced manufacturing, cities &amp; places, energy, environmental, life sciences, transportation and water. From advisory and consulting, feasibility, planning, design, program and lifecycle management, we&#39;re creating a more connected and sustainable world.",
@@ -25715,8 +25715,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 6.12,
     "location_tagged": true,
-    "office_address": "Mumbai",
-    "bangalore_address": "Mumbai"
+    "office_address": "Jacobs Driving School Ground, Karukachal, Changanassery, Kottayam",
+    "bangalore_address": "Jacobs Driving School Ground, Karukachal, Changanassery, Kottayam"
   },
   {
     "id": 457,
@@ -25990,8 +25990,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 11.3,
     "location_tagged": true,
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Deloitte, 5th Cross Road, Devarabeesanahalli, Shivanasamudra Ward",
+    "bangalore_address": "Deloitte, 5th Cross Road, Devarabeesanahalli, Shivanasamudra Ward"
   },
   {
     "id": 463,
@@ -26080,8 +26080,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 8.01,
     "location_tagged": true,
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Lam Research, Bagmane Tech Park Flyover, Bagmane Cosmos, New Thippasandra",
+    "bangalore_address": "Lam Research, Bagmane Tech Park Flyover, Bagmane Cosmos, New Thippasandra"
   },
   {
     "id": 465,
@@ -26170,8 +26170,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 4.86,
     "location_tagged": true,
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Oracle, Tavarekere Main Road, Sadgunte Palya, Chikka Adugodi",
+    "bangalore_address": "Oracle, Tavarekere Main Road, Sadgunte Palya, Chikka Adugodi"
   },
   {
     "id": 467,
@@ -26350,8 +26350,8 @@
     "location_tagged": true,
     "is_remote_office": false,
     "remote_office_distance_km": 0.76,
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Bengaluru East, Karnataka, India",
+    "bangalore_address": "Bengaluru East, Karnataka, India"
   },
   {
     "id": 471,
@@ -26761,8 +26761,8 @@
   {
     "id": 480,
     "name": "Godrej & Boyce Mfg. Co. Ltd.",
-    "lat": 22.5717718,
-    "lng": 88.4269505,
+    "lat": 12.9716,
+    "lng": 77.5946,
     "city": "Bengaluru",
     "industry": "Logistics",
     "description": "Godrej &amp; Boyce Mfg. Co. Ltd. | 708,830 followers on LinkedIn. Godrej is one of India\u2019s most trusted brands serving over 1.1bn customers worldwide, every day.\n \nGodrej &amp; Boyce, a Godrej group company, began it&#39;s journey in 1897 with the manufacture of high quality locks and continues with its outstanding engineering capabilities across diverse categories \u2013 from consumer goods and furniture, precision manufacturing and aerospace, infrastructure development, and industrial logistics to real estate and power distribution.\n\nAt Godrej, we enable you to do work that\u2019s good for you, your customers, your community and good for the people around you - essentially, work that you can be proud of.",
@@ -26800,8 +26800,8 @@
     "location_tagged": true,
     "is_remote_office": false,
     "remote_office_distance_km": 1565.5,
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Godrej & Boyce Mfg. Co. Ltd, GODREJ BHAVAN, Street Number 13, DN Block",
+    "bangalore_address": "Godrej & Boyce Mfg. Co. Ltd, GODREJ BHAVAN, Street Number 13, DN Block"
   },
   {
     "id": 481,
@@ -26935,8 +26935,8 @@
     "location_tagged": true,
     "is_remote_office": false,
     "remote_office_distance_km": 0.76,
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Greater Bengaluru Area",
+    "bangalore_address": "Greater Bengaluru Area"
   },
   {
     "id": 484,
@@ -27070,8 +27070,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 11.22,
     "location_tagged": true,
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "KPMG, C 1, 3rd Cross Road, Devarabeesanahalli",
+    "bangalore_address": "KPMG, C 1, 3rd Cross Road, Devarabeesanahalli"
   },
   {
     "id": 487,
@@ -27160,8 +27160,8 @@
     "is_remote_office": false,
     "remote_office_distance_km": 13.94,
     "location_tagged": true,
-    "office_address": "Bengaluru",
-    "bangalore_address": "Bengaluru"
+    "office_address": "Larsen & Toubro Infotech Ltd, 25 - 31, Sitaramapalya, Kaveri Nagara",
+    "bangalore_address": "Larsen & Toubro Infotech Ltd, 25 - 31, Sitaramapalya, Kaveri Nagara"
   },
   {
     "id": 489,
