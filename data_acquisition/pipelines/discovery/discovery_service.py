@@ -193,8 +193,9 @@ class CompanyDiscoveryService:
                 for suggestion in r_cb.json()[:3]:
                     cand_name = suggestion.get("name", "")
                     if is_name_match(comp_name, cand_name):
-                        domain = suggestion.get("domain")
-                        if domain and not is_blacklisted_domain(domain):
+                        domain = str(suggestion.get("domain") or "").lower()
+                        foreign_tlds = (".it", ".de", ".fr", ".es", ".nl", ".ru", ".cn", ".jp", ".br", ".au")
+                        if domain and not is_blacklisted_domain(domain) and not domain.endswith(foreign_tlds):
                             cand_url = f"https://www.{domain}"
                             is_active, healed_url, _ = validate_website_domain(cand_url)
                             if is_active and healed_url:

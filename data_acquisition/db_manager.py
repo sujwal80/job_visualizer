@@ -87,7 +87,36 @@ class DBManager:
             db_path = os.environ.get("STARTUP_DB_PATH", "backend/startups.json")
         self.db_path = db_path
         self.startups = []
+        self.cache_dir = os.path.join(os.path.dirname(__file__), "cache")
+        self.geocode_cache_file = os.path.join(self.cache_dir, "geocode_cache.json")
+        self.geocode_cache = self._load_json_cache(self.geocode_cache_file)
         self.load_db()
+
+    def _load_json_cache(self, filepath):
+        if os.path.exists(filepath):
+            try:
+                with open(filepath, "r") as f:
+                    return json.load(f)
+            except Exception:
+                return {}
+        return {}
+
+    def _save_json_cache(self, filepath, data):
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        try:
+            with open(filepath, "w") as f:
+                json.dump(data, f, indent=2)
+        except Exception:
+            pass
+
+    def find_startup_any_city(self, name):
+        """Find startup by normalized name across any city to inherit core metadata."""
+        norm = self._normalize_text(name)
+        base = self._normalize_base_text(name)
+        for s in self.startups:
+            if self._normalize_text(s.get("name")) == norm or (base and self._normalize_base_text(s.get("name")) == base):
+                return s
+        return None
         
     def load_db(self):
         with self.file_lock(self.db_path):
@@ -637,6 +666,14 @@ class DBManager:
         return None, None
 
     def _geocode_osm(self, query):
+        norm_q = str(query or "").lower().strip()
+        if hasattr(self, "geocode_cache") and norm_q in self.geocode_cache:
+            res = self.geocode_cache[norm_q]
+            if isinstance(res, (list, tuple)) and len(res) == 2:
+                lat, lng = float(res[0]), float(res[1])
+                print(f"  [Geocoder Cache Hit] '{query}' -> ({lat}, {lng})")
+                return lat, lng
+
         url = "https://nominatim.openstreetmap.org/search"
         params = {
             "q": query,
@@ -666,6 +703,9 @@ class DBManager:
                     lat = float(loc["lat"])
                     lng = float(loc["lon"])
                     print(f"  -> Geocoded successfully -> ({lat}, {lng})")
+                    if hasattr(self, "geocode_cache"):
+                        self.geocode_cache[norm_q] = [lat, lng]
+                        self._save_json_cache(self.geocode_cache_file, self.geocode_cache)
                     return lat, lng
                 break
             except Exception as e:
@@ -869,6 +909,7 @@ class DBManager:
         s = re.sub(r'\byc\s+[a-z0-9]+\b', '', s, flags=re.IGNORECASE)
         s = re.sub(r'\byc\b', '', s, flags=re.IGNORECASE)
         suffix_patterns = [
+            r'\bin\s+india\b', r'\bindia\b',
             r'\bprivate\s+limited\b', r'\bpvt\.?\s*ltd\.?\b', r'\bpte\.?\s*ltd\.?\b',
             r'\bcorporation\b', r'\bcompany\b', r'\bl\.?l\.?c\.?\b', r'\binc\.?\b',
             r'\bltd\.?\b', r'\bcorp\.?\b', r'\bco\.?\b'

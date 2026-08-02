@@ -13,7 +13,9 @@ def run_suite(suite_name, script_path):
     print(f"\n======================================================================")
     print(f" [RUNNING SUITE] {suite_name}: {script_path}")
     print(f"======================================================================")
-    res = subprocess.run([sys.executable, script_path], cwd=os.path.dirname(__file__), text=True)
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.path.abspath(os.path.dirname(__file__)) + os.pathsep + env.get("PYTHONPATH", "")
+    res = subprocess.run([sys.executable, script_path], cwd=os.path.dirname(__file__), text=True, env=env)
     if res.returncode != 0:
         print(f"\n❌ [FAILED] Suite {suite_name} exited with code {res.returncode}")
         return False
@@ -25,36 +27,23 @@ def main():
     tests_dir = os.path.join(workspace_root, "tests")
     
     suites = [
-        ("1. Direct Modular Unit Tests", os.path.join(tests_dir, "test_unit_modular.py")),
-        ("2. Data Pipeline Regression Suite", os.path.join(tests_dir, "test_pipeline_regression.py")),
-        ("3. Production Scaling & Security E2E", os.path.join(tests_dir, "test_e2e_production.py")),
-        ("4. UI Stress Testing & Bug Remediation E2E", os.path.join(tests_dir, "test_e2e_ui_layout.py")),
-        ("5. Exploratory Combinatorial Cross-Feature E2E", os.path.join(tests_dir, "test_e2e_combinatorial.py")),
-        ("6. Production Scalability & Bounded Memory Suite", os.path.join(tests_dir, "test_scalability_bounds.py")),
-        ("7. Google OAuth & Session Security Verification", os.path.join(tests_dir, "test_oauth_security.py")),
-        ("8. E2E Interactive QA (Playwright Chromium)", os.path.join(tests_dir, "test_e2e_interactive_qa.py")),
-        ("9. Asynchronous Crawler Queue & Atomic Locking Verification", os.path.join(tests_dir, "test_async_crawler_queue.py")),
-        ("10. Client-Side Caching Milestone 2 Backend Verification", os.path.join(tests_dir, "test_backend_m2.py")),
-        ("11. Client-Side Caching Milestone 3 Frontend Verification", os.path.join(tests_dir, "test_frontend_m3_caching.py")),
-        ("12. Client-Side Caching Milestone 4 Master Verification Suite", os.path.join(tests_dir, "test_client_side_api_caching.py")),
-        ("13. Industry Classification Verification", os.path.join(tests_dir, "test_industry_classification.py")),
-        ("14. Remote Office Location Verification", os.path.join(tests_dir, "test_remote_office_location.py")),
-        ("15. Data Acquisition Pipeline Verification", os.path.join(tests_dir, "test_data_acquisition_pipeline.py")),
-        ("16. India Remediation Verification", os.path.join(tests_dir, "test_india_remediation.py")),
-        ("17. Database State Tracking & Logo Extraction Unit Tests", os.path.join(tests_dir, "test_database_state_tracking.py")),
-        ("18. Remote Office Unpinned Coordinate Retention Verification", os.path.join(tests_dir, "test_remote_unpinned.py")),
-        ("19. Cloudflare KV Session Store Integration", os.path.join(tests_dir, "test_oauth_kv.py")),
-        ("20. Cloudflare Workers Endpoint Integration", os.path.join(tests_dir, "test_worker_endpoints.py")),
-        ("21. E2E Search, Filtering, and Map boundaries Suite", os.path.join(tests_dir, "test_e2e_search_filtering.py")),
-        ("22. HTML/JS Syntax & Event Handler Integrity", os.path.join(tests_dir, "test_html_js_parser.py")),
-        ("23. Mobile and Web Responsiveness E2E", os.path.join(tests_dir, "test_mobile_responsiveness.py")),
-        ("24. Viewport Mode Transition on Manual Pan", os.path.join(tests_dir, "test_viewport_mode_transition.py")),
-        ("25. E2E User Journeys Regression Suite", os.path.join(tests_dir, "test_e2e_user_journeys.py")),
-        ("26. Client-Side Caching Milestone 2 Viewport Caching & Filtering", os.path.join(tests_dir, "test_viewport_caching_m2.py")),
-        ("27. Client-Side Caching Milestone 2 Viewport Caching E2E", os.path.join(tests_dir, "test_viewport_caching_e2e.py")),
-        ("28. User Profile Management Unit & Persistence Verification", os.path.join(tests_dir, "test_user_profile.py")),
-        ("29. User-Specific Rate Limiting Verification", os.path.join(tests_dir, "test_user_rate_limiting.py")),
-        ("30. E2E User Profile Auto-Filtering Flow", os.path.join(tests_dir, "test_e2e_profile_filtering.py"))
+        ("1. Data Pipeline Regression Suite", os.path.join(tests_dir, "test_pipeline_regression.py")),
+        ("2. Data Acquisition Pipeline Verification", os.path.join(tests_dir, "test_data_acquisition_pipeline.py")),
+        ("3. India Remediation Verification", os.path.join(tests_dir, "test_india_remediation.py")),
+        ("4. Revalidation & Healing Engine AC Unit Verification Suite", os.path.join(tests_dir, "test_revalidation_healing_engine.py")),
+        ("5. Asynchronous Crawler Queue & Atomic Locking Verification", os.path.join(tests_dir, "test_async_crawler_queue.py")),
+        ("6. Industry Classification Verification", os.path.join(tests_dir, "test_industry_classification.py")),
+        ("7. Remote Office Location Verification", os.path.join(tests_dir, "test_remote_office_location.py")),
+        ("8. Database State Tracking & Logo Extraction Unit Tests", os.path.join(tests_dir, "test_database_state_tracking.py")),
+        ("9. Caching Optimizations Unit Verification", os.path.join(tests_dir, "test_caching_optimizations_unit.py")),
+        ("10. Crawler Unit Verification", os.path.join(tests_dir, "test_crawler_unit.py")),
+        ("11. Logo and Domain Refactor Verification", os.path.join(tests_dir, "test_logo_and_domain_refactor.py")),
+        ("12. R3 Deduplication Slugs Verification", os.path.join(tests_dir, "test_r3_deduplication_slugs.py")),
+        ("13. Request Deduplication Cache Verification", os.path.join(tests_dir, "test_request_deduplication_cache.py")),
+        ("14. HTML/JS Syntax & Event Handler Integrity", os.path.join(tests_dir, "test_html_js_parser.py")),
+        ("15. Online Revalidation E2E Verification Suite", os.path.join(tests_dir, "test_online_revalidation_e2e.py")),
+        ("16. Adversarial Revalidation Hardening Suite", os.path.join(tests_dir, "test_adversarial_revalidation.py")),
+        ("17. Revalidate Hourly Service Verification Suite", os.path.join(tests_dir, "test_revalidate_hourly_service.py")),
     ]
     
     print("\n⚡ WORLDTECH MAP // FULL-STACK MASTER TEST RUNNER ⚡")

@@ -36,7 +36,7 @@ def get_base_city(city_label):
     if "chennai" in c: return "Chennai"
     if "hyderabad" in c: return "Hyderabad"
     if "pune" in c: return "Pune"
-    if "delhi" in c or "ncr" in c or "gurugram" in c or "noida" in c: return "Delhi"
+    if "delhi" in c or "ncr" in c or "gurugram" in c or "gurgaon" in c or "noida" in c: return "Delhi"
     return "Bengaluru"
 
 def main():

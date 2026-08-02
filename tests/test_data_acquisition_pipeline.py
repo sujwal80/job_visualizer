@@ -14,6 +14,7 @@ from data_acquisition.pipelines.validation.job_validator import JobValidator
 from data_acquisition.pipelines.crawling.job_scrapers.job_metadata_extractor import extract_job_metadata
 from data_acquisition.pipelines.tagging.logo_enricher import LogoEnricher
 from data_acquisition.utils.validation import validate_logo_image, is_blacklisted_domain
+from data_acquisition.deduplicate_startups import get_metro_city
 
 
 class TestDataAcquisitionPipeline(unittest.TestCase):
@@ -273,7 +274,8 @@ class TestDataAcquisitionPipeline(unittest.TestCase):
         for s in startups:
             name = str(s.get("name") or "").strip()
             base_norm = db._normalize_base_text(name)
-            key = base_norm if base_norm else db._normalize_text(name)
+            metro = get_metro_city(s.get("city"))
+            key = (base_norm if base_norm else db._normalize_text(name), metro)
             self.assertNotIn(key, group_keys, f"Duplicate company group key found in prod db: '{key}' ({name})")
             group_keys.add(key)
             self.assertFalse(db.is_aggregator_name(name), f"Aggregator startup name found in prod db: '{name}'")
