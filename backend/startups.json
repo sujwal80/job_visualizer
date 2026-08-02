@@ -7389,8 +7389,8 @@
     "last_crawled": "2026-07-31T19:40:38.089656",
     "logo_domain": "karmel-it.com",
     "logo_svg_url": "https://icons.duckduckgo.com/ip3/karmel-it.com.ico",
-    "lat": 17.360589,
-    "lng": 78.4740613,
+    "lat": 17.4483,
+    "lng": 78.3915,
     "is_remote_office": false,
     "remote_office_distance_km": 14.82,
     "location_tagged": true,
@@ -7407,8 +7407,8 @@
       "contact_email": "",
       "benefits": ""
     },
-    "office_address": "Mana Karmel, Kodati, Kodathi, Bangalore East",
-    "bangalore_address": "Mana Karmel, Kodati, Kodathi, Bangalore East",
+    "office_address": "Karmel-IT, Madhapur, Hyderabad, Telangana",
+    "bangalore_address": "Karmel-IT, Madhapur, Hyderabad, Telangana",
     "_address_verified_guardrail": true
   },
   {
@@ -26549,9 +26549,9 @@
   {
     "id": 484,
     "name": "DevRev",
-    "lat": 13.1976048,
-    "lng": 77.7074856,
-    "city": "Bangalore Bangalore, IN",
+    "lat": 12.9345,
+    "lng": 77.6908,
+    "city": "Bengaluru",
     "industry": "Software Development",
     "description": "DevRev | 60,981 followers on LinkedIn. We built Computer, the only AI with native \u201cshared memory\u201d. So you get answers &amp; actions you can really trust.  | At DevRev, we&#39;re building the future of work with Computer \u2013 your AI teammate. Unlike traditional tools, Computer unifies all your data sources, tools, and workflows into a single AI-ready platform, giving employees real-time insights, proactive suggestions, and powerful agentic actions. It extends your existing software with AI-native apps and agents that work alongside your teams and customers \u2013 updating workflows, coordinating across teams, and eliminating repetitive work.",
     "website": "https://devrev.ai",
@@ -26586,7 +26586,9 @@
         "company_name": "DevRev",
         "company": "DevRev"
       }
-    ]
+    ],
+    "office_address": "DevRev, Embassy TechVillage, Outer Ring Rd, Bellandur, Bengaluru, Karnataka",
+    "bangalore_address": "DevRev, Embassy TechVillage, Outer Ring Rd, Bellandur, Bengaluru, Karnataka"
   },
   {
     "id": 485,
@@ -28774,9 +28776,9 @@
   {
     "id": 532,
     "name": "Airwallex",
-    "lat": 13.1976048,
-    "lng": 77.7074856,
-    "city": "Bangalore Bangalore, IN",
+    "lat": 12.9784,
+    "lng": 77.6408,
+    "city": "Bengaluru",
     "industry": "Financial Services",
     "description": "Airwallex | 184,439 followers on LinkedIn. Empowering businesses to grow beyond borders | Airwallex is a leading global payments and financial platform for modern businesses, offering trusted solutions to manage everything from business account, payments, treasury, and spend management to embedded finance. \n\nWith our proprietary infrastructure, Airwallex takes the friction out of global payments and financial operations, empowering businesses of all sizes to unlock new opportunities and grow beyond borders. \n\nProudly founded in Melbourne, Airwallex supports over 150,000 businesses globally and is trusted by brands such as Brex, Canva, Rippling, Navan, Qantas, SHEIN and many more.",
     "website": "https://www.airwallex.com/global",
@@ -28811,7 +28813,9 @@
         "company_name": "Airwallex",
         "company": "Airwallex"
       }
-    ]
+    ],
+    "office_address": "Airwallex, Indiranagar, Bengaluru, Karnataka",
+    "bangalore_address": "Airwallex, Indiranagar, Bengaluru, Karnataka"
   },
   {
     "id": 533,
@@ -29464,9 +29468,9 @@
   {
     "id": 548,
     "name": "Deccan AI",
-    "lat": 12.9716,
-    "lng": 77.5946,
-    "city": "Mountain View, California",
+    "lat": 12.9121,
+    "lng": 77.6446,
+    "city": "Bengaluru",
     "industry": "Software Development",
     "description": "Deccan AI | 42,514 followers on LinkedIn. Build Super Accurate AI | Build Super Accurate AI with us. Based in San Francisco, Deccan AI helps frontier AI labs and enterprises like Google, Snowflake, and more  improve model performance through research-grade evals, benchmarks, and novel datasets at scale.\n\nWe deliver mid-and post-training solutions across major domains, including Agentic, Coding, Functional Streams, Multimodal, Model Alignment, and Robotics.",
     "website": "https://www.deccan.ai",
@@ -29517,8 +29521,8 @@
         "company": "Deccan AI"
       }
     ],
-    "office_address": "Deccan Bus Stop Lane 3, Deccan Gymkhana, Pune, Pune City Subdistrict",
-    "bangalore_address": "Deccan Bus Stop Lane 3, Deccan Gymkhana, Pune, Pune City Subdistrict",
+    "office_address": "Deccan AI, HSR Layout, Bengaluru, Karnataka",
+    "bangalore_address": "Deccan AI, HSR Layout, Bengaluru, Karnataka",
     "_address_verified_guardrail": true
   },
   {
@@ -29980,9 +29984,9 @@
   {
     "id": 559,
     "name": "Material Depot",
-    "lat": 12.9716,
-    "lng": 77.5946,
-    "city": "Pan India",
+    "lat": 12.9116,
+    "lng": 77.6389,
+    "city": "Bengaluru",
     "industry": "Retail",
     "description": "Material Depot | 31,358 followers on LinkedIn. Reimagining How India Builds Homes | Material Depot | Reimagining How India Builds Homes\n\nBeautiful homes begin with inspiration - we make sure they don\u2019t get lost in execution.\n\nMaterial Depot is a design-first home materials platform helping homeowners, architects, and designers discover, visualise, and source materials with clarity and confidence. We combine curated, globally inspired collections with a responsive supply chain to bring better choices, transparent pricing, and reliable delivery to Indian homes",
     "website": "https://materialdepot.com",
@@ -30018,8 +30022,8 @@
         "company": "Material Depot"
       }
     ],
-    "office_address": "Material Depot, Gopanpally - Wipro Road, Greater Hyderabad Municipal Corporation West Zone, Hyderabad",
-    "bangalore_address": "Material Depot, Gopanpally - Wipro Road, Greater Hyderabad Municipal Corporation West Zone, Hyderabad",
+    "office_address": "Material Depot, 19th Main Rd, Sector 4, HSR Layout, Bengaluru, Karnataka",
+    "bangalore_address": "Material Depot, 19th Main Rd, Sector 4, HSR Layout, Bengaluru, Karnataka",
     "_address_verified_guardrail": true
   },
   {
@@ -30563,7 +30567,7 @@
     "name": "Stealth AI Startup",
     "lat": 12.9716,
     "lng": 77.5946,
-    "city": "Worldwide",
+    "city": "Bengaluru",
     "industry": "Technology, Information and Internet",
     "description": "Stealth AI Startup | 206,662 followers on LinkedIn. The Global Network of Founders Building AI in Stealth | Stealth AI Startup is a private community for founders, researchers, and engineers building next-generation AI companies before public launch.\n\nFounders tag themselves here to:\n\n\ud83d\udd39 Gain credibility while working in stealth\n\ud83d\udd39 Connect discreetly with other AI founders\n\ud83d\udd39 Receive inbound interest from early-stage VCs\n\ud83d\udd39 Join curated founder-only circles &amp; discussions\n\ud83d\udd39 Access hiring pipelines for early team building\n\nIf you&#39;re building an AI startup in stealth, add your profile to the community and tag yourself to this page.\n\nYour stealth journey deserves visibility \u2014 without revealing your idea.",
     "website": "https://stealth-startup.io",
@@ -30599,8 +30603,8 @@
         "company": "Stealth AI Startup"
       }
     ],
-    "office_address": "Greater Hyderabad Area",
-    "bangalore_address": "Greater Hyderabad Area"
+    "office_address": "Bengaluru, Karnataka",
+    "bangalore_address": "Bengaluru, Karnataka"
   },
   {
     "id": 573,
@@ -31759,9 +31763,9 @@
   {
     "id": 598,
     "name": "Genpact",
-    "lat": 12.9716,
-    "lng": 77.5946,
-    "city": "New York, NY",
+    "lat": 12.926,
+    "lng": 77.6762,
+    "city": "Bengaluru",
     "industry": "Business Consulting and Services",
     "description": "Genpact | 5,878,828 followers on LinkedIn. Genpact is an agentic and advanced technology solutions company. We leverage process intelligence and artificial intelligence to deliver measurable outcomes. With a strong partner ecosystem and decades of client trust, we provide innovative solutions that transform how businesses run.",
     "website": "https://www.genpact.com",
@@ -31797,8 +31801,8 @@
         "company": "Genpact"
       }
     ],
-    "office_address": "Genpact, Sector 18, Gurgaon, Gurugram",
-    "bangalore_address": "Genpact, Sector 18, Gurgaon, Gurugram",
+    "office_address": "Genpact, Salarpuria Softzone, Bellandur, Bengaluru, Karnataka",
+    "bangalore_address": "Genpact, Salarpuria Softzone, Bellandur, Bengaluru, Karnataka",
     "_address_verified_guardrail": true
   },
   {
