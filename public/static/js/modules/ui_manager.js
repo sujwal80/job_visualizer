@@ -177,39 +177,85 @@ export function renderDirectory(startups, customEmptyText = null) {
     }
 }
 
-export function getJobSourceButtonStyle(source) {
+export function getJobSourceLabel(job) {
+    const s = String((job && job.source) || '').trim();
+    const u = String((job && (job.url || job.job_url)) || '').trim().toLowerCase();
+    if (s.toLowerCase().includes('linkedin') || u.includes('linkedin.com') || u.includes('licdn.com') || u.includes('linkedin')) {
+        return 'LinkedIn';
+    }
+    if (s.toLowerCase().includes('instahyre') || u.includes('instahyre.com')) {
+        return 'Instahyre';
+    }
+    if (s.toLowerCase() === 'yc' || s.toLowerCase().includes('y combinator') || s.toLowerCase().includes('ycombinator') || u.includes('ycombinator.com') || u.includes('workatastartup.com')) {
+        return 'Y Combinator';
+    }
+    if (s.toLowerCase().includes('greenhouse') || u.includes('greenhouse.io')) {
+        return 'Greenhouse ATS';
+    }
+    if (s.toLowerCase().includes('lever') || u.includes('lever.co')) {
+        return 'Lever ATS';
+    }
+    if (s.toLowerCase().includes('ashby') || u.includes('ashbyhq.com')) {
+        return 'Ashby ATS';
+    }
+    if (s.toLowerCase().includes('indeed') || u.includes('indeed.com')) {
+        return 'Indeed';
+    }
+    if (s.toLowerCase().includes('wellfound') || s.toLowerCase().includes('angellist') || u.includes('wellfound.com') || u.includes('angel.co')) {
+        return 'Wellfound';
+    }
+    if (s.toLowerCase().includes('naukri') || u.includes('naukri.com')) {
+        return 'Naukri';
+    }
+    if (s.toLowerCase().includes('glassdoor') || u.includes('glassdoor.')) {
+        return 'Glassdoor';
+    }
+    if (s.toLowerCase().includes('cutshort') || u.includes('cutshort.')) {
+        return 'Cutshort';
+    }
+    if (s.toLowerCase().includes('hirist') || u.includes('hirist.')) {
+        return 'Hirist';
+    }
+    if (s && !s.toLowerCase().includes('company') && s.toLowerCase() !== 'direct') {
+        return s;
+    }
+    return 'Company Site';
+}
+
+export function getJobSourceButtonStyle(source, url) {
     const s = String(source || '').trim().toLowerCase();
-    if (s.includes('linkedin')) {
+    const u = String(url || '').trim().toLowerCase();
+    if (s.includes('linkedin') || u.includes('linkedin.com') || u.includes('licdn.com') || u.includes('linkedin')) {
         return { btnClass: 'job-btn btn-linkedin', iconClass: 'fa-brands fa-linkedin', label: 'LinkedIn Apply ↗' };
     }
-    if (s.includes('google')) {
+    if (s.includes('google') || u.includes('google.com/jobs')) {
         return { btnClass: 'job-btn btn-google', iconClass: 'fa-brands fa-google', label: 'Google Jobs ↗' };
     }
-    if (s.includes('instahyre')) {
+    if (s.includes('instahyre') || u.includes('instahyre.com')) {
         return { btnClass: 'job-btn btn-instahyre', iconClass: 'fa-solid fa-bolt', label: 'Instahyre Apply ↗' };
     }
-    if (s === 'yc' || s.includes('y combinator') || s.includes('ycombinator')) {
+    if (s === 'yc' || s.includes('y combinator') || s.includes('ycombinator') || u.includes('ycombinator.com') || u.includes('workatastartup.com')) {
         return { btnClass: 'job-btn btn-yc', iconClass: 'fa-brands fa-y-combinator', label: 'YC Apply ↗' };
     }
-    if (s.includes('Green House') || s.includes('greenhouse') || s.includes('lever')) {
+    if (s.includes('green house') || s.includes('greenhouse') || s.includes('lever') || s.includes('ashby') || u.includes('greenhouse.io') || u.includes('lever.co') || u.includes('ashbyhq.com')) {
         return { btnClass: 'job-btn btn-ats', iconClass: 'fa-solid fa-file-lines', label: 'Green House ↗' };
     }
-    if (s.includes('indeed')) {
+    if (s.includes('indeed') || u.includes('indeed.com')) {
         return { btnClass: 'job-btn btn-indeed', iconClass: 'fa-solid fa-briefcase', label: 'Indeed Apply ↗' };
     }
-    if (s.includes('wellfound') || s.includes('angellist')) {
+    if (s.includes('wellfound') || s.includes('angellist') || u.includes('wellfound.com') || u.includes('angel.co')) {
         return { btnClass: 'job-btn btn-wellfound', iconClass: 'fa-brands fa-angellist', label: 'Wellfound Apply ↗' };
     }
-    if (s.includes('naukri')) {
+    if (s.includes('naukri') || u.includes('naukri.com')) {
         return { btnClass: 'job-btn btn-naukri', iconClass: 'fa-solid fa-user-tie', label: 'Naukri Apply ↗' };
     }
-    if (s.includes('glassdoor')) {
+    if (s.includes('glassdoor') || u.includes('glassdoor.')) {
         return { btnClass: 'job-btn btn-glassdoor', iconClass: 'fa-solid fa-door-open', label: 'Glassdoor Apply ↗' };
     }
-    if (s.includes('cutshort')) {
+    if (s.includes('cutshort') || u.includes('cutshort.')) {
         return { btnClass: 'job-btn btn-cutshort', iconClass: 'fa-solid fa-scissors', label: 'Cutshort Apply ↗' };
     }
-    if (s.includes('hirist')) {
+    if (s.includes('hirist') || u.includes('hirist.')) {
         return { btnClass: 'job-btn btn-hirist', iconClass: 'fa-solid fa-layer-group', label: 'Hirist Apply ↗' };
     }
     return { btnClass: 'job-btn btn-direct', iconClass: 'fa-solid fa-up-right-from-square', label: 'Company Site ↗' };
@@ -369,7 +415,7 @@ export function renderDrawerDetails(startup) {
     if (blrJobs.length > 0) {
         blrJobs.forEach(j => {
             const deptText = j.department ? String(j.department) : 'General';
-            const sourceText = j.source ? String(j.source) : 'Direct';
+            const sourceText = getJobSourceLabel(j);
             const jobType = j.job_type ? String(j.job_type) : 'Full-Time';
             const salaryText = (j.salary && j.salary !== "Not disclosed" && j.salary !== "N/A") ? String(j.salary) : 'Competitive Salary';
             const expText = (j.experience && j.experience !== "Not specified") ? String(j.experience) : 'Experience Not Specified';
@@ -399,7 +445,7 @@ export function renderDrawerDetails(startup) {
                 tagsChildren.push(createElement('span', { className: 'job-tag badge-attr', style: 'background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;', textContent: `🔥 Active` }));
             }
 
-            const styleInfo = getJobSourceButtonStyle(j.source);
+            const styleInfo = getJobSourceButtonStyle(sourceText, j.url || j.job_url);
             const safeJobUrl = getSafeUrl(j.url);
             const applyBtn = safeJobUrl ? createElement('a', {
                 href: safeJobUrl,

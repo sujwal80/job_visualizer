@@ -5,6 +5,68 @@ from data_acquisition.pipelines.crawling.job_scrapers.job_metadata_extractor imp
 from data_acquisition.pipelines.validation.job_validator import JobValidator
 
 
+def resolve_job_source(job, default_source=None):
+    if not isinstance(job, dict):
+        return default_source or "Direct"
+    src = str(job.get("source") or "").strip()
+    url = str(job.get("url") or job.get("job_url") or "").strip().lower()
+
+    if "linkedin.com" in url or "licdn.com" in url:
+        return "LinkedIn"
+    if "instahyre.com" in url:
+        return "Instahyre"
+    if "ycombinator.com" in url or "workatastartup.com" in url:
+        return "Y Combinator"
+    if "greenhouse.io" in url:
+        return "Greenhouse ATS"
+    if "lever.co" in url:
+        return "Lever ATS"
+    if "ashbyhq.com" in url:
+        return "Ashby ATS"
+    if "indeed.com" in url:
+        return "Indeed"
+    if "wellfound.com" in url or "angel.co" in url:
+        return "Wellfound"
+    if "naukri.com" in url:
+        return "Naukri"
+    if "glassdoor." in url:
+        return "Glassdoor"
+    if "cutshort." in url:
+        return "Cutshort"
+    if "hirist." in url:
+        return "Hirist"
+
+    src_lower = src.lower()
+    if "linkedin" in src_lower:
+        return "LinkedIn"
+    if "instahyre" in src_lower:
+        return "Instahyre"
+    if "ycombinator" in src_lower or src_lower == "yc":
+        return "Y Combinator"
+    if "greenhouse" in src_lower:
+        return "Greenhouse ATS"
+    if "lever" in src_lower:
+        return "Lever ATS"
+    if "ashby" in src_lower:
+        return "Ashby ATS"
+    if "indeed" in src_lower:
+        return "Indeed"
+    if "wellfound" in src_lower or "angellist" in src_lower:
+        return "Wellfound"
+    if "naukri" in src_lower:
+        return "Naukri"
+    if "glassdoor" in src_lower:
+        return "Glassdoor"
+    if "cutshort" in src_lower:
+        return "Cutshort"
+    if "hirist" in src_lower:
+        return "Hirist"
+
+    if src and "company" not in src_lower and src_lower != "direct":
+        return src
+    return default_source or "Direct"
+
+
 class ScraperBase:
     """
     Base class for all job scrapers providing integrated metadata extraction
@@ -17,6 +79,8 @@ class ScraperBase:
         if not isinstance(raw_jobs, list):
             return []
         valid_jobs = []
+        cls_name = self.__class__.__name__.lower()
+        default_src = "LinkedIn" if "linkedin" in cls_name else None
         for job in raw_jobs:
             if not isinstance(job, dict):
                 continue
@@ -24,6 +88,7 @@ class ScraperBase:
             title = str(job.get("title") or "Unknown Role").strip()
             job["url"] = url
             job["job_url"] = url
+            job["source"] = resolve_job_source(job, default_source=default_src)
 
             # Extract and update metadata
             snippet = str(job.get("description") or job.get("snippet") or "")

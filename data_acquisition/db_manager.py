@@ -149,6 +149,9 @@ class DBManager:
                                 
                         if "last_crawled" not in s:
                             s["last_crawled"] = None
+                        for job in s.get("job_openings", []):
+                            if isinstance(job, dict):
+                                job["source"] = self._resolve_job_source_clean(job)
                 except (json.JSONDecodeError, OSError) as e:
                     # Do not swallow/reset to empty list. Raise to halt execution and avoid destructive overwrite.
                     raise e
@@ -247,11 +250,25 @@ class DBManager:
         if self.is_aggregator_name(name):
             return None
 
+        def _city_matches(s):
+            if not target_city:
+                return True
+            s_city = str(s.get("city") or "").strip()
+            if not s_city:
+                return True
+            try:
+                from data_acquisition.geo_config import match_target_city
+                return bool(match_target_city(s_city, target_city))
+            except ImportError:
+                return True
+
         normalized_name = self._normalize_text(name)
         
         # 1. Match by domain (excluding shorteners, search engines, and aggregators)
         if logo_domain and not is_blacklisted_domain(logo_domain):
             for s in self.startups:
+                if not _city_matches(s):
+                    continue
                 s_domain = s.get("logo_domain")
                 if s_domain and s_domain == logo_domain and not is_blacklisted_domain(s_domain):
                     return s
@@ -259,6 +276,8 @@ class DBManager:
         # 2. Match by exact normalized name
         if normalized_name:
             for s in self.startups:
+                if not _city_matches(s):
+                    continue
                 if self._normalize_text(s.get("name")) == normalized_name:
                     return s
 
@@ -266,6 +285,8 @@ class DBManager:
         base_name = self._normalize_base_text(name)
         if base_name:
             for s in self.startups:
+                if not _city_matches(s):
+                    continue
                 s_base = self._normalize_base_text(s.get("name"))
                 if s_base and s_base == base_name:
                     return s
@@ -730,7 +751,7 @@ class DBManager:
                         time.sleep(1.2 * delay_mult)
                 else:
                     time.sleep(backoff)
-                response = requests.get(url, params=params, headers=headers, timeout=10)
+                response = requests.get(url, params=params, headers=headers, timeout=(5, 5))
                 if response.status_code == 429 or response.status_code >= 500:
                     print(f"  [ OSM Rate limit/Error HTTP {response.status_code} (Attempt {attempt+1}/3). Backing off {backoff}s...")
                     backoff *= 2
@@ -792,6 +813,7 @@ class DBManager:
             normalized_url = ej.get("url") or ej.get("job_url") or ""
             ej["url"] = normalized_url
             ej["job_url"] = normalized_url
+            ej["source"] = self._resolve_job_source_clean(ej)
             if not ej.get("experience") or ej.get("experience") == "Not disclosed":
                 ej["experience"] = "Not specified"
             else:
@@ -844,7 +866,7 @@ class DBManager:
             else:
                 clean_title = self._sanitize_string(str(title))
                 clean_loc = self._sanitize_string(str(job.get("location") or DEFAULT_TARGET_CITY))
-                clean_src = self._sanitize_string(str(job.get("source", "LinkedIn")))
+                clean_src = self._resolve_job_source_clean(job)
                 print(f"  + Adding Job opening: '{clean_title}' ({clean_loc})")
                 # Deduce department from title
                 dept = self._deduce_department(clean_title)
@@ -864,6 +886,67 @@ class DBManager:
                 })
         
         startup["job_openings"] = existing_jobs
+
+    def _resolve_job_source_clean(self, job):
+        if not isinstance(job, dict):
+            return "LinkedIn"
+        src = str(job.get("source") or "").strip()
+        url = str(job.get("url") or job.get("job_url") or "").strip().lower()
+
+        if "linkedin.com" in url or "licdn.com" in url:
+            return "LinkedIn"
+        if "instahyre.com" in url:
+            return "Instahyre"
+        if "ycombinator.com" in url or "workatastartup.com" in url:
+            return "Y Combinator"
+        if "greenhouse.io" in url:
+            return "Greenhouse ATS"
+        if "lever.co" in url:
+            return "Lever ATS"
+        if "ashbyhq.com" in url:
+            return "Ashby ATS"
+        if "indeed.com" in url:
+            return "Indeed"
+        if "wellfound.com" in url or "angel.co" in url:
+            return "Wellfound"
+        if "naukri.com" in url:
+            return "Naukri"
+        if "glassdoor." in url:
+            return "Glassdoor"
+        if "cutshort." in url:
+            return "Cutshort"
+        if "hirist." in url:
+            return "Hirist"
+
+        src_lower = src.lower()
+        if "linkedin" in src_lower:
+            return "LinkedIn"
+        if "instahyre" in src_lower:
+            return "Instahyre"
+        if "ycombinator" in src_lower or src_lower == "yc":
+            return "Y Combinator"
+        if "greenhouse" in src_lower:
+            return "Greenhouse ATS"
+        if "lever" in src_lower:
+            return "Lever ATS"
+        if "ashby" in src_lower:
+            return "Ashby ATS"
+        if "indeed" in src_lower:
+            return "Indeed"
+        if "wellfound" in src_lower or "angellist" in src_lower:
+            return "Wellfound"
+        if "naukri" in src_lower:
+            return "Naukri"
+        if "glassdoor" in src_lower:
+            return "Glassdoor"
+        if "cutshort" in src_lower:
+            return "Cutshort"
+        if "hirist" in src_lower:
+            return "Hirist"
+
+        if src and "company" not in src_lower and src_lower != "direct":
+            return self._sanitize_string(src)
+        return "LinkedIn"
 
     def _deduce_department(self, title):
         title_lower = title.lower()
@@ -1055,3 +1138,259 @@ class DBManager:
         if is_fallback_coordinate(lat, lng):
             return False
         return True
+
+    def normalize_and_deduplicate_offices(self):
+        """
+        Normalizes city names across all office entries and deduplicates redundant branch entries
+        for the same city within a startup.
+        """
+        city_map = {
+            "bengaluru": "Bengaluru, Karnataka",
+            "bangalore": "Bengaluru, Karnataka",
+            "hyderabad": "Hyderabad, Telangana",
+            "mumbai": "Mumbai, Maharashtra",
+            "pune": "Pune, Maharashtra",
+            "chennai": "Chennai, Tamil Nadu",
+            "gurugram": "Gurugram, Haryana",
+            "gurgaon": "Gurugram, Haryana",
+            "noida": "Noida, Uttar Pradesh",
+            "delhi": "New Delhi, Delhi",
+            "new delhi": "New Delhi, Delhi",
+            "kolkata": "Kolkata, West Bengal",
+            "ahmedabad": "Ahmedabad, Gujarat"
+        }
+        for s in self.startups:
+            offices = s.get("offices", [])
+            unique_offices = []
+            seen_cities = set()
+            for off in offices:
+                if not isinstance(off, dict):
+                    continue
+                city_raw = str(off.get("city") or "Bengaluru").strip()
+                clean_city = re.sub(r'^(primary|headquarters|hq|office|branch)\s*[:\-]?\s*', '', city_raw, flags=re.IGNORECASE).strip()
+                clean_lower = clean_city.lower()
+                for k, std in city_map.items():
+                    if k in clean_lower:
+                        clean_city = std
+                        break
+                off["city"] = clean_city
+                dedup_key = clean_city.lower()
+                if dedup_key not in seen_cities:
+                    seen_cities.add(dedup_key)
+                    unique_offices.append(off)
+                elif off.get("is_hq") and unique_offices:
+                    for u in unique_offices:
+                        if u.get("city", "").lower() == dedup_key:
+                            u["is_hq"] = True
+                            break
+            s["offices"] = unique_offices
+        self.save_db()
+
+    def polish_all_addresses(self):
+        """
+        Polishes every office_address in self.startups by stripping boilerplate prefixes,
+        investor/registrar contact snippets, and trailing phone/email text.
+        """
+        for s in self.startups:
+            name = str(s.get("name") or "")
+            for off in s.get("offices", []):
+                addr = str(off.get("office_address") or "").strip()
+                if not addr:
+                    continue
+                clean = re.sub(r"^(where is [^\?]+\?\s*)?(visit us at|the )?(registered|corporate|head|main|branch)?\s*(office )?address (of|for) .*?(\bis\b|\bis located at\b|\blocated at\b|\bat\b|:\s*)\s*", "", addr, flags=re.IGNORECASE)
+                clean = re.sub(r"^.*?[\x27\u2019]s? (registered|corporate|head|main|branch)?\s*(office )?address (\bis\b|\bis located at\b|\blocated at\b|\bat\b|:\s*)\s*", "", clean, flags=re.IGNORECASE)
+                clean = re.sub(r"^.*?(\bis located at\b|\blocated at\b|\bvisit us at\b)[:\s,]*", "", clean, flags=re.IGNORECASE)
+                clean = re.split(r"\b(e-?mail|tel|phone|contact|website|fax|call us|call us at)\b", clean, flags=re.IGNORECASE)[0].strip(" ,;:-")
+                clean = re.sub(r"\s+", " ", clean).strip(" ,;:-")
+                if len(clean) > 10 and clean != addr:
+                    off["office_address"] = clean
+        self.save_db()
+
+    def heal_all_generic_offices(self):
+        """
+        Resolves generic office addresses across self.startups using a 4-tier healing strategy
+        (Job Openings -> Nominatim OSM -> Metadata description -> Throttled Search fallback).
+        """
+        generic_labels = {
+            "delhi ncr", "bengaluru", "mumbai", "hyderabad", "pune", "chennai", "kolkata", "ahmedabad",
+            "new delhi", "gurugram", "noida", "bengaluru, karnataka", "mumbai, maharashtra",
+            "hyderabad, telangana", "new delhi, delhi", "gurugram, haryana", "noida, uttar pradesh",
+            "pune, maharashtra", "chennai, tamil nadu", "kolkata, west bengal", "ahmedabad, gujarat"
+        }
+        street_words = ["road", "rd", "street", "st", "floor", "tower", "plot", "sector", "nagar", "layout", "park", "bhavan", "marg", "phase", "suite", "unit", "block", "building", "indiranagar", "koramangala", "hsr", "whitefield", "bkc", "andheri", "bandra", "powai", "kurla", "goregaon", "teynampet", "valasaravakkam", "pin code", "zip", "centrium", "plaza", "embassy", "seepz", "midc"]
+
+        def _is_generic(addr, city):
+            if not addr:
+                return True
+            addr_lower = str(addr).strip().lower()
+            city_lower = str(city).strip().lower()
+            if addr_lower == city_lower or addr_lower in generic_labels or len(addr_lower) < 20:
+                return True
+            if not any(w in addr_lower for w in street_words):
+                return True
+            return False
+
+        def _search_web_throttled(company_name, city):
+            query = f"{company_name} company {city} office address"
+            headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"}
+            try:
+                res = requests.post("https://html.duckduckgo.com/html/", data={"q": query}, headers=headers, timeout=(5, 5))
+                if res.status_code == 200:
+                    soup = BeautifulSoup(res.text, "html.parser")
+                    for a in soup.find_all("a", class_="result__snippet"):
+                        t = a.text.strip()
+                        if any(w in t.lower() for w in street_words):
+                            clean = re.sub(r"^(where is [^\?]+\?|the registered (office )?address of [^\.\:]+(is|at)|address\s*[:\-]|location\s*[:\-]|we['’]d love to hear from you address|contacts y information about [^\:]+company in [^\:]+[:\-]|get [^\:]+in [^\:]+address,\s*|\d+ (day|week|month|year)s? ago\s*[\·\-]\s*|[A-Za-z]+ \d+,\s*\d{4}\s*[\·\-]\s*)\s*", "", t, flags=re.IGNORECASE)
+                            clean = re.sub(r"\s+", " ", clean).strip()
+                            clean = re.split(r"(phone|tel|website|reviews|user ratings|contact person|quotes instantly|working time|description|explore the financials)", clean, flags=re.IGNORECASE)[0].strip(" ,;-:")
+                            if not any(bad in clean.lower() for bad in ["explore the financials", "board members", "legal insights", "view profile", "annual report", "financial statements"]):
+                                if len(clean) > 25 and any(char.isdigit() for char in clean):
+                                    time.sleep(1.0)
+                                    return clean
+            except Exception:
+                time.sleep(0.5)
+            return None
+
+        for s in self.startups:
+            name = s.get("name", "")
+            for off in s.get("offices", []):
+                city = str(off.get("city") or "Bengaluru").split(",")[0].strip()
+                if not _is_generic(off.get("office_address"), city):
+                    continue
+                # Tier 1: Jobs
+                found_addr = None
+                for j in s.get("job_openings", []):
+                    if isinstance(j, dict):
+                        loc = str(j.get("location") or "").strip()
+                        if any(w in loc.lower() for w in street_words) and not _is_generic(loc, city):
+                            found_addr = loc
+                            break
+                # Tier 2: OSM
+                if not found_addr:
+                    try:
+                        res = requests.get("https://nominatim.openstreetmap.org/search", params={"q": f"{name}, {city}", "format": "json", "limit": 1}, headers={"User-Agent": "BangaloreStartupVisualizer/1.0"}, timeout=(5, 5))
+                        if res.status_code == 200 and res.json():
+                            disp = res.json()[0]["display_name"]
+                            if any(w in disp.lower() for w in street_words) and not _is_generic(disp, city):
+                                found_addr = ", ".join([p.strip() for p in disp.split(",")[:4]])
+                    except Exception:
+                        pass
+                # Tier 3: Description
+                if not found_addr:
+                    desc = s.get("description", "")
+                    for line in desc.split(". "):
+                        if city.lower() in line.lower() and len(line) > 25 and any(w in line.lower() for w in street_words):
+                            found_addr = line.strip(" .;")
+                            break
+                # Tier 4: Throttled Search
+                if not found_addr:
+                    found_addr = _search_web_throttled(name, city)
+
+                if found_addr and not _is_generic(found_addr, city):
+                    off["office_address"] = found_addr
+                    lat, lng = self.geocode_address(found_addr, name, target_city=city)
+                    if lat is not None and lng is not None:
+                        off["lat"] = lat
+                        off["lng"] = lng
+        self.save_db()
+
+    def remediate_issue_logos(self):
+        """
+        Handles startups whose official homepages have WAF/Cloudflare blocks, custom CDN layouts,
+        or crawl issues by applying curated official SVG/high-resolution logos.
+        """
+        manual_logo_overrides = {
+            "Purplle.com": "https://media6.ppl-media.com/mediafiles/ecomm/promo/1728010487_p-icon-square-appfirst-.svg",
+            "Adani Enterprises Limited": "https://upload.wikimedia.org/wikipedia/commons/2/22/Adani_logo.svg",
+            "PepsiCo": "https://upload.wikimedia.org/wikipedia/commons/a/a6/PepsiCo_logo.svg",
+            "MakeMyTrip": "https://upload.wikimedia.org/wikipedia/commons/4/4b/MakeMyTrip_Logo.svg",
+            "Pickyourtrail": "https://pickyourtrail.com/favicon.png",
+            "mthree": "https://upload.wikimedia.org/wikipedia/commons/8/87/Wiley_logo.svg",
+            "IMC Trading": "https://upload.wikimedia.org/wikipedia/commons/9/91/IMC_Trading_logo.svg",
+            "Marsh Risk": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Marsh_%26_McLennan_Companies_logo.svg",
+            "NVIDIA": "https://upload.wikimedia.org/wikipedia/commons/2/21/Nvidia_logo.svg",
+            "Infosys": "https://upload.wikimedia.org/wikipedia/commons/9/95/Infosys_logo.svg",
+            "Capgemini": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Capgemini_201x_logo.svg",
+            "Rolls-Royce": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Rolls-Royce_logo.svg",
+            "Headout": "https://www.headout.com/static/favicons/favicon-1024x1024.png",
+            "YouTrip": "https://www.you.co/sg/wp-content/uploads/sites/2/2025/11/icon-512x512-1-150x150.png",
+            "Google": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg",
+            "Mastercard": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg",
+            "Verizon": "https://upload.wikimedia.org/wikipedia/commons/8/81/Verizon_2015_logo.svg",
+            "Nasdaq": "https://upload.wikimedia.org/wikipedia/commons/8/87/NASDAQ_Logo.svg",
+            "Coinbase": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Coinbase.svg",
+            "DoorDash": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Doordash_logo.svg",
+            "Zillow": "https://upload.wikimedia.org/wikipedia/commons/7/77/Zillow_logo.svg",
+            "Agoda": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Agoda_logo.svg",
+            "Canonical": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Canonical_logo.svg",
+            "Priceline": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Priceline_logo.svg",
+            "Medpace": "https://www.medpace.com/wp-content/themes/medpace/assets/images/logo.svg",
+            "Blue Dart": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Blue_Dart_logo.svg",
+            "Colgate-Palmolive": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Colgate-Palmolive_logo.svg",
+            "SUN PHARMA": "https://upload.wikimedia.org/wikipedia/en/e/e9/Sun_Pharma_logo.svg",
+            "Ather Energy": "https://upload.wikimedia.org/wikipedia/commons/b/be/Ather_Energy_logo.svg",
+            "Morningstar": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Morningstar_Logo.svg",
+            "Baker Hughes": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Baker_Hughes_logo.svg",
+            "FactSet": "https://upload.wikimedia.org/wikipedia/commons/9/97/FactSet_logo.svg",
+            "Zuora": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Zuora_logo.svg",
+            "Sprinto": "https://sprinto.com/wp-content/themes/sprinto/assets/images/sprinto-logo.svg",
+            "Testsigma": "https://testsigma.com/assets/images/testsigma-logo.svg",
+            "Jar": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Jar_logo.svg",
+            "CRED": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Cred_logo.svg",
+            "Flipkart": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Flipkart_logo.svg",
+            "Razorpay": "https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg",
+            "Swiggy": "https://upload.wikimedia.org/wikipedia/en/1/12/Swiggy_logo.svg",
+            "Zomato": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Zomato_Logo.svg",
+            "PhonePe": "https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.svg",
+            "BrowserStack": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Browserstack_logo.svg",
+            "Freshworks": "https://upload.wikimedia.org/wikipedia/commons/9/92/Freshworks_Logo.svg",
+            "Chargebee": "https://upload.wikimedia.org/wikipedia/commons/9/91/Chargebee_logo.svg",
+            "HCLSoftware": "https://upload.wikimedia.org/wikipedia/commons/5/5e/HCL_Software_logo.svg",
+            "WNS": "https://upload.wikimedia.org/wikipedia/commons/a/a2/WNS_logo.svg",
+            "Fractal": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Fractal_Analytics_logo.svg",
+            "Ingram Micro": "https://upload.wikimedia.org/wikipedia/commons/5/58/Ingram_Micro_logo.svg",
+            "Bluehost": "https://upload.wikimedia.org/wikipedia/commons/7/73/Bluehost_logo.svg",
+            "Marriott International": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Marriott_International_logo.svg",
+            "Godrej": "https://upload.wikimedia.org/wikipedia/commons/3/36/Godrej_Logo.svg",
+            "Godrej Industries Group": "https://upload.wikimedia.org/wikipedia/commons/3/36/Godrej_Logo.svg",
+            "Godrej Properties Limited": "https://upload.wikimedia.org/wikipedia/commons/3/36/Godrej_Logo.svg",
+            "AU SMALL FINANCE BANK": "https://upload.wikimedia.org/wikipedia/commons/1/1d/AU_Small_Finance_Bank_logo.svg",
+            "Matrimony.com Limited": "https://upload.wikimedia.org/wikipedia/en/7/7e/Bharat_Matrimony_logo.svg",
+            "Setu": "https://setu.co/assets/logo.svg",
+            "StockGro": "https://www.stockgro.club/assets/images/logo.svg",
+            "InsuranceDekho": "https://www.insurancedekho.com/assets/images/id-logo.svg",
+            "super.money": "https://super.money/assets/logo.svg",
+            "VEGROW": "https://vegrow.in/assets/logo.svg",
+            "PlanetSpark": "https://www.planetspark.in/assets/logo.svg",
+            "MediBuddy": "https://www.medibuddy.in/assets/logo.svg",
+            "Moveworks": "https://www.moveworks.com/assets/logo.svg",
+            "Zocdoc": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Zocdoc_logo.svg",
+            "SonicWall": "https://upload.wikimedia.org/wikipedia/commons/5/5b/SonicWall_Logo.svg",
+            "Citadel Securities": "https://upload.wikimedia.org/wikipedia/commons/a/a8/Citadel_Securities_logo.svg",
+            "Radware": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Radware_Logo.svg",
+            "A.P. Moller - Maersk": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Maersk_Group_Logo.svg",
+            "Renesas Electronics": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Renesas_Electronics_logo.svg",
+            "Charles River Laboratories": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Charles_River_Laboratories_logo.svg",
+            "Cushman & Wakefield": "https://upload.wikimedia.org/wikipedia/commons/6/69/Cushman_%26_Wakefield_Logo.svg",
+            "WSP in India": "https://upload.wikimedia.org/wikipedia/commons/d/de/WSP_logo.svg",
+            "Virtusa": "https://upload.wikimedia.org/wikipedia/commons/3/30/Virtusa_logo.svg",
+            "Optima": "https://upload.wikimedia.org/wikipedia/commons/1/10/Optima_logo.svg",
+            "AB InBev GCC India": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Anheuser-Busch_InBev_logo.svg",
+            "Firstsource": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Firstsource_logo.svg",
+            "Pepper": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Pepper_Logo.svg",
+            "Seclore": "https://upload.wikimedia.org/wikipedia/commons/1/16/Seclore_Logo.svg",
+            "Lonza": "https://upload.wikimedia.org/wikipedia/commons/3/31/Lonza_logo.svg",
+            "Blue Dart": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Blue_Dart_logo.svg",
+            "Piramal Finance Limited": "https://www.piramalfinance.com/assets/images/logo.svg"
+        }
+        for s in self.startups:
+            name = str(s.get("name") or "").strip()
+            current_logo = str(s.get("logo_svg_url") or "").strip()
+            if any(bad in current_logo.lower() for bad in [".gif", "/banner/", "banner.", "-banner", "banner-", "hero", "1200x", "ogimage", "footer_logo", "about-us"]):
+                s["logo_svg_url"] = ""
+                current_logo = ""
+            if name in manual_logo_overrides:
+                override_url = manual_logo_overrides[name]
+                if override_url != current_logo:
+                    s["logo_svg_url"] = override_url
+        self.save_db()

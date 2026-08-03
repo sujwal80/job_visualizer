@@ -625,6 +625,15 @@ def validate_logo_image(logo_url, content_bytes=None, headers=None):
     if not logo_url or not isinstance(logo_url, str) or not logo_url.startswith(("http://", "https://")):
         return False
 
+    url_lower = logo_url.lower()
+    junk_keywords = [
+        ".gif", "/banner/", "banner.", "-banner", "banner-", "discount", "offer",
+        "join-elite", "hero", "blog", "slide", "1200x", "ogimage", "about-us",
+        "about_us", "footer_logo", "facebook", "twitter", "instagram", "youtube"
+    ]
+    if any(kw in url_lower for kw in junk_keywords):
+        return False
+
     try:
         parsed = urllib.parse.urlparse(logo_url)
         netloc_domain = parsed.netloc.split(':')[0].lower()
@@ -768,20 +777,17 @@ def validate_logo_image(logo_url, content_bytes=None, headers=None):
                     if res_get.headers.get("x-fallback", "").lower() == "true" or res_get.headers.get("x-unavatar-fallback", "").lower() == "true":
                         return False
                     content_type = res_get.headers.get("Content-Type", "").lower()
-                    content_chunk = res_get.raw.read(4096)
-                    if content_chunk:
+                    full_content = res_get.content[:1024 * 1024]
+                    if full_content:
                         try:
-                            content_str_chunk = content_chunk.decode('utf-8', errors='ignore')
+                            content_str_lower = full_content[:4096].decode('utf-8', errors='ignore').lower()
                         except Exception:
-                            content_str_chunk = ""
-                        content_str_lower = content_str_chunk.lower()
+                            content_str_lower = ""
                         
                         is_svg = "image/svg+xml" in content_type or "<svg" in content_str_lower or "<?xml" in content_str_lower
                         is_html = "text/html" in content_type or "<html" in content_str_lower or "<!doctype html" in content_str_lower
                         
                         if is_svg:
-                            remaining_bytes = res_get.raw.read(1024 * 1024)
-                            full_content = content_chunk + remaining_bytes
                             if not is_safe_svg(full_content):
                                 return False
                             w, h = get_image_dimensions(full_content)
@@ -792,8 +798,6 @@ def validate_logo_image(logo_url, content_bytes=None, headers=None):
                             if is_claimed_standard_image:
                                 if "<svg" in content_str_lower or "<html" in content_str_lower or "<script" in content_str_lower:
                                     return False
-                            remaining_bytes = res_get.raw.read(1024 * 1024)
-                            full_content = content_chunk + remaining_bytes
                             w, h = get_image_dimensions(full_content)
 
                         if w is not None and h is not None:

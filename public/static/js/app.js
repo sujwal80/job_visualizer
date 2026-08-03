@@ -21,7 +21,8 @@ import {
     selectAndOpenStartup,
     _processOpenStartup,
     scrollToCard,
-    getJobSourceButtonStyle
+    getJobSourceButtonStyle,
+    getJobSourceLabel
 } from './modules/ui_manager.js';
 import {
     handleHashRouting,
@@ -1356,6 +1357,7 @@ window.WorldTechApp = {
     map,
     fetchFilteredStartups,
     getJobSourceButtonStyle,
+    getJobSourceLabel,
     lockProgrammaticMove,
     getTempRemoteMarker: () => state.tempRemoteMarker,
     resetMapView,

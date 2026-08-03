@@ -34,8 +34,6 @@ from data_acquisition.pipelines.discovery.discovery_service import CompanyDiscov
 from data_acquisition.pipelines.crawling.job_scrapers.linkedin_scraper import LinkedInScraper
 from data_acquisition.pipelines.validation.job_validator import JobValidator
 from data_acquisition.utils.validation import validate_logo_image, is_blacklisted_domain
-from data_acquisition.verify_city_address_consistency import main as enforce_consistency
-from data_acquisition.heal_all_office_addresses import main as enrich_office_addresses
 
 METRO_CITIES = [
     "Bengaluru",
@@ -76,13 +74,16 @@ def audit_metro_city_coverage(db_path):
 
 def validate_and_enrich_prod_db(db_path, public_db_path):
     print("\n[Prod DB Validation] Validating real-world data and enforcing city consistency...")
-    # 1. Enforce strict geographic consistency across cities, addresses, and coordinates
-    enforce_consistency()
-
-    # 2. Enrich any generic addresses with real-world street/building addresses
-    enrich_office_addresses()
-
-    # 3. Final synchronization check
+    db = DBManager(db_path=db_path)
+    # 1. Normalize and deduplicate city offices
+    db.normalize_and_deduplicate_offices()
+    # 2. Heal any generic addresses with real-world street/building addresses
+    db.heal_all_generic_offices()
+    # 3. Polish and clean address formatting
+    db.polish_all_addresses()
+    # 4. Remediate WAF/Cloudflare homepage issue logos
+    db.remediate_issue_logos()
+    # 5. Final synchronization check
     shutil.copy2(db_path, public_db_path)
     print(f"[Prod DB Validation] Verified and synchronized {db_path} -> {public_db_path}")
 

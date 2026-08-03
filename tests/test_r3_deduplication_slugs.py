@@ -220,5 +220,48 @@ class TestR3DeduplicationSlugs(unittest.TestCase):
         # Verify database remains empty (no aggregators registered as startups)
         self.assertEqual(len(db.get_all_startups()), 0)
 
+    # -------------------------------------------------------------------------
+    # 5. Job Source Resolution Tests
+    # -------------------------------------------------------------------------
+    def test_job_source_resolution(self):
+        db = DBManager(db_path=self.db_path)
+
+        # 1. LinkedIn URL with incorrect source "Company" or "company" -> should resolve to "LinkedIn"
+        li_job_comp = {
+            "title": "Software Engineer",
+            "url": "https://www.linkedin.com/jobs/view/software-engineer-12345",
+            "source": "Company"
+        }
+        self.assertEqual(db._resolve_job_source_clean(li_job_comp), "LinkedIn")
+
+        li_job_in = {
+            "title": "Backend Lead",
+            "url": "https://in.linkedin.com/jobs/view/backend-lead-54321",
+            "source": "company website"
+        }
+        self.assertEqual(db._resolve_job_source_clean(li_job_in), "LinkedIn")
+
+        # 2. Other aggregator URLs with missing or incorrect source -> should resolve correctly
+        ih_job = {
+            "title": "Product Manager",
+            "url": "https://www.instahyre.com/job-999",
+            "source": "Company"
+        }
+        self.assertEqual(db._resolve_job_source_clean(ih_job), "Instahyre")
+
+        yc_job = {
+            "title": "Founder Fellow",
+            "url": "https://www.ycombinator.com/companies/acme/jobs/1",
+            "source": "Direct"
+        }
+        self.assertEqual(db._resolve_job_source_clean(yc_job), "Y Combinator")
+
+        # 3. Missing source and URL -> default to LinkedIn
+        missing_job = {
+            "title": "Unknown Role"
+        }
+        self.assertEqual(db._resolve_job_source_clean(missing_job), "LinkedIn")
+
+
 if __name__ == "__main__":
     unittest.main()

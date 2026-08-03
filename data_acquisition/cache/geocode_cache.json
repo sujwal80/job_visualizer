@@ -1,0 +1,426 @@
+{
+  "m.g.road, gurugram": [
+    28.4795543,
+    77.0798926
+  ],
+  "bellandur, bengaluru": [
+    12.9320495,
+    77.6842915
+  ],
+  "cisco chennai": [
+    12.9392418,
+    80.2348911
+  ],
+  "ulsoor road bengaluru, bengaluru": [
+    12.9753396,
+    77.6207075
+  ],
+  "bahwan cybertek chennai": [
+    12.950526,
+    80.2417568
+  ],
+  "hsr layout, bengaluru": [
+    12.9116225,
+    77.6388622
+  ],
+  "infosys pune": [
+    18.5941952,
+    73.7092228
+  ],
+  "infosys hyderabad": [
+    17.4350636,
+    78.3505964
+  ],
+  "electronic city, bengaluru": [
+    12.8487599,
+    77.648253
+  ],
+  "infosys chennai": [
+    12.8903332,
+    80.2279785
+  ],
+  "nov 2, kolkata": [
+    22.6860681,
+    88.4446406
+  ],
+  "en-46, kolkata": [
+    22.5726459,
+    88.3638953
+  ],
+  "mar 20, new": [
+    35.3443261,
+    52.0628829
+  ],
+  "no. 1723, bengaluru": [
+    12.9767936,
+    77.590082
+  ],
+  "mumbai 710/ 711, mumbai 710/ 711": [
+    18.9991643,
+    72.8620819
+  ],
+  "yelahanka taluk, bengaluru": [
+    13.0977327,
+    77.5929801
+  ],
+  "whitefield, bengaluru": [
+    12.9957428,
+    77.7579489
+  ],
+  "jan 24, bengaluru": [
+    12.9134612,
+    77.6657495
+  ],
+  "moonfrog labs bengaluru": [
+    12.9702558,
+    77.6281889
+  ],
+  "capgemini mumbai": [
+    19.1763408,
+    72.9889108
+  ],
+  "pinnacle hyderabad": [
+    17.4078276,
+    78.4503266
+  ],
+  "first, chennai": [
+    13.0919362,
+    80.2921131
+  ],
+  "marathahalli, bengaluru": [
+    12.9552572,
+    77.6984163
+  ],
+  "corporate 901, mumbai - 400 051 .": [
+    19.0546435,
+    72.8870823
+  ],
+  "jun 17, mumbai": [
+    28.3039571,
+    -81.6421555
+  ],
+  "111, mumbai": [
+    19.054999,
+    72.8692035
+  ],
+  "lenovo, 11th main road, ias officers colony, btm layout 2nd stage": [
+    12.9137004,
+    77.6082555
+  ],
+  "lenovo, palm beach marg, shahbaz village, belapur west": [
+    19.0114597,
+    73.0356132
+  ],
+  "epsilon, yemaluru, yamalur, bengaluru east city corporation": [
+    12.9452581,
+    77.6886571
+  ],
+  "capco wipro, 4, hk bhaba road, bandstand": [
+    19.0490379,
+    72.8209764
+  ],
+  "capgemini, ward 123, zone 9 teynampet, chennai corporation": [
+    13.0358691,
+    80.2465939
+  ],
+  "blue dart, kharadi bypass, pune, pune city subdistrict": [
+    18.5055918,
+    73.9267974
+  ],
+  "swiggy instamart, gear school road, kaadubeesanahalli, shivanasamudra ward": [
+    12.9234645,
+    77.694995
+  ],
+  "godrej infotech, lal bahadur shastri marg, godrej station side colony, pirojsha godrej nagar": [
+    19.105434,
+    72.9231706
+  ],
+  "kotak mahindra bank, juhu tara road, ashok nagar, juhu": [
+    19.1021456,
+    72.8263265
+  ],
+  "kotak mahindra bank, sainikpuri-ecil main road, anupuram, ward 2 dr a s rao nagar": [
+    17.4773316,
+    78.5626048
+  ],
+  "sia industry, pipe line road, netaji nagar, kurla west": [
+    19.0756428,
+    72.8817743
+  ],
+  "appectual it solutions, goregaon east, p/s ward, mumbai zone 4": [
+    19.1655249,
+    72.8526144
+  ],
+  "dbs bank atm, arrivals pickup, shastri nagar, k/e ward": [
+    19.0923476,
+    72.8546604
+  ],
+  "indusind bank, lal bahadur shastri marg, sunder baug, asalpha": [
+    19.0842814,
+    72.8845683
+  ],
+  "licious store, 2nd main road, doctors layout, kasturi nagar": [
+    13.0049835,
+    77.6601436
+  ],
+  "swiggy mall, 11th cross road, thubarahalli palya, beml layout 6th stage": [
+    12.9566703,
+    77.7198705
+  ],
+  "ninjacart, kothanur main road, lbs nagar, k narayanapura": [
+    13.0665089,
+    77.6406839
+  ],
+  "meesho, kariyamma agrahara road, kariyammana agrahara, kaadubeesanahalli": [
+    12.9385117,
+    77.6903051
+  ],
+  "vedantu, 1081, 18th cross road, sector 3": [
+    12.911931,
+    77.6383253
+  ],
+  "material depot, gopanpally - wipro road, greater hyderabad municipal corporation west zone, hyderabad": [
+    17.4277435,
+    78.3287316
+  ],
+  "genpact, outer ring road, iblur, bellandur": [
+    12.9239007,
+    77.6711003
+  ],
+  "genpact, hyderabad": [
+    17.4852772,
+    78.3585486
+  ],
+  "ai noor masjid road, asad baba nagar, kishan bagh, ward 56 kishanbagh": [
+    17.3587591,
+    78.4420743
+  ],
+  "vel nagar 3rd main road, cmwssb division 144, ward 144, zone 11 valasaravakkam": [
+    13.0601485,
+    80.1750622
+  ],
+  "mp azhagar cool bar & maligai, pandidurai street, cmwssb division 174, ward 174": [
+    12.9877968,
+    80.2181407
+  ],
+  "san francisco sourdough eatery, north old mill loop, riverstone, coeur d'alene": [
+    47.6946686,
+    -116.8061881
+  ],
+  "zenith die cast pvt ltd, 23b, icchanguru, bengaluru": [
+    12.7811669,
+    77.7454478
+  ],
+  "fission labs, jubilee hills road no 36, jubilee hills, ward 95 jubilee hills": [
+    17.4348859,
+    78.4033828
+  ],
+  "t-hub, hyderabad": [
+    17.4457222,
+    78.3488216
+  ],
+  "may 1, kolkata": [
+    22.5347662,
+    88.3669903
+  ],
+  "mumbai 1, mumbai suite 1": [
+    18.9448345,
+    72.8428644
+  ],
+  "koramangala, bengaluru": [
+    12.9357366,
+    77.624081
+  ],
+  "1201, navi mumbai \u2013": [
+    19.0308262,
+    73.0198537
+  ],
+  ", mumbai": [
+    19.054999,
+    72.8692035
+  ],
+  "kamala mills, mumbai": [
+    19.0041456,
+    72.827484
+  ],
+  "mumbai 203, mumbai 203": [
+    18.9991643,
+    72.8620819
+  ],
+  "mumbai, mumbai": [
+    19.0592671,
+    72.861326
+  ],
+  "development 1105, navi mumbai -": [
+    19.0230978,
+    73.0391345
+  ],
+  ", navi mumbai-": [
+    19.0308262,
+    73.0198537
+  ],
+  ", goregaon (east) mumbai": [
+    19.1692623,
+    72.8552548
+  ],
+  "701, mumbai": [
+    19.054999,
+    72.8692035
+  ],
+  "1602, mumbai": [
+    19.054999,
+    72.8692035
+  ],
+  "richmond town, bengaluru": [
+    12.963555,
+    77.6015856
+  ],
+  "bangalore, bengaluru": [
+    12.9767936,
+    77.590082
+  ],
+  "domlur, bengaluru": [
+    12.9624669,
+    77.6381958
+  ],
+  "j.p nagar phase, bengaluru": [
+    12.9103614,
+    77.5991174
+  ],
+  "ajaib jakarta": [
+    -6.1763423,
+    106.7837684
+  ],
+  "bangalore &, bengaluru": [
+    12.9767936,
+    77.590082
+  ],
+  "second, bengaluru": [
+    13.0150796,
+    77.5024519
+  ],
+  "canada 100 king street west, toronto": [
+    43.6492045,
+    -79.3817723
+  ],
+  ", hyderabad \u2013": [
+    17.360589,
+    78.4740613
+  ],
+  "hitec city, hyderabad": [
+    17.4490055,
+    78.3831376
+  ],
+  "reliable, mumbai": [
+    19.1486697,
+    72.8335058
+  ],
+  ", hitech city hyderabad": [
+    17.4696885,
+    78.3851526
+  ],
+  "malleshwaram, bengaluru": [
+    13.0027353,
+    77.5703253
+  ],
+  "uae 106, hyderabad": [
+    25.2761746,
+    55.3376497
+  ],
+  "ic hyderabad": [
+    17.360589,
+    78.4740613
+  ],
+  "vela san francisco": [
+    8.3715528,
+    -77.0993929
+  ],
+  "kula san francisco": [
+    -11.7630118,
+    -76.9857624
+  ],
+  "chennai, chennai 9th floor": [
+    13.0836939,
+    80.270186
+  ],
+  "old no.195, chennai": [
+    12.9552271,
+    80.1669115
+  ],
+  "digicert lehi": [
+    40.4223539,
+    -111.8833657
+  ],
+  "indiranagar (bangalore), bengaluru": [
+    12.9981698,
+    77.5429724
+  ],
+  "ta, bengaluru": [
+    12.9767936,
+    77.590082
+  ],
+  "mg road bangalore, bengaluru": [
+    12.9760475,
+    77.6046532
+  ],
+  "indira nagar ii, bengaluru": [
+    12.9732913,
+    77.6404672
+  ],
+  "koramangala industrial layout, bengaluru": [
+    12.9332863,
+    77.6147149
+  ],
+  "trilegal, bengaluru": [
+    12.9739096,
+    77.6017504
+  ],
+  "7 sec hsr layout bangalore south bangalore ka 560102 in ., bengaluru": [
+    12.9157227,
+    77.649014
+  ],
+  "jayanagar, bengaluru": [
+    12.9292731,
+    77.5824229
+  ],
+  "koramangala 3, bengaluru": [
+    12.9357366,
+    77.624081
+  ],
+  "btm layout, bengaluru": [
+    12.9140008,
+    77.6102821
+  ],
+  "-1, bengaluru": [
+    12.9711094,
+    77.769267
+  ],
+  "cunningham road, bengaluru": [
+    12.9857312,
+    77.5960537
+  ],
+  "address, bengaluru": [
+    12.9852203,
+    77.7253261
+  ],
+  "kalyan nagar, bengaluru": [
+    13.0221416,
+    77.6403368
+  ],
+  ", plano": [
+    33.0136764,
+    -96.6925096
+  ],
+  "j.p. nagar phase, bengaluru": [
+    12.9103614,
+    77.5991174
+  ],
+  ", hitec city hyderabad": [
+    17.4490055,
+    78.3831376
+  ],
+  "134/2, hyderabad": [
+    17.360589,
+    78.4740613
+  ]
+}

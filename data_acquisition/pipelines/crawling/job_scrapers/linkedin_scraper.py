@@ -105,7 +105,8 @@ class LinkedInScraper(ScraperBase):
                         "company_name": company_name,
                         "company_slug": company_slug,
                         "job_url": job_url,
-                        "location": location
+                        "location": location,
+                        "source": "LinkedIn"
                     }
                     snippet_text = card.text.strip() if card else ""
                     job_data.update(extract_job_metadata(title, raw_snippet=snippet_text))

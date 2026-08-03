@@ -160,16 +160,11 @@ class LogoEnricher:
                     if not is_blacklisted_domain(full_url):
                         candidates.append(full_url)
                         
-            # 2. Priority: OpenGraph Image (og:image)
-            og_img = soup.find('meta', property=lambda p: p and 'og:image' in str(p).lower())
-            if og_img and og_img.get('content'):
-                full_url = urllib.parse.urljoin(response.url, og_img.get('content'))
-                if not is_blacklisted_domain(full_url):
-                    candidates.append(full_url)
-                    
-            # 3. Priority: Header & Brand Img Tags
+            # 2. Priority: Header & Brand Img Tags (no banners or promo images)
             for img in soup.find_all('img', src=True):
                 src = img.get('src', '')
+                if any(bad in src.lower() for bad in [".gif", "/banner/", "banner", "hero", "1200x", "ogimage", "footer_logo", "about-us"]):
+                    continue
                 alt = str(img.get('alt') or '').lower()
                 cls = " ".join(img.get('class') or []).lower()
                 if 'logo' in src.lower() or 'logo' in alt or 'logo' in cls or 'brand' in cls:

@@ -20,6 +20,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from data_acquisition.utils.validation import is_blacklisted_domain, validate_logo_image
+from data_acquisition.enrich_issue_logos import MANUAL_LOGO_OVERRIDES
 
 DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -31,9 +32,14 @@ def extract_official_logo(startup):
     web = str(startup.get("website") or "").strip()
     current_logo = str(startup.get("logo_svg_url") or "").strip()
 
+    if name in MANUAL_LOGO_OVERRIDES:
+        override_url = MANUAL_LOGO_OVERRIDES[name]
+        return name, override_url, "MANUAL_OVERRIDE"
+
     if current_logo and current_logo.startswith("http") and not is_blacklisted_domain(current_logo):
-        if validate_logo_image(current_logo):
-            return name, current_logo, "EXISTS_VALID"
+        if not any(bad in current_logo.lower() for bad in [".gif", "/banner/", "banner", "hero", "1200x", "ogimage", "footer_logo", "about-us"]):
+            if validate_logo_image(current_logo):
+                return name, current_logo, "EXISTS_VALID"
 
     if not web or not web.startswith(("http://", "https://")) or is_blacklisted_domain(web):
         return name, "", "NO_WEBSITE"
@@ -54,16 +60,11 @@ def extract_official_logo(startup):
                 if not is_blacklisted_domain(full_url):
                     candidates.append(full_url)
 
-        # 2. Look for OpenGraph image (og:image)
-        og_img = soup.find("meta", property=lambda p: p and "og:image" in str(p).lower())
-        if og_img and og_img.get("content"):
-            full_url = urllib.parse.urljoin(res.url, og_img.get("content"))
-            if not is_blacklisted_domain(full_url):
-                candidates.append(full_url)
-
-        # 3. Look for header/brand img tags
+        # 2. Look for SVG/PNG header/brand img tags (no banners or promo images)
         for img in soup.find_all("img", src=True):
             src = img.get("src", "")
+            if any(bad in src.lower() for bad in [".gif", "/banner/", "banner", "hero", "1200x", "ogimage", "footer_logo", "about-us"]):
+                continue
             alt = (img.get("alt") or "").lower()
             cls = " ".join(img.get("class") or []).lower()
             if "logo" in src.lower() or "logo" in alt or "logo" in cls or "brand" in cls:
@@ -98,7 +99,7 @@ def main():
         name = s.get("name")
         if name in res_map:
             logo_url, status = res_map[name]
-            if logo_url and logo_url != s.get("logo_svg_url"):
+            if logo_url != s.get("logo_svg_url", ""):
                 s["logo_svg_url"] = logo_url
                 enriched_count += 1
 
