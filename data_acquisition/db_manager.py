@@ -252,10 +252,6 @@ class DBManager:
         # 1. Match by domain (excluding shorteners, search engines, and aggregators)
         if logo_domain and not is_blacklisted_domain(logo_domain):
             for s in self.startups:
-                if target_city:
-                    s_city = str(s.get("city") or "")
-                    if s_city and s_city.lower() != "n/a" and not match_target_city(s_city, target_city):
-                        continue
                 s_domain = s.get("logo_domain")
                 if s_domain and s_domain == logo_domain and not is_blacklisted_domain(s_domain):
                     return s
@@ -263,10 +259,6 @@ class DBManager:
         # 2. Match by exact normalized name
         if normalized_name:
             for s in self.startups:
-                if target_city:
-                    s_city = str(s.get("city") or "")
-                    if s_city and s_city.lower() != "n/a" and not match_target_city(s_city, target_city):
-                        continue
                 if self._normalize_text(s.get("name")) == normalized_name:
                     return s
 
@@ -274,10 +266,6 @@ class DBManager:
         base_name = self._normalize_base_text(name)
         if base_name:
             for s in self.startups:
-                if target_city:
-                    s_city = str(s.get("city") or "")
-                    if s_city and s_city.lower() != "n/a" and not match_target_city(s_city, target_city):
-                        continue
                 s_base = self._normalize_base_text(s.get("name"))
                 if s_base and s_base == base_name:
                     return s
@@ -318,6 +306,45 @@ class DBManager:
             return [self._sanitize_value_recursive(v, key_name) for v in val]
         return val
 
+
+    def _ensure_office_branch(self, startup, target_city, address=None, lat=None, lng=None):
+        if not isinstance(startup, dict):
+            return
+        offices = startup.setdefault("offices", [])
+        if not offices:
+            offices.append({
+                "city": startup.get("city") or DEFAULT_TARGET_CITY,
+                "office_address": startup.get("office_address") or startup.get("city") or DEFAULT_TARGET_CITY,
+                "lat": startup.get("lat"),
+                "lng": startup.get("lng"),
+                "is_hq": True
+            })
+
+        if not target_city:
+            return
+
+        has_city = False
+        for off in offices:
+            off_city = str(off.get("city") or "")
+            if match_target_city(off_city, target_city) or target_city.lower() in off_city.lower():
+                has_city = True
+                if (off.get("lat") is None or off.get("lng") is None) and lat is not None and lng is not None:
+                    off["lat"] = lat
+                    off["lng"] = lng
+                break
+
+        if not has_city:
+            branch_lat, branch_lng = lat, lng
+            if (branch_lat is None or branch_lng is None) and address:
+                branch_lat, branch_lng = self.geocode_address(address, startup.get("name"), target_city=target_city)
+            offices.append({
+                "city": target_city,
+                "office_address": address or target_city,
+                "lat": branch_lat,
+                "lng": branch_lng,
+                "is_hq": False
+            })
+            print(f"[DB Manager] Added new branch office in '{target_city}' for existing company '{startup.get('name')}' (ID: {startup.get('id')})")
 
     def merge_startup(self, company_details, jobs, target_city=None):
         """
@@ -490,6 +517,7 @@ class DBManager:
                         city_label = city_label.split(',')[0] + f", {target_city}"
                     existing["city"] = city_label
                     
+                self._ensure_office_branch(existing, target_city, address, new_lat, new_lng)
                 self._merge_job_openings(existing, jobs)
                 self.save_db()
                 return existing
@@ -514,6 +542,15 @@ class DBManager:
                     "lat": new_lat,
                     "lng": new_lng,
                     "city": city_label,
+                    "offices": [
+                        {
+                            "city": city_label,
+                            "office_address": address or city_label,
+                            "lat": new_lat,
+                            "lng": new_lng,
+                            "is_hq": True
+                        }
+                    ],
                     "industry": company_details.get("industry") or "Software",
                     "description": company_details.get("description") or "",
                     "website": company_details.get("website") or "",

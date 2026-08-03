@@ -68,6 +68,27 @@ export async function loadStartups() {
   }
 }
 
+function matchesCityQuery(cityVal, cityQueryClean) {
+  if (!cityVal) return false;
+  const lowerCity = String(cityVal).toLowerCase();
+  for (const [regionKey, synSet] of Object.entries(config.REGION_SYNONYM_MAP)) {
+    if (synSet.has(cityQueryClean)) {
+      let targetSyns = synSet;
+      if (!COUNTRY_NAMES.has(cityQueryClean)) {
+        targetSyns = new Set([...synSet].filter(syn => !COUNTRY_NAMES.has(syn)));
+      }
+      for (const syn of targetSyns) {
+        const regex = new RegExp(`\\b${escapeRegExp(syn)}\\b`);
+        if (regex.test(lowerCity)) return true;
+      }
+    }
+  }
+  const normalizedQuery = cityQueryClean.replace(/,\s*[a-z\s]+$/, '').trim();
+  const compQuery = normalizedQuery.replace("bangalore", "bengaluru");
+  const compCity = lowerCity.replace("bangalore", "bengaluru");
+  return compCity.includes(compQuery) || compCity.includes(cityQueryClean);
+}
+
 export function filterAndSortStartups(startups, minLat, maxLat, minLng, maxLng, limit, options = {}) {
   const {
     cityQuery = "", skillQuery = "", industryQuery = "", searchQuery = "",
@@ -77,51 +98,46 @@ export function filterAndSortStartups(startups, minLat, maxLat, minLng, maxLng, 
   
   const filtered = [];
   for (const s of startups) {
-    const lat = safeFloat(s.lat);
-    const lng = safeFloat(s.lng);
-    
+    const offices = (Array.isArray(s.offices) && s.offices.length > 0)
+      ? s.offices
+      : [{ lat: s.lat, lng: s.lng, city: s.city, office_address: s.office_address, is_hq: true }];
+
+    let matchedOffices = [];
     if (minLat !== null && maxLat !== null && minLng !== null && maxLng !== null) {
       const latSpan = Math.abs(maxLat - minLat);
-      const effLat = lat !== null ? lat : config.DEFAULT_MAP_CENTER_LAT;
-      const effLng = lng !== null ? lng : config.DEFAULT_MAP_CENTER_LNG;
-      
-      if (s.has_pin === false) {
-        if (latSpan < 1.0) {
-          if (effLat < minLat || effLat > maxLat || effLng < minLng || effLng > maxLng) continue;
+      for (const off of offices) {
+        const offLat = safeFloat(off.lat);
+        const offLng = safeFloat(off.lng);
+        const effLat = offLat !== null ? offLat : config.DEFAULT_MAP_CENTER_LAT;
+        const effLng = offLng !== null ? offLng : config.DEFAULT_MAP_CENTER_LNG;
+        
+        if (s.has_pin === false) {
+          if (latSpan < 1.0) {
+            if (effLat >= minLat && effLat <= maxLat && effLng >= minLng && effLng <= maxLng) {
+              matchedOffices.push(off);
+            }
+          }
+        } else {
+          if (effLat >= minLat && effLat <= maxLat && effLng >= minLng && effLng <= maxLng) {
+            matchedOffices.push(off);
+          }
         }
-      } else {
-        if (effLat < minLat || effLat > maxLat || effLng < minLng || effLng > maxLng) continue;
       }
+      if (matchedOffices.length === 0) continue;
+    } else {
+      matchedOffices = offices;
     }
     
     if (cityQuery) {
       const cityQueryClean = cityQuery.trim().toLowerCase();
-      const cityVal = (s.city || s.location || "").toLowerCase();
-      let isMatch = false;
+      const cityMatchedOffices = matchedOffices.filter(off => matchesCityQuery(off.city || s.city || s.location, cityQueryClean));
       
-      for (const [regionKey, synSet] of Object.entries(config.REGION_SYNONYM_MAP)) {
-        if (synSet.has(cityQueryClean)) {
-          let targetSyns = synSet;
-          if (!COUNTRY_NAMES.has(cityQueryClean)) {
-            targetSyns = new Set([...synSet].filter(syn => !COUNTRY_NAMES.has(syn)));
-          }
-          
-          for (const syn of targetSyns) {
-            const regex = new RegExp(`\\b${escapeRegExp(syn)}\\b`);
-            if (regex.test(cityVal)) {
-              isMatch = true;
-              break;
-            }
-          }
-          if (isMatch) break;
-        }
-      }
-      
-      if (!isMatch) {
-        const normalizedQuery = cityQueryClean.replace(/,\s*[a-z\s]+$/, '').trim();
-        const compQuery = normalizedQuery.replace("bangalore", "bengaluru");
-        const compCity = cityVal.replace("bangalore", "bengaluru");
-        if (!compCity.includes(compQuery) && !compCity.includes(cityQueryClean)) {
+      if (cityMatchedOffices.length > 0) {
+        matchedOffices = cityMatchedOffices;
+      } else {
+        const jobs = s.job_openings || s.jobs || [];
+        const hasJobInCity = jobs.some(j => matchesCityQuery(j.location || "", cityQueryClean));
+        if (!hasJobInCity && !matchesCityQuery(s.city || s.location, cityQueryClean)) {
           continue;
         }
       }
@@ -219,8 +235,17 @@ export function filterAndSortStartups(startups, minLat, maxLat, minLng, maxLng, 
       if (filteredJobs.length === 0) continue;
       sCopy = { ...s, job_openings: filteredJobs };
     } else {
-      sCopy = s;
+      sCopy = { ...s };
     }
+    
+    if (matchedOffices && matchedOffices.length > 0) {
+      const bestOffice = matchedOffices[0];
+      sCopy.lat = safeFloat(bestOffice.lat) !== null ? safeFloat(bestOffice.lat) : sCopy.lat;
+      sCopy.lng = safeFloat(bestOffice.lng) !== null ? safeFloat(bestOffice.lng) : sCopy.lng;
+      if (bestOffice.city) sCopy.city = bestOffice.city;
+      if (bestOffice.office_address) sCopy.office_address = bestOffice.office_address;
+    }
+    sCopy.offices = offices;
     
     const effectiveJobs = sCopy.job_openings || sCopy.jobs || [];
     if (deptQuery) {
@@ -293,7 +318,8 @@ export function formatStartupSummary(s) {
     verified_email: sanitizeString(s.verified_email),
     job_count: jobOpenings.length,
     job_titles: jobOpenings.map(j => sanitizeString(j.title || "")),
-    founder_names: (s.founders || []).map(f => sanitizeString(f.name || ""))
+    founder_names: (s.founders || []).map(f => sanitizeString(f.name || "")),
+    offices: Array.isArray(s.offices) ? s.offices : []
   };
 }
 
@@ -384,7 +410,8 @@ export function formatLightweightSummary(s) {
     head_count: s.head_count,
     funding_stage: sanitizeString(s.funding_stage || "Seed / Active"),
     verified_email: sanitizeString(s.verified_email),
-    founder_names: (s.founders || []).map(f => sanitizeString(f.name || ""))
+    founder_names: (s.founders || []).map(f => sanitizeString(f.name || "")),
+    offices: Array.isArray(s.offices) ? s.offices : []
   };
 }
 
