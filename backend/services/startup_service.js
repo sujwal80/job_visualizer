@@ -238,13 +238,11 @@ export function filterAndSortStartups(startups, minLat, maxLat, minLng, maxLng, 
       sCopy = { ...s };
     }
     
-    if (matchedOffices && matchedOffices.length > 0) {
-      const bestOffice = matchedOffices[0];
-      sCopy.lat = safeFloat(bestOffice.lat) !== null ? safeFloat(bestOffice.lat) : sCopy.lat;
-      sCopy.lng = safeFloat(bestOffice.lng) !== null ? safeFloat(bestOffice.lng) : sCopy.lng;
-      if (bestOffice.city) sCopy.city = bestOffice.city;
-      if (bestOffice.office_address) sCopy.office_address = bestOffice.office_address;
-    }
+    const bestOffice = (matchedOffices && matchedOffices.length > 0) ? matchedOffices[0] : (offices[0] || {});
+    sCopy.lat = safeFloat(bestOffice.lat) !== null ? safeFloat(bestOffice.lat) : (safeFloat(s.lat) !== null ? safeFloat(s.lat) : config.DEFAULT_MAP_CENTER_LAT);
+    sCopy.lng = safeFloat(bestOffice.lng) !== null ? safeFloat(bestOffice.lng) : (safeFloat(s.lng) !== null ? safeFloat(s.lng) : config.DEFAULT_MAP_CENTER_LNG);
+    if (bestOffice.city || s.city) sCopy.city = bestOffice.city || s.city;
+    if (bestOffice.office_address || s.office_address) sCopy.office_address = bestOffice.office_address || s.office_address;
     sCopy.offices = offices;
     
     const effectiveJobs = sCopy.job_openings || sCopy.jobs || [];
@@ -291,8 +289,8 @@ export function formatStartupSummary(s) {
     }
   }
   
-  const latVal = safeFloat(s.lat);
-  const lngVal = safeFloat(s.lng);
+  const latVal = safeFloat(s.lat) !== null ? safeFloat(s.lat) : (s.offices && s.offices[0] ? safeFloat(s.offices[0].lat) : null);
+  const lngVal = safeFloat(s.lng) !== null ? safeFloat(s.lng) : (s.offices && s.offices[0] ? safeFloat(s.offices[0].lng) : null);
   
   return {
     id: s.id,
@@ -381,8 +379,8 @@ export function formatStartupDetails(s) {
 export function formatLightweightSummary(s) {
   const logoSvgUrl = s.logo_svg_url || "";
   const logoUrl = logoSvgUrl || "";
-  const latVal = safeFloat(s.lat);
-  const lngVal = safeFloat(s.lng);
+  const latVal = safeFloat(s.lat) !== null ? safeFloat(s.lat) : (s.offices && s.offices[0] ? safeFloat(s.offices[0].lat) : null);
+  const lngVal = safeFloat(s.lng) !== null ? safeFloat(s.lng) : (s.offices && s.offices[0] ? safeFloat(s.offices[0].lng) : null);
   const jobs = s.job_openings || s.jobs || [];
   const jobCount = jobs.length > 0 ? jobs.length : (s.job_count || 0);
   
