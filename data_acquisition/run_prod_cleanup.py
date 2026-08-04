@@ -15,6 +15,18 @@ if parent_dir not in sys.path:
 from data_acquisition.db_manager import DBManager
 from data_acquisition.utils.validation import is_blacklisted_domain, validate_logo_image, validate_website_domain
 
+def clean_office_address(addr):
+    if not addr:
+        return ""
+    addr = re.sub(r"\xa0", " ", addr)
+    # Remove "...Read more", "Read more", "... Read more" with case insensitivity
+    addr = re.sub(r"\b(?:read\s+more|readmore)\b\.?$", "", addr, flags=re.IGNORECASE).strip()
+    addr = re.sub(r"\.{2,}\s*$", "", addr).strip() # strip trailing dots
+    addr = re.sub(r"\b(?:read\s+more|readmore)\b", "", addr, flags=re.IGNORECASE).strip()
+    addr = re.sub(r"\s+", " ", addr) # normalize spacing
+    return addr.strip()
+
+
 # Mock rules for deterministic network verification
 def mock_gethostbyname(domain):
     domain_lower = domain.lower()
@@ -84,7 +96,8 @@ def run_cleanup_pass(db):
         "merged_records": 0,
         "removed_aggregators": 0,
         "cleared_logos": 0,
-        "pruned_jobs": 0
+        "pruned_jobs": 0,
+        "cleared_address_boilerplates": 0
     }
 
     # -------------------------------------------------------------------------
@@ -339,6 +352,19 @@ def run_cleanup_pass(db):
                             s["city"] = f"{c_name.capitalize()} (Remote Office)"
                         break
 
+    # -------------------------------------------------------------------------
+    # Stage 5: Office Address Suffix & Format Cleanup
+    # Clean up trailing ...Read more, Read more, ellipsis, and normalize double spaces.
+    # -------------------------------------------------------------------------
+    for s in db.startups:
+        for o in s.get("offices", []):
+            addr = o.get("office_address")
+            if addr:
+                cleaned = clean_office_address(addr)
+                if cleaned != addr:
+                    o["office_address"] = cleaned
+                    stats["cleared_address_boilerplates"] += 1
+
     return stats
 
 
@@ -377,6 +403,7 @@ def main():
         print(f"Stage 2 Removed Aggregator Startups: {pass1_stats['removed_aggregators']}")
         print(f"Stage 3 Cleared Logos: {pass1_stats['cleared_logos']}")
         print(f"Stage 4 Pruned Jobs: {pass1_stats['pruned_jobs']}")
+        print(f"Stage 5 Cleared Address Boilerplates: {pass1_stats['cleared_address_boilerplates']}")
 
         print("\n========================================================")
         print(f"=== PASS 2: Verifying 0 Remaining Inconsistencies   ===")
@@ -401,6 +428,7 @@ def main():
         print(f"Stage 2 Removed Aggregator Startups: {pass2_stats['removed_aggregators']}")
         print(f"Stage 3 Cleared Logos: {pass2_stats['cleared_logos']}")
         print(f"Stage 4 Pruned Jobs: {pass2_stats['pruned_jobs']}")
+        print(f"Stage 5 Cleared Address Boilerplates: {pass2_stats['cleared_address_boilerplates']}")
 
         if total_pass2_changes == 0 and companies_after_pass1 == companies_after_pass2 and jobs_after_pass1 == jobs_after_pass2:
             print("\n[SUCCESS] Pass 2 reported 0 remaining dataset inconsistencies. Dataset is 100% clean!")

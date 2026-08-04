@@ -181,7 +181,22 @@ async def get_ws_browser_url():
         await asyncio.sleep(1)
     raise RuntimeError("Chrome debugging port 9333 is not active! Make sure Chrome launched successfully.")
 
+def clean_office_address(addr):
+    if not addr:
+        return ""
+    addr = re.sub(r"\xa0", " ", addr)
+    # Remove "...Read more", "Read more", "... Read more" with case insensitivity
+    addr = re.sub(r"\b(?:read\s+more|readmore)\b\.?$", "", addr, flags=re.IGNORECASE).strip()
+    addr = re.sub(r"\.{2,}\s*$", "", addr).strip() # strip trailing dots
+    addr = re.sub(r"\b(?:read\s+more|readmore)\b", "", addr, flags=re.IGNORECASE).strip()
+    addr = re.sub(r"\s+", " ", addr) # normalize spacing
+    return addr.strip()
+
 def parse_address_from_dom(html):
+    raw = _parse_raw_address_from_dom(html)
+    return clean_office_address(raw) if raw else None
+
+def _parse_raw_address_from_dom(html):
     """
     Extract address using 3 tiers of Google search elements:
     Tier 1: SGE / AI Overview text
@@ -320,6 +335,8 @@ async def heal_address_workflow(db_path=None, resume_index=0):
                 lng = o.get("lng")
                 o_city = str(o.get("city") or s.get("city") or "").strip()
                 exp_city = get_expected_city(o_city)
+                if exp_city == "other":
+                    continue
                 
                 # Rule 1 Check
                 is_r1 = False
