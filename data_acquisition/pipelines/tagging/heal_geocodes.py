@@ -272,11 +272,7 @@ async def heal_address_workflow(db_path=None, resume_index=0):
     db = DBManager(db_path=db_path)
     db.load_db()
     
-    # Identify cluster coordinates
-    all_coords = [ (round(o["lat"], 6), round(o["lng"], 6)) for s in db.startups for o in s.get("offices", []) if o.get("lat") and o.get("lng") ]
-    coord_counts = Counter(all_coords)
-    CLUSTER_COORDS = {c for c, cnt in coord_counts.items() if cnt >= 3}
-    ALL_DEFAULT_CENTERS = CLUSTER_COORDS | KNOWN_CENTERS
+    ALL_DEFAULT_CENTERS = KNOWN_CENTERS
     
     def is_center_tagged(lat, lng):
         if not lat or not lng: return False
