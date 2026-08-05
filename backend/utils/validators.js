@@ -29,18 +29,6 @@ export function safeFloat(val, defaultVal = null) {
 }
 
 export function checkHasPin(s) {
-  if (s.is_remote_office === true) return false;
-  const lat = safeFloat(s.lat);
-  const lng = safeFloat(s.lng);
-  if (lat === null || lng === null) return false;
-  
-  for (const [fLat, fLng] of config.FALLBACK_COORDINATES) {
-    if (Math.abs(lat - fLat) < config.PIN_DELTA_THRESHOLD && Math.abs(lng - fLng) < config.PIN_DELTA_THRESHOLD) {
-      return false;
-    }
-  }
-  const addr = (s.address || s.street_address || s.bangalore_address || s.city || "").trim().toLowerCase();
-  if (config.GENERIC_HUB_LABELS.has(addr)) return false;
   return true;
 }
 

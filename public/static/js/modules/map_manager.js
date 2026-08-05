@@ -195,7 +195,6 @@ export function cullMarkers(map) {
 
 export function initializeMarkers(startups) {
     startups.forEach(startup => {
-        if (startup.has_pin === false) return;
         if (startup.orig_lat === undefined) {
             startup.orig_lat = startup.lat;
             startup.orig_lng = startup.lng;
@@ -250,8 +249,6 @@ export function updateMarkersDiff(startups) {
     }
 
     startups.forEach(startup => {
-        if (startup.has_pin === false) return;
-
         if (startup.orig_lat === undefined) {
             startup.orig_lat = startup.lat;
             startup.orig_lng = startup.lng;

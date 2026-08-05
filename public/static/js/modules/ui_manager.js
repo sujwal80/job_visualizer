@@ -108,7 +108,7 @@ export function renderDirectory(startups, customEmptyText = null) {
         const badgeTags = [
             createElement('span', { className: `pill pill-${indClass}`, textContent: startup.industry || 'Tech' })
         ];
-        if (startup.has_pin === false) {
+        if (startup.is_remote_office === true) {
             badgeTags.push(createElement('span', { className: 'verified-pill', style: 'background: #fef9c3; color: #854d0e; border: 1px solid #fde047;', textContent: '📍 Remote / Hub' }));
         }
         if (startup.funding_stage && startup.funding_stage !== "N/A") {
@@ -615,25 +615,6 @@ export function _processOpenStartup(fullStartup) {
 
         let flyCenter = [fullStartup.lng || 77.5946, fullStartup.lat || 12.9716];
         let flyZoom = 16;
-
-        if (fullStartup.has_pin === false) {
-            const centerLng = state.defaultLocation ? state.defaultLocation[0] : 77.5946;
-            const centerLat = state.defaultLocation ? state.defaultLocation[1] : 12.9716;
-            fullStartup.lng = centerLng;
-            fullStartup.lat = centerLat;
-            flyCenter = [centerLng, centerLat];
-            flyZoom = 15.5;
-
-            const markerEl = createLogoContent(fullStartup);
-            markerEl.classList.add('active');
-            markerEl.style.zIndex = '10000';
-            state.tempRemoteMarker = new maplibregl.Marker({
-                element: markerEl,
-                anchor: 'center'
-            })
-                .setLngLat([centerLng, centerLat])
-                .addTo(map);
-        }
 
         lockProgrammaticMove(2500);
         map.flyTo({

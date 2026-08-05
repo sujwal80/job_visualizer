@@ -111,16 +111,8 @@ export function filterAndSortStartups(startups, minLat, maxLat, minLng, maxLng, 
         const effLat = offLat !== null ? offLat : config.DEFAULT_MAP_CENTER_LAT;
         const effLng = offLng !== null ? offLng : config.DEFAULT_MAP_CENTER_LNG;
         
-        if (s.has_pin === false) {
-          if (latSpan < 1.0) {
-            if (effLat >= minLat && effLat <= maxLat && effLng >= minLng && effLng <= maxLng) {
-              matchedOffices.push(off);
-            }
-          }
-        } else {
-          if (effLat >= minLat && effLat <= maxLat && effLng >= minLng && effLng <= maxLng) {
-            matchedOffices.push(off);
-          }
+        if (effLat >= minLat && effLat <= maxLat && effLng >= minLng && effLng <= maxLng) {
+          matchedOffices.push(off);
         }
       }
       if (matchedOffices.length === 0) continue;

@@ -69,7 +69,7 @@ export function createLogoContent(startup) {
         children.push(img);
     }
     
-    const containerClass = 'logo-marker' + (startup.has_pin === false ? ' hub-logo-marker' : '');
+    const containerClass = 'logo-marker';
     return createElement('div', { className: containerClass, children });
 }
 

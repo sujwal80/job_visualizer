@@ -190,7 +190,7 @@ function filterStartupsByViewport(startups, queryParams) {
     const keepRemote = latSpan >= 1.0;
 
     return startups.filter(s => {
-        if (s.has_pin === false) {
+        if (s.is_remote_office === true) {
             return keepRemote;
         }
         
@@ -364,7 +364,7 @@ function filterCityStartupsLocally(startups) {
             const keepRemote = latSpan >= 1.0;
 
             filtered = filtered.filter(s => {
-                if (s.has_pin === false) {
+                if (s.is_remote_office === true) {
                     if (latSpan >= 1.0) {
                         return true;
                     }
