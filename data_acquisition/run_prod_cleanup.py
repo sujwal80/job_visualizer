@@ -25,7 +25,19 @@ def clean_office_address(addr):
     addr = re.sub(r"\b(?:read\s+more|readmore)\b", "", addr, flags=re.IGNORECASE).strip()
     addr = re.sub(r"\s+", " ", addr) # normalize spacing
     return addr.strip()
+def has_word(kw, text):
+    return bool(re.search(r"\b" + re.escape(kw) + r"\b", text.lower()))
 
+def get_expected_city(city_str):
+    c_lower = str(city_str or "").lower()
+    if any(has_word(k, c_lower) for k in ["bengaluru", "bangalore"]): return "bengaluru"
+    if any(has_word(k, c_lower) for k in ["hyderabad"]): return "hyderabad"
+    if any(has_word(k, c_lower) for k in ["chennai", "madras"]): return "chennai"
+    if any(has_word(k, c_lower) for k in ["pune"]): return "pune"
+    if any(has_word(k, c_lower) for k in ["kolkata", "calcutta"]): return "kolkata"
+    if any(has_word(k, c_lower) for k in ["delhi", "new delhi", "ncr", "gurugram", "gurgaon", "noida"]): return "delhi_ncr"
+    if any(has_word(k, c_lower) for k in ["mumbai", "bombay"]): return "mumbai"
+    return "other"
 
 # Mock rules for deterministic network verification
 def mock_gethostbyname(domain):
@@ -97,7 +109,8 @@ def run_cleanup_pass(db):
         "removed_aggregators": 0,
         "cleared_logos": 0,
         "pruned_jobs": 0,
-        "cleared_address_boilerplates": 0
+        "cleared_address_boilerplates": 0,
+        "removed_other_offices": 0
     }
 
     # -------------------------------------------------------------------------
@@ -365,6 +378,22 @@ def run_cleanup_pass(db):
                     o["office_address"] = cleaned
                     stats["cleared_address_boilerplates"] += 1
 
+    # -------------------------------------------------------------------------
+    # Stage 6: Filter out non-metro/international offices
+    # Only keep offices that belong to one of the 7 supported Indian metro cities.
+    # -------------------------------------------------------------------------
+    for s in db.startups:
+        offices = s.get("offices", [])
+        if isinstance(offices, list) and len(offices) > 0:
+            filtered_offices = []
+            for o in offices:
+                o_city = str(o.get("city") or s.get("city") or "").strip()
+                if get_expected_city(o_city) != "other":
+                    filtered_offices.append(o)
+                else:
+                    stats["removed_other_offices"] += 1
+            s["offices"] = filtered_offices
+
     return stats
 
 
@@ -404,6 +433,7 @@ def main():
         print(f"Stage 3 Cleared Logos: {pass1_stats['cleared_logos']}")
         print(f"Stage 4 Pruned Jobs: {pass1_stats['pruned_jobs']}")
         print(f"Stage 5 Cleared Address Boilerplates: {pass1_stats['cleared_address_boilerplates']}")
+        print(f"Stage 6 Removed Non-Metro/International Offices: {pass1_stats['removed_other_offices']}")
 
         print("\n========================================================")
         print(f"=== PASS 2: Verifying 0 Remaining Inconsistencies   ===")
@@ -429,6 +459,7 @@ def main():
         print(f"Stage 3 Cleared Logos: {pass2_stats['cleared_logos']}")
         print(f"Stage 4 Pruned Jobs: {pass2_stats['pruned_jobs']}")
         print(f"Stage 5 Cleared Address Boilerplates: {pass2_stats['cleared_address_boilerplates']}")
+        print(f"Stage 6 Removed Non-Metro/International Offices: {pass2_stats['removed_other_offices']}")
 
         if total_pass2_changes == 0 and companies_after_pass1 == companies_after_pass2 and jobs_after_pass1 == jobs_after_pass2:
             print("\n[SUCCESS] Pass 2 reported 0 remaining dataset inconsistencies. Dataset is 100% clean!")

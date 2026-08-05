@@ -357,6 +357,9 @@ async def heal_address_workflow(db_path=None, resume_index=0):
                 # Rule 2 Check
                 is_r2 = is_center_tagged(lat, lng)
                 
+                if o.get("location_tagged") is True and not is_r1 and not is_r2:
+                    continue
+                
                 if is_r1 or is_r2:
                     print(f"\n[HEAL] {s_name} ({o_city}) - violates Rule 1={is_r1}, Rule 2={is_r2}")
                     
