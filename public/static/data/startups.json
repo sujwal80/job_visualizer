@@ -437,8 +437,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Unit No: 101 - B, 1st Floor, Raheja Plaza -I, LBS Marg, Ghatkopar (West) Mumbai - 400086",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0948568,
+        "lng": 72.9173499,
         "is_hq": true,
         "location_tagged": true
       },
@@ -452,8 +452,8 @@
       },
       {
         "city": "Hyderabad, Telangana",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.3676,
+        "lng": 78.5313,
         "is_hq": false,
         "office_address": "13-18-97/25, nr. Kamala Nagar, VR Colony, Kamala Nagar, Dilsukhnagar , Telangana, 500060, Hyderabad, State of Telangna",
         "location_tagged": true
@@ -944,8 +944,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "513-579-9911. Mumbai, India Unit No. 301, 3rd Building level (2nd Office Floor), Building No. Mumbai 400708",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0450862,
+        "lng": 72.8512532,
         "is_hq": true,
         "location_tagged": true
       },
@@ -1553,16 +1553,16 @@
       },
       {
         "city": "Pune, Maharashtra",
-        "lat": 18.5213738,
-        "lng": 73.8545071,
+        "lat": 18.5240698,
+        "lng": 73.8447258,
         "is_hq": false,
         "office_address": "Pune 1187/17, Ghole Road, Shivaji Nagar, Pune - 411 005",
         "location_tagged": true
       },
       {
         "city": "Kolkata, West Bengal",
-        "lat": 22.5726459,
-        "lng": 88.3638953,
+        "lat": 22.5128398,
+        "lng": 88.4011451,
         "is_hq": false,
         "office_address": "Kolkata BioWonder, Unit No 1002, 10th Floor, 789, Anandpur Main Road, EM Bypass, West Bengal, Kolkata - 700 107",
         "location_tagged": true
@@ -1907,8 +1907,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "-NO.148,RAJIV GANDHI SALAI (OMR) OKKIYAM THURAIPAKKAM CHENNAI Chennai TN 600097 IN.",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 12.929664,
+        "lng": 80.231164,
         "is_hq": false,
         "location_tagged": true
       },
@@ -2270,8 +2270,8 @@
       },
       {
         "city": "Mumbai, Maharashtra",
-        "lat": 19.067115,
-        "lng": 72.8657245,
+        "lat": 19.0675218,
+        "lng": 72.8474705,
         "is_hq": false,
         "office_address": "Unit A, 2nd & 6th Floor One BKC C-22, Opposite Bharat Nagar Bus Stop, Complex-Bandra East, Mumbai-400051, Maharashtra",
         "location_tagged": true
@@ -2302,8 +2302,8 @@
       },
       {
         "city": "Kolkata, West Bengal",
-        "lat": 22.5726459,
-        "lng": 88.3638953,
+        "lat": 22.5732956,
+        "lng": 88.4373448,
         "is_hq": false,
         "office_address": ". 7th Floor, Godrej Waterside Building, Tower 1, Unit 2, Salt Lake City Sector 5, Kolkata-700091, West Bengal",
         "location_tagged": true
@@ -4270,8 +4270,8 @@
       {
         "city": "Pune, Maharashtra",
         "office_address": "No B - 104, Wing B, Ground Floor,,Sr. No. 51/2A/2, Navale IT Zone, Phase - 2, Haveli Pune, Narhe,Pune City,Pune,Maharashtra,411041-India. ACF-8952",
-        "lat": 18.5213738,
-        "lng": 73.8545071,
+        "lat": 18.4491,
+        "lng": 73.8062,
         "is_hq": true,
         "location_tagged": true
       }
@@ -4335,8 +4335,8 @@
       {
         "city": "Pune, Maharashtra",
         "office_address": "Unit 601, Pune",
-        "lat": 18.5213738,
-        "lng": 73.8545071,
+        "lat": 18.630073,
+        "lng": 73.844073,
         "is_hq": true,
         "location_tagged": true
       }
@@ -4709,8 +4709,8 @@
       {
         "city": "Pune, Maharashtra",
         "office_address": "Pune, Maharashtra Locations 3rd Floor,ONYX, North Main Road,Koregaon Park, Pune, Maharashtra 411001, IN",
-        "lat": 18.5213738,
-        "lng": 73.8545071,
+        "lat": 18.5396759,
+        "lng": 73.8967325,
         "is_hq": true,
         "location_tagged": true
       }
@@ -5046,8 +5046,8 @@
       {
         "city": "Kolkata, West Bengal",
         "office_address": "AdventzInfinity5, Unit No. 609, Plot No. 5, Block BN, Sector 5, Salt Lake, Kolkata, West Bengal 700091",
-        "lat": 22.5753205,
-        "lng": 88.3600377,
+        "lat": 22.5809,
+        "lng": 88.434,
         "is_hq": true,
         "location_tagged": true
       }
@@ -5773,8 +5773,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "Opposite to Bharath Dass School, Phase-2, Thirumalai Nagar Annexe, Perungudi, Chennai, Tamil Nadu 600096.",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 12.9583683,
+        "lng": 80.241897,
         "is_hq": true,
         "location_tagged": true
       }
@@ -5838,8 +5838,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "No 17, Lakshmi St, Alagappa Nagar, Kilpauk, Chennai-600010, Tamil Nadu",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0784549,
+        "lng": 80.2339949,
         "is_hq": true,
         "location_tagged": true
       }
@@ -6038,8 +6038,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "Core 3, 6th Floor, Pacifica Tech Park, Navalur, Chennai, Tamil Nadu 600130",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0741,
+        "lng": 80.2258,
         "is_hq": true,
         "location_tagged": true
       }
@@ -6120,8 +6120,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "5th Floor, EA Chambers (Express Avenue), No. 49 & 50L, Whites Road, Royapettah, Chennai - 600014, Tamil Nadu, India",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0580044,
+        "lng": 80.2647244,
         "is_hq": true,
         "location_tagged": true
       }
@@ -8638,8 +8638,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": ". 9th Floor, Tower 2, Laxmi Infobahn, Gandipet Mandal, Kokapet, K.V.Rangareddy, Rajendra Nagar , Hyderabad, Telangana, India, 500075",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.395693,
+        "lng": 78.328374,
         "is_hq": true,
         "location_tagged": true
       }
@@ -8738,8 +8738,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "No. 108, Door No. 08-3-945, Sri Nilaya Estates, Ameerpet, Srinagar Colony, Khairatabad, Hyderabad, Telangana, 500073, India",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4323,
+        "lng": 78.4465,
         "is_hq": true,
         "location_tagged": true
       }
@@ -8803,8 +8803,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Corissa Nunn Consulting Hyderabad, Telangana, India",
-        "lat": 17.8495919,
-        "lng": 79.1151663,
+        "lat": 17.3617194,
+        "lng": 78.4751689,
         "is_hq": true,
         "location_tagged": true
       }
@@ -8853,8 +8853,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Villa No 55, Aparna Orchids Near NAC, Izzathnagar, Kothaguda, Hitex , HYDERABAD, Telangana,",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4679312,
+        "lng": 78.3742087,
         "is_hq": true,
         "location_tagged": true
       }
@@ -8903,8 +8903,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "1st floor, PSR kalanjali apartment, Kompally, Hyderabad, Telangana",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.533026,
+        "lng": 78.478495,
         "is_hq": true,
         "location_tagged": true
       }
@@ -8953,8 +8953,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "H No 3-8-36/5/1/ Fayaz Nagar, Mominpet Road, Sadasivpet, Sangareddy,Telangana, India",
-        "lat": 17.8495919,
-        "lng": 79.1151663,
+        "lat": 17.5936926,
+        "lng": 77.9358105,
         "is_hq": true,
         "location_tagged": true
       }
@@ -9103,8 +9103,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "3-945, Rd Number 48, Ayyappa Society, Mega Hills, Madhapur, Hyderabad, Telangana 500081",
-        "lat": 25.489286,
-        "lng": 68.8437618,
+        "lat": 17.448442,
+        "lng": 78.392705,
         "is_hq": true,
         "location_tagged": true
       }
@@ -9356,8 +9356,8 @@
       {
         "city": "Pune, Maharashtra",
         "office_address": "The Hive, Plot 100-101/1, Raja Bahadur Motilal Road, Pune, Maharashtra 411001",
-        "lat": 18.5213738,
-        "lng": 73.8545071,
+        "lat": 18.537073,
+        "lng": 73.881467,
         "is_hq": true,
         "location_tagged": true
       }
@@ -9421,8 +9421,8 @@
       {
         "city": "Kolkata, West Bengal",
         "office_address": "No 3/1, 3rd Floor, Shreeram Chambers RN Mukherjee Road, Kolkata - 700001",
-        "lat": 22.5726459,
-        "lng": 88.3638953,
+        "lat": 22.56082,
+        "lng": 88.362118,
         "is_hq": true,
         "location_tagged": true
       }
@@ -9471,8 +9471,8 @@
       {
         "city": "Kolkata, West Bengal",
         "office_address": "4444, New Town, Rajarhat , Kolkata, West Bengal, India - 700156. AAU-7566",
-        "lat": 22.5726459,
-        "lng": 88.3638953,
+        "lat": 22.575,
+        "lng": 88.4817,
         "is_hq": true,
         "location_tagged": true
       }
@@ -9521,8 +9521,8 @@
       {
         "city": "Kolkata, West Bengal",
         "office_address": "Godrej Waterside Tower I 8 Sector V Kolkata West Bengal, 700091",
-        "lat": 12.9352,
-        "lng": 77.6245,
+        "lat": 22.5732956,
+        "lng": 88.4373448,
         "is_hq": true,
         "location_tagged": true
       }
@@ -9571,8 +9571,8 @@
       {
         "city": "Kolkata, West Bengal",
         "office_address": "P-219, CIT Road Scheme VII-M, Kolkata, West Bengal 700054",
-        "lat": 22.5726459,
-        "lng": 88.3638953,
+        "lat": 22.587779,
+        "lng": 88.392688,
         "is_hq": true,
         "location_tagged": true
       }
@@ -9621,8 +9621,8 @@
       {
         "city": "Kolkata, West Bengal",
         "office_address": "60/A, nalini seth road. barabazar. Block/Municipality: Kolkata District: Kolkata, 700007",
-        "lat": 22.5726459,
-        "lng": 88.3638953,
+        "lat": 22.5793688,
+        "lng": 88.360316,
         "is_hq": true,
         "location_tagged": true
       }
@@ -9876,8 +9876,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "MICE Wise DMC Chennai Brandwise Marketing Solutions No 5 , Manjolai 1st Main Rd, Kalaimagal Nagar, Ekkatuthangal, Chennai, Tamil Nadu.- 600032",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0266723,
+        "lng": 80.2036743,
         "is_hq": true,
         "location_tagged": true
       }
@@ -9999,8 +9999,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "No 1 A & B Citius Block Olympia Tech Park, Sidco Industrial Estate, Guindy, Chennai-600032, Tamil Nadu",
-        "lat": 12.9352,
-        "lng": 77.6245,
+        "lat": 13.0149711,
+        "lng": 80.2035874,
         "is_hq": false,
         "location_tagged": true
       }
@@ -10099,8 +10099,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "Pentabay Softwares Pvt. Ltd. 758, 1C, Mount Chambers, Anna Salai, Mount Road, Chennai, Tamil Nadu, India",
-        "lat": 11.3323723,
-        "lng": 78.6098639,
+        "lat": 12.957133,
+        "lng": 80.1431864,
         "is_hq": true,
         "location_tagged": true
       }
@@ -10149,8 +10149,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "CHENNAI, INDIA Automation & Robotics Center. No:43, Chettiyar Agaram Main Road, Porur, Chennai, Tamil Nadu - 600116",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0338,
+        "lng": 80.1486,
         "is_hq": true,
         "location_tagged": true
       }
@@ -10199,8 +10199,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "Indiqube Marina, 3rd Floor, Guindy Industrial Estate, SIDCO Industrial Estate, Guindy, Chennai, Tamil Nadu 600032",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.015,
+        "lng": 80.2006,
         "is_hq": true,
         "location_tagged": true
       }
@@ -10299,8 +10299,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "217, 11, Arumbakkam. Chennai, Th Street, Annai Satya Nagar, Arumbakkam, Chennai-600106, Tamil Nadu",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0768536,
+        "lng": 80.2103155,
         "is_hq": true,
         "location_tagged": true
       }
@@ -10457,8 +10457,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "2nd Floor, No: 23, Rajiv Gandhi Salai (OMR), Navalur, Chennai, Tamil Nadu, India - 600130",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0309598,
+        "lng": 80.1933282,
         "is_hq": true,
         "location_tagged": true
       }
@@ -11587,8 +11587,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "603 and Terrace, Kotia Nirman, New Link Road, New Fun Republic, Andheri West, Mumbai, Maharashtra 400053",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1347058,
+        "lng": 72.832305,
         "is_hq": true,
         "location_tagged": true
       }
@@ -12044,8 +12044,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "153-154, 2ND FLOOR, SDF V, SEEPZ ANDHERI MUMBAI , MUMBAI CITY UNCLASSIFIED MH 400096",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1292686,
+        "lng": 72.8800819,
         "is_hq": true,
         "location_tagged": true
       }
@@ -12344,8 +12344,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Level 1, Regus Imperial Business Park Pvt Ltd, Block A, Dr Annie Besant Road, Shiv Sagar Estate, Worli, Mumbai, Maharashtra 400018",
-        "lat": 17.4953974,
-        "lng": 78.3197494,
+        "lat": 18.9885253,
+        "lng": 72.8134765,
         "is_hq": true,
         "location_tagged": true
       }
@@ -12394,8 +12394,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "5th Floor, Empire Plaza, Building A, LBS Marg, Vikhroli West, Mumbai 400083, Maharashtra, India",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1174987,
+        "lng": 72.9268504,
         "is_hq": true,
         "location_tagged": true
       }
@@ -12444,8 +12444,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Reliance Corporate IT Park, Thane-Belapur Road, Ghansoli, Navi Mumbai - 400701, Maharashtra, India",
-        "lat": 19.5670323,
-        "lng": 76.4164557,
+        "lat": 19.125323,
+        "lng": 73.006955,
         "is_hq": true,
         "location_tagged": true
       }
@@ -12494,8 +12494,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "6th Floor, Jolly Board Tower D - Wing, i-Think Techno Campus, Kanjurmarg East, Mumbai - 400042, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1295726,
+        "lng": 72.930219,
         "is_hq": true,
         "location_tagged": true
       }
@@ -12844,8 +12844,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "xNETRA - Mumbai 403, KK Archade, Plot-22, Sector-21, Ulwe, Navi Mumbai, MH, INDIA - 410206",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 18.9856,
+        "lng": 73.1246,
         "is_hq": true,
         "location_tagged": true
       }
@@ -12894,8 +12894,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "\ud83d\udccd 6th Floor, Unitech Trade Center, Sector 43, Gurugram, Haryana \ud83d\udcde",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 28.4595,
+        "lng": 77.0266,
         "is_hq": true,
         "location_tagged": true
       }
@@ -13144,8 +13144,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Office No. 3, 4th Floor, Second Avenue, Connekt Coworks, Subhash Nagar, Andheri East, Mumbai, Maharashtra-400093",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.123444,
+        "lng": 72.868452,
         "is_hq": true,
         "location_tagged": true
       }
@@ -13294,8 +13294,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "D-715 to D-718, Neelkanth Business Park, Nathani Road, Vidyavihar (W), Mumbai, Maharashtra, India, 400086",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0842286,
+        "lng": 72.9041224,
         "is_hq": true,
         "location_tagged": true
       }
@@ -13409,8 +13409,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "3rd Floor, A Wing, Madhu Corporate Park, Pandurang Budhkar Marg, Worli, Mumbai - 400013, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0002,
+        "lng": 72.8235,
         "is_hq": true,
         "location_tagged": true
       }
@@ -13459,8 +13459,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "2438, 24th Floor, Rupa Renaissance, B Wing, D-33 Turbhe MIDC Road, TTC Industrial Area, Turbhe, Navi Mumbai, , Thane, Maharashtra, India - 400705",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0604943,
+        "lng": 73.0054755,
         "is_hq": true,
         "location_tagged": true
       }
@@ -13517,8 +13517,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "233, Ground floor, office no. 31, kedy shopping centre, 234, Bellasis Rd, Mumbai Central,. Mumbai, Maharashtra 400008",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 18.9675863,
+        "lng": 72.8280365,
         "is_hq": false,
         "location_tagged": true
       }
@@ -13640,8 +13640,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "SHOP NO-7, BANDRA NATRAJ CHS LTD, OPP ST.PETERS CHURCH, 68 HILL ROAD,, BANDRA WEST, Mumbai, Maharashtra, 400050",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.062971,
+        "lng": 72.835231,
         "is_hq": true,
         "location_tagged": true
       }
@@ -13740,8 +13740,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Office no. 303, INIZIO,Cardinal Gracious Road,Mumbai,Mumbai,Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1149025,
+        "lng": 72.8593701,
         "is_hq": true,
         "location_tagged": true
       }
@@ -13913,8 +13913,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Level-17, Tower-A, Peninsula Business Park, Senapati Bapat Marg, Lower Parel, Mumbai, Maharashtra - 400 013",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0055919,
+        "lng": 72.82874,
         "is_hq": true,
         "location_tagged": true
       }
@@ -14163,8 +14163,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "No 13B-100, 113 & 114, C-20, G Block Rd, G Block BKC, Bandra Kurla Complex, Bandra East, Mumbai, Maharashtra 400051",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0604,
+        "lng": 72.8624,
         "is_hq": true,
         "location_tagged": true
       }
@@ -14213,8 +14213,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "8TH FLOOR, C-BLOCK, DEVCHAND HOUSE, SHIVSAGAR ESTATE, DR. A.B. ROAD, WORLI, , MUMBAI, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 18.989588,
+        "lng": 72.813427,
         "is_hq": true,
         "location_tagged": true
       }
@@ -14463,8 +14463,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "705-706, Midas, Sahar Plaza, Near JB Nagar Metro Station, Andheri Kurla Road, Andheri E, Mumbai, Maharashtra 400059",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1128969,
+        "lng": 72.86855,
         "is_hq": true,
         "location_tagged": true
       }
@@ -14521,8 +14521,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Office No. 408 / 409, 4th Floor, \"Parle Square\", Monghibai Road, Vile Parle (East), Mumbai 400057 Call us",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1044,
+        "lng": 72.8525,
         "is_hq": false,
         "location_tagged": true
       }
@@ -14621,8 +14621,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "83-C, Mittal Court, Nariman Point, Mumbai - 400021",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 18.9253579,
+        "lng": 72.8233256,
         "is_hq": true,
         "location_tagged": true
       }
@@ -14821,8 +14821,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "2, Amar CHS Limited, 8th Road, TPS-III, Khar (West), Mumbai, Maharashtra, India, 400052",
-        "lat": 17.4987995,
-        "lng": 78.3852813,
+        "lat": 19.0670574,
+        "lng": 72.8350509,
         "is_hq": true,
         "location_tagged": true
       }
@@ -14921,8 +14921,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "1001,10TH FLOOR , TOWER A, EMBASSY 247 LBS MARG VIKHROLI(WEST), Mumbai, Maharashtra, India, 400083",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.099503,
+        "lng": 72.91814,
         "is_hq": true,
         "location_tagged": true
       }
@@ -14971,8 +14971,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "No. 209, 2nd Floor, Kanara Business Centre, Pant Nagar, Ghatkopar (East), Mumbai-400075",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0854,
+        "lng": 72.9085,
         "is_hq": true,
         "location_tagged": true
       }
@@ -15021,8 +15021,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "6th Floor, Block A, Godrej IT Park, 02GBD, Pirojshanagar, LBS Road, Vikhroli (West), Mumbai City, Maharashtra,, 400079",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1025489,
+        "lng": 72.9322658,
         "is_hq": true,
         "location_tagged": true
       }
@@ -15229,8 +15229,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "706/7, Level 7(7th Floor), Tower 2nd Seawoods. Mumbai, Maharashtra India - 400706",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.2348482,
+        "lng": 72.8307789,
         "is_hq": true,
         "location_tagged": true
       }
@@ -15430,8 +15430,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "11th Floor, B4-B5, Nirlon Knowledge Park Off Western Express Highway Goregaon (E) Mumbai 400063",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1534739,
+        "lng": 72.8566872,
         "is_hq": true,
         "location_tagged": true
       }
@@ -15480,8 +15480,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Wework Goregaon, 20th Floor, Oberoi Commerz II, International Business Park, Oberoi Garden City Goregaon East (D2), Mumbai, MH 400063",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1618056,
+        "lng": 72.8575922,
         "is_hq": true,
         "location_tagged": true
       }
@@ -15630,8 +15630,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "403-406, Twin Complex Phase-I. Maroshi Road, Marol Naka, Andheri East, Mumbai-400059, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1093677,
+        "lng": 72.878637,
         "is_hq": true,
         "location_tagged": true
       }
@@ -15680,8 +15680,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Vishnu Nagar-Dombivli West, Thane, Mumbai, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.2204667,
+        "lng": 73.0868092,
         "is_hq": true,
         "location_tagged": true
       }
@@ -15896,8 +15896,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "851/852, 5th Floor, Building No 8, Solitaire Corporate Park, Near Chakala, Andheri East-400093",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1121725,
+        "lng": 72.8598286,
         "is_hq": true,
         "location_tagged": true
       }
@@ -15946,8 +15946,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Mumbai: A Wing, 1st Floor, Unit 101,102,103, Kensington SEZ-Building, One South Avenue, Powai, Mumbai, Maharashtra 400076",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1345061,
+        "lng": 72.9117948,
         "is_hq": true,
         "location_tagged": true
       }
@@ -16049,8 +16049,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "2nd Floor, Der Deutsche Parkz, Adjacent to Nahur Railway Station, Subhash Nagar Rd, Industrial Area, Bhandup West, Mumbai, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 18.97295,
+        "lng": 72.8473608,
         "is_hq": true,
         "location_tagged": true
       }
@@ -16152,8 +16152,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Our headquarters 1108, 11th Floor, One Lodha Place, Senapati Bapat Marg, Lower Parel, Mumbai, Maharashtra - 400013",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0055919,
+        "lng": 72.82874,
         "is_hq": true,
         "location_tagged": true
       }
@@ -16456,8 +16456,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "C 208, Neelkanth Business Park, Nathani Road, Vidyavihar West, Mumbai, Maharashtra 400086",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0842286,
+        "lng": 72.9041224,
         "is_hq": true,
         "location_tagged": true
       }
@@ -16608,8 +16608,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Amaha Mental Health Centre 601, Notan Heights, 18A, Gurunanak Rd Patkar Blocks, Bandra West, Mumbai, Maharashtra - 400050",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0462417,
+        "lng": 72.8290775,
         "is_hq": true,
         "location_tagged": true
       }
@@ -16658,8 +16658,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "12th Floor, Lotus Business Park, Off New Link Road, Andheri (West), Mumbai 400053, Maharashtra, India. bcs@bauerindia.in",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0990985,
+        "lng": 72.8488734,
         "is_hq": true,
         "location_tagged": true
       }
@@ -16708,8 +16708,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "107, 109, A-Wing, Solaris Saki Vihar Road, Powai, Mumbai, Maharashtra 400072",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.125023,
+        "lng": 72.8930391,
         "is_hq": true,
         "location_tagged": true
       }
@@ -16860,8 +16860,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "AMINA Bank AG ADGM Unit 08, Floor 07, Al Sarab Tower ADGM Square Al Maryah ... Andheri East Mumbai 400 059",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1048359,
+        "lng": 72.872441,
         "is_hq": true,
         "location_tagged": true
       }
@@ -16910,8 +16910,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Incuspaze, Business Park, Hiranandani Lighthall, Saki Vihar Rd, Tunga Village, Chandivali, Powai, Mumbai, Maharashtra 400072",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1151,
+        "lng": 72.889,
         "is_hq": true,
         "location_tagged": true
       }
@@ -17062,8 +17062,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Kapadia Apartment, 502, SV Rd, Vile Parle West, Mumbai, Maharashtra 400056",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.101594,
+        "lng": 72.839671,
         "is_hq": true,
         "location_tagged": true
       }
@@ -17112,8 +17112,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Mumbai (Andheri East) Ascot Centre, 601-602, Maharaj Int'l Airport Rd, Ashok Nagar, Andheri East, Mumbai, Maharashtra 400099",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1062,
+        "lng": 72.8709,
         "is_hq": true,
         "location_tagged": true
       }
@@ -17162,8 +17162,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "NIBR Corporate Park 1 Aerocity, 2nd Floor, S.No. 2010, 2016, Andheri-Kurla Rd, Safed Pul, Andheri (East), Mumbai - 400072, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1132192,
+        "lng": 72.8872392,
         "is_hq": true,
         "location_tagged": true
       }
@@ -17212,8 +17212,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Mumbai - 400 079",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1025489,
+        "lng": 72.9322658,
         "is_hq": true,
         "location_tagged": true
       }
@@ -17594,8 +17594,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "21st Floor, Cyber One, Vashi, Navi Mumbai, Maharashtra - 400703",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.067617,
+        "lng": 72.992958,
         "is_hq": true,
         "location_tagged": true
       }
@@ -17696,8 +17696,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "1st Floor, Samruddhi Space, Shivam Apartment, Anand Bharti Rd, opp. to Anand Bharati Samaj Hall, Chendani, Koliwada, Thane East, Mumbai, Maharashtra 400603",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1850826,
+        "lng": 72.9783325,
         "is_hq": true,
         "location_tagged": true
       }
@@ -17945,8 +17945,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "9th Floor, Vishwaroop IT Park, Plot Nos. 34/35/38, Sector 30A, Vashi, Navi Mumbai - 400703, Maharashtra, India",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0911476,
+        "lng": 73.0060833,
         "is_hq": true,
         "location_tagged": true
       }
@@ -18095,8 +18095,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "414, Empire Complex, Ground Floor, Senapati Bapat Marg, Lower Parel, Mumbai-400013, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 18.996617,
+        "lng": 72.8267721,
         "is_hq": true,
         "location_tagged": true
       }
@@ -18197,8 +18197,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "91, Springboard, Ackruti Trade Center, MIDC, Andheri East, Mumbai-400093, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1176843,
+        "lng": 72.8712989,
         "is_hq": true,
         "location_tagged": true
       }
@@ -18302,8 +18302,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "6th floor, Grande Palladium, 175, CST Road, Kalina, Santacruz (E), Vidyanagari, Mumbai, Mumbai, Maharashtra, India, 400098",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0735489,
+        "lng": 72.8703188,
         "is_hq": true,
         "location_tagged": true
       }
@@ -18770,8 +18770,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "41, Sarvodaya Ind. Est., Off. Mahakali Caves Road, Andheri East, Mumbai, Maharashtra 400093",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1193467,
+        "lng": 72.8635994,
         "is_hq": true,
         "location_tagged": true
       }
@@ -18870,8 +18870,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "2, Jay Chandrika,Road No. 2 Pestom Sagar,Chembur , Mumbai, Maharashtra, India - 400089",
-        "lat": 17.4987995,
-        "lng": 78.3852813,
+        "lat": 19.0681268,
+        "lng": 72.9015676,
         "is_hq": true,
         "location_tagged": true
       }
@@ -18974,8 +18974,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "WeWork Futura, Sr No 133(P), CTS No 4944, Magarpatta Road, Hadapsar, Pune, Maharashtra - 411028",
-        "lat": 18.5213738,
-        "lng": 73.8545071,
+        "lat": 12.9716,
+        "lng": 77.5946,
         "is_hq": true,
         "location_tagged": true
       }
@@ -19032,8 +19032,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "501, 5th Floor, Building No.9. Airoli Knowledge Park, MIDC Industrial Area, Airoli Navi Mumbai 400708, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1102905,
+        "lng": 72.8724975,
         "is_hq": false,
         "location_tagged": true
       }
@@ -19236,8 +19236,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "204, 2nd Floor, Accord Nidhi Co-operative Society, Malad Link Road, Malad (West), Mumbai, Maharashtra 400064",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1946977,
+        "lng": 72.8340252,
         "is_hq": true,
         "location_tagged": true
       }
@@ -19335,8 +19335,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "A/703, MANU SMRUTI, DONGRIPADA GHODBUNDER ROAD, THANE (WEST) Thane, Maharashtra, India - 400601",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.2683978,
+        "lng": 72.971166,
         "is_hq": true,
         "location_tagged": true
       }
@@ -19641,8 +19641,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "101,Floor -1, Plot -18, Lane, Hutatma Chowk, For t , Mumbai, Maharashtra, India - 400001",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 18.9273,
+        "lng": 72.834,
         "is_hq": true,
         "location_tagged": true
       }
@@ -19743,8 +19743,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "B-1402, Peninsula Business Park, Lower Parel (W), Mumbai - 400013",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 18.9982387,
+        "lng": 72.8288798,
         "is_hq": true,
         "location_tagged": true
       }
@@ -20001,8 +20001,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "A-614, Kanakia Wallstreet, Andheri - Kurla Road, Chakala, Andheri East, Mumbai, Maharashtra, India",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1042252,
+        "lng": 72.8732491,
         "is_hq": true,
         "location_tagged": true
       }
@@ -20103,8 +20103,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Building 11th Floor, ASPIRE - IITB Research Park Foundation, IIT Bombay, Mumbai - 400076",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1345061,
+        "lng": 72.9117948,
         "is_hq": true,
         "location_tagged": true
       }
@@ -20255,8 +20255,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "T-231, TOWER-2, 03RD FLOOR, INTERNATIONAL INFOTECH PARK, VASHI , NAVI MUMBAI, Maharashtra, India",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.013999,
+        "lng": 73.022204,
         "is_hq": true,
         "location_tagged": true
       }
@@ -20755,8 +20755,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "04-102, Nesco IT Park, North Wing, Bldg 4, W.E. Highway, Goregaon East, Mumbai, Maharashtra 400063",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1618056,
+        "lng": 72.8575922,
         "is_hq": true,
         "location_tagged": true
       }
@@ -20805,8 +20805,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "13, Floor-Mezzanine, Plot 48/50, Tinshed Ramchandra Bhatt Marg, Umerkhadi, Chinchbunder, Mumbai, Maharashtra 400009",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 18.9601,
+        "lng": 72.8356,
         "is_hq": true,
         "location_tagged": true
       }
@@ -20855,8 +20855,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Mumbai Office (West Zonal) Arti Lab, Kamleshwar Building Santacruz West, Mumbai - 54, India",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0863995,
+        "lng": 72.8384256,
         "is_hq": true,
         "location_tagged": true
       }
@@ -21153,8 +21153,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "102, Boston House, Behind Landmark Building, Suren Road, Chakala Andheri Kurla Road, Andheri East, Mumbai-400093, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.116931,
+        "lng": 72.856617,
         "is_hq": true,
         "location_tagged": true
       }
@@ -21261,8 +21261,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "No. 3, 2nd Floor, A wing, JB Nagar Andheri Kurla Road, Mumbai 400059 For Inquiries Business Enquiries",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1048359,
+        "lng": 72.872441,
         "is_hq": false,
         "location_tagged": true
       }
@@ -21334,8 +21334,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "at 801, 8th Floor, Empressa Building, 2nd Road, Khar West Mumbai, Mumbai - 400052, Maharashtra, India",
-        "lat": 19.5670323,
-        "lng": 76.4164557,
+        "lat": 19.0673709,
+        "lng": 72.8384739,
         "is_hq": false,
         "location_tagged": true
       },
@@ -21392,8 +21392,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "54 D,Kandivali Industrial Estates, Charkop,Kandivali (West) Mumbai, Maharashtra-400067",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.2056277,
+        "lng": 72.8180353,
         "is_hq": true,
         "location_tagged": true
       }
@@ -21492,8 +21492,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "16th Floor, Rupa Solitaire, Millennium Business Park, Office No 1617, D1, Mahape, Navi Mumbai-400710, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1774841,
+        "lng": 72.8462615,
         "is_hq": true,
         "location_tagged": true
       }
@@ -21542,8 +21542,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Office No. 313, 3rd Floor, B-Wing, Blumen Business Park, Station Road, Mumbai, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1774841,
+        "lng": 72.8462615,
         "is_hq": true,
         "location_tagged": true
       }
@@ -21592,8 +21592,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Level 3, Jubilee One Road No. 1 Jubilee Hills Hyderabad 500033",
-        "lat": 17.4572475,
-        "lng": 78.4328892,
+        "lat": 17.4326,
+        "lng": 78.4071,
         "is_hq": true,
         "location_tagged": true
       }
@@ -21642,8 +21642,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "1201-02, Tower 2, One World Centre, Jupiter Mills Compound, 841, S.B. Marg, Elphinstone Road (W), Mumbai, Maharashtra, India",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 18.9690472,
+        "lng": 72.8211807,
         "is_hq": true,
         "location_tagged": true
       }
@@ -21841,8 +21841,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "1207 12TH FLOOR DAMJI SHAMJI BUSINESS GALLERIA LBS MARG KANURGMARG , MUMBAI, Maharashtra, India - 400078",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1253,
+        "lng": 72.9278,
         "is_hq": true,
         "location_tagged": true
       }
@@ -21991,8 +21991,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Building No. 3, Inspire BKC, 8th Floor, Wing A, G Block, Bandra Kurla Complex, Bandra East, Mumbai",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0631303,
+        "lng": 72.8614109,
         "is_hq": true,
         "location_tagged": true
       }
@@ -22041,8 +22041,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "No 2B, Vaswani Chamber, Dr Annie Basant Road Worli Mumbai - 400018",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0120367,
+        "lng": 72.8214496,
         "is_hq": true,
         "location_tagged": true
       }
@@ -22141,8 +22141,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "604, Eco House, Behind Udipi Vihar Restaurant, Vishweshwar Nagar, Goregaon East-400063. Behind Udipi Vihar Restaurant,Vishweshwar Nagar is",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1694,
+        "lng": 72.8588,
         "is_hq": true,
         "location_tagged": true
       }
@@ -22293,8 +22293,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "1st Floor, Athena Towers, Mindspace Malad, Goregaon (W), Mumbai - 400063, India",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1648,
+        "lng": 72.8492,
         "is_hq": true,
         "location_tagged": true
       }
@@ -22393,8 +22393,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "29th Floor, International Business Park, Oberoi Garden City, Off Western Express Highway, Goregaon (East) Mumbai, Maharashtra, 400063 India",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1618056,
+        "lng": 72.8575922,
         "is_hq": true,
         "location_tagged": true
       }
@@ -22543,8 +22543,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "701, Sigma Building, Hiranandani Gardens, Powai, Mumbai 400076, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.119717,
+        "lng": 72.913356,
         "is_hq": true,
         "location_tagged": true
       }
@@ -22643,8 +22643,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "15 Floor, First Avenue, Veera Desai Industrial Estate, Captain Suresh Samant Marg, Prem Nagar, Goregaon West, Mumbai - 400104, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1399655,
+        "lng": 72.8375169,
         "is_hq": true,
         "location_tagged": true
       }
@@ -22801,8 +22801,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "WeWork Vaswani Chambers, 1st Floor, 264-265, Dr Annie Besant Road, Municipal Colony, Shivaji Nagar, Worli Colony, Mumbai, Mumbai, Maharashtra - 400030",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0120367,
+        "lng": 72.8214496,
         "is_hq": true,
         "location_tagged": true
       }
@@ -22951,8 +22951,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "D-111, FIRST FLOOR, KANAKIA ZILLION, LBS MARG, KURLA West, MUMBAI-400070",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0842541,
+        "lng": 72.8851751,
         "is_hq": true,
         "location_tagged": true
       }
@@ -23103,8 +23103,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "19th Floor, DLH Park, S.V. Road, Goregaon (W), Mumbai 400064, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1735739,
+        "lng": 72.8451808,
         "is_hq": true,
         "location_tagged": true
       }
@@ -23203,8 +23203,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Kojar Imperia, SV Road, Malad West, Mumbai, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.1744603,
+        "lng": 72.8467173,
         "is_hq": true,
         "location_tagged": true
       }
@@ -23303,8 +23303,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "602, 6th floor, Ackruti Centre Point, Central Road, M.I.D.C., Andheri (East), Mumbai, Maharashtra 400093",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.118819,
+        "lng": 72.8696517,
         "is_hq": true,
         "location_tagged": true
       }
@@ -23405,8 +23405,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Euphoric Thought Technologies Pvt. Ltd. \ud83d\udccd 979, 4th Floor, 1st A Cross, off 80 Feet Road, S.T. Bed, Koramangala 4th Block, Bengaluru, Karnataka-560034",
-        "lat": 12.9332863,
-        "lng": 77.6147149,
+        "lat": 12.9352,
+        "lng": 77.6245,
         "is_hq": true,
         "location_tagged": true
       }
@@ -23924,8 +23924,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "Film Centre Building, A/21, 2nd Floor, Tardeo Rd, Janata Nagar, Tardeo, Mumbai, Maharashtra 400034",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 18.97229,
+        "lng": 72.8129272,
         "is_hq": true,
         "location_tagged": true
       }
@@ -24126,8 +24126,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "1601 B, 16th floor 1601 B, 16th floor Rupa Renaissance, Plot no. D33 & D207, Juinagar, MIDC Road, TTC e, Maharashtra, India - 400705",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0604943,
+        "lng": 73.0054755,
         "is_hq": true,
         "location_tagged": true
       }
@@ -24438,8 +24438,8 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "No. 18, Gate 1 & 2, Dodda Banaswadi Main Rd, Maruthiseva Nagar, Mumbai, Maharashtra",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.088828,
+        "lng": 72.8429233,
         "is_hq": false,
         "location_tagged": true
       }
@@ -26196,8 +26196,8 @@
       {
         "city": "Bengaluru, Karnataka",
         "office_address": "7th & 8th Floor, Plot No. 183, Rajiv Nagar, Udyog Vihar ... Bengaluru, Karnataka 560068. Kolkata. Urban Company Limited, Asyst Park, 1st",
-        "lat": 12.9721872,
-        "lng": 77.594908,
+        "lat": 12.9036089,
+        "lng": 77.6313659,
         "is_hq": true,
         "location_tagged": true
       }
@@ -26616,8 +26616,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "1st Floor, Near Valluvar Kottam, Krishna Street, Nungambakkam, Chennai-600034, Tamil Nadu",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0542719,
+        "lng": 80.2466501,
         "is_hq": false,
         "location_tagged": true
       }
@@ -30713,8 +30713,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "3rd Floor, Building 3600 - Synergy Square-3, Genome Valley, Hyderabad - 500101 India",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.6623856,
+        "lng": 78.6574484,
         "is_hq": true,
         "location_tagged": true
       }
@@ -30816,8 +30816,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Hyderabad, Telangana. Financial District Floor 9 Hyderabad, Telangana, IN. Floor 9 Hyderabad, Telangana 500032",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.42,
+        "lng": 78.3378,
         "is_hq": true,
         "location_tagged": true
       }
@@ -30866,8 +30866,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "58 Janardhan Plaza Apts, Plot No. 120/121 Lumbini, Gachibowli, Hyderabad, Telangana, India",
-        "lat": 17.8495919,
-        "lng": 79.1151663,
+        "lat": 17.4253835,
+        "lng": 78.4304513,
         "is_hq": true,
         "location_tagged": true
       }
@@ -30966,8 +30966,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "16th floor, Hyderabad",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.3617194,
+        "lng": 78.4751689,
         "is_hq": true,
         "location_tagged": true
       }
@@ -31016,8 +31016,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "4th Floor, Sreenidhi Pearls, Plot No 12, Street No. 1, Patrika Nagar, Madhapur , Hyderabad, Telangana",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4481119,
+        "lng": 78.3803726,
         "is_hq": true,
         "location_tagged": true
       }
@@ -31066,8 +31066,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "UNIT 1103, FLOOR 10, VASAVI MPM GRAND, Srinagar Colony, Hyderabad, Khairatabad, Telangana, India, 500073",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4358,
+        "lng": 78.4445,
         "is_hq": true,
         "location_tagged": true
       }
@@ -31223,8 +31223,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "10/8, Block B, 1st Floor, CDC Towers, R.No.5, Nacharam Industrial Area, I.E.Nacharam, Hyderabad, Uppal, Telangana, India, 500076",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.425,
+        "lng": 78.5597,
         "is_hq": true,
         "location_tagged": true
       }
@@ -31323,8 +31323,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Visit us at Zithara Technologies Private Limited 3rd Floor, Plot No. 2, Meenakshi Bamboos, Above HDFC Bank, Opp AIG Hospital, Hyderabad, Telangana 500032",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.443004,
+        "lng": 78.366231,
         "is_hq": true,
         "location_tagged": true
       }
@@ -31381,8 +31381,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "no 9C, 2nd Floor, 452001 B Block 5th Floor Building, Road No.2, Banjara Hills, Hyderabad-500034 Maya Plaza",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4155,
+        "lng": 78.4147,
         "is_hq": false,
         "location_tagged": true
       }
@@ -31481,8 +31481,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Sy No. 75a & 76, Block-a, Shaikpet, Toli Chowki, Hyderabad, Golconda",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4059518,
+        "lng": 78.3942548,
         "is_hq": true,
         "location_tagged": true
       }
@@ -31639,8 +31639,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Hyderabad, Telangana, India Address: Hyderabad, Telangana, 500090",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.3108,
+        "lng": 78.4389,
         "is_hq": true,
         "location_tagged": true
       }
@@ -31689,8 +31689,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "City, Hyderabad. Spanning 50,000 square feet, Our Office 7th Floor, Orwell, TOWER-1 Sattva, Knowledge City Rd Hitec City, HYD 500032",
-        "lat": 25.3810931,
-        "lng": 68.37348,
+        "lat": 17.4482,
+        "lng": 78.3693,
         "is_hq": false,
         "location_tagged": true
       }
@@ -31797,8 +31797,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "8-2-293/82/A, Plot-8, Road Number 5, Women's Welfare Housing Society, Jubilee Hills, Hyderabad, Telangana 500045",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4282165,
+        "lng": 78.4220584,
         "is_hq": true,
         "location_tagged": true
       }
@@ -31947,8 +31947,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "1st Floor, Building No: 12C, Mindspace, Hitech City, Madhapur, Ranga Reddy District, Hyderabad, Telangana,, 500081",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4394183,
+        "lng": 78.3781217,
         "is_hq": true,
         "location_tagged": true
       }
@@ -31997,8 +31997,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "3rd Floor, A Wing, Aurobindo Galaxy, Plot No. 1, Part of Sy. No. 83/1, TSIIC, Raidurg, Rangareddi, Hyderabad",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.3617194,
+        "lng": 78.4751689,
         "is_hq": true,
         "location_tagged": true
       }
@@ -32047,8 +32047,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "3rd Floor, RMZ Nexity, Tower- 30, Raidurg Village, Serilingampally, Madhapur, Hyderabad, Shaikpet, Telangana, India, 500081",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.430973,
+        "lng": 78.384035,
         "is_hq": true,
         "location_tagged": true
       }
@@ -32469,8 +32469,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "3Rd Floor, Opposite Icici Bank, Chaitanyapuri, Dilsukh Nagar, Above Dcb Bank, Chaitanyapuri, Hyderabad-500060",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.3723,
+        "lng": 78.5333,
         "is_hq": true,
         "location_tagged": true
       }
@@ -32619,8 +32619,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Unit B23, Bala Nagar, Cooperative Industrial Estate, Hyderabad-500037",
-        "lat": 25.3743945,
-        "lng": 68.3475712,
+        "lat": 17.4654,
+        "lng": 78.4485,
         "is_hq": true,
         "location_tagged": true
       }
@@ -32775,8 +32775,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "#17- 83/2, Road No.9, Dilsukhnagar, Hyderabad, Dilsukhnagar Colony, K.V.Rangareddy, Saroornagar, Telangana, India",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.328055,
+        "lng": 78.521424,
         "is_hq": true,
         "location_tagged": true
       }
@@ -32825,8 +32825,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "No. 101, 5-9-22/3/8, Hill Fort 6th Street, Adarsh Nagar, Hyderabad, Hyderabad",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.406119,
+        "lng": 78.475219,
         "is_hq": true,
         "location_tagged": true
       }
@@ -33025,8 +33025,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "FLAT NO G-107, RAINBOW, VISTAS ROCK GARDEN, Moosapet, Hyderabad, Ameerpet, Telangana, India, 500018 ... . Key",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4431,
+        "lng": 78.4397,
         "is_hq": true,
         "location_tagged": true
       }
@@ -33225,8 +33225,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "8th Floor, Tower 1, Vasavi Skycity, Gachibowli, Seri Lingampally, Hyderabad, Telangana, India",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.514588,
+        "lng": 78.356646,
         "is_hq": true,
         "location_tagged": true
       }
@@ -33424,8 +33424,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Floor, Suite: 137, 138, 139 Western Aqua, Hitech City Hyderabad, Telangana, 500081",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4394183,
+        "lng": 78.3781217,
         "is_hq": true,
         "location_tagged": true
       }
@@ -33474,8 +33474,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Office Unit-3A, Hyderabad",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.3617194,
+        "lng": 78.4751689,
         "is_hq": true,
         "location_tagged": true
       }
@@ -33573,8 +33573,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Unit No. 332, Plot No. 1-118/1/4/C, No. 14, 3rd Floor, Silicon Towers, Kondapur, Hyderabad - 500032",
-        "lat": 25.3720635,
-        "lng": 68.3446343,
+        "lat": 17.4545,
+        "lng": 78.3637,
         "is_hq": false,
         "location_tagged": true
       }
@@ -33879,8 +33879,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Suite 303 Hyderabad, Telangana 500081, Whitefield Road Suite 301 Kondapur, Hyderabad, Telangana 500084",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4562,
+        "lng": 78.3724,
         "is_hq": true,
         "location_tagged": true
       }
@@ -34086,8 +34086,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "2nd Floor, Apsidc Building, Road No 13, Banjara Hills, Hyderabad-500034",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4098949,
+        "lng": 78.4388237,
         "is_hq": false,
         "location_tagged": true
       }
@@ -34236,8 +34236,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "at PT NO. 589,MATRUSRI NAGAR, MIYAPUR, Mathrusri Nagar, K.V.Rangareddy, Serilingampally, Telangana, India, 500049",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4938,
+        "lng": 78.3689,
         "is_hq": false,
         "location_tagged": true
       }
@@ -34436,8 +34436,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Tablespace Building, 6th Floor, Hitech City, Hyderabad, Telangana - 500081",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4394183,
+        "lng": 78.3781217,
         "is_hq": false,
         "location_tagged": true
       }
@@ -34486,8 +34486,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Unit 302, Surya Arcade, Cyber Hills, PJR Nagar, Gachibowli, Cyberabad (Hyderabad), 500032",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4384406,
+        "lng": 78.330147,
         "is_hq": true,
         "location_tagged": true
       }
@@ -34635,8 +34635,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Flat 401, Ganesh Meadows, Rd no 14B, Gopal Nagar Society, Kukatpally , Hyderabad",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4889807,
+        "lng": 78.384516,
         "is_hq": true,
         "location_tagged": true
       }
@@ -34735,8 +34735,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "3rd Floor, Benaka, Opposite Kotak Mahindra Bank, Road No 1, Banjara Hills, Hyderabad-500034",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4092787,
+        "lng": 78.4502066,
         "is_hq": true,
         "location_tagged": true
       }
@@ -34785,8 +34785,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "1601 , 16th Floor Babukhan Estate Basheerbagh Hyderabad - 500 029. 9550588000 / 040-49984508. Client / Prospect",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.3997,
+        "lng": 78.4782,
         "is_hq": true,
         "location_tagged": true
       }
@@ -34835,8 +34835,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "5th Floor, Office No-145, Western Aqua Building, Hitech City, Kondapur, Hyderabad, Telangana 500084",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4646028,
+        "lng": 78.3666328,
         "is_hq": false,
         "location_tagged": true
       }
@@ -35085,8 +35085,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "1st, 2nd and 3rd Floor, 247, Lane Road, Hyderabad, Telangana, 500033, Madh\u0101pur, State of Telang\u0101na",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4347,
+        "lng": 78.3929,
         "is_hq": true,
         "location_tagged": true
       }
@@ -35303,8 +35303,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "25th Floor, Aurobindo Orbit, Hitech City, Raidurg, Kothaguda, Serilingampally, Hyderabad, Telangana 500084",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4743,
+        "lng": 78.3832,
         "is_hq": true,
         "location_tagged": true
       }
@@ -35502,8 +35502,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Plot No.237, 8-2-293/82/JIII/237, Film Nagar, Road No. 78, Jubilee Hills, Hyderabad 500033 Telangana ; E-mail. Ravi@globalclassrooms.in",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4138745,
+        "lng": 78.4072414,
         "is_hq": true,
         "location_tagged": true
       }
@@ -35652,8 +35652,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "B 405, BALAJI BLISS APPARTMENTS ,HYDER NAGAR , HYDERABAD, Telangana, India - 500085",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.5008,
+        "lng": 78.3833,
         "is_hq": true,
         "location_tagged": true
       }
@@ -35851,8 +35851,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "13th Floor, Building No 9, WeWork Raheja Mindspace, TSIIC, Software Units Layout, Madhapur, Hyderabad, Telangana 500081",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4371,
+        "lng": 78.3926,
         "is_hq": false,
         "location_tagged": true
       }
@@ -36150,16 +36150,16 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "1st Floor, Krest Building, Near Indian Bank Head Office, No.2, Jehangir Street, Chennai - 600001",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0859504,
+        "lng": 80.2795055,
         "is_hq": true,
         "location_tagged": true
       },
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Hyderabad, Telangana 500001, India",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.3934858,
+        "lng": 78.4706736,
         "is_hq": false,
         "location_tagged": true
       }
@@ -36315,8 +36315,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Planify Capital, Ground floor, Oyster Complex, Greenlands Road Somajiguda, Begumpet, Hyderabad, Telangana 500016",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4377,
+        "lng": 78.4614,
         "is_hq": false,
         "location_tagged": true
       }
@@ -36365,8 +36365,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "RMZ Futura Block A, Plot No 14 & 15, Hitech City Phase 2, Madhapur, Hyderabad, Telangana - 500081",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4422,
+        "lng": 78.3763,
         "is_hq": true,
         "location_tagged": true
       }
@@ -36773,8 +36773,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Bizness Square, 4th Floor, Opposite Hitex Junction, Hitech City, Madhapur, Hyderabad, Telangana",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.47374,
+        "lng": 78.3609499,
         "is_hq": true,
         "location_tagged": true
       }
@@ -37023,8 +37023,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "Module:0802,8thFloor,ABlockSouthSide,TIDELPark,No:4,RajivGandhiSalai(OMR),Ta ramani",
-        "lat": 12.9352,
-        "lng": 77.6245,
+        "lat": 12.9882659,
+        "lng": 80.2509146,
         "is_hq": false,
         "location_tagged": true
       }
@@ -37122,8 +37122,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "No.26, Thirumalai Nagar, Vadaperumbakka",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.1726341,
+        "lng": 80.2198783,
         "is_hq": true,
         "location_tagged": true
       }
@@ -37223,8 +37223,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "Chennai No:4, 2nd Floor, 3rd Main Road, Rajalakshmi Nagar, Dhandeeswaram, Above Indian Bank, Velachery, Chennai, Tamil Nadu, 600042",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 12.981033,
+        "lng": 80.223792,
         "is_hq": true,
         "location_tagged": true
       }
@@ -37524,8 +37524,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "Module 2A, 3rd Floor, Block A, IIT-M Research Park, Phase - II, Kanagam Rd, Kanagam, Taramani, Chennai, Tamil Nadu",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 12.9913878,
+        "lng": 80.241728,
         "is_hq": true,
         "location_tagged": true
       }
@@ -37574,8 +37574,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "Attn: konnectmojo No. 11/552, Medavakkam Main Road, Above ICICI Bank, Kovilambakkam, Chennai 600117, Tamil Nadu, India",
-        "lat": 11.3323723,
-        "lng": 78.6098639,
+        "lat": 12.9428283,
+        "lng": 80.1829067,
         "is_hq": true,
         "location_tagged": true
       }
@@ -37690,8 +37690,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "No 58A, Thirumangalam road, Villivakkam, Tiruvallur, Ambattur, Tamil Nadu, India, 600049. ... Chennai, and its current",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.1076409,
+        "lng": 80.2024878,
         "is_hq": false,
         "location_tagged": true
       }
@@ -37790,8 +37790,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "9th Floor, Block E, IIT Madras Research Park, Near, Kanagam Road, Kanagam-Tharamani, Chennai-600113, Tamil Nadu",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0048983,
+        "lng": 80.244919,
         "is_hq": false,
         "location_tagged": true
       }
@@ -37890,8 +37890,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "Pacifica Tech Park, Block 1, Core 1, 2nd Floor, No. 23, Rajiv Gandhi Salai (OMR), Navalur, Chennai, Tamil Nadu 600130",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 12.8418329,
+        "lng": 80.2188756,
         "is_hq": true,
         "location_tagged": true
       }
@@ -37940,8 +37940,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "40, 11th Ave, Mettupalayam, Ashok Nagar, Chennai - 600 083 739 7251 333 / 934 5133 343 CHENNAI TAMIL NADU",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0311659,
+        "lng": 80.2128075,
         "is_hq": false,
         "location_tagged": true
       }
@@ -38305,8 +38305,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "ALG Towers, 3rd Floor, Plot No. 48, Electrical & Electronic Industrial Estate, Main Road, Chennai, Tamil Nadu 600096",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 12.9553188,
+        "lng": 80.2455084,
         "is_hq": true,
         "location_tagged": true
       }
@@ -38455,8 +38455,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "No 94, Tvh Beliciaa Towers, 2nd Tower, 10th Floor, Near Sun TV Office, Mrc Nagar, Mandaveli, Chennai-600028, Tamil Nadu",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0282,
+        "lng": 80.2612,
         "is_hq": true,
         "location_tagged": true
       }
@@ -38505,8 +38505,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "Automios Technologies Pvt. Ltd, IIT Madras Research Park, B-Block, 5th Floor, Kanagam Road, Taramani, Chennai, Tamil Nadu - 600113",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 12.9863,
+        "lng": 80.2487,
         "is_hq": true,
         "location_tagged": true
       }
@@ -38705,16 +38705,16 @@
       {
         "city": "Gurugram, Haryana",
         "office_address": "DLF Cyber City Complex Building 8, Level 12, Tower C, DLF Cyber City, DLF Phase 2, Sector 24, Gurugram, Haryana, India",
-        "lat": 29.0,
-        "lng": 76.0,
+        "lat": 28.447202,
+        "lng": 77.104866,
         "is_hq": true,
         "location_tagged": true
       },
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "NO - A-415, SEKKADU MAIN ROAD, KAMARAJ NAGAR, AVADI, CHENNAI - 71, Avadi, Chennai-600054, Tamil Nadu",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.1142559,
+        "lng": 80.0803474,
         "is_hq": false,
         "location_tagged": true
       }
@@ -38813,8 +38813,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "Olympia Teknos, Ambedkar Nagar, Sidco Industrial Estate, Guindy, Chennai-600032, Tamil Nadu",
-        "lat": 12.9698,
-        "lng": 77.75,
+        "lat": 13.0032,
+        "lng": 80.211,
         "is_hq": false,
         "location_tagged": true
       }
@@ -39013,8 +39013,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "No 144, Nelson Manickam Road, West Namasivaya Puram, Nungambakkam, Chennai-600034, Tamil Nadu",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0540857,
+        "lng": 80.2494641,
         "is_hq": false,
         "location_tagged": true
       }
@@ -39063,8 +39063,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "No. 4, Arumugam Street Seven Wells, Chennai, CHENNAI, Tamil Nadu, India, 600001",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0963219,
+        "lng": 80.2816652,
         "is_hq": true,
         "location_tagged": true
       }
@@ -39163,8 +39163,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "A5C, Anugraha Apartments No 41, Nungambakkam High Road Nungambakkam Chennai - 600034, Tamil Nadu, India",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.059091,
+        "lng": 80.247431,
         "is_hq": true,
         "location_tagged": true
       }
@@ -39265,8 +39265,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "576, Mogappair West, , Chennai, Tamil Nadu 600037 Address: 170, EVR Rd, Dr. Office Address: 576, Mogappair West, Ambattur",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.08,
+        "lng": 80.1614,
         "is_hq": true,
         "location_tagged": true
       }
@@ -39315,8 +39315,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "C/o IITM Incubation Cell, Kanagam Road, Taramani, Chennai - 600113, Tamil Nadu, India",
-        "lat": 11.3323723,
-        "lng": 78.6098639,
+        "lat": 12.9867934,
+        "lng": 80.2408441,
         "is_hq": true,
         "location_tagged": true
       }
@@ -39415,8 +39415,8 @@
       {
         "city": "Chennai, Tamil Nadu",
         "office_address": "Flat -1A, Plot - 105, Firms Nandhana, Vaikasi, Virugambakkam, Chennai, Chennai City Corporation, Tamil Nadu, India, 600092",
-        "lat": 13.0836939,
-        "lng": 80.270186,
+        "lat": 13.0446695,
+        "lng": 80.1877693,
         "is_hq": true,
         "location_tagged": true
       }
@@ -43931,8 +43931,8 @@
       {
         "city": "Pune, Maharashtra",
         "office_address": "The Social Street (Opposite - Hotel Vivanta), B-Wing, 2nd Floor, Hinjewadi - Wakad Road, Pune 411057, Maharashtra",
-        "lat": 18.5213738,
-        "lng": 73.8545071,
+        "lat": 18.5877071,
+        "lng": 73.7005318,
         "is_hq": true,
         "location_tagged": true
       },
@@ -44097,8 +44097,8 @@
       {
         "city": "Bengaluru, Karnataka",
         "office_address": "Level 14 & 15, Concorde Towers 1, Vittal Mallya Road, UB City, Bengaluru - 560001, Karnataka, India",
-        "lat": 14.9562045,
-        "lng": 75.7896741,
+        "lat": 12.971748,
+        "lng": 77.5958345,
         "is_hq": true,
         "location_tagged": true
       }
@@ -44448,8 +44448,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "11th Floor, Building 16, Raheja Mindspace, HITEC City Hyderabad 500081 India",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4394183,
+        "lng": 78.3781217,
         "is_hq": true,
         "location_tagged": true
       }
@@ -44548,8 +44548,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "FIELDSKPHB 7th Phase Rd, Kukatpally Housing Board Colony, Kukatpally, Hyderabad, Telangana 500085",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4812,
+        "lng": 78.3816,
         "is_hq": true,
         "location_tagged": true
       }
@@ -44598,8 +44598,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "134/2, Whitefield Building, Hi Tech City, Opposite SLN Terminus, Kondapur, Platinum Street, Anjaiah Nagar-Gachibowli, Hyderabad-500032",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.454571,
+        "lng": 78.369692,
         "is_hq": true,
         "location_tagged": true
       }
@@ -44648,8 +44648,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "3rd Floor, Plot C1, Block 3, IDA Uppal, Uppal, Hyderabad, Telangana",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4043132,
+        "lng": 78.5606735,
         "is_hq": true,
         "location_tagged": true
       }
@@ -44698,16 +44698,16 @@
       {
         "city": "Mumbai, Maharashtra",
         "office_address": "127,MANMALA TANK ROAD, TAIKALWADI, MAHIM (WEST) , MUMBAI, Maharashtra, India - 400016",
-        "lat": 19.054999,
-        "lng": 72.8692035,
+        "lat": 19.0300578,
+        "lng": 72.845176,
         "is_hq": true,
         "location_tagged": true
       },
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Hyderabad 3rd Floor, Plot No: 1303 and 1304, Madhapur, Hyderabad 500081",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4371,
+        "lng": 78.3926,
         "is_hq": false,
         "location_tagged": true
       }
@@ -45154,8 +45154,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Hyderabad, India Jain Sadguru Capital Park 7th Floor, Image Gardens Road Madhapur, Hyderabad, Telangana 500081",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4371,
+        "lng": 78.3926,
         "is_hq": true,
         "location_tagged": true
       }
@@ -45204,8 +45204,8 @@
       {
         "city": "Hyderabad, Telangana",
         "office_address": "Hyderabad Office 1st Floor C&D Block, Unit No.18, iLabs Center, Software Units Layout-1, Madhapur, HYDERABAD-500081",
-        "lat": 17.360589,
-        "lng": 78.4740613,
+        "lat": 17.4371,
+        "lng": 78.3926,
         "is_hq": true,
         "location_tagged": true
       }

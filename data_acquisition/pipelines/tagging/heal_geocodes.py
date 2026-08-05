@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 """
-Google-based Geocode and Address Healer
+Google Chrome DOM + ArcGIS Precision Geocode Healer
 Path: data_acquisition/pipelines/tagging/heal_geocodes.py
 
-Systematically verifies and heals company office addresses across all startups:
-1. Launches a single headed Google Chrome instance with remote debugging.
-2. Reuses the session to search google.com for <company_name> <city_name> office address.
-3. Detects CAPTCHAs, prompts the user to solve them, and polls until cleared.
-4. Extracts address using:
-   - Tier 1: AI Overview (AI Mode)
-   - Tier 2: Google Maps / Knowledge Panel listing
-   - Tier 3: Standard Search Result Snippets
-5. Eliminates Rule 1 (city mismatch) and Rule 2 (center-of-city tagging).
-6. Saves and synchronizes backend/startups.json and public/static/data/startups.json.
+IMPORTANT RULES FOR THIS SCRIPT:
+1. NEVER modify, alter, or overwrite `office_address` in the database under ANY circumstances. The address text is finalized and immutable.
+2. Paste the full `office_address` directly into the Google Chrome search bar.
+3. Extract real latitude and longitude numbers exclusively from:
+   - Tier 1: Embedded Google Maps URLs/links in the Chrome DOM (@lat,lng or ll=lat,lng).
+   - Tier 2: Free ArcGIS World Geocoding API on the exact full address string.
+   - Tier 3: Known Tech-Park and Locality Gazetteer coordinates.
+4. ONLY update `lat` and `lng` for offices violating Rule 1 (outside city >80km) or Rule 2 (center of city).
+5. Synchronize backend/startups.json and public/static/data/startups.json after processing.
 """
 
 import os
@@ -27,8 +26,6 @@ import re
 import shutil
 import math
 import urllib.parse
-from bs4 import BeautifulSoup
-from collections import Counter
 import random
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
@@ -36,9 +33,8 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from data_acquisition.db_manager import DBManager
-from data_acquisition.geo_config import DEFAULT_TARGET_CITY, CITY_SYNONYMS, is_fallback_coordinate
+from data_acquisition.geo_config import DEFAULT_TARGET_CITY, CITY_SYNONYMS
 
-# Coordinates of canonical city centers
 CITY_CENTERS = {
     "bengaluru": (12.9716, 77.5946),
     "mumbai": (19.0760, 72.8777),
@@ -50,13 +46,13 @@ CITY_CENTERS = {
 }
 
 KNOWN_CENTERS = {
-    (12.9716, 77.5946), (12.976794, 77.590082), (12.971599, 77.594563),
-    (19.076, 72.8777), (19.054999, 72.869203), (19.0688, 72.868),
-    (28.6139, 77.2090), (28.613895, 77.209006), (28.4595, 77.0266), (28.5355, 77.3910),
-    (17.385, 78.4867), (17.360589, 78.474061), (17.4485, 78.3734),
-    (13.0827, 80.2707), (13.083694, 80.270186),
-    (18.5204, 73.8567), (18.521374, 73.854507),
-    (22.5726, 88.3639), (22.572646, 88.363895)
+    (12.9716, 77.5946), (12.976794, 77.590082), (12.971599, 77.594563), (12.9767936, 77.590082),
+    (19.076, 72.8777), (19.054999, 72.869203), (19.0688, 72.868), (19.0759837, 72.8776559),
+    (28.6139, 77.2090), (28.613895, 77.209006), (28.4595, 77.0266), (28.5355, 77.3910), (28.6138954, 77.2090057),
+    (17.385, 78.4867), (17.360589, 78.474061), (17.4485, 78.3734), (17.360589, 78.4740613), (17.385044, 78.486671),
+    (13.0827, 80.2707), (13.083694, 80.270186), (13.0836939, 80.270186),
+    (18.5204, 73.8567), (18.521374, 73.854507), (18.5213738, 73.854507),
+    (22.5726, 88.3639), (22.572646, 88.363895), (22.5726459, 88.363895)
 }
 
 CITY_MARKERS = {
@@ -66,85 +62,47 @@ CITY_MARKERS = {
     "hyderabad": ["hyderabad", "telangana", "hitec city", "hitech city", "gachibowli", "madhapur", "jubilee hills", "banjara hills", "kondapur", "begumpet"],
     "pune": ["pune", "baner", "hinjewadi", "kharadi", "viman nagar", "koregaon park"],
     "chennai": ["chennai", "madras", "omr", "guindy", "t nagar", "velachery", "adyar", "sholinganallur", "perungudi"],
-    "kolkata": ["kolkata", "calcutta", "salt lake", "new town"]
+    "kolkata": ["kolkata", "calcutta", "salt lake", "new town", "rajarhat", "sector v"]
 }
+
 OTHER_INDIA = ["kochi", "kerala", "ahmedabad", "gujarat", "jaipur", "rajasthan", "indore", "chandigarh", "surat", "vadodara", "nagpur", "bhopal", "visakhapatnam", "mysuru", "mysore", "mangalore", "ladakh", "leh", "ernakulam", "udaipur"]
 INTERNATIONAL = ["usa", "united states", "california", "new york", "nyc", "san francisco", "sf", "bay area", "austin", "seattle", "boston", "los angeles", "chicago", "wyoming", "pennsylvania", "miami", "florida", "united kingdom", "uk", "london", "manchester", "singapore", "australia", "sydney", "jakarta", "indonesia", "dubai", "uae", "canada", "toronto", "vancouver", "germany", "berlin", "france", "paris", "netherlands", "amsterdam", "tokyo", "japan"]
 
-# Locality gazetteer for geocoding fallback
 LOCALITY_GAZETTEER = {
     # Bengaluru
-    "koramangala": (12.9352, 77.6245, "Koramangala, Bengaluru, Karnataka"),
-    "hsr layout": (12.9121, 77.6446, "HSR Layout, Bengaluru, Karnataka"),
-    "hsr": (12.9121, 77.6446, "HSR Layout, Bengaluru, Karnataka"),
-    "indiranagar": (12.9784, 77.6408, "Indiranagar, Bengaluru, Karnataka"),
-    "whitefield": (12.9698, 77.7500, "Whitefield, Bengaluru, Karnataka"),
-    "bellandur": (12.9304, 77.6784, "Bellandur, Bengaluru, Karnataka"),
-    "electronic city": (12.8452, 77.6602, "Electronic City, Bengaluru, Karnataka"),
-    "jayanagar": (12.9308, 77.5838, "Jayanagar, Bengaluru, Karnataka"),
-    "jp nagar": (12.9063, 77.5857, "JP Nagar, Bengaluru, Karnataka"),
-    "sarjapur": (12.9166, 77.6749, "Sarjapur Road, Bengaluru, Karnataka"),
-    "marathahalli": (12.9592, 77.6974, "Marathahalli, Bengaluru, Karnataka"),
-    "manyata": (13.0487, 77.6209, "Manyata Tech Park, Nagavara, Bengaluru"),
-    "bagmane": (12.9822, 77.6653, "Bagmane Tech Park, CV Raman Nagar, Bengaluru"),
+    "koramangala": (12.9352, 77.6245), "hsr layout": (12.9121, 77.6446), "indiranagar": (12.9784, 77.6408),
+    "whitefield": (12.9698, 77.7500), "bellandur": (12.9304, 77.6784), "electronic city": (12.8452, 77.6602),
+    "jayanagar": (12.9308, 77.5838), "jp nagar": (12.9063, 77.5857), "sarjapur": (12.9166, 77.6749),
+    "marathahalli": (12.9592, 77.6974), "manyata": (13.0487, 77.6209), "bagmane": (12.9822, 77.6653),
+    "rmz ecoworld": (12.9220, 77.6833), "embassy golf links": (12.9472, 77.6394),
     
     # Mumbai
-    "andheri east": (19.1155, 72.8715, "Andheri East, Mumbai, Maharashtra"),
-    "andheri west": (19.1363, 72.8277, "Andheri West, Mumbai, Maharashtra"),
-    "andheri": (19.1197, 72.8464, "Andheri, Mumbai, Maharashtra"),
-    "powai": (19.1197, 72.9051, "Powai, Mumbai, Maharashtra"),
-    "bkc": (19.0657, 72.8687, "Bandra Kurla Complex, Mumbai, Maharashtra"),
-    "bandra kurla complex": (19.0657, 72.8687, "Bandra Kurla Complex, Mumbai, Maharashtra"),
-    "lower parel": (18.9953, 72.8315, "Lower Parel, Mumbai, Maharashtra"),
-    "worli": (19.0178, 72.8181, "Worli, Mumbai, Maharashtra"),
+    "andheri east": (19.1155, 72.8715), "andheri west": (19.1363, 72.8277), "andheri": (19.1197, 72.8464),
+    "powai": (19.1197, 72.9051), "bkc": (19.0657, 72.8687), "bandra kurla complex": (19.0657, 72.8687),
+    "lower parel": (18.9953, 72.8315), "worli": (19.0178, 72.8181), "ghatkopar": (19.0865, 72.9090),
+    "vikhroli": (19.1102, 72.9261), "navi mumbai": (19.0330, 73.0297), "thane": (19.2183, 72.9781),
 
     # Delhi NCR
-    "connaught place": (28.6315, 77.2167, "Connaught Place, New Delhi, Delhi"),
-    "cp": (28.6315, 77.2167, "Connaught Place, New Delhi, Delhi"),
-    "tilak nagar": (28.6365, 77.0965, "Tilak Nagar, New Delhi, Delhi"),
-    "okhla": (28.5320, 77.2721, "Okhla Industrial Area, New Delhi, Delhi"),
-    "cyber city": (28.4950, 77.0895, "DLF Cyber City, Gurugram, Haryana"),
-    "udyog vihar": (28.5024, 77.0818, "Udyog Vihar, Gurugram, Haryana"),
-    "noida sector 62": (28.6288, 77.3686, "Sector 62, Noida, Uttar Pradesh"),
-    "sector 62": (28.6288, 77.3686, "Sector 62, Noida, Uttar Pradesh"),
+    "connaught place": (28.6315, 77.2167), "cp": (28.6315, 77.2167), "tilak nagar": (28.6365, 77.0965),
+    "okhla": (28.5320, 77.2721), "cyber city": (28.4950, 77.0895), "udyog vihar": (28.5024, 77.0818),
+    "noida sector 62": (28.6288, 77.3686), "sector 62": (28.6288, 77.3686),
 
     # Hyderabad
-    "hitech city": (17.4435, 78.3772, "Hitech City, Hyderabad, Telangana"),
-    "hitec city": (17.4435, 78.3772, "Hitech City, Hyderabad, Telangana"),
-    "gachibowli": (17.4401, 78.3489, "Gachibowli, Hyderabad, Telangana"),
-    "madhapur": (17.4483, 78.3915, "Madhapur, Hyderabad, Telangana"),
-    "jubilee hills": (17.4326, 78.4071, "Jubilee Hills, Hyderabad, Telangana"),
+    "hitech city": (17.4435, 78.3772), "hitec city": (17.4435, 78.3772), "gachibowli": (17.4401, 78.3489),
+    "madhapur": (17.4483, 78.3915), "jubilee hills": (17.4326, 78.4071), "financial district": (17.4262, 78.3389),
+    "kondapur": (17.4682, 78.3619),
     
     # Pune
-    "baner": (18.5590, 73.7868, "Baner, Pune, Maharashtra"),
-    "hinjewadi": (18.5913, 73.7389, "Hinjewadi, Pune, Maharashtra"),
-    "kharadi": (18.5515, 73.9427, "Kharadi, Pune, Maharashtra"),
-    "viman nagar": (18.5679, 73.9143, "Viman Nagar, Pune, Maharashtra")
-}
-
-DEFAULT_CITY_LOCALITIES = {
-    "bengaluru": [
-        (12.9352, 77.6245, "Koramangala, Bengaluru, Karnataka", "No. 42, 4th Block, Koramangala, Bengaluru, Karnataka 560034"),
-        (12.9121, 77.6446, "HSR Layout, Bengaluru, Karnataka", "2nd Sector, HSR Layout, Bengaluru, Karnataka 560102"),
-        (12.9784, 77.6408, "Indiranagar, Bengaluru, Karnataka", "100 Feet Road, Indiranagar, Bengaluru, Karnataka 560038"),
-        (12.9698, 77.7500, "Whitefield, Bengaluru, Karnataka", "ITPL Main Road, Whitefield, Bengaluru, Karnataka 560066")
-    ],
-    "mumbai": [
-        (19.1155, 72.8777, "Andheri East, Mumbai, Maharashtra", "MIDC Industrial Area, Andheri East, Mumbai, Maharashtra 400093"),
-        (19.0657, 72.8687, "Bandra Kurla Complex, Mumbai, Maharashtra", "G Block, Bandra Kurla Complex, Mumbai, Maharashtra 400051"),
-        (19.1197, 72.9051, "Powai, Mumbai, Maharashtra", "Hiranandani Gardens, Powai, Mumbai, Maharashtra 400076")
-    ],
-    "delhi_ncr": [
-        (28.4950, 77.0895, "DLF Cyber City, Gurugram, Haryana", "DLF Cyber City, Sector 24, Gurugram, Haryana 122002"),
-        (28.6315, 77.2167, "Connaught Place, New Delhi, Delhi", "Connaught Place, New Delhi, Delhi 110001")
-    ],
-    "hyderabad": [
-        (17.4435, 78.3772, "Hitech City, Hyderabad, Telangana", "HITEC City, Madhapur, Hyderabad, Telangana 500081"),
-        (17.4401, 78.3489, "Gachibowli, Hyderabad, Telangana", "Gachibowli, Hyderabad, Telangana 500032")
-    ],
-    "other": [
-        (12.9352, 77.6245, "Koramangala, Bengaluru, Karnataka", "Koramangala, Bengaluru, Karnataka 560034")
-    ]
+    "baner": (18.5590, 73.7868), "hinjewadi": (18.5913, 73.7389), "kharadi": (18.5515, 73.9427),
+    "viman nagar": (18.5679, 73.9143), "koregaon park": (18.5362, 73.8940),
+    
+    # Chennai
+    "omr": (12.9229, 80.2319), "guindy": (13.0067, 80.2206), "t nagar": (13.0418, 80.2341),
+    "adyar": (13.0012, 80.2565), "velachery": (12.9815, 80.2180),
+    
+    # Kolkata
+    "salt lake": (22.5867, 88.4172), "sector v": (22.5786, 88.4357), "new town": (22.5958, 88.4795),
+    "rajarhat": (22.6200, 88.5100)
 }
 
 def has_word(kw, text):
@@ -170,7 +128,6 @@ def haversine(lat1, lng1, lat2, lng2):
     return R * c
 
 async def get_ws_browser_url():
-    """Poll json/version until Chrome debugging port is active."""
     for _ in range(15):
         try:
             res = requests.get("http://127.0.0.1:9333/json/version", timeout=2)
@@ -181,88 +138,35 @@ async def get_ws_browser_url():
         await asyncio.sleep(1)
     raise RuntimeError("Chrome debugging port 9333 is not active! Make sure Chrome launched successfully.")
 
-def clean_office_address(addr):
-    if not addr:
-        return ""
-    addr = re.sub(r"\xa0", " ", addr)
-    # Remove "...Read more", "Read more", "... Read more" with case insensitivity
-    addr = re.sub(r"\b(?:read\s+more|readmore)\b\.?$", "", addr, flags=re.IGNORECASE).strip()
-    addr = re.sub(r"\.{2,}\s*$", "", addr).strip() # strip trailing dots
-    addr = re.sub(r"\b(?:read\s+more|readmore)\b", "", addr, flags=re.IGNORECASE).strip()
-    addr = re.sub(r"\s+", " ", addr) # normalize spacing
-    return addr.strip()
+def parse_coords_from_dom(html):
+    """Extract GPS coordinates directly from Google Maps preview links inside the DOM."""
+    m = re.search(r'[@|ll=]([0-9]{1,2}\.[0-9]{4,}),([0-9]{1,3}\.[0-9]{4,})', html)
+    if m:
+        try:
+            lat, lng = float(m.group(1)), float(m.group(2))
+            if 6.0 <= lat <= 37.0 and 68.0 <= lng <= 98.0:
+                return lat, lng
+        except Exception:
+            pass
+    return None, None
 
-def parse_address_from_dom(html):
-    raw = _parse_raw_address_from_dom(html)
-    return clean_office_address(raw) if raw else None
-
-def _parse_raw_address_from_dom(html):
-    """
-    Extract address using 3 tiers of Google search elements:
-    Tier 1: SGE / AI Overview text
-    Tier 2: Knowledge Panel / Map card (Lrzca, kp-header)
-    Tier 3: Standard organic result snippets containing address indicators
-    """
-    soup = BeautifulSoup(html, "html.parser")
-    for element in soup(["script", "style"]):
-        element.decompose()
-    
-    # 1. AI Overview check (Tier 1)
-    # Search for common SGE class signatures or data attributes
-    ai_container = soup.find(attrs={"data-ai-overview": True}) or soup.find(class_=lambda c: c and "ai-overview" in c.lower())
-    if ai_container:
-        text = ai_container.get_text().strip()
-        # Find anything resembling a clean street address
-        m = re.search(r"((No\.|Plot|Building|Tower|Sector|Phase|Road|Street|Layout|Nagar|Marg|Block|Pincode|Pin).*?\d{6})", text, re.IGNORECASE | re.DOTALL)
-        if m:
-            return m.group(1).replace("\n", " ").strip()
-            
-    # 2. Google Map / Local Business panel check (Tier 2)
-    # Target address element class: Lrzca (standard Google local listing address container)
-    map_addr_el = soup.find(class_="Lrzca") or soup.find(attrs={"data-dtype": "d02addr"})
-    if map_addr_el:
-        addr_text = map_addr_el.get_text().strip()
-        if len(addr_text) > 10:
-            return addr_text
-            
-    # Search for text containing "Address:" followed by street text in panel
-    panel_texts = soup.find_all(string=re.compile(r"Address\s*:", re.IGNORECASE))
-    for t in panel_texts:
-        parent = t.parent
-        # Look for sibling text containing the address
-        sibling = parent.find_next_sibling()
-        if sibling:
-            sib_text = sibling.get_text().strip()
-            if len(sib_text) > 15:
-                return sib_text
-        parent_text = parent.get_text().strip()
-        if len(parent_text) > 20:
-            clean = re.sub(r"^Address\s*:\s*", "", parent_text, flags=re.IGNORECASE)
-            return clean
-
-    # 3. Standard Search Results (Tier 3)
-    # Organic snippet containers
-    snippets = []
-    for g in soup.find_all(class_="VwiC3b") or soup.find_all(class_=lambda c: c and "snippet" in c.lower()):
-        snippets.append(g.get_text().strip())
-    # Also fallback to general paragraph text containing address indicators
-    for kw in ["road", "sector", "phase", "nagar", "layout", "street", "building", "park", "pincode", "district"]:
-        for el in soup.find_all(string=re.compile(r"\b" + re.escape(kw) + r"\b", re.IGNORECASE)):
-            parent = el.parent
-            if parent and parent.name in ["span", "div", "p"] and len(parent.text) < 300:
-                snippets.append(parent.text.strip())
-                
-    # Filter snippets for address structure
-    for snip in snippets:
-        if any(m in snip.lower() for m in ["road", "rd", "nagar", "sector", "phase", "layout", "building", "tower", "floor", "park"]):
-            # Clean up boilerplate
-            clean = re.sub(r"^(address|headquarters|office|location|contact)\s*[:\-]?\s*", "", snip, flags=re.IGNORECASE)
-            # Truncate if too long
-            if len(clean) > 200:
-                clean = clean[:200] + "..."
-            return clean
-            
-    return None
+def geocode_arcgis(address):
+    """Fallback to free ArcGIS World Geocoding API on the exact full address string."""
+    if not address or len(address) < 5:
+        return None, None
+    url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates"
+    params = {"singleLine": address, "f": "json", "maxLocations": 1, "outFields": "Score"}
+    try:
+        r = requests.get(url, params=params, timeout=6).json()
+        candidates = r.get("candidates", [])
+        if candidates and candidates[0].get("score", 0) >= 70:
+            loc = candidates[0]["location"]
+            lat, lng = loc["y"], loc["x"]
+            if 6.0 <= lat <= 37.0 and 68.0 <= lng <= 98.0:
+                return round(lat, 7), round(lng, 7)
+    except Exception:
+        pass
+    return None, None
 
 async def heal_address_workflow(db_path=None, resume_index=0):
     if db_path is None:
@@ -274,17 +178,21 @@ async def heal_address_workflow(db_path=None, resume_index=0):
     
     ALL_DEFAULT_CENTERS = KNOWN_CENTERS
     
-    def is_center_tagged(lat, lng):
+    def is_center_tagged(lat, lng, exp_city):
         if not lat or not lng: return False
-        r = (round(lat, 6), round(lng, 6))
-        if r in ALL_DEFAULT_CENTERS: return True
+        r1 = (round(lat, 6), round(lng, 6))
+        r2 = (round(lat, 4), round(lng, 4))
+        if r1 in ALL_DEFAULT_CENTERS or r2 in ALL_DEFAULT_CENTERS: return True
         for clat, clng in ALL_DEFAULT_CENTERS:
+            if abs(lat - clat) < 0.003 and abs(lng - clng) < 0.003:
+                return True
+        if exp_city in CITY_CENTERS:
+            clat, clng = CITY_CENTERS[exp_city]
             if abs(lat - clat) < 0.005 and abs(lng - clng) < 0.005:
                 return True
         return False
 
-    # Launch Chrome once
-    profile_dir = "/Users/singhujwal/starup_visualizer/chrome_profile_healer"
+    profile_dir = os.path.expanduser("~/starup_visualizer/chrome_profile_healer")
     print(f"Launching headed Chrome process with profile: {profile_dir}")
     chrome_proc = subprocess.Popen([
         "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -301,7 +209,6 @@ async def heal_address_workflow(db_path=None, resume_index=0):
         ws_browser_url = await get_ws_browser_url()
         print("Connected to Chrome Debugging WebSocket!")
         
-        # Create a single tab target to reuse
         async with websockets.connect(ws_browser_url, max_size=None) as ws:
             cmd = {
                 "id": 1,
@@ -334,7 +241,7 @@ async def heal_address_workflow(db_path=None, resume_index=0):
                 if exp_city == "other":
                     continue
                 
-                # Rule 1 Check
+                # Rule 1 Check (outside city or mismatch)
                 is_r1 = False
                 if exp_city in CITY_MARKERS:
                     for other_c, kws in CITY_MARKERS.items():
@@ -350,121 +257,111 @@ async def heal_address_workflow(db_path=None, resume_index=0):
                         if haversine(lat, lng, clat, clng) > 80.0:
                             is_r1 = True
                 
-                # Rule 2 Check
-                is_r2 = is_center_tagged(lat, lng)
+                # Rule 2 Check (center of city tagging)
+                is_r2 = is_center_tagged(lat, lng, exp_city)
                 
-                if o.get("location_tagged") is True and not is_r1 and not is_r2:
+                if not is_r1 and not is_r2:
                     continue
                 
-                if is_r1 or is_r2:
-                    print(f"\n[HEAL] {s_name} ({o_city}) - violates Rule 1={is_r1}, Rule 2={is_r2}")
-                    
-                    # Search query
-                    query = f"{s_name} {o_city} office address"
-                    search_url = f"https://www.google.com/search?q={urllib.parse.quote(query)}"
-                    
-                    # Connect and parse HTML, handle Captcha
-                    extracted_addr = None
-                    try:
-                        async with websockets.connect(ws_page_url, max_size=None) as ws_page:
-                            # Navigate the reusable tab to the search URL via JavaScript
-                            navigate_cmd = {
-                                "id": 5,
+                print(f"\n[HEAL COORDS ONLY] {s_name} ({o_city}) - violates Rule 1={is_r1}, Rule 2={is_r2} | Full Address: \"{addr}\"")
+                
+                # Paste the full office address directly into the search bar
+                query = f"{s_name}, {addr}" if len(addr) < 35 and s_name.lower() not in addr.lower() else addr
+                search_url = f"https://www.google.com/search?q={urllib.parse.quote(query)}"
+                
+                dom_lat, dom_lng = None, None
+                try:
+                    async with websockets.connect(ws_page_url, max_size=None) as ws_page:
+                        navigate_cmd = {
+                            "id": 5,
+                            "method": "Runtime.evaluate",
+                            "params": {"expression": f"window.location.href = '{search_url}'"}
+                        }
+                        await ws_page.send(json.dumps(navigate_cmd))
+                        await ws_page.recv()
+                        
+                        captcha_detected_once = False
+                        for attempt in range(150):
+                            await asyncio.sleep(2)
+                            get_body = {
+                                "id": 2,
                                 "method": "Runtime.evaluate",
-                                "params": {"expression": f"window.location.href = '{search_url}'"}
+                                "params": {"expression": "document.body.innerText"}
                             }
-                            await ws_page.send(json.dumps(navigate_cmd))
-                            await ws_page.recv()
+                            await ws_page.send(json.dumps(get_body))
+                            resp = json.loads(await ws_page.recv())
+                            body_text = resp.get("result", {}).get("result", {}).get("value", "")
                             
-                            # Poll page state to wait for load or captcha solution
-                            captcha_detected_once = False
-                            max_normal_attempts = 12
-                            for attempt in range(300):
-                                await asyncio.sleep(2)
-                                # Evaluate body text
-                                get_body = {
-                                    "id": 2,
-                                    "method": "Runtime.evaluate",
-                                    "params": {"expression": "document.body.innerText"}
-                                }
-                                await ws_page.send(json.dumps(get_body))
-                                resp = json.loads(await ws_page.recv())
-                                body_text = resp.get("result", {}).get("result", {}).get("value", "")
-                                
-                                is_captcha = False
-                                if "our systems have detected unusual traffic" in body_text.lower():
-                                    is_captcha = True
-                                elif "about this page" in body_text.lower() and "unusual traffic" in body_text.lower():
-                                    is_captcha = True
-                                elif "verifying your request" in body_text.lower() and "do not refresh" in body_text.lower():
-                                    is_captcha = True
-                                    
-                                if is_captcha:
-                                    captcha_detected_once = True
-                                    print(f"!!! [CAPTCHA DETECTED] (preview: {repr(body_text[:120])}) Please solve the Google captcha in the opened Chrome window !!!")
-                                    continue
-                                
-                                # Fetch DOM HTML
-                                get_html = {
-                                    "id": 3,
-                                    "method": "Runtime.evaluate",
-                                    "params": {"expression": "document.documentElement.outerHTML"}
-                                }
-                                await ws_page.send(json.dumps(get_html))
-                                resp_html = json.loads(await ws_page.recv())
-                                page_html = resp_html.get("result", {}).get("result", {}).get("value", "")
-                                
-                                if page_html:
-                                    extracted_addr = parse_address_from_dom(page_html)
-                                    if extracted_addr:
-                                        print(f"Extracted address: {extracted_addr}")
-                                        break
-                                    elif "no results found" in body_text.lower():
-                                        break
-                                
-                                if not captcha_detected_once and attempt >= max_normal_attempts:
+                            is_captcha = any(kw in body_text.lower() for kw in ["our systems have detected unusual traffic", "unusual traffic", "verifying your request"])
+                            if is_captcha and ("do not refresh" in body_text.lower() or "unusual traffic" in body_text.lower()):
+                                captcha_detected_once = True
+                                print(f"!!! [CAPTCHA DETECTED] Please solve the Google captcha in the opened Chrome window !!!")
+                                continue
+                            
+                            get_html = {
+                                "id": 3,
+                                "method": "Runtime.evaluate",
+                                "params": {"expression": "document.documentElement.outerHTML"}
+                            }
+                            await ws_page.send(json.dumps(get_html))
+                            resp_html = json.loads(await ws_page.recv())
+                            page_html = resp_html.get("result", {}).get("result", {}).get("value", "")
+                            
+                            if page_html:
+                                dom_lat, dom_lng = parse_coords_from_dom(page_html)
+                                if dom_lat and dom_lng:
+                                    print(f"  -> Found GPS coordinates directly in Google Maps DOM: ({dom_lat}, {dom_lng})")
                                     break
-                                
-                    except Exception as e:
-                        print("Error during page communication:", e)
-                        
-                    # Apply healed data
-                    if extracted_addr:
-                        o["office_address"] = extracted_addr
-                        # Check locality in extracted address to geocode
-                        matched_gaz = False
-                        for loc_key, (new_lat, new_lng, clean_city_str) in LOCALITY_GAZETTEER.items():
-                            if re.search(r"\b" + re.escape(loc_key) + r"\b", extracted_addr.lower()):
-                                o["lat"] = new_lat
-                                o["lng"] = new_lng
-                                matched_gaz = True
+                                elif "no results found" in body_text.lower() or attempt >= 3:
+                                    break
+                            
+                            if not captcha_detected_once and attempt >= 5:
                                 break
-                        if not matched_gaz:
-                            # Assign fallback coordinates
-                            pool = DEFAULT_CITY_LOCALITIES.get(exp_city, DEFAULT_CITY_LOCALITIES["bengaluru"])
-                            lat_p, lng_p, clean_city_str, full_str = pool[(s.get("id", idx) + o_idx) % len(pool)]
-                            o["lat"], o["lng"] = lat_p, lng_p
-                    else:
-                        # Fallback tech-hub assignment
-                        pool = DEFAULT_CITY_LOCALITIES.get(exp_city, DEFAULT_CITY_LOCALITIES["bengaluru"])
-                        lat_p, lng_p, clean_city_str, full_str = pool[(s.get("id", idx) + o_idx) % len(pool)]
-                        o["lat"] = lat_p
-                        o["lng"] = lng_p
-                        o["office_address"] = f"{s_name} Office, {full_str}"
-                        
+                            
+                except Exception as e:
+                    print("Error during page communication:", e)
+                    
+                # NOTE: We NEVER touch or update o["office_address"]. It remains unchanged!
+                
+                # Coordinate resolution hierarchy (ONLY updating lat & lng)
+                resolved = False
+                if dom_lat and dom_lng:
+                    o["lat"], o["lng"] = round(dom_lat, 7), round(dom_lng, 7)
+                    resolved = True
+                    print(f"  -> Updated Coordinates via Google DOM: ({o['lat']}, {o['lng']})")
+                
+                if not resolved:
+                    # Tier 2: Call ArcGIS API on exact full address string
+                    arc_lat, arc_lng = geocode_arcgis(addr)
+                    if not arc_lat and len(addr) < 30:
+                        arc_lat, arc_lng = geocode_arcgis(f"{s_name}, {addr}")
+                    if arc_lat and arc_lng:
+                        o["lat"], o["lng"] = arc_lat, arc_lng
+                        resolved = True
+                        print(f"  -> Updated Coordinates via ArcGIS API: ({o['lat']}, {o['lng']})")
+
+                if not resolved:
+                    # Tier 3: Check Locality Gazetteer against full address string
+                    for loc_key, (new_lat, new_lng) in LOCALITY_GAZETTEER.items():
+                        if re.search(r"\b" + re.escape(loc_key) + r"\b", addr.lower()):
+                            o["lat"], o["lng"] = new_lat, new_lng
+                            resolved = True
+                            print(f"  -> Updated Coordinates via Locality Gazetteer ('{loc_key}'): ({o['lat']}, {o['lng']})")
+                            break
+
+                if resolved:
                     o["location_tagged"] = True
                     healed_count += 1
+                else:
+                    print("  -> Could not resolve more precise coordinates from address. Leaving coordinates as is.")
+                
+                if healed_count % 5 == 0:
+                    db.save_db()
+                
+                delay = random.uniform(5.0, 9.0)
+                print(f"Waiting {delay:.2f} seconds before next search query...")
+                await asyncio.sleep(delay)
                     
-                    # Save DB periodically to prevent loss of progress
-                    if healed_count % 10 == 0:
-                        db.save_db()
-                    
-                    # Randomized delay between queries to prevent Google CAPTCHA rate limits
-                    delay = random.uniform(8.0, 15.0)
-                    print(f"Waiting {delay:.2f} seconds before next search query...")
-                    await asyncio.sleep(delay)
-                        
-        # Close the reusable tab target at the end
         try:
             async with websockets.connect(ws_browser_url, max_size=None) as ws:
                 cmd_close = {
@@ -478,10 +375,9 @@ async def heal_address_workflow(db_path=None, resume_index=0):
             pass
 
         db.save_db()
-        print(f"\n=== ADDRESS HEALING COMPLETED ===")
-        print(f"Total offices healed: {healed_count}")
+        print(f"\n=== COORDINATE HEALING COMPLETED (NO ADDRESSES WERE MODIFIED) ===")
+        print(f"Total office coordinates updated: {healed_count}")
         
-        # Synchronize database to static public folder
         public_db_path = os.path.join(PROJECT_ROOT, "public", "static", "data", "startups.json")
         os.makedirs(os.path.dirname(public_db_path), exist_ok=True)
         shutil.copy2(db_path, public_db_path)
