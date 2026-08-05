@@ -600,8 +600,21 @@ export function _processOpenStartup(fullStartup) {
         const id = fullStartup.id;
         console.log('[DEBUG _processOpenStartup] id=' + id + ' state.currentSelectedId=' + state.currentSelectedId);
         const idx = state.startupsData.findIndex(s => s.id === id);
-        if (idx !== -1) state.startupsData[idx] = fullStartup;
-        else state.startupsData.push(fullStartup);
+        if (idx !== -1) {
+            const existing = state.startupsData[idx];
+            state.startupsData[idx] = { 
+                ...existing, 
+                ...fullStartup, 
+                lat: fullStartup.lat ?? (fullStartup.offices?.[0]?.lat ?? existing.lat),
+                lng: fullStartup.lng ?? (fullStartup.offices?.[0]?.lng ?? existing.lng),
+                orig_lat: existing.orig_lat ?? (fullStartup.lat ?? existing.lat),
+                orig_lng: existing.orig_lng ?? (fullStartup.lng ?? existing.lng)
+            };
+        } else {
+            fullStartup.lat = fullStartup.lat ?? (fullStartup.offices?.[0]?.lat ?? 12.9716);
+            fullStartup.lng = fullStartup.lng ?? (fullStartup.offices?.[0]?.lng ?? 77.5946);
+            state.startupsData.push(fullStartup);
+        }
 
         if (state.tempRemoteMarker) {
             state.tempRemoteMarker.remove();
@@ -613,7 +626,8 @@ export function _processOpenStartup(fullStartup) {
             window.location.hash = `company_id=${id}`;
         }
 
-        let flyCenter = [fullStartup.lng || 77.5946, fullStartup.lat || 12.9716];
+        const activeStartup = idx !== -1 ? state.startupsData[idx] : fullStartup;
+        let flyCenter = [activeStartup.lng || 77.5946, activeStartup.lat || 12.9716];
         let flyZoom = 16;
 
         lockProgrammaticMove(2500);

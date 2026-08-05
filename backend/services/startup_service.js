@@ -1,5 +1,5 @@
 import * as config from '../config.js';
-import { safeFloat, checkHasPin, sanitizeString, sanitizeUrl, stripRedundant } from '../utils/validators.js';
+import { safeFloat, sanitizeString, sanitizeUrl, stripRedundant } from '../utils/validators.js';
 
 const COUNTRY_NAMES = new Set(['india', 'in', 'usa', 'us', 'united states', 'america', 'uk', 'united kingdom', 'gb', 'great britain']);
 
@@ -34,7 +34,6 @@ export async function loadStartups() {
     
     for (const s of data) {
       if (typeof s !== 'object') continue;
-      s.has_pin = checkHasPin(s);
       for (const fKey of ["name", "city", "description", "industry", "funding_stage", "total_raised", "verified_email"]) {
         if (fKey in s) s[fKey] = sanitizeString(s[fKey]);
       }
@@ -297,7 +296,7 @@ export function formatStartupSummary(s) {
     logo_url: logoUrl,
     url: website,
     description: sanitizeString(s.description).substring(0, 120),
-    has_pin: s.has_pin !== false,
+    
     industry: sanitizeString(s.industry),
     head_count: s.head_count,
     logo_domain: logoDomain,
@@ -315,6 +314,10 @@ export function formatStartupSummary(s) {
 
 export function formatStartupDetails(s) {
   const sCopy = { ...s };
+  const latVal = safeFloat(sCopy.lat) !== null ? safeFloat(sCopy.lat) : (sCopy.offices && sCopy.offices[0] ? safeFloat(sCopy.offices[0].lat) : null);
+  const lngVal = safeFloat(sCopy.lng) !== null ? safeFloat(sCopy.lng) : (sCopy.offices && sCopy.offices[0] ? safeFloat(sCopy.offices[0].lng) : null);
+  sCopy.lat = latVal !== null ? latVal : config.DEFAULT_MAP_CENTER_LAT;
+  sCopy.lng = lngVal !== null ? lngVal : config.DEFAULT_MAP_CENTER_LNG;
   for (const field of ["name", "city", "description", "industry", "funding_stage", "total_raised", "verified_email"]) {
     if (field in sCopy) sCopy[field] = sanitizeString(sCopy[field]);
   }
@@ -396,7 +399,6 @@ export function formatLightweightSummary(s) {
       source: sanitizeString(j.source),
       url: sanitizeUrl(j.url || j.job_url)
     })),
-    has_pin: s.has_pin !== false,
     head_count: s.head_count,
     funding_stage: sanitizeString(s.funding_stage || "Seed / Active"),
     verified_email: sanitizeString(s.verified_email),
@@ -427,7 +429,6 @@ export async function loadStartupsFromAssets(assetsBinding) {
   
   for (const s of data) {
     if (typeof s !== 'object') continue;
-    s.has_pin = checkHasPin(s);
     for (const fKey of ["name", "city", "description", "industry", "funding_stage", "total_raised", "verified_email"]) {
       if (fKey in s) s[fKey] = sanitizeString(s[fKey]);
     }

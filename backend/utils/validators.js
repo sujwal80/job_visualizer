@@ -28,10 +28,6 @@ export function safeFloat(val, defaultVal = null) {
   return f;
 }
 
-export function checkHasPin(s) {
-  return true;
-}
-
 export function sanitizeUrl(url) {
   if (!url || typeof url !== 'string') return "";
   const urlClean = url.trim();
