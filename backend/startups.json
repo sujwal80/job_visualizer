@@ -5045,7 +5045,7 @@
     "offices": [
       {
         "city": "Kolkata, West Bengal",
-        "office_address": "AdventzInfinity5,UnitNo.609,plotNo.5,BlockBN,Sector5,SaltLake, Kolkata, kolkata, West Bengal, India, 700091. Its corporate identification number is (CIN) U72900WB2019PTC234235 and its current status is Active.",
+        "office_address": "AdventzInfinity5, Unit No. 609, Plot No. 5, Block BN, Sector 5, Salt Lake, Kolkata, West Bengal 700091",
         "lat": 22.5753205,
         "lng": 88.3600377,
         "is_hq": true,
@@ -6911,9 +6911,9 @@
     "offices": [
       {
         "city": "Bengaluru, Karnataka",
-        "office_address": "MediBuddy is headquartered in Bengaluru, Tower C, 6th Floor, IBC Knowledge Park, 4/1 Bannerghatta Road, India, and has 1 office location.",
-        "lat": 12.9327941,
-        "lng": 77.602333,
+        "office_address": "Tower C, 6th Floor, IBC Knowledge Park, 4/1 Bannerghatta Road, Bengaluru, Karnataka",
+        "lat": 12.9665616,
+        "lng": 77.7243892,
         "is_hq": true,
         "location_tagged": true
       }
@@ -23252,7 +23252,7 @@
     "offices": [
       {
         "city": "Mumbai, Maharashtra",
-        "office_address": "RYAN INTERNATIONAL location No. 52-D, 'Samrat', Office No:6, Ground Floor, Sir MV Road, Opposite Vishal Hall, Andheri (E), Mumbai, Maharashtra, 400069",
+        "office_address": "No. 52-D, 'Samrat', Office No. 6, Ground Floor, Sir MV Road, Opposite Vishal Hall, Andheri (E), Mumbai, Maharashtra 400069",
         "lat": 19.121585,
         "lng": 72.8526559,
         "is_hq": true,
@@ -34834,7 +34834,7 @@
     "offices": [
       {
         "city": "Hyderabad, Telangana",
-        "office_address": "Telangana, Others, 5TH FLOOR, OFFICE NO-145, WESTERN AQUA BUILDING, HITECH CITY, KONDAPUR, HYDERABDAD, Hyderabad, Telangana, 500084. location icon Locations on",
+        "office_address": "5th Floor, Office No-145, Western Aqua Building, Hitech City, Kondapur, Hyderabad, Telangana 500084",
         "lat": 17.360589,
         "lng": 78.4740613,
         "is_hq": false,
