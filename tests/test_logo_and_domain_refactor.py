@@ -5,6 +5,7 @@ import os
 from data_acquisition.utils.validation import is_blacklisted_domain, validate_logo_image, get_image_dimensions
 from data_acquisition.pipelines.tagging.logo_enricher import LogoEnricher
 from data_acquisition.db_manager import DBManager
+from data_acquisition.enrich_all_official_logos import get_logo_candidate_score, extract_linkedin_slug
 
 class TestLogoAndDomainRefactor(unittest.TestCase):
 
@@ -118,6 +119,32 @@ class TestLogoAndDomainRefactor(unittest.TestCase):
 
         clean_url, domain = db._clean_url_and_domain("https://mycompany.com/about")
         self.assertEqual(domain, "mycompany.com")
+
+    def test_get_logo_candidate_score_prioritizes_high_res(self):
+        """Test logo quality scoring hierarchy."""
+        # SVGs should outscore PNGs and favicons
+        svg_score = get_logo_candidate_score("https://mycompany.com/logo.svg", "svg_logo")
+        ln_score = get_logo_candidate_score("https://media.licdn.com/dms/image/v2/C560BAQHG/company-logo_200_200/0/1638200?e=1710", "linkedin_logo")
+        apple_score = get_logo_candidate_score("https://mycompany.com/apple-touch-icon.png", "apple_touch_icon")
+        google_score = get_logo_candidate_score("https://www.google.com/s2/favicons?domain=mycompany.com", "google_favicon")
+
+        self.assertGreater(svg_score, ln_score)
+        self.assertGreater(ln_score, apple_score)
+        self.assertGreater(apple_score, google_score)
+
+        # Junk banners should be scored as 0
+        banner_score = get_logo_candidate_score("https://mycompany.com/hero-banner-logo.png", "brand_img")
+        self.assertEqual(banner_score, 0)
+
+    def test_extract_linkedin_slug_from_jobs(self):
+        """Test extracting linkedin company slug from startup jobs or fields."""
+        startup_with_job = {
+            "name": "Acme Corp",
+            "job_openings": [
+                {"title": "SDE-1", "company_slug": "acme-corp-technologies"}
+            ]
+        }
+        self.assertEqual(extract_linkedin_slug(startup_with_job), "acme-corp-technologies")
 
 if __name__ == "__main__":
     unittest.main()

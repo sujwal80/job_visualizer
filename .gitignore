@@ -86,6 +86,7 @@ Thumbs.db
 .gemini/
 scratch/
 chrome_profile_healer/
+chrome_profile_guest/
 
 # Demo videos and media recordings
 *.webm

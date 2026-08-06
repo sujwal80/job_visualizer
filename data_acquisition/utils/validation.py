@@ -642,19 +642,22 @@ def validate_logo_image(logo_url, content_bytes=None, headers=None):
 
         # Extract target domain for favicon / unavatar services
         target_domain = netloc_domain
+        is_favicon_service = False
         if "google.com/s2/favicons" in logo_url:
             qs = urllib.parse.parse_qs(parsed.query)
             target_domain = qs.get("domain", [netloc_domain])[0]
+            is_favicon_service = True
         elif "unavatar.io" in logo_url:
             path_parts = parsed.path.strip('/').split('/')
             if path_parts and path_parts[0]:
                 target_domain = path_parts[0]
+            is_favicon_service = True
 
         # Domain blacklist check
         if is_blacklisted_domain(target_domain):
             return False
 
-        if is_blacklisted_domain(netloc_domain):
+        if not is_favicon_service and is_blacklisted_domain(netloc_domain):
             return False
 
         # SSRF Private IP protection
