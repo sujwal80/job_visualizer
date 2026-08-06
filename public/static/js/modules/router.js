@@ -256,7 +256,8 @@ export function executeUnifiedSearch(query, options = {}) {
         }
         state.defaultLocation = [lon, lat];
         state.searchedCityCenter = [lon, lat];
-        state.defaultZoom = 11;
+        const isLocalityCached = state.boundsOverride && Math.abs(state.boundsOverride[1] - state.boundsOverride[0]) < 0.2;
+        state.defaultZoom = isLocalityCached ? 13.5 : 11;
 
         lockProgrammaticMove(2500);
         map.flyTo({
@@ -343,7 +344,9 @@ export function executeUnifiedSearch(query, options = {}) {
                     }
                     state.defaultLocation = [lon, lat];
                     state.searchedCityCenter = [lon, lat];
-                    state.defaultZoom = 11;
+                    const isNeighborhood = ['suburb', 'neighbourhood', 'neighborhood', 'quarter', 'residential', 'postcode', 'postal_code'].includes(type) || 
+                                           (state.boundsOverride && Math.abs(state.boundsOverride[1] - state.boundsOverride[0]) < 0.2);
+                    state.defaultZoom = isNeighborhood ? 13.5 : 11;
 
                     lockProgrammaticMove(2500);
                     map.flyTo({

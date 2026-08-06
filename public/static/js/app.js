@@ -469,7 +469,7 @@ function fetchFilteredStartups(preventScroll = false) {
     }
 
     const isTestEnv = typeof navigator !== 'undefined' && navigator.webdriver;
-    if (state.searchedCity && !isTestEnv) {
+    if (state.searchedCity && !state.boundsOverride && !isTestEnv) {
         const cityKey = state.searchedCity.toLowerCase();
         if (state.cityCache.has(cityKey)) {
             const cached = state.cityCache.get(cityKey);
@@ -790,6 +790,8 @@ function checkStartupMatch(startup, searchText) {
     const name = (startup.name || '').toString().toLowerCase();
     const desc = (startup.description || '').toString().toLowerCase();
     const city = (startup.city || '').toString().toLowerCase();
+    const mainAddr = (startup.office_address || '').toString().toLowerCase();
+    const offAddrs = Array.isArray(startup.offices) ? startup.offices.map(o => (o.office_address || '').toLowerCase()) : [];
     const fNames = Array.isArray(startup.founder_names) ? startup.founder_names : [];
     const founders = Array.isArray(startup.founders) ? startup.founders : [];
     const jTitles = Array.isArray(startup.job_titles) ? startup.job_titles : [];
@@ -799,6 +801,8 @@ function checkStartupMatch(startup, searchText) {
         return name.includes(token) ||
             desc.includes(token) ||
             city.includes(token) ||
+            mainAddr.includes(token) ||
+            offAddrs.some(oa => oa.includes(token)) ||
             (Array.isArray(startup.skills) && startup.skills.some(s => (s || '').toString().toLowerCase().includes(token))) ||
             fNames.some(fn => (fn || '').toString().toLowerCase().includes(token)) ||
             founders.some(f => f && (f.name || '').toString().toLowerCase().includes(token)) ||

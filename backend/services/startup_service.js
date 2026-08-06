@@ -67,9 +67,13 @@ export async function loadStartups() {
   }
 }
 
-function matchesCityQuery(cityVal, cityQueryClean) {
-  if (!cityVal) return false;
-  const lowerCity = String(cityVal).toLowerCase();
+function matchesCityQuery(cityVal, cityQueryClean, addressVal = "") {
+  if (!cityVal && !addressVal) return false;
+  const lowerCity = String(cityVal || "").toLowerCase();
+  const lowerAddr = String(addressVal || "").toLowerCase();
+  
+  if (lowerAddr && lowerAddr.includes(cityQueryClean)) return true;
+  
   for (const [regionKey, synSet] of Object.entries(config.REGION_SYNONYM_MAP)) {
     if (synSet.has(cityQueryClean)) {
       let targetSyns = synSet;
@@ -78,14 +82,14 @@ function matchesCityQuery(cityVal, cityQueryClean) {
       }
       for (const syn of targetSyns) {
         const regex = new RegExp(`\\b${escapeRegExp(syn)}\\b`);
-        if (regex.test(lowerCity)) return true;
+        if (regex.test(lowerCity) || regex.test(lowerAddr)) return true;
       }
     }
   }
   const normalizedQuery = cityQueryClean.replace(/,\s*[a-z\s]+$/, '').trim();
   const compQuery = normalizedQuery.replace("bangalore", "bengaluru");
   const compCity = lowerCity.replace("bangalore", "bengaluru");
-  return compCity.includes(compQuery) || compCity.includes(cityQueryClean);
+  return compCity.includes(compQuery) || compCity.includes(cityQueryClean) || lowerAddr.includes(compQuery) || lowerAddr.includes(cityQueryClean);
 }
 
 export function filterAndSortStartups(startups, minLat, maxLat, minLng, maxLng, limit, options = {}) {
@@ -107,10 +111,14 @@ export function filterAndSortStartups(startups, minLat, maxLat, minLng, maxLng, 
       for (const off of offices) {
         const offLat = safeFloat(off.lat);
         const offLng = safeFloat(off.lng);
-        const effLat = offLat !== null ? offLat : config.DEFAULT_MAP_CENTER_LAT;
-        const effLng = offLng !== null ? offLng : config.DEFAULT_MAP_CENTER_LNG;
+        if (offLat === null || offLng === null) {
+          if (latSpan >= 1.0) {
+            matchedOffices.push(off);
+          }
+          continue;
+        }
         
-        if (effLat >= minLat && effLat <= maxLat && effLng >= minLng && effLng <= maxLng) {
+        if (offLat >= minLat && offLat <= maxLat && offLng >= minLng && offLng <= maxLng) {
           matchedOffices.push(off);
         }
       }
@@ -121,14 +129,17 @@ export function filterAndSortStartups(startups, minLat, maxLat, minLng, maxLng, 
     
     if (cityQuery) {
       const cityQueryClean = cityQuery.trim().toLowerCase();
-      const cityMatchedOffices = matchedOffices.filter(off => matchesCityQuery(off.city || s.city || s.location, cityQueryClean));
+      const cityMatchedOffices = matchedOffices.filter(off => 
+        matchesCityQuery(off.city || s.city || s.location, cityQueryClean, off.office_address || s.office_address || "")
+      );
       
       if (cityMatchedOffices.length > 0) {
         matchedOffices = cityMatchedOffices;
       } else {
         const jobs = s.job_openings || s.jobs || [];
         const hasJobInCity = jobs.some(j => matchesCityQuery(j.location || "", cityQueryClean));
-        if (!hasJobInCity && !matchesCityQuery(s.city || s.location, cityQueryClean)) {
+        const addrMatch = matchesCityQuery("", cityQueryClean, s.office_address || "");
+        if (!hasJobInCity && !matchesCityQuery(s.city || s.location, cityQueryClean) && !addrMatch) {
           continue;
         }
       }
@@ -162,8 +173,11 @@ export function filterAndSortStartups(startups, minLat, maxLat, minLng, maxLng, 
           const nameVal = (s.name || "").toLowerCase();
           const descVal = (s.description || "").toLowerCase();
           const cityVal = (s.city || s.location || "").toLowerCase();
+          const addrVal = (s.office_address || "").toLowerCase();
+          const offAddrs = (s.offices || []).map(o => (o.office_address || "").toLowerCase());
           
-          let tokenMatched = nameVal.includes(token) || descVal.includes(token) || cityVal.includes(token);
+          let tokenMatched = nameVal.includes(token) || descVal.includes(token) || cityVal.includes(token) ||
+                             addrVal.includes(token) || offAddrs.some(oa => oa.includes(token));
           
           if (!tokenMatched) {
             const sSkills = s.skills;
