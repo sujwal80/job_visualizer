@@ -23,10 +23,14 @@ import math
 import re
 import shutil
 import requests
-
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
+
+from dotenv import load_dotenv
+from data_acquisition.google_maps_client import get_google_geocode, print_quota_summary
+
+load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
 CITY_CENTERS = {
     "bengaluru": (12.9716, 77.5946),
@@ -227,12 +231,27 @@ def run_fast_geocoding():
             new_lat, new_lng = None, None
             source_engine = ""
 
-            # Tier 1: Esri ArcGIS on full address
-            new_lat, new_lng = geocode_arcgis(addr)
+            # Tier 1: Google Maps Geocoding API on full address (Cached & Quota Protected)
+            new_lat, new_lng = get_google_geocode(addr)
             if new_lat and new_lng and (not clat or haversine(new_lat, new_lng, clat, clng) <= 80.0):
-                source_engine = "Esri ArcGIS (Full Address)"
+                source_engine = "Google Maps Geocoding API"
 
-            # Tier 2: Esri ArcGIS on cleaned/simplified building address
+            # Tier 1b: Google Maps Geocoding API on simplified address (Cached & Quota Protected)
+            if not source_engine:
+                simplified = re.sub(r'\b(?:no\.|number|flat|door|unit|suite|room|cabin|floor|flr|plot|bldg|building|tower|wing)\s*[\w\d\-\/\&]+\b', '', addr, flags=re.I)
+                simplified = re.sub(r'\s+', ' ', simplified).strip(' ,.-')
+                if simplified and simplified != addr and len(simplified) > 5:
+                    new_lat, new_lng = get_google_geocode(simplified)
+                    if new_lat and new_lng and (not clat or haversine(new_lat, new_lng, clat, clng) <= 80.0):
+                        source_engine = "Google Maps Geocoding API (Simplified)"
+
+            # Tier 2: Esri ArcGIS on full address (free fallback)
+            if not source_engine:
+                new_lat, new_lng = geocode_arcgis(addr)
+                if new_lat and new_lng and (not clat or haversine(new_lat, new_lng, clat, clng) <= 80.0):
+                    source_engine = "Esri ArcGIS (Full Address)"
+
+            # Tier 3: Esri ArcGIS on cleaned/simplified building address (free fallback)
             if not source_engine:
                 simplified = re.sub(r'\b(?:no\.|number|flat|door|unit|suite|room|cabin|floor|flr|plot|bldg|building|tower|wing)\s*[\w\d\-\/\&]+\b', '', addr, flags=re.I)
                 simplified = re.sub(r'\s+', ' ', simplified).strip(' ,.-')
@@ -241,13 +260,13 @@ def run_fast_geocoding():
                     if new_lat and new_lng and (not clat or haversine(new_lat, new_lng, clat, clng) <= 80.0):
                         source_engine = "Esri ArcGIS (Simplified Landmark)"
 
-            # Tier 3: Photon Elasticsearch Geocoder
+            # Tier 4: Photon Elasticsearch Geocoder (free fallback)
             if not source_engine:
                 new_lat, new_lng = geocode_photon(addr)
                 if new_lat and new_lng and (not clat or haversine(new_lat, new_lng, clat, clng) <= 80.0):
                     source_engine = "Photon Komoot (Elasticsearch)"
 
-            # Tier 4: Locality Gazetteer lookup
+            # Tier 5: Locality Gazetteer lookup (instant local fallback)
             if not source_engine:
                 for loc_key, (g_lat, g_lng) in LOCALITY_GAZETTEER.items():
                     if re.search(r"\b" + re.escape(loc_key) + r"\b", addr.lower()):
@@ -263,7 +282,7 @@ def run_fast_geocoding():
             else:
                 print(f"  -> Could not improve precision beyond current coordinate. Retained ({lat}, {lng})")
 
-            time.sleep(0.3) # Fast 300ms pacing for courteous API usage
+            time.sleep(0.1)
 
     print(f"\n=== PRECISION GEOCODING COMPLETE ===")
     print(f"Flagged problematic detailed offices: {flagged_count}")
@@ -277,6 +296,8 @@ def run_fast_geocoding():
     os.makedirs(os.path.dirname(public_db_path), exist_ok=True)
     shutil.copy2(db_path, public_db_path)
     print(f"Synchronized database to: {public_db_path}")
+
+    print_quota_summary()
 
 if __name__ == "__main__":
     run_fast_geocoding()
