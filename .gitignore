@@ -95,3 +95,6 @@ chrome_profile_guest/
 # Unnecessary Markdown files (agent reports, handoffs, briefings, prompts)
 *.md
 !README.md
+# Whitelist documentation directory and all markdown files within it
+!documentation/
+!documentation/**
